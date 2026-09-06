@@ -6,7 +6,8 @@ from client.api import ApiClient
 from client.render import event_lines, hunt_summary, retreat_advice
 
 
-def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 5.0) -> None:
+def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 5.0,
+               render_status=None) -> None:
     console.print("[dim]掛機中。按 Enter 停止觀看（掛機在伺服器繼續）。[/dim]")
     stop = threading.Event()
 
@@ -25,6 +26,9 @@ def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 5.0) -> N
         except Exception as exc:
             console.print(f"[red]結算失敗：{exc}[/red]")
             break
+        if render_status is not None:
+            render_status(status)
+        console.print("[dim]掛機中。按 Enter 停止觀看（掛機在伺服器繼續）。[/dim]")
         for line in event_lines(status.get("events", [])):
             console.print(line)
         if status.get("retreated"):

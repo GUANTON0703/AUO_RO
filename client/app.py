@@ -117,20 +117,29 @@ def _do_hunt(api: ApiClient, character: dict, console: Console) -> None:
     if not maps:
         console.print("[yellow]還沒有解鎖的地圖。[/yellow]")
         return
-    for m in maps:
-        console.print(f"  {m.id}　{m.name}（解鎖 Lv {getattr(m, 'unlock_base_level', 1)}）")
-    map_id = Prompt.ask("去哪張圖（map_id）", choices=[m.id for m in maps])
+    map_id = _choose(
+        console,
+        "選擇狩獵地圖",
+        [(f"{m.name}（解鎖 Lv {getattr(m, 'unlock_base_level', 1)}）", m.id)
+         for m in maps],
+    )
+    if map_id is None:
+        return
     map_def = _content.maps[map_id]
-    for mid in map_def.monster_ids:
-        mon = _content.get_monster(mid)
-        console.print(f"  {mid}　{mon.name}　Lv {mon.level}")
-    monster_id = Prompt.ask("打哪種怪（monster_id，留空自動選）", default="")
+    monster_id = _choose(
+        console,
+        "選擇目標怪物",
+        [(f"{_content.get_monster(mid).name}（Lv {_content.get_monster(mid).level}）", mid)
+         for mid in map_def.monster_ids],
+    )
     try:
         api.hunt_start(map_id, monster_id or None)
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return
-    watch_hunt(api, console)
+    watch_hunt(api, console, render_status=lambda _status: _render_screen(
+        console, api, character, None
+    ))
 
 
 def _do_stop(api: ApiClient, console: Console) -> None:
@@ -193,7 +202,9 @@ def run(server_url: str) -> None:
             elif cmd in ("h", "hunt"):
                 _do_hunt(api, character, console)
             elif cmd in ("v", "watch"):
-                watch_hunt(api, console)
+                watch_hunt(api, console, render_status=lambda _status: _render_screen(
+                    console, api, character, None
+                ))
             elif cmd == "stop":
                 _do_stop(api, console)
             elif cmd in ("s", "status"):

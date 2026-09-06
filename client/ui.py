@@ -1,6 +1,12 @@
 from rich.console import Console
-from rich.prompt import Prompt
+from rich.prompt import Prompt as RichPrompt
 from rich.table import Table
+
+
+class Prompt:
+    """Local input adapter so menu prompts cannot monkeypatch the chooser."""
+
+    ask = staticmethod(RichPrompt.ask)
 
 
 def choose(console: Console, title: str, rows: list, *, allow_back: bool = True):

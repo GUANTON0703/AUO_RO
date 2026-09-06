@@ -3,7 +3,11 @@
     uv run python scripts/revamp_check.py
 """
 import tempfile
+import sys
 from datetime import datetime, timedelta
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient
 from rich.console import Console
@@ -12,6 +16,7 @@ from client.api import ApiClient
 from client.app import _merge_sheet, _render_screen
 from client.menus import stats_menu
 from client.render import retreat_advice
+from client.terminal import prepare_windows_console
 from server.app import create_app
 from server.db import connection
 
@@ -30,6 +35,7 @@ def _rewind(cid: int, seconds: int) -> None:
 
 
 def main() -> None:
+    prepare_windows_console()
     console = Console()
     db = tempfile.mktemp(suffix=".db")
     connection.configure(db)
@@ -59,7 +65,7 @@ def main() -> None:
 
     console.rule("3) 加點後掛機東門村郊 + rewind 40 秒看逐回合事件")
     fresh = next(r for r in api.list_characters() if r["id"] == cid)
-    api.allocate_stats(cid, {"str": 20, "vit": 15, "agi": 10})
+    api.allocate_stats(cid, {"str": 5, "vit": 3, "agi": 3})
     api.hunt_start("prontera_east_gate", "green_cotton_worm")
     _rewind(cid, 40)
     status = api.hunt_status()
