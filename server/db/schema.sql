@@ -73,3 +73,20 @@ CREATE TABLE IF NOT EXISTS character_equipment (
 );
 CREATE INDEX IF NOT EXISTS idx_char_items ON character_items(character_id);
 CREATE INDEX IF NOT EXISTS idx_char_equip ON character_equipment(character_id);
+
+CREATE TABLE IF NOT EXISTS account_items (
+    account_id INTEGER NOT NULL REFERENCES accounts(id),
+    item_id    TEXT NOT NULL,
+    qty        INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (account_id, item_id)
+);
+CREATE TABLE IF NOT EXISTS account_equipment (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id   INTEGER NOT NULL REFERENCES accounts(id),
+    equipment_id TEXT NOT NULL,
+    refine       INTEGER NOT NULL DEFAULT 0,
+    card_ids     TEXT NOT NULL DEFAULT '[]',
+    acquired_at  TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_account_items ON account_items(account_id);
+CREATE INDEX IF NOT EXISTS idx_account_equip ON account_equipment(account_id);
