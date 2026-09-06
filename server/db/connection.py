@@ -52,9 +52,9 @@ def transaction():
     try:
         conn.execute("BEGIN IMMEDIATE")
         yield conn
-        conn.execute("COMMIT")
+        conn.commit()
     except Exception:
-        conn.execute("ROLLBACK")
+        conn.rollback()  # 沒有進行中的交易時是 no-op，不會蓋掉原始例外
         raise
     finally:
         conn.close()

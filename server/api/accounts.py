@@ -28,6 +28,10 @@ class TokenResponse(BaseModel):
 
 @router.post("/accounts", status_code=201, response_model=AccountPublic)
 def register(body: RegisterRequest):
+    # 便宜的預檢：擋掉明顯無效的邀請碼，避免對未驗證請求做昂貴的密碼雜湊。
+    # 交易內還有一次權威檢查，並發安全性不靠這行。
+    if not invites.is_available(body.invite_code):
+        raise HTTPException(status_code=400, detail="邀請碼無效或已被使用")
     try:
         account_id = accounts_repo.register_with_invite(
             body.username, passwords.hash_password(body.password), body.invite_code
