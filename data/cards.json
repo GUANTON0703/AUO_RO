@@ -15,5 +15,17 @@
   {"id": "queen_bee_card", "name": "蜂后卡片", "monster_id": "queen_bee", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 30}, {"type": "flat_stat", "stat": "aspd", "amount": 5}]},
   {"id": "forest_guardian_card", "name": "森林守衛卡片", "monster_id": "forest_guardian", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "percent_stat", "stat": "defense", "pct": 20}]},
   {"id": "choco_monkey_card", "name": "巧克猴卡片", "monster_id": "choco_monkey", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "demihuman", "pct": 20}]},
-  {"id": "curly_boar_king_card", "name": "卷鬃山豬王卡片", "monster_id": "curly_boar_king", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 15}]}
+  {"id": "curly_boar_king_card", "name": "卷鬃山豬王卡片", "monster_id": "curly_boar_king", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 15}]},
+
+  {"id": "mole_card", "name": "土撥鼠卡片", "monster_id": "mole", "slot": "shoes", "drop_rate": 0.003, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 2}, {"type": "flat_stat", "stat": "max_hp", "amount": 40}]},
+  {"id": "clay_monster_card", "name": "泥怪卡片", "monster_id": "clay_monster", "slot": "armor", "drop_rate": 0.003, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 5}]},
+  {"id": "drop_poring_card", "name": "水滴波利卡片", "monster_id": "drop_poring", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "water", "pct": 15}]},
+  {"id": "locust_card", "name": "蝗蟲卡片", "monster_id": "locust", "slot": "weapon", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "aspd", "amount": 4}]},
+  {"id": "bigfoot_bear_card", "name": "大腳熊卡片", "monster_id": "bigfoot_bear", "slot": "weapon", "drop_rate": 0.003, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 20}]},
+  {"id": "ghost_poring_card", "name": "幽靈波利卡片", "monster_id": "ghost_poring", "slot": "garment", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "shadow", "pct": 15}]},
+  {"id": "poison_spore_card", "name": "毒魔菇卡片", "monster_id": "poison_spore", "slot": "accessory", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "poison", "pct": 20}]},
+  {"id": "mandragora_card", "name": "曼陀羅魔花卡片", "monster_id": "mandragora", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "shadow", "pct": 10}, {"type": "flat_stat", "stat": "mdef", "amount": 5}]},
+
+  {"id": "raging_bigfoot_card", "name": "狂暴大腳熊卡片", "monster_id": "raging_bigfoot", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "animal", "pct": 20}, {"type": "flat_stat", "stat": "atk", "amount": 15}]},
+  {"id": "golden_bug_king_card", "name": "黃金蟲王卡片", "monster_id": "golden_bug_king", "slot": "accessory", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "insect", "pct": 20}]}
 ]

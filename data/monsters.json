@@ -267,5 +267,537 @@
     ],
     "is_mvp": false,
     "lore": ""
+  },
+  {
+    "id": "bee_soldier",
+    "name": "蜂兵",
+    "level": 14,
+    "element": "wind",
+    "race": "insect",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 136,
+    "job_exp": 68,
+    "stats": {"max_hp": 347, "max_sp": 0, "atk": 36, "matk": 20, "defense": 0, "mdef": 4, "hit": 15, "flee": 23, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.4},
+      {"item_id": "fluff", "rate": 0.3},
+      {"item_id": "red_potion", "rate": 0.1}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "poison_snail",
+    "name": "毒紋蝸牛",
+    "level": 18,
+    "element": "water",
+    "race": "insect",
+    "size": "medium",
+    "role": "tank",
+    "base_exp": 265,
+    "job_exp": 132,
+    "stats": {"max_hp": 1245, "max_sp": 0, "atk": 27, "matk": 25, "defense": 16, "mdef": 5, "hit": 19, "flee": 16, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.6},
+      {"item_id": "jellopy", "rate": 0.35},
+      {"item_id": "clover", "rate": 0.1}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "mole",
+    "name": "土撥鼠",
+    "level": 16,
+    "element": "earth",
+    "race": "animal",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 169,
+    "job_exp": 84,
+    "stats": {"max_hp": 590, "max_sp": 0, "atk": 31, "matk": 22, "defense": 5, "mdef": 5, "hit": 17, "flee": 21, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fluff", "rate": 0.4},
+      {"item_id": "clover", "rate": 0.2},
+      {"item_id": "mole_card", "rate": 0.003}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "red_bat",
+    "name": "紅蝙蝠",
+    "level": 17,
+    "element": "fire",
+    "race": "animal",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 186,
+    "job_exp": 93,
+    "stats": {"max_hp": 448, "max_sp": 0, "atk": 42, "matk": 23, "defense": 0, "mdef": 5, "hit": 18, "flee": 26, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fluff", "rate": 0.45},
+      {"item_id": "feather", "rate": 0.3},
+      {"item_id": "red_potion", "rate": 0.12}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "minion_miner",
+    "name": "礦工魔",
+    "level": 19,
+    "element": "earth",
+    "race": "demihuman",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 222,
+    "job_exp": 111,
+    "stats": {"max_hp": 745, "max_sp": 0, "atk": 35, "matk": 26, "defense": 6, "mdef": 6, "hit": 20, "flee": 24, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "jellopy", "rate": 0.4},
+      {"item_id": "oridecon", "rate": 0.05},
+      {"item_id": "blade", "rate": 0.04}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "miner_foreman",
+    "name": "礦工工頭",
+    "level": 20,
+    "element": "earth",
+    "race": "demihuman",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 313,
+    "job_exp": 156,
+    "stats": {"max_hp": 1440, "max_sp": 0, "atk": 30, "matk": 27, "defense": 18, "mdef": 6, "hit": 21, "flee": 18, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "oridecon", "rate": 0.08},
+      {"item_id": "elunium", "rate": 0.05},
+      {"item_id": "ring", "rate": 0.04}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "clay_doll",
+    "name": "泥人",
+    "level": 22,
+    "element": "water",
+    "race": "formless",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 281,
+    "job_exp": 140,
+    "stats": {"max_hp": 916, "max_sp": 0, "atk": 40, "matk": 29, "defense": 7, "mdef": 7, "hit": 23, "flee": 27, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.5},
+      {"item_id": "clover", "rate": 0.2},
+      {"item_id": "blue_potion", "rate": 0.03}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "clay_monster",
+    "name": "泥怪",
+    "level": 23,
+    "element": "water",
+    "race": "formless",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 393,
+    "job_exp": 196,
+    "stats": {"max_hp": 1757, "max_sp": 0, "atk": 33, "matk": 31, "defense": 21, "mdef": 7, "hit": 24, "flee": 20, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.5},
+      {"item_id": "elunium", "rate": 0.06},
+      {"item_id": "clay_monster_card", "rate": 0.003}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "drop_poring",
+    "name": "水滴波利",
+    "level": 24,
+    "element": "water",
+    "race": "angel",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 323,
+    "job_exp": 162,
+    "stats": {"max_hp": 727, "max_sp": 0, "atk": 56, "matk": 32, "defense": 0, "mdef": 7, "hit": 25, "flee": 35, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "jellopy", "rate": 0.6},
+      {"item_id": "sticky_mucus", "rate": 0.4},
+      {"item_id": "drop_poring_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "locust",
+    "name": "蝗蟲",
+    "level": 25,
+    "element": "wind",
+    "race": "insect",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 345,
+    "job_exp": 172,
+    "stats": {"max_hp": 1102, "max_sp": 0, "atk": 45, "matk": 33, "defense": 8, "mdef": 8, "hit": 26, "flee": 30, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fluff", "rate": 0.4},
+      {"item_id": "feather", "rate": 0.3},
+      {"item_id": "locust_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "heavy_locust",
+    "name": "重金屬蝗蟲",
+    "level": 26,
+    "element": "wind",
+    "race": "insect",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 367,
+    "job_exp": 184,
+    "stats": {"max_hp": 1168, "max_sp": 0, "atk": 47, "matk": 34, "defense": 8, "mdef": 8, "hit": 27, "flee": 31, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "feather", "rate": 0.4},
+      {"item_id": "oridecon", "rate": 0.06},
+      {"item_id": "elunium", "rate": 0.04}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "pobopoli",
+    "name": "波波利",
+    "level": 27,
+    "element": "wind",
+    "race": "angel",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 390,
+    "job_exp": 195,
+    "stats": {"max_hp": 865, "max_sp": 0, "atk": 63, "matk": 35, "defense": 0, "mdef": 8, "hit": 28, "flee": 38, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "jellopy", "rate": 0.5},
+      {"item_id": "clover", "rate": 0.2},
+      {"item_id": "fly_wing", "rate": 0.1}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "ladybug",
+    "name": "瓢蟲",
+    "level": 31,
+    "element": "wind",
+    "race": "insect",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 487,
+    "job_exp": 244,
+    "stats": {"max_hp": 1067, "max_sp": 0, "atk": 71, "matk": 40, "defense": 0, "mdef": 9, "hit": 32, "flee": 43, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "feather", "rate": 0.4},
+      {"item_id": "clover", "rate": 0.2},
+      {"item_id": "red_potion", "rate": 0.15}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "cramy",
+    "name": "克瑞米",
+    "level": 32,
+    "element": "wind",
+    "race": "insect",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 512,
+    "job_exp": 256,
+    "stats": {"max_hp": 1121, "max_sp": 0, "atk": 73, "matk": 41, "defense": 0, "mdef": 10, "hit": 33, "flee": 44, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fluff", "rate": 0.4},
+      {"item_id": "feather", "rate": 0.3},
+      {"item_id": "clover", "rate": 0.15}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "forest_spirit",
+    "name": "森靈",
+    "level": 34,
+    "element": "earth",
+    "race": "formless",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 564,
+    "job_exp": 282,
+    "stats": {"max_hp": 1760, "max_sp": 0, "atk": 59, "matk": 44, "defense": 10, "mdef": 10, "hit": 35, "flee": 39, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "clover", "rate": 0.5},
+      {"item_id": "oridecon", "rate": 0.08},
+      {"item_id": "stunner", "rate": 0.04}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "bigfoot_bear",
+    "name": "大腳熊",
+    "level": 35,
+    "element": "fire",
+    "race": "animal",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 768,
+    "job_exp": 384,
+    "stats": {"max_hp": 3316, "max_sp": 0, "atk": 49, "matk": 45, "defense": 32, "mdef": 10, "hit": 36, "flee": 28, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fluff", "rate": 0.5},
+      {"item_id": "elunium", "rate": 0.08},
+      {"item_id": "bigfoot_bear_card", "rate": 0.003}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "white_ghost",
+    "name": "白幽靈",
+    "level": 37,
+    "element": "wind",
+    "race": "undead",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 646,
+    "job_exp": 323,
+    "stats": {"max_hp": 1408, "max_sp": 0, "atk": 83, "matk": 47, "defense": 0, "mdef": 11, "hit": 38, "flee": 50, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.35},
+      {"item_id": "oridecon", "rate": 0.08},
+      {"item_id": "hunter_bow", "rate": 0.04}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "ghost_poring",
+    "name": "幽靈波利",
+    "level": 38,
+    "element": "poison",
+    "race": "undead",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 674,
+    "job_exp": 337,
+    "stats": {"max_hp": 2100, "max_sp": 0, "atk": 66, "matk": 49, "defense": 11, "mdef": 11, "hit": 39, "flee": 43, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "jellopy", "rate": 0.5},
+      {"item_id": "sticky_mucus", "rate": 0.35},
+      {"item_id": "ghost_poring_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "white_rat",
+    "name": "白鼠",
+    "level": 39,
+    "element": "water",
+    "race": "animal",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 703,
+    "job_exp": 352,
+    "stats": {"max_hp": 1532, "max_sp": 0, "atk": 88, "matk": 50, "defense": 0, "mdef": 12, "hit": 40, "flee": 53, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fluff", "rate": 0.45},
+      {"item_id": "feather", "rate": 0.3},
+      {"item_id": "blue_potion", "rate": 0.05}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "blue_rat",
+    "name": "藍鼠",
+    "level": 40,
+    "element": "water",
+    "race": "animal",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 732,
+    "job_exp": 366,
+    "stats": {"max_hp": 2280, "max_sp": 0, "atk": 69, "matk": 51, "defense": 12, "mdef": 12, "hit": 41, "flee": 45, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fluff", "rate": 0.45},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "elunium", "rate": 0.06}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "familiar_thief_bug",
+    "name": "浮勒盜蟲",
+    "level": 42,
+    "element": "poison",
+    "race": "insect",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 791,
+    "job_exp": 396,
+    "stats": {"max_hp": 2468, "max_sp": 0, "atk": 72, "matk": 53, "defense": 13, "mdef": 13, "hit": 43, "flee": 47, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.5},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "jellopy", "rate": 0.4}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "poison_spore",
+    "name": "毒魔菇",
+    "level": 43,
+    "element": "poison",
+    "race": "demon",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 821,
+    "job_exp": 410,
+    "stats": {"max_hp": 2564, "max_sp": 0, "atk": 74, "matk": 55, "defense": 13, "mdef": 13, "hit": 44, "flee": 48, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.45},
+      {"item_id": "clover", "rate": 0.2},
+      {"item_id": "poison_spore_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "golden_bug",
+    "name": "黃金蟲",
+    "level": 45,
+    "element": "fire",
+    "race": "insect",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 1148,
+    "job_exp": 574,
+    "stats": {"max_hp": 4972, "max_sp": 0, "atk": 62, "matk": 57, "defense": 40, "mdef": 14, "hit": 46, "flee": 35, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "elunium", "rate": 0.12},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "jellopy", "rate": 0.5}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "mal_thief_bug",
+    "name": "瑪勒盜蟲",
+    "level": 45,
+    "element": "poison",
+    "race": "insect",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 883,
+    "job_exp": 442,
+    "stats": {"max_hp": 2762, "max_sp": 0, "atk": 77, "matk": 57, "defense": 14, "mdef": 14, "hit": 46, "flee": 50, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.5},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "feather", "rate": 0.3}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "mandragora",
+    "name": "曼陀羅魔花",
+    "level": 49,
+    "element": "shadow",
+    "race": "demon",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 1012,
+    "job_exp": 506,
+    "stats": {"max_hp": 3181, "max_sp": 0, "atk": 83, "matk": 62, "defense": 15, "mdef": 15, "hit": 50, "flee": 54, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "clover", "rate": 0.5},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "mandragora_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "evil_sunflower",
+    "name": "邪惡向日葵",
+    "level": 50,
+    "element": "holy",
+    "race": "plant",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 1360,
+    "job_exp": 680,
+    "stats": {"max_hp": 5922, "max_sp": 0, "atk": 68, "matk": 63, "defense": 45, "mdef": 15, "hit": 51, "flee": 38, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "clover", "rate": 0.55},
+      {"item_id": "elunium", "rate": 0.12},
+      {"item_id": "oridecon", "rate": 0.1}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "queen_scarab",
+    "name": "女王甲蟲",
+    "level": 44,
+    "element": "holy",
+    "race": "angel",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 852,
+    "job_exp": 426,
+    "stats": {"max_hp": 1864, "max_sp": 0, "atk": 98, "matk": 56, "defense": 0, "mdef": 13, "hit": 45, "flee": 59, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "feather", "rate": 0.4},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "clover", "rate": 0.2}
+    ],
+    "is_mvp": false,
+    "lore": ""
+  },
+  {
+    "id": "dragonfly",
+    "name": "龍蠅",
+    "level": 45,
+    "element": "water",
+    "race": "insect",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 883,
+    "job_exp": 442,
+    "stats": {"max_hp": 1934, "max_sp": 0, "atk": 100, "matk": 57, "defense": 0, "mdef": 14, "hit": 46, "flee": 60, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "feather", "rate": 0.45},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "fly_wing", "rate": 0.15}
+    ],
+    "is_mvp": false,
+    "lore": ""
   }
 ]

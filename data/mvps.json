@@ -130,5 +130,49 @@
       {"item_id": "elunium", "rate": 0.3}
     ],
     "lore": "帶領整個豬群的老王，捲曲的鬃毛下是刀槍不入的厚皮。"
+  },
+  {
+    "id": "raging_bigfoot",
+    "name": "狂暴大腳熊",
+    "level": 36,
+    "element": "fire",
+    "race": "animal",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 803,
+    "job_exp": 402,
+    "cooldown_hours": 12,
+    "home_map_id": "morroc_oasis",
+    "is_mvp": true,
+    "stats": {"max_hp": 23117, "max_sp": 0, "atk": 125, "matk": 65, "defense": 43, "mdef": 11, "hit": 56, "flee": 41, "aspd": 110, "crit": 5},
+    "drops": [
+      {"item_id": "raging_bigfoot_card", "rate": 0.03},
+      {"item_id": "hard_leather_armor", "rate": 0.12},
+      {"item_id": "choco_boots", "rate": 0.12},
+      {"item_id": "elunium", "rate": 0.3}
+    ],
+    "lore": "綠洲深處失控暴走的巨熊，被牠盯上的旅人沒有一個活著離開。"
+  },
+  {
+    "id": "golden_bug_king",
+    "name": "黃金蟲王",
+    "level": 45,
+    "element": "fire",
+    "race": "insect",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 1148,
+    "job_exp": 574,
+    "cooldown_hours": 24,
+    "home_map_id": "prontera_sewer",
+    "is_mvp": true,
+    "stats": {"max_hp": 33150, "max_sp": 0, "atk": 154, "matk": 80, "defense": 54, "mdef": 14, "hit": 69, "flee": 50, "aspd": 110, "crit": 5},
+    "drops": [
+      {"item_id": "golden_bug_king_card", "rate": 0.03},
+      {"item_id": "curly_horn_helm", "rate": 0.1},
+      {"item_id": "ring", "rate": 0.15},
+      {"item_id": "oridecon", "rate": 0.3}
+    ],
+    "lore": "下水道金光閃閃的蟲群之王，甲殼比精煉過的鋼還硬。"
   }
 ]
