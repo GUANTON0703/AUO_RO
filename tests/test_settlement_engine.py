@@ -155,3 +155,20 @@ def test_online_and_offline_expected_values_align():
     off = settle(hero, m, 3600, HuntConfig(), random.Random(1), offline=True, pity_in={})
     ratio = off.kills / max(1, on.kills)
     assert 0.4 < ratio < 0.85
+
+
+def test_online_settlement_includes_combat_events():
+    c = load_content()
+    r = settle(_hero(), c.get_monster("green_cotton_worm"), elapsed_seconds=40,
+               cfg=HuntConfig(), rng=random.Random(0), offline=False, pity_in={})
+    kinds = {e.kind for e in r.events}
+    assert "attack" in kinds or "skill" in kinds
+    assert "kill" in kinds
+    assert any(e.kind == "kill_batch" for e in r.events)
+
+
+def test_offline_settlement_has_no_per_round_events():
+    c = load_content()
+    r = settle(_hero(), c.get_monster("poring"), elapsed_seconds=3600,
+               cfg=HuntConfig(), rng=random.Random(0), offline=True, pity_in={})
+    assert not any(e.kind in ("attack", "skill") for e in r.events)

@@ -154,6 +154,7 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
     potions_left = potion_count
     potions_used = 0
     kills = 0
+    combat_events: list = []
     retreated = False
     reason = ""
     elapsed = 0.0
@@ -175,6 +176,7 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
         for s in p.skills:
             s._cd_left = 0
         r = simulate_fight(p, foe, rng)
+        combat_events.extend(r.events)
         elapsed += time_per_kill
         if r.winner == p.name:
             kills += 1
@@ -192,7 +194,7 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
     drops, pity_out = roll_drops(monster.drops, kills, rng, offline=False,
                                  pity_in=pity_in, cfg=cfg)
 
-    events: list = []
+    events: list = list(combat_events[-60:])
     if kills > 0:
         events.append(KillBatchEvent(monster.name, kills, base_exp, job_exp, zeny))
     events += _rare_drop_events(monster, drops, cfg)
