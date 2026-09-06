@@ -132,6 +132,8 @@ class EquipmentDef(BaseModel):
     card_slots: int = Field(default=0, ge=0, le=4)
     job_ids: list[str] = Field(default_factory=list)   # 空 = 全職可用
     required_level: int = Field(default=1, ge=1)
+    npc_buy: int | None = None    # NPC 售價（None = NPC 不賣）
+    npc_sell: int = Field(default=0, ge=0)
 
 
 class CardDef(BaseModel):

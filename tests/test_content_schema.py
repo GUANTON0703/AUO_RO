@@ -103,6 +103,15 @@ def test_equipment_slot_and_refine():
         job_ids=["novice", "swordman", "thief"], required_level=1,
     )
     assert e.refinable is True
+    assert e.npc_buy is None and e.npc_sell == 0
+
+    bought = EquipmentDef(
+        id="knife", name="小刀", slot="weapon", rarity="common",
+        stats={"atk": 17}, refinable=True, card_slots=1,
+        job_ids=["novice", "swordman", "thief"], required_level=1,
+        npc_buy=100, npc_sell=50,
+    )
+    assert bought.npc_buy == 100 and bought.npc_sell == 50
 
 
 def test_element_chart_multiplier_lookup():
