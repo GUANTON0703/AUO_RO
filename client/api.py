@@ -148,3 +148,49 @@ class ApiClient:
 
     def withdraw(self, **b):
         return self._req("POST", "/api/storage/withdraw", json=b)
+
+    # --- social: leaderboard ---
+    def leaderboard(self, by="base_level"):
+        return self._req("GET", "/api/leaderboard", params={"by": by})
+
+    # --- social: chat ---
+    def chat_post(self, channel, text):
+        return self._req("POST", "/api/chat", json={"channel": channel, "text": text})
+
+    def chat_since(self, channel, after=0):
+        return self._req("GET", "/api/chat", params={"channel": channel, "after": after})
+
+    # --- social: trade ---
+    def trade_offer(self, to_username):
+        return self._req("POST", "/api/trade/offer", json={"to_username": to_username})
+
+    def trade_put(self, tid, **kw):
+        return self._req("POST", f"/api/trade/{tid}/put", json=kw)
+
+    def trade_confirm(self, tid):
+        return self._req("POST", f"/api/trade/{tid}/confirm")
+
+    def trade_cancel(self, tid):
+        return self._req("POST", f"/api/trade/{tid}/cancel")
+
+    def trade_pending(self):
+        return self._req("GET", "/api/trade/pending")
+
+    def trade_get(self, tid):
+        return self._req("GET", f"/api/trade/{tid}")
+
+    # --- social: guild ---
+    def guild_create(self, name):
+        return self._req("POST", "/api/guild", json={"name": name})
+
+    def guild_join(self, gid):
+        return self._req("POST", f"/api/guild/{gid}/join")
+
+    def guild_leave(self):
+        return self._req("POST", "/api/guild/leave")
+
+    def guild_mine(self):
+        return self._req("GET", "/api/guild/mine")
+
+    def guild_list(self):
+        return self._req("GET", "/api/guild")
