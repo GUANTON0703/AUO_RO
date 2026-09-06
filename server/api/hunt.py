@@ -9,9 +9,10 @@ from pydantic import BaseModel
 from server.auth.dependencies import CurrentAccount
 from server.config import get_settings
 from server.content import load_content
-from server.progression import CharacterSnapshot, build_player_combatant
+from server.progression import CharacterSnapshot, EquippedPiece, build_player_combatant
 from server.progression.levels import apply_base_exp, apply_job_exp
 from server.repositories import characters as characters_repo
+from server.repositories import inventory
 from server.settlement import HuntConfig, settle
 
 router = APIRouter(prefix="/api/hunt", tags=["hunt"])
@@ -43,9 +44,32 @@ def _snapshot(row, *, hp=None, sp=None) -> CharacterSnapshot:
         base_level=row["base_level"], job_level=row["job_level"],
         stats={k: row[f"stat_{k}"] for k in _STAT_KEYS},
         learned_skills=json.loads(row["learned_skills"]),
-        equipped=[],
+        equipped=[
+            EquippedPiece(
+                equipment_id=e["equipment_id"], refine=e["refine"],
+                card_ids=list(e["card_ids"]),
+            )
+            for e in inventory.list_equipped(row["id"])
+        ],
         hp=hp, sp=sp,
     )
+
+
+def _pick_potion(character_id: int):
+    """回傳 (item_id, heal, qty)；沒有可用補品回 (None, 0, 0)。"""
+    inv = inventory.list_inventory(character_id)
+    best = (None, 0, 0)
+    for item_id, qty in inv["items"].items():
+        item = _content.items.get(item_id)
+        if item is None or item.kind != "consumable" or qty <= 0:
+            continue
+        heal = max(
+            (e.get("amount", 0) for e in item.effects if e.get("type") == "heal_hp"),
+            default=0,
+        )
+        if heal > best[1]:
+            best = (item_id, heal, qty)
+    return best
 
 
 def _pick_monster(map_def, base_level: int) -> str:
@@ -96,10 +120,13 @@ def _settle_current(row) -> dict:
     elapsed = max(0.0, (now - last).total_seconds())
     offline = elapsed > settings.online_grace_seconds
 
+    potion_id, potion_heal, potion_count = _pick_potion(row["id"])
+
     rng = random.Random(hash(row["hunt_last_settled_at"]) & 0xFFFFFFFF)
     result = settle(
         player, monster, elapsed, HuntConfig.from_settings(settings), rng,
-        offline=offline, pity_in=json.loads(row["hunt_pity"]), potion_count=0,
+        offline=offline, pity_in=json.loads(row["hunt_pity"]),
+        potion_item_id=potion_id, potion_heal=potion_heal, potion_count=potion_count,
     )
 
     new_bl, new_bexp, _ = apply_base_exp(row["base_level"], row["base_exp"], result.base_exp)
@@ -110,6 +137,9 @@ def _settle_current(row) -> dict:
         job_level=new_jl, job_exp=new_jexp, zeny_delta=result.zeny,
     )
     characters_repo.merge_hunt_loot(row["id"], result.drops, result.pity_out)
+    inventory.apply_drops(row["id"], result.drops)
+    if potion_id and result.potions_used:
+        inventory.consume_item(row["id"], potion_id, result.potions_used)
     characters_repo.update_hunt_progress(
         row["id"], hp=result.final_hp, sp=result.final_sp,
         last_settled_at=now.isoformat(),

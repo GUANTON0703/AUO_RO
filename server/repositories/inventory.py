@@ -111,6 +111,18 @@ def list_inventory(character_id: int) -> dict:
     return {"items": items, "equipment": equipment}
 
 
+def list_equipped(character_id: int) -> list[dict]:
+    with connection.get_connection() as conn:
+        return [
+            _equip_dict(r)
+            for r in conn.execute(
+                "SELECT * FROM character_equipment "
+                "WHERE character_id = ? AND equipped_slot IS NOT NULL ORDER BY id",
+                (character_id,),
+            ).fetchall()
+        ]
+
+
 def apply_drops(character_id: int, drops: dict) -> None:
     content = load_content()
     for item_id, qty in (drops or {}).items():

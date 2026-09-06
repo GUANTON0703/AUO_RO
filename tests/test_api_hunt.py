@@ -6,6 +6,30 @@ def _ready_char(client, headers, db_helpers, base_level=20):
     return ch
 
 
+def test_hunt_drops_go_to_inventory(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_south_field"})
+    db_helpers.rewind_hunt(ch["id"], seconds=3600)
+    client.get("/api/hunt/status", headers=h)
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert sum(inv["items"].values()) + len(inv["equipment"]) > 0
+
+
+def test_hunt_consumes_potions_from_inventory(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    db_helpers.set_stats(ch["id"], {"str": 55, "agi": 1, "vit": 1, "int": 1,
+                                    "dex": 30, "luk": 1})
+    db_helpers.give_item(ch["id"], "red_potion", 400)
+    client.post("/api/hunt/start", headers=h,
+                json={"map_id": "prontera_south_field", "monster_id": "bee_soldier"})
+    db_helpers.rewind_hunt(ch["id"], seconds=8 * 3600)
+    client.get("/api/hunt/status", headers=h)
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert inv["items"].get("red_potion", 200) < 200
+
+
 def test_start_hunt_validates_unlock_level(client, auth, db_helpers):
     _, headers, _ = auth
     _ready_char(client, headers, db_helpers, base_level=1)
