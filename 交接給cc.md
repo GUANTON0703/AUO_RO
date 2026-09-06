@@ -2,7 +2,15 @@
 
 最後更新：2026-09-07
 
-## 2026-09-07 掛機結算重構（未 commit，測試 358 passed，Codex LGTM）
+## 2026-09-07 第二批：GM 工具、主選單常駐面板、畫面修復（branch fix/hunt-settlement-decouple，370 passed，Codex LGTM）
+
+- **GM 選單**：GM 帳號登入後多 `g` 指令。調經驗/掉寶倍率、掛機參數（結算地板、勝率門檻，存 `server_settings` 表，`HuntConfig.from_settings` 讀）、給自己角色錢、設經驗值、查線上玩家。後端 `GET /api/me`（回 is_gm）、`PUT /api/admin/settings/hunt`、`GET /api/admin/settings`。
+- **主選單常駐**：掛機時右上角顯示掛機狀態面板；聊天訊息常駐中間（回主選單拉一次、顯示最近 8 條，切選單再回來不消失）。
+- **觀看畫面**：`Live` 改全螢幕緩衝區（修畫面被過高內容擠爆重複顯示）；掛機時間本地補間（不再每 15 秒才跳）；戰鬥紀錄去掉「擊殺 ×N」跟逐擊重複的那行；大批次（離線追趕）直接倒完不逐播。
+- **安全**：聊天名稱/內文、角色名做 rich markup escape（玩家送 `[/]` 會讓別人客戶端崩）；建角擋掉名稱含中括號。
+- 本機 `rotxt.db` 有測試帳號 `livetest1`（一般）、`livetest2`（已授 GM）。使用者原 GM 帳號 `1409313` 不受影響。
+
+## 2026-09-07 第一批：掛機結算重構（已 commit 到同一 branch，Codex LGTM）
 
 改了三個 bug + 一個架構調整：
 
