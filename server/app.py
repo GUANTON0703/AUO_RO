@@ -51,6 +51,10 @@ def create_app() -> FastAPI:
 
     app.include_router(leaderboard_router)
 
+    from server.api.chat import router as chat_router
+
+    app.include_router(chat_router)
+
     @app.get("/health")
     def health() -> dict:
         return {"status": "ok"}

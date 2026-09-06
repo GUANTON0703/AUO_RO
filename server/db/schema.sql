@@ -97,3 +97,13 @@ CREATE TABLE IF NOT EXISTS character_mvp_cooldowns (
     available_at TEXT NOT NULL,
     PRIMARY KEY (character_id, mvp_id)
 );
+
+CREATE TABLE IF NOT EXISTS chat_messages (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    channel        TEXT NOT NULL,
+    account_id     INTEGER REFERENCES accounts(id),
+    character_name TEXT NOT NULL,
+    text           TEXT NOT NULL,
+    created_at     TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_chat_channel ON chat_messages(channel, id);

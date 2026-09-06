@@ -1,0 +1,33 @@
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+
+from server.auth.dependencies import CurrentAccount
+from server.repositories import characters as characters_repo
+from server.repositories import chat as chat_repo
+
+router = APIRouter(prefix="/api/chat", tags=["chat"])
+
+
+class ChatRequest(BaseModel):
+    channel: str = Field(min_length=1, max_length=64)
+    text: str = Field(min_length=1, max_length=200)
+
+
+def _character_name(account_id: int) -> str:
+    rows = characters_repo.list_for_account(account_id)
+    if not rows:
+        raise HTTPException(status_code=404, detail="沒有角色")
+    return rows[0]["name"]
+
+
+@router.post("")
+def send_chat(body: ChatRequest, account_id: CurrentAccount):
+    name = _character_name(account_id)
+    if body.channel != "world":
+        raise HTTPException(status_code=400, detail="未知頻道")
+    return chat_repo.post(body.channel, account_id, name, body.text)
+
+
+@router.get("")
+def read_chat(account_id: CurrentAccount, channel: str = "world", after: int = 0):
+    return chat_repo.since(channel, after)
