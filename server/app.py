@@ -19,6 +19,10 @@ def create_app() -> FastAPI:
 
     app.include_router(accounts_router)
 
+    from server.api.characters import router as characters_router
+
+    app.include_router(characters_router)
+
     @app.get("/health")
     def health() -> dict:
         return {"status": "ok"}
