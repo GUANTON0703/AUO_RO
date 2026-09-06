@@ -92,27 +92,28 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
             max_kills = expected_before_death
             retreated, reason = True, "戰鬥中被擊倒"
 
-    # 2) 補品 / 血量能撐幾場。初始緩衝 = 現在血量掉到門檻前能吸收的傷害。
-    dmg = prof.avg_damage_taken
-    if dmg > 0:
+    # 2) 每場淨損 = 平均受傷 - 場間自然回血。淨損 <= 0 → 靠回血無限撐。
+    regen_per_fight = player.max_hp * cfg.hp_regen_frac_per_sec * time_per_kill
+    net_dmg = prof.avg_damage_taken - regen_per_fight
+    if net_dmg > 0:
         threshold_hp = player.max_hp * cfg.potion_hp_threshold
         buffer_hp = max(0.0, player.hp - threshold_hp)
         if potion_heal > 0 and potion_count > 0:
-            sustainable = int((buffer_hp + potion_count * potion_heal) / dmg)
+            sustainable = int((buffer_hp + potion_count * potion_heal) / net_dmg)
             if sustainable < max_kills:
                 max_kills = sustainable
                 retreated, reason = True, "補品用盡"
         else:
-            sustainable = int(player.hp / dmg)
+            sustainable = int(player.hp / net_dmg)
             if sustainable < max_kills:
                 max_kills = sustainable
                 retreated, reason = True, "沒有補品，血量見底"
 
     kills = max(0, max_kills)
-    if potion_heal > 0 and dmg > 0:
+    if potion_heal > 0 and net_dmg > 0:
         threshold_hp = player.max_hp * cfg.potion_hp_threshold
         buffer_hp = max(0.0, player.hp - threshold_hp)
-        healing_needed = max(0.0, kills * dmg - buffer_hp)
+        healing_needed = max(0.0, kills * net_dmg - buffer_hp)
         potions_used = min(potion_count, math.ceil(healing_needed / potion_heal))
     used_seconds = kills * time_per_kill
 
@@ -181,8 +182,9 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
             retreated, reason = True, "戰鬥中被擊倒"
             break
 
-        # 場間 SP 回復
+        # 場間 SP / HP 自然回復
         p.sp = min(p.max_sp, p.sp + round(cfg.sp_regen_per_sec * time_per_kill))
+        p.heal(round(p.max_hp * cfg.hp_regen_frac_per_sec * time_per_kill))
 
     base_exp = kills * monster.base_exp
     job_exp = kills * monster.job_exp
