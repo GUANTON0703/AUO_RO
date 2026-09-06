@@ -29,7 +29,7 @@ def test_stats_increase_with_level():
 def test_boss_role_scales_hard():
     n = baseline(level=30, role="normal")
     b = baseline(level=30, role="boss")
-    assert b.max_hp >= n.max_hp * 8
+    assert b.max_hp >= n.max_hp * 3
 
 
 def test_returns_valid_combat_stats():

@@ -81,6 +81,30 @@ def test_every_mvp_card_exists():
         assert card_ids, f"{mvp.id} 沒有掉自己的卡"
 
 
+def test_mvp_beatable_by_geared_same_level_player():
+    import random
+
+    from server.combat import simulate_fight
+    from server.combat.combatant import Combatant
+    from server.progression import (
+        CharacterSnapshot, EquippedPiece, build_player_combatant,
+    )
+    c = content.load_content()
+    for mvp in c.mvps.values():
+        lv = mvp.level
+        hero = build_player_combatant(CharacterSnapshot(
+            name="P", job_id="swordman", base_level=lv, job_level=min(lv, 50),
+            stats={"str": lv + 20, "agi": lv // 2, "vit": lv, "int": 5,
+                   "dex": lv, "luk": lv // 3},
+            learned_skills={"bash": 5},
+            equipped=[EquippedPiece("blade", 5, []), EquippedPiece("cotton_shirt", 5, [])],
+        ), c)
+        r = simulate_fight(hero, Combatant.from_monster(mvp), rng=random.Random(0),
+                           max_rounds=300)
+        assert r.winner == hero.name, f"{mvp.name} 同級養好的劍士打不贏"
+        assert 10 <= r.rounds <= 250, f"{mvp.name} 戰鬥 {r.rounds} 回合，不在合理範圍"
+
+
 def test_starter_weapon_per_job_buyable():
     c = content.load_content()
     weapons = [e for e in c.equipment.values() if e.slot == "weapon"]
