@@ -7,6 +7,8 @@ from server.auth.dependencies import CurrentAccount
 from server.config import get_settings
 from server.content import load_content
 from server.progression import CharacterSnapshot, EquippedPiece, build_player_combatant
+from server.progression.skills import skill_points_available
+from server.progression.stats import stat_points_available
 from server.repositories import characters as characters_repo
 from server.repositories import inventory
 from shared.models import CharacterPublic
@@ -35,8 +37,12 @@ def _to_public(row) -> CharacterPublic:
         stat_int=row["stat_int"],
         stat_dex=row["stat_dex"],
         stat_luk=row["stat_luk"],
-        stat_points=row["stat_points"],
-        skill_points=row["skill_points"],
+        stat_points=stat_points_available(
+            row["base_level"], {k: row[f"stat_{k}"] for k in _STAT_KEYS}
+        ),
+        skill_points=skill_points_available(
+            row["job_level"], json.loads(row["learned_skills"])
+        ),
         zeny=row["zeny"],
         location_map=row["location_map"],
         learned_skills=json.loads(row["learned_skills"]),

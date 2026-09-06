@@ -34,6 +34,12 @@ def _public(row) -> dict:
         "base_exp": row["base_exp"], "job_exp": row["job_exp"],
         "zeny": row["zeny"],
         **{f"stat_{k}": row[f"stat_{k}"] for k in STAT_KEYS},
+        "stat_points": stat_points_available(
+            row["base_level"], {k: row[f"stat_{k}"] for k in STAT_KEYS}
+        ),
+        "skill_points": skill_points_available(
+            row["job_level"], json.loads(row["learned_skills"])
+        ),
         "learned_skills": json.loads(row["learned_skills"]),
     }
 
