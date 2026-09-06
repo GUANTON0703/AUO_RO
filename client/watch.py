@@ -5,13 +5,18 @@ from rich.console import Console, Group
 from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
+from rich.text import Text
 
 from client.api import ApiClient, ApiError
 from client.render import event_lines, hunt_status_panel, hunt_summary, retreat_advice
 
+# 單一批次事件超過這個行數就不逐行播，直接倒完（離線追趕、長時間空窗）
+_BIG_BATCH_LINES = 20
+_HISTORY_CAP = 200
 
-def _frame(character_panel, status: dict, events: list):
-    hunt_panel = hunt_status_panel(status)
+
+def _frame(character_panel, status: dict, events: list, elapsed: float | None):
+    hunt_panel = hunt_status_panel(status, elapsed)
     if character_panel:
         top = Table.grid(expand=True)
         top.add_column(ratio=1)
@@ -40,14 +45,20 @@ def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 1.0,
 
     threading.Thread(target=_wait_enter, daemon=True).start()
 
-    history = []
-    pending = []
+    history: list = []
+    pending: list = []
     last_batch_id = None
     last_pop = time.monotonic()
-    last_status = {}
+    # 掛機時間本地補間：記住伺服器回的秒數與收到的時刻，畫面上自己往前跑
+    server_secs = 0.0
+    server_secs_at = time.monotonic()
+    last_status: dict = {}
     error = None
     no_hunt_message = None
-    with Live(console=console, refresh_per_second=4, transient=False) as live:
+    # 全螢幕緩衝區：畫面不會被過高的內容擠爆、離開時自動還原。
+    # 非終端機（測試錄製 console）時關掉，否則輸出抓不到。
+    use_screen = bool(getattr(console, "is_terminal", False))
+    with Live(console=console, refresh_per_second=4, screen=use_screen) as live:
         while True:
             try:
                 status = api.hunt_status()
@@ -62,18 +73,35 @@ def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 1.0,
                 break
             last_status = status
             character_panel = render_status(status) if render_status else None
+
             batch_id = status.get("batch_id")
             if batch_id is not None and batch_id != last_batch_id:
-                pending.extend(event_lines(status.get("events", [])))
                 last_batch_id = batch_id
+                server_secs = float(status.get("effective_seconds", 0) or 0)
+                server_secs_at = time.monotonic()
+                lines = event_lines(status.get("events", []))
+                if status.get("offline") or len(lines) > _BIG_BATCH_LINES:
+                    if status.get("offline"):
+                        history.append(Text(
+                            f"— 離線結算：擊殺 {status.get('kills', 0)}，"
+                            f"經驗 +{status.get('base_exp', 0)}/{status.get('job_exp', 0)}，"
+                            f"Zeny +{status.get('zeny', 0)} —", style="dim"))
+                    history.extend(lines)
+                    pending.clear()
+                else:
+                    pending.extend(lines)
+
             if pending and time.monotonic() - last_pop >= 1.0:
-                n = 5 if len(pending) > 30 else 1
-                history.extend(pending[:n])
-                del pending[:n]
+                history.append(pending.pop(0))
                 last_pop = time.monotonic()
-            live.update(_frame(character_panel, status, history), refresh=True)
+            if len(history) > _HISTORY_CAP:
+                del history[:-_HISTORY_CAP]
+
+            elapsed = server_secs + (time.monotonic() - server_secs_at)
+            live.update(_frame(character_panel, status, history, elapsed), refresh=True)
             if status.get("retreated") or stop.wait(poll_seconds):
                 break
+
     if no_hunt_message is not None:
         console.print(f"[yellow]{no_hunt_message}[/yellow]")
     elif error is not None:

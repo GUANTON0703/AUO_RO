@@ -109,9 +109,10 @@ def newbie_hint_panel() -> Panel:
     )
 
 
-def hunt_status_panel(status: dict) -> Panel:
+def hunt_status_panel(status: dict, elapsed_seconds: float | None = None) -> Panel:
     state = "撤退" if status.get("retreated") else "進行中"
     monster = status.get("monster_name") or status.get("monster_id", "未知")
+    secs = status.get("effective_seconds", 0) if elapsed_seconds is None else elapsed_seconds
     lines = [
         f"狀態：{state}",
         f"目標：{monster}",
@@ -119,7 +120,7 @@ def hunt_status_panel(status: dict) -> Panel:
         f"Base EXP：+{status.get('base_exp', 0)}",
         f"Job EXP：+{status.get('job_exp', 0)}",
         f"Zeny：+{status.get('zeny', 0)}",
-        f"掛機時間：{status.get('effective_seconds', 0):.0f} 秒",
+        f"掛機時間：{secs:.0f} 秒",
     ]
     return Panel("\n".join(lines), title="掛機狀態", expand=False)
 
@@ -144,8 +145,15 @@ _COMBAT_KINDS = {"attack", "skill", "fled"}
 def event_lines(events: list[dict], max_combat_lines: int = 20) -> list:
     out: list = []
     combat_idx: list[int] = []
+    # 有逐擊事件時，「擊殺 Y ×N」的批次摘要跟逐擊的「擊倒了 Y」重複，跳過摘要。
+    # 離線統計結算沒有逐擊事件，這時才靠 kill_batch 顯示成果。
+    has_blow_by_blow = any(
+        e.get("kind") in ("attack", "skill", "kill") for e in events
+    )
     for e in events:
         kind = e.get("kind")
+        if kind == "kill_batch" and has_blow_by_blow:
+            continue
         if kind == "attack":
             actor = e.get("actor", "?")
             target = e.get("target", "?")

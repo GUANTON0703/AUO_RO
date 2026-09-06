@@ -94,38 +94,55 @@ def _attack_batch(n, batch_id="b1", retreated=False):
     }
 
 
-def test_watch_drips_big_batch_not_all_at_once(monkeypatch):
+def test_watch_small_batch_drips_one_per_second(monkeypatch):
     _block_input(monkeypatch)
     monkeypatch.setattr(watch_mod.time, "monotonic", _stepping_clock())
-    # 25 事件，第 3 次輪詢就撤退 —— drip 每秒 1 行，來不及全出現
+    # 5 事件的小批次：第 2 次輪詢（撤退）前只吐得出一部分
     api = _FakeApi([
-        _attack_batch(25),
-        _attack_batch(25),
+        _attack_batch(5),
         {"batch_id": "b1", "events": [], "retreated": True,
          "retreat_reason": "補品用盡", "kills": 0, "base_exp": 0,
-         "job_exp": 0, "zeny": 0, "effective_seconds": 3},
+         "job_exp": 0, "zeny": 0, "effective_seconds": 2},
     ])
     con = Console(record=True, width=120)
     watch_hunt(api, con, poll_seconds=0.01)
     out = con.export_text()
-    shown = sum(1 for i in range(25) if str(1000 + i) in out)
-    assert shown < 25
+    shown = sum(1 for i in range(5) if str(1000 + i) in out)
+    assert 0 < shown < 5
 
 
-def test_watch_drips_big_batch_gradually(monkeypatch):
+def test_watch_big_batch_dumped_immediately(monkeypatch):
     _block_input(monkeypatch)
     monkeypatch.setattr(watch_mod.time, "monotonic", _stepping_clock())
-    statuses = [_attack_batch(25) for _ in range(40)]
-    statuses.append({"batch_id": "b1", "events": [], "retreated": True,
-                     "retreat_reason": "補品用盡", "kills": 0, "base_exp": 0,
-                     "job_exp": 0, "zeny": 0, "effective_seconds": 40})
-    api = _FakeApi(statuses)
+    # 25 事件的大批次：不逐播，第一次輪詢就全進 history（視窗顯示最後 10 行）
+    api = _FakeApi([
+        _attack_batch(25),
+        {"batch_id": "b1", "events": [], "retreated": True,
+         "retreat_reason": "補品用盡", "kills": 0, "base_exp": 0,
+         "job_exp": 0, "zeny": 0, "effective_seconds": 2},
+    ])
     con = Console(record=True, width=120)
-    watch_hunt(api, con, poll_seconds=0.001)
+    watch_hunt(api, con, poll_seconds=0.01)
     out = con.export_text()
-    # 給足夠輪詢後，整批 25 行最終都會出現（視窗只留最後 10 行，檢查尾段）
-    assert str(1000 + 24) in out
-    assert api.calls > 25
+    assert str(1000 + 24) in out  # 尾段（最後 10 行內）第一輪就看得到
+
+
+def test_watch_offline_batch_shows_summary(monkeypatch):
+    _block_input(monkeypatch)
+    monkeypatch.setattr(watch_mod.time, "monotonic", _stepping_clock())
+    api = _FakeApi([
+        {"batch_id": "b1", "retreated": False, "offline": True,
+         "kills": 42, "base_exp": 500, "job_exp": 250, "zeny": 99,
+         "events": [{"kind": "kill_batch", "monster_name": "波利", "count": 42,
+                     "base_exp": 500, "job_exp": 250, "zeny": 99}]},
+        {"batch_id": "b1", "events": [], "retreated": True,
+         "retreat_reason": "補品用盡", "kills": 42, "base_exp": 500,
+         "job_exp": 250, "zeny": 99, "effective_seconds": 9000},
+    ])
+    con = Console(record=True, width=120)
+    watch_hunt(api, con, poll_seconds=0.01)
+    out = con.export_text()
+    assert "離線結算" in out
 
 
 def test_watch_ignores_repeated_same_batch_id(monkeypatch):
