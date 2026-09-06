@@ -613,15 +613,15 @@ def gm_menu(api, character: dict, console: Console | None = None) -> None:
             return
         try:
             if action == "mult":
-                exp = _ask_float(console, "經驗倍率", s.get("experience_multiplier", 1.0))
-                drop = _ask_float(console, "掉寶倍率", s.get("drop_multiplier", 1.0))
+                exp = _ask_float(console, "經驗倍率", s["experience_multiplier"])
+                drop = _ask_float(console, "掉寶倍率", s["drop_multiplier"])
                 if exp is None or drop is None:
                     continue
                 api.admin_set_multipliers(exp, drop)
                 console.print("[green]已更新倍率[/green]")
             elif action == "hunt":
-                floor = _ask_float(console, "結算地板秒數", s.get("settle_floor_seconds", 15.0))
-                wr = _ask_float(console, "勝率門檻（0~1）", s.get("huntable_win_rate", 0.6))
+                floor = _ask_float(console, "結算地板秒數", s["settle_floor_seconds"])
+                wr = _ask_float(console, "勝率門檻（0~1）", s["huntable_win_rate"])
                 if floor is None or wr is None:
                     continue
                 api.admin_set_hunt(floor, wr)

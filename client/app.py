@@ -1,3 +1,5 @@
+import time
+
 import httpx
 from rich.console import Console, Group
 from rich.markup import escape
@@ -121,12 +123,20 @@ def _render_screen(console: Console, api: ApiClient, character: dict,
     char_panel = status_panel(_merge_sheet(api, _current_character(api, character)))
     hunt = _try_hunt_status(api)
     if hunt and not hunt.get("retreated"):
+        # 掛機時間本地補間：伺服器回的秒數變了就重新對時，沒變就自己往前跑，
+        # 這樣每次重繪畫面都看得到時間在動、不會像停住了
+        secs = float(hunt.get("effective_seconds", 0) or 0)
+        if secs != state.get("hunt_secs"):
+            state["hunt_secs"] = secs
+            state["hunt_secs_at"] = time.monotonic()
+        shown = state.get("hunt_secs", 0) + (time.monotonic() - state.get("hunt_secs_at", time.monotonic()))
         grid = Table.grid(expand=True)
         grid.add_column(ratio=1)
         grid.add_column(ratio=1)
-        grid.add_row(char_panel, hunt_status_panel(hunt))
+        grid.add_row(char_panel, hunt_status_panel(hunt, shown))
         console.print(grid)
     else:
+        state["hunt_secs"] = None
         console.print(char_panel)
 
     _refresh_chat(api, state)
