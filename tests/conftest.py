@@ -52,6 +52,17 @@ class _DbHelpers:
         from server.repositories import characters as repo
         repo.set_stats(character_id, stats)
 
+    def give_equipment(self, character_id, equipment_id):
+        from server.repositories import inventory
+        return inventory.add_equipment(character_id, equipment_id)
+
+    def give_item(self, character_id, item_id, qty):
+        from server.repositories import inventory
+        inventory.add_item(character_id, item_id, qty)
+
+    def set_zeny(self, character_id, amount):
+        self._exec("UPDATE characters SET zeny = ? WHERE id = ?", (amount, character_id))
+
     def rewind_hunt(self, character_id, seconds):
         with connection.get_connection() as conn:
             row = conn.execute(

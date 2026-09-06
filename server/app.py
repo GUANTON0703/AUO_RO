@@ -31,6 +31,10 @@ def create_app() -> FastAPI:
 
     app.include_router(hunt_router)
 
+    from server.api.inventory import router as inventory_router
+
+    app.include_router(inventory_router)
+
     @app.get("/health")
     def health() -> dict:
         return {"status": "ok"}
