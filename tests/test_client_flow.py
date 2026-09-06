@@ -470,9 +470,11 @@ def test_render_screen_shows_hunt_panel_when_hunting(monkeypatch):
                            "job_exp": 6, "zeny": 4, "effective_seconds": 90,
                            "retreated": False})
     con = Console(record=True, width=100)
-    app._render_screen(con, api, {"id": 1, "name": "阿獵"}, None, _state())
+    st = _state()
+    app._render_screen(con, api, {"id": 1, "name": "阿獵"}, None, st)
     out = con.export_text()
     assert "掛機狀態" in out and "綠棉蟲" in out
+    assert st["_hunting"] is True   # 掛機中旗標 → 主迴圈據此開自動重畫
 
 
 def test_render_screen_shows_recent_chat(monkeypatch):

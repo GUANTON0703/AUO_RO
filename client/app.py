@@ -1,3 +1,4 @@
+import sys
 import time
 
 import httpx
@@ -117,11 +118,70 @@ def _refresh_chat(api: ApiClient, state: dict) -> None:
     state["chat_seeded"] = True
 
 
+def _read_line_live(console: Console, redraw, refresh: float = 2.0) -> str:
+    """等待整行輸入的同時，每 refresh 秒重畫一次畫面（呼叫端已先畫過一次）。
+    掛機中主選單才用這個，讓數字看得到在動。
+    非互動終端機（管線、測試）直接退回一般 input，不做重畫。"""
+    if not sys.stdin.isatty():
+        return Prompt.ask("[cyan]>[/cyan]")
+    try:
+        import msvcrt
+    except ImportError:
+        msvcrt = None
+
+    if msvcrt is None:
+        import select
+        sys.stdout.write("> "); sys.stdout.flush()
+        last = time.monotonic()
+        while True:
+            r, _, _ = select.select([sys.stdin], [], [], 0.2)
+            if r:
+                line = sys.stdin.readline()
+                if line == "":
+                    raise EOFError
+                return line.rstrip("\n")
+            if time.monotonic() - last >= refresh:
+                redraw()
+                sys.stdout.write("> "); sys.stdout.flush()
+                last = time.monotonic()
+
+    buf = ""
+    last = time.monotonic()
+    sys.stdout.write("> "); sys.stdout.flush()
+    while True:
+        if msvcrt.kbhit():
+            ch = msvcrt.getwch()
+            if ch in ("\r", "\n"):
+                sys.stdout.write("\n"); sys.stdout.flush()
+                return buf
+            if ch == "\003":
+                raise KeyboardInterrupt
+            if ch == "\x04":            # Ctrl-D
+                raise EOFError
+            if ch in ("\x00", "\xe0"):   # 方向鍵等特殊鍵前綴，吃掉下一個
+                msvcrt.getwch()
+                continue
+            if ch in ("\b", "\x7f"):
+                if buf:
+                    buf = buf[:-1]
+                    sys.stdout.write("\b \b"); sys.stdout.flush()
+                continue
+            buf += ch
+            sys.stdout.write(ch); sys.stdout.flush()
+        else:
+            if time.monotonic() - last >= refresh:
+                redraw()
+                sys.stdout.write("> " + buf); sys.stdout.flush()
+                last = time.monotonic()
+            time.sleep(0.05)
+
+
 def _render_screen(console: Console, api: ApiClient, character: dict,
                    last_output, state: dict) -> None:
     console.clear()
     char_panel = status_panel(_merge_sheet(api, _current_character(api, character)))
     hunt = _try_hunt_status(api)
+    state["_hunting"] = bool(hunt and not hunt.get("retreated"))
     if hunt and not hunt.get("retreated"):
         # 掛機時間本地補間：伺服器回的秒數變了就重新對時，沒變就自己往前跑，
         # 這樣每次重繪畫面都看得到時間在動、不會像停住了
@@ -278,15 +338,23 @@ def run(server_url: str) -> None:
         menus["gm"] = gm_menu
 
     last_output = "[bold green]歡迎回來，" + character["name"] + "！[/bold green] 輸入指令代號或直接打字。"
-    while True:
+
+    def _draw():
         try:
             _render_screen(console, api, character, last_output, state)
         except Exception as exc:
             import traceback
             console.print(f"[red]畫面繪製出錯：{exc}[/red]")
             console.print(f"[dim]{traceback.format_exc()}[/dim]")
+
+    while True:
+        _draw()
         try:
-            cmd = Prompt.ask("[cyan]>[/cyan]").strip().lower()
+            if state.get("_hunting"):
+                # 掛機中：等指令時每 2 秒重畫，掛機時間 / 血量 / 經驗看得到在動
+                cmd = _read_line_live(console, _draw).strip().lower()
+            else:
+                cmd = Prompt.ask("[cyan]>[/cyan]").strip().lower()
         except (EOFError, KeyboardInterrupt):
             break
         if not cmd:
