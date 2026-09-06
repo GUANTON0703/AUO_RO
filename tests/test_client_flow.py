@@ -161,6 +161,38 @@ def test_shop_menu_buys(monkeypatch):
     assert ("buy", "red_potion", 5) in rec.calls
 
 
+def test_shop_menu_shows_chinese_sell_name_and_price(monkeypatch):
+    from client import menus
+    from rich.console import Console
+
+    class SellApi:
+        def __init__(self):
+            self.calls = []
+
+        def shop(self):
+            return {"items": [], "equipment": []}
+
+        def inventory(self, cid):
+            return {"items": {"red_potion": 3}, "equipment": []}
+
+        def sell(self, **kwargs):
+            self.calls.append(kwargs)
+            return {"ok": True, "gained": 50}
+
+    answers = iter(["2", "1"])
+    monkeypatch.setattr("client.ui.Prompt.ask", lambda *a, **k: next(answers))
+    monkeypatch.setattr(menus.IntPrompt, "ask", staticmethod(lambda *a, **k: 2))
+    api = SellApi()
+    con = Console(record=True, width=100)
+    menus.shop_menu(api, {"id": 1}, con)
+    out = con.export_text()
+    assert "紅色藥水" in out
+    assert "單價 25z" in out
+    assert "可得 75z" in out
+    assert "獲得 50 Zeny" in out
+    assert api.calls == [{"item_id": "red_potion", "qty": 2}]
+
+
 def test_refine_menu_calls_refine(monkeypatch):
     from client import menus, ui
     from rich.console import Console

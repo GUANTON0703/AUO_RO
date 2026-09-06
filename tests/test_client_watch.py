@@ -2,6 +2,7 @@ import builtins
 
 from rich.console import Console
 
+from client.api import ApiError
 from client import watch as watch_mod
 from client.watch import watch_hunt
 
@@ -51,3 +52,18 @@ def test_watch_handles_api_error(monkeypatch):
     con = Console(record=True, width=80)
     watch_hunt(_Boom(), con, poll_seconds=0.01)
     assert "結算失敗" in con.export_text()
+
+
+def test_watch_handles_no_active_hunt_as_normal_state(monkeypatch):
+    import time
+    monkeypatch.setattr(builtins, "input", lambda: time.sleep(10))
+
+    class _NoHunt:
+        def hunt_status(self):
+            raise ApiError(409, "目前沒有正在掛機")
+
+    con = Console(record=True, width=80)
+    watch_hunt(_NoHunt(), con, poll_seconds=0.01)
+    out = con.export_text()
+    assert "目前沒有正在掛機" in out
+    assert "結算失敗" not in out

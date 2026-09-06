@@ -39,6 +39,31 @@ def _eq_name(equipment_id: str) -> str:
     return eq.name if eq else equipment_id
 
 
+def _item_name(item_id: str) -> str:
+    item = _content.items.get(item_id)
+    return item.name if item else item_id
+
+
+def _sell_price(item_id: str, shop: dict) -> int:
+    item = _content.items.get(item_id)
+    if item is not None:
+        return item.npc_sell
+    for row in shop.get("items") or []:
+        if row.get("id") == item_id:
+            return int(row.get("sell_price") or 0)
+    return 0
+
+
+def _equipment_sell_price(equipment_id: str, shop: dict) -> int:
+    equipment = _content.equipment.get(equipment_id)
+    if equipment is not None:
+        return equipment.npc_sell
+    for row in shop.get("equipment") or []:
+        if row.get("id") == equipment_id:
+            return int(row.get("sell_price") or 0)
+    return 0
+
+
 def _cost_run(frm, to):
     return sum(raise_cost(v) for v in range(frm, to))
 
@@ -258,9 +283,15 @@ def shop_menu(api, character: dict, console: Console | None = None) -> None:
         return
 
     inv = api.inventory(_cid(character))
-    rows = [(f"{iid}×{qty}", ("item", iid))
-            for iid, qty in (inv.get("items") or {}).items()]
-    rows += [(f"#{e['id']} {_eq_name(e.get('equipment_id'))} +{e.get('refine', 0)}",
+    rows = []
+    for iid, qty in (inv.get("items") or {}).items():
+        unit_price = _sell_price(iid, shop)
+        rows.append((
+            f"{_item_name(iid)}×{qty}｜單價 {unit_price}z｜可得 {unit_price * qty}z",
+            ("item", iid),
+        ))
+    rows += [(f"#{e['id']} {_eq_name(e.get('equipment_id'))} +{e.get('refine', 0)}"
+              f"｜可得 {_equipment_sell_price(e.get('equipment_id'), shop)}z",
               ("equip", e["id"]))
              for e in (inv.get("equipment") or []) if not e.get("equipped_slot")]
     picked = choose(console, "賣什麼", rows)
@@ -276,7 +307,12 @@ def shop_menu(api, character: dict, console: Console | None = None) -> None:
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return
-    console.print(f"[green]{result}[/green]")
+    gained = result.get("gained", 0) if isinstance(result, dict) else 0
+    sold_name = _item_name(ref) if kind == "item" else _eq_name(
+        next((e.get("equipment_id") for e in inv.get("equipment") or []
+              if e.get("id") == ref), str(ref))
+    )
+    console.print(f"[green]已賣出 {sold_name}，獲得 {gained} Zeny[/green]")
 
 
 def storage_menu(api, character: dict, console: Console | None = None) -> None:

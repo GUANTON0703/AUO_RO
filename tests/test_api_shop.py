@@ -12,6 +12,8 @@ def test_shop_lists_buyable(client, auth, db_helpers):
     assert r.status_code == 200
     ids = {i["id"] for i in r.json()["items"]}
     assert "red_potion" in ids
+    red_potion = next(i for i in r.json()["items"] if i["id"] == "red_potion")
+    assert red_potion["sell_price"] == 25
 
 
 def test_buy_deducts_zeny_and_adds_item(client, auth, db_helpers):

@@ -39,12 +39,14 @@ class SellRequest(BaseModel):
 def list_shop(account_id: CurrentAccount):
     _current_character(account_id)
     items = [
-        {"id": i.id, "name": i.name, "price": i.npc_buy, "kind": i.kind}
+        {"id": i.id, "name": i.name, "price": i.npc_buy,
+         "sell_price": i.npc_sell, "kind": i.kind}
         for i in _content.items.values()
         if i.npc_buy is not None
     ]
     equipment = [
-        {"id": e.id, "name": e.name, "price": e.npc_buy, "slot": e.slot}
+        {"id": e.id, "name": e.name, "price": e.npc_buy,
+         "sell_price": e.npc_sell, "slot": e.slot}
         for e in _content.equipment.values()
         if e.npc_buy is not None
     ]

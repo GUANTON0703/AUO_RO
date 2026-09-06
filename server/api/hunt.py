@@ -1,7 +1,6 @@
 import json
 import random
 from dataclasses import asdict
-from dataclasses import asdict
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException

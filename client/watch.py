@@ -3,13 +3,21 @@ import threading
 from rich.console import Console, Group
 from rich.live import Live
 from rich.panel import Panel
+from rich.table import Table
 
-from client.api import ApiClient
+from client.api import ApiClient, ApiError
 from client.render import event_lines, hunt_status_panel, hunt_summary, retreat_advice
 
 
 def _frame(character_panel, status: dict, events: list):
-    top = Group(character_panel, hunt_status_panel(status)) if character_panel else hunt_status_panel(status)
+    hunt_panel = hunt_status_panel(status)
+    if character_panel:
+        top = Table.grid(expand=True)
+        top.add_column(ratio=1)
+        top.add_column(ratio=1)
+        top.add_row(character_panel, hunt_panel)
+    else:
+        top = hunt_panel
     recent = events[-24:] or ["等待伺服器回傳戰鬥事件…"]
     return Group(
         top,
@@ -18,7 +26,7 @@ def _frame(character_panel, status: dict, events: list):
     )
 
 
-def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 5.0,
+def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 1.0,
                render_status=None) -> None:
     stop = threading.Event()
 
@@ -34,10 +42,17 @@ def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 5.0,
     history = []
     last_status = {}
     error = None
+    no_hunt_message = None
     with Live(console=console, refresh_per_second=4, transient=False) as live:
         while True:
             try:
                 status = api.hunt_status()
+            except ApiError as exc:
+                if exc.status == 409:
+                    no_hunt_message = "目前沒有正在掛機，請先按 h 開始掛機。"
+                else:
+                    error = exc
+                break
             except Exception as exc:
                 error = exc
                 break
@@ -47,7 +62,9 @@ def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 5.0,
             live.update(_frame(character_panel, status, history), refresh=True)
             if status.get("retreated") or stop.wait(poll_seconds):
                 break
-    if error is not None:
+    if no_hunt_message is not None:
+        console.print(f"[yellow]{no_hunt_message}[/yellow]")
+    elif error is not None:
         console.print(f"[red]結算失敗：{error}[/red]")
     elif last_status.get("retreated"):
         console.print(hunt_summary(last_status))
