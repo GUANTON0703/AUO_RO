@@ -63,7 +63,7 @@ class CombatStats(BaseModel):
 
 class DropEntry(BaseModel):
     item_id: str
-    rate: float = Field(gt=0.0, le=1.0)   # 0~1 機率；卡片這種低機率也照這個欄位
+    rate: float = Field(ge=0.0, le=1.0)   # 0~1 機率；卡片這種低機率也照這個欄位
     min_qty: int = Field(default=1, ge=1)
     max_qty: int = Field(default=1, ge=1)
 
