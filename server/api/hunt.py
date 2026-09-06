@@ -145,8 +145,9 @@ def _no_op_settlement(fresh) -> dict:
     return {
         "monster_id": fresh["hunting_monster_id"],
         "monster_name": _content.get_monster(fresh["hunting_monster_id"]).name,
-        "kills": 0, "base_exp": 0, "job_exp": 0, "zeny": 0, "drops": {},
-        "offline": False, "effective_seconds": 0.0,
+        "kills": fresh["hunt_kills"], "base_exp": fresh["hunt_base_exp"],
+        "job_exp": fresh["hunt_job_exp"], "zeny": fresh["hunt_zeny"], "drops": {},
+        "offline": False, "effective_seconds": fresh["hunt_seconds"],
         "retreated": False, "retreat_reason": None, "events": [],
         "character": {
             "base_level": fresh["base_level"], "base_exp": fresh["base_exp"],
@@ -213,21 +214,32 @@ def _settle_current(row) -> dict:
     characters_repo.update_hunt_progress(
         row["id"], hp=result.final_hp, sp=result.final_sp,
         last_settled_at=now.isoformat(),
+        kills=result.kills, base_exp=result.base_exp,
+        job_exp=result.job_exp, zeny=result.zeny,
+        seconds=result.effective_seconds,
     )
     if result.retreated:
         characters_repo.clear_hunt_state(row["id"])
+    else:
+        map_def = _content.maps[row["hunting_map_id"]]
+        strategy = _strategies.get(row["id"], HuntStrategy())
+        candidates = [mid for mid in map_def.monster_ids if strategy.allows(mid)]
+        if result.effective_seconds >= HuntConfig.from_settings(settings).round_seconds and candidates:
+            current_index = candidates.index(row["hunting_monster_id"])
+            next_monster = candidates[(current_index + 1) % len(candidates)]
+            characters_repo.update_hunt_target(row["id"], next_monster)
 
     fresh = characters_repo.get_character(row["id"])
     return {
         "monster_id": row["hunting_monster_id"],
         "monster_name": monster.name,
-        "kills": result.kills,
-        "base_exp": result.base_exp,
-        "job_exp": result.job_exp,
-        "zeny": result.zeny,
+        "kills": fresh["hunt_kills"],
+        "base_exp": fresh["hunt_base_exp"],
+        "job_exp": fresh["hunt_job_exp"],
+        "zeny": fresh["hunt_zeny"],
         "drops": result.drops,
         "offline": offline,
-        "effective_seconds": result.effective_seconds,
+        "effective_seconds": fresh["hunt_seconds"],
         "retreated": result.retreated,
         "retreat_reason": result.retreat_reason,
         "events": [asdict(e) for e in result.events],

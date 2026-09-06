@@ -59,6 +59,21 @@ def test_start_then_status_accrues_progress(client, auth, db_helpers):
     assert any(e["kind"] == "kill_batch" for e in body["events"])
 
 
+def test_hunt_status_returns_cumulative_session_totals(client, auth, db_helpers):
+    _, headers, _ = auth
+    ch = _ready_char(client, headers, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=headers,
+                json={"map_id": "prontera_south_field"})
+    db_helpers.rewind_hunt(ch["id"], seconds=12)
+    first = client.get("/api/hunt/status", headers=headers).json()
+    db_helpers.rewind_hunt(ch["id"], seconds=5)
+    second = client.get("/api/hunt/status", headers=headers).json()
+    assert second["effective_seconds"] > first["effective_seconds"]
+    assert second["kills"] >= first["kills"]
+    assert second["base_exp"] >= first["base_exp"]
+    assert second["zeny"] >= first["zeny"]
+
+
 def test_hunt_status_includes_current_target(client, auth, db_helpers):
     _, headers, _ = auth
     _ready_char(client, headers, db_helpers, base_level=20)
@@ -67,6 +82,17 @@ def test_hunt_status_includes_current_target(client, auth, db_helpers):
     body = client.get("/api/hunt/status", headers=headers).json()
     assert body["monster_id"] == "mushroom"
     assert body["monster_name"] == "魔菇"
+
+
+def test_hunt_rotates_through_map_monsters(client, auth, db_helpers):
+    _, headers, _ = auth
+    ch = _ready_char(client, headers, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=headers,
+                json={"map_id": "prontera_south_field", "monster_id": "mushroom"})
+    db_helpers.rewind_hunt(ch["id"], seconds=10)
+    client.get("/api/hunt/status", headers=headers)
+    next_status = client.get("/api/hunt/status", headers=headers).json()
+    assert next_status["monster_id"] != "mushroom"
 
 
 def test_offline_gap_applies_efficiency(client, auth, db_helpers):
@@ -107,8 +133,9 @@ def test_concurrent_status_settles_once(client, auth, db_helpers):
     for t in threads:
         t.join()
 
-    settled = [r for r in results if r["kills"] > 0]
-    noop = [r for r in results if r["kills"] == 0]
+    # 累計欄位下，競爭請求也會看到已累計的擊殺；用事件判斷誰實際結算。
+    settled = [r for r in results if any(e["kind"] == "kill_batch" for e in r["events"])]
+    noop = [r for r in results if not r["events"]]
     assert len(settled) == 1
     assert len(noop) == 1
     final = client.get("/api/characters", headers=headers).json()[0]

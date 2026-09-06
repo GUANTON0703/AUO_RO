@@ -18,10 +18,10 @@ def _frame(character_panel, status: dict, events: list):
         top.add_row(character_panel, hunt_panel)
     else:
         top = hunt_panel
-    recent = events[-24:] or ["等待伺服器回傳戰鬥事件…"]
+    recent = events[-10:] or ["等待伺服器回傳戰鬥事件…"]
     return Group(
         top,
-        Panel(Group(*recent), title="即時戰鬥紀錄", height=14),
+        Panel(Group(*recent), title="即時戰鬥紀錄", height=14, expand=True),
         "[dim]按 Enter 停止觀看（掛機仍在伺服器繼續）。[/dim]",
     )
 

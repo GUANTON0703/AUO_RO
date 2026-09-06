@@ -69,3 +69,15 @@ def init_db() -> None:
         }
         if "role" not in account_columns:
             conn.execute("ALTER TABLE accounts ADD COLUMN role TEXT NOT NULL DEFAULT 'player'")
+        character_columns = {
+            row[1] for row in conn.execute("PRAGMA table_info(characters)").fetchall()
+        }
+        for name, definition in (
+            ("hunt_kills", "INTEGER NOT NULL DEFAULT 0"),
+            ("hunt_base_exp", "INTEGER NOT NULL DEFAULT 0"),
+            ("hunt_job_exp", "INTEGER NOT NULL DEFAULT 0"),
+            ("hunt_zeny", "INTEGER NOT NULL DEFAULT 0"),
+            ("hunt_seconds", "REAL NOT NULL DEFAULT 0"),
+        ):
+            if name not in character_columns:
+                conn.execute(f"ALTER TABLE characters ADD COLUMN {name} {definition}")

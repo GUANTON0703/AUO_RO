@@ -86,7 +86,9 @@ def set_hunt_state(character_id: int, *, map_id, monster_id, started_at,
             """
             UPDATE characters SET
                 hunting_map_id = ?, hunting_monster_id = ?, hunt_started_at = ?,
-                hunt_last_settled_at = ?, hunt_hp = ?, hunt_sp = ?
+                hunt_last_settled_at = ?, hunt_hp = ?, hunt_sp = ?,
+                hunt_kills = 0, hunt_base_exp = 0, hunt_job_exp = 0, hunt_zeny = 0,
+                hunt_seconds = 0
             WHERE id = ?
             """,
             (map_id, monster_id, started_at, last_settled_at, hp, sp, character_id),
@@ -107,12 +109,22 @@ def clear_hunt_state(character_id: int) -> None:
         )
 
 
-def update_hunt_progress(character_id: int, *, hp, sp, last_settled_at) -> None:
+def update_hunt_progress(character_id: int, *, hp, sp, last_settled_at,
+                         kills=0, base_exp=0, job_exp=0, zeny=0, seconds=0.0) -> None:
     with connection.get_connection() as conn:
         conn.execute(
-            "UPDATE characters SET hunt_hp = ?, hunt_sp = ?, hunt_last_settled_at = ? WHERE id = ?",
-            (hp, sp, last_settled_at, character_id),
+            "UPDATE characters SET hunt_hp = ?, hunt_sp = ?, hunt_last_settled_at = ?, "
+            "hunt_kills = hunt_kills + ?, hunt_base_exp = hunt_base_exp + ?, "
+            "hunt_job_exp = hunt_job_exp + ?, hunt_zeny = hunt_zeny + ?, "
+            "hunt_seconds = hunt_seconds + ? WHERE id = ?",
+            (hp, sp, last_settled_at, kills, base_exp, job_exp, zeny, seconds, character_id),
         )
+
+
+def update_hunt_target(character_id: int, monster_id: str) -> None:
+    with connection.get_connection() as conn:
+        conn.execute("UPDATE characters SET hunting_monster_id = ? WHERE id = ?",
+                     (monster_id, character_id))
 
 
 def apply_progression(character_id: int, *, base_level: int, base_exp: int,

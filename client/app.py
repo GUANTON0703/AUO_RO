@@ -135,15 +135,8 @@ def _do_hunt(api: ApiClient, character: dict, console: Console) -> None:
     )
     if map_id is None:
         return
-    map_def = _content.maps[map_id]
-    monster_id = _choose(
-        console,
-        "選擇目標怪物",
-        [(f"{_content.get_monster(mid).name}（Lv {_content.get_monster(mid).level}）", mid)
-         for mid in map_def.monster_ids],
-    )
     try:
-        api.hunt_start(map_id, monster_id or None)
+        api.hunt_start(map_id, None)
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return
