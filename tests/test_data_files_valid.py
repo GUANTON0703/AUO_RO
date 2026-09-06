@@ -17,6 +17,23 @@ def test_every_map_has_monsters_in_its_level_range():
             assert lo - 5 <= mon.level <= hi + 10, f"{mon.id} 等級偏離 {m.id} 的帶"
 
 
+def test_every_equipment_obtainable():
+    c = content.load_content()
+    drop_ids = set()
+    for owner in list(c.monsters.values()) + list(c.mvps.values()):
+        drop_ids.update(d.item_id for d in owner.drops)
+    for eq in c.equipment.values():
+        assert eq.npc_buy is not None or eq.id in drop_ids, f"{eq.id} 無取得來源"
+
+
+def test_level_curve_has_no_gap():
+    c = content.load_content()
+    levels = [m.level for m in c.monsters.values()]
+    for lo in range(1, 50, 5):
+        hi = lo + 4
+        assert any(lo <= lv <= hi for lv in levels), f"等級 {lo}-{hi} 沒有可打的怪"
+
+
 def test_element_chart_has_fire_earth_advantage():
     c = content.load_content()
     assert c.element_chart.multiplier("fire", "earth") > 1.0
