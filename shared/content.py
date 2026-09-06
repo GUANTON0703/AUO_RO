@@ -82,3 +82,78 @@ class MonsterDef(BaseModel):
     drops: list[DropEntry] = Field(default_factory=list)
     is_mvp: bool = False
     lore: str = ""
+
+
+class MapDef(BaseModel):
+    id: str
+    name: str
+    town: Literal["prontera", "morroc"]
+    level_range: list[int] = Field(min_length=2, max_length=2)
+    monster_ids: list[str] = Field(default_factory=list)
+    mvp_id: str | None = None
+    unlock_base_level: int = Field(ge=1)
+
+
+class MvpDef(MonsterDef):
+    cooldown_hours: int = Field(ge=1)
+    home_map_id: str
+
+
+class SkillDef(BaseModel):
+    id: str
+    name: str
+    job_id: str
+    kind: Literal["active", "passive"]
+    max_level: int = Field(ge=1, le=10)
+    sp_cost: list[int] = Field(default_factory=list)
+    cooldown_s: float = 0.0
+    effects: list[dict] = Field(default_factory=list)   # 型別化延到戰鬥引擎階段
+    idle_default: dict = Field(default_factory=dict)
+
+
+class JobDef(BaseModel):
+    id: str
+    name: str
+    tier: Literal["novice", "first", "second"]
+    parent_id: str | None = None
+    change_job_level: int = Field(default=10, ge=1)   # 轉入此職所需的前職 Job Level
+    hp_per_level: float = Field(gt=0)
+    sp_per_level: float = Field(ge=0)
+    skill_ids: list[str] = Field(default_factory=list)
+
+
+class EquipmentDef(BaseModel):
+    id: str
+    name: str
+    slot: Literal["weapon", "offhand", "head", "armor", "garment", "shoes", "accessory"]
+    rarity: Literal["common", "fine", "legendary"]
+    stats: dict = Field(default_factory=dict)
+    refinable: bool = True
+    card_slots: int = Field(default=0, ge=0, le=4)
+    job_ids: list[str] = Field(default_factory=list)   # 空 = 全職可用
+    required_level: int = Field(default=1, ge=1)
+
+
+class CardDef(BaseModel):
+    id: str
+    name: str
+    monster_id: str
+    slot: Literal["weapon", "offhand", "head", "armor", "garment", "shoes", "accessory"]
+    drop_rate: float = Field(gt=0.0, le=1.0)
+    effects: list[dict] = Field(default_factory=list)
+
+
+class ItemDef(BaseModel):
+    id: str
+    name: str
+    kind: Literal["consumable", "material", "misc"]
+    effects: list[dict] = Field(default_factory=list)
+    npc_buy: int | None = None    # NPC 售價（None = NPC 不賣）
+    npc_sell: int = Field(default=0, ge=0)
+
+
+class ElementChart(BaseModel):
+    table: dict[str, dict[str, float]] = Field(default_factory=dict)
+
+    def multiplier(self, attacker: str, defender: str) -> float:
+        return self.table.get(attacker, {}).get(defender, 1.0)

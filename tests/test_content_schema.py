@@ -56,3 +56,58 @@ def test_drop_entry_rate_is_fraction():
     DropEntry(item_id="jellopy", rate=0.5)
     with pytest.raises(Exception):
         DropEntry(item_id="jellopy", rate=1.5)
+
+
+def test_map_def():
+    from shared.content import MapDef
+
+    m = MapDef(id="prontera_east_gate", name="普隆德拉野外-東門村郊",
+               town="prontera", level_range=[1, 12],
+               monster_ids=["green_cotton_worm", "mad_bunny"],
+               mvp_id=None, unlock_base_level=1)
+    assert m.town == "prontera"
+
+
+def test_skill_def_effects_are_structured():
+    from shared.content import SkillDef
+
+    s = SkillDef(
+        id="bash", name="爆裂波動", job_id="swordman", kind="active",
+        max_level=10, sp_cost=[8, 8, 9, 9, 10], cooldown_s=0,
+        effects=[{"type": "physical_hit", "power_pct": [130, 145, 160, 175, 190]}],
+        idle_default={"enabled": True, "trigger": "every_turn", "priority": 1},
+    )
+    assert s.kind == "active"
+
+
+def test_card_effect_flat_stat_and_proc():
+    from shared.content import CardDef
+
+    c = CardDef(
+        id="poring_card", name="波利卡片", monster_id="poring",
+        slot="armor", drop_rate=0.001,
+        effects=[
+            {"type": "flat_stat", "stat": "max_hp", "amount": 100},
+            {"type": "on_kill_proc", "chance_pct": 100, "effect": "heal_hp", "amount": 5},
+        ],
+    )
+    assert c.slot == "armor"
+
+
+def test_equipment_slot_and_refine():
+    from shared.content import EquipmentDef
+
+    e = EquipmentDef(
+        id="knife", name="小刀", slot="weapon", rarity="common",
+        stats={"atk": 17}, refinable=True, card_slots=1,
+        job_ids=["novice", "swordman", "thief"], required_level=1,
+    )
+    assert e.refinable is True
+
+
+def test_element_chart_multiplier_lookup():
+    from shared.content import ElementChart
+
+    chart = ElementChart(table={"fire": {"earth": 1.5, "water": 0.5, "fire": 0.25}})
+    assert chart.multiplier("fire", "earth") == 1.5
+    assert chart.multiplier("fire", "wind") == 1.0   # 未列 = 中性
