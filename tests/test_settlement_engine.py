@@ -1,6 +1,6 @@
 import random
 
-from server.combat.combatant import Combatant
+from server.combat.combatant import Combatant, ResolvedSkill
 from server.settlement.config import HuntConfig
 from server.settlement.engine import settle
 from server.content import load_content
@@ -12,6 +12,19 @@ def _hero(**kw):
     base.update(kw)
     return Combatant(**base)
 
+
+def _skill_hero():
+    c = load_content()
+    bash_def = c.skills["bash"]
+    bash = ResolvedSkill(
+        skill_id="bash", name=bash_def.name, level=1, kind="active",
+        sp_cost=5, cooldown_rounds=0, effects=bash_def.effects,
+        trigger="every_turn", priority=3,
+    )
+    return _hero(skills=[bash])
+
+
+# ---------------------------------------------------------------- Task 5：統計路徑
 
 def test_offline_applies_efficiency_and_cap():
     c = load_content()
@@ -78,3 +91,39 @@ def test_events_include_kill_batch():
     m = c.get_monster("poring")
     r = settle(_hero(), m, 3600, HuntConfig(), random.Random(4), offline=True, pity_in={})
     assert any(e.kind == "kill_batch" for e in r.events)
+
+
+# ---------------------------------------------------------------- Task 6：逐場路徑
+
+def test_online_literal_path_matches_kills_roughly():
+    c = load_content()
+    poring = c.get_monster("poring")
+    r = settle(_hero(), poring, elapsed_seconds=60, cfg=HuntConfig(),
+               rng=random.Random(0), offline=False, pity_in={})
+    assert 1 <= r.kills <= 30
+    assert r.base_exp == r.kills * poring.base_exp
+
+
+def test_online_sp_regen_between_fights():
+    c = load_content()
+    poring = c.get_monster("poring")
+    # 一個帶耗 SP 技能的英雄，長時間在線：有場間 SP 回復時，SP 不會被抽乾。
+    with_regen = settle(_skill_hero(), poring, elapsed_seconds=1000,
+                        cfg=HuntConfig(sp_regen_per_sec=1.0),
+                        rng=random.Random(0), offline=False, pity_in={})
+    no_regen = settle(_skill_hero(), poring, elapsed_seconds=1000,
+                      cfg=HuntConfig(sp_regen_per_sec=0.0),
+                      rng=random.Random(0), offline=False, pity_in={})
+    assert with_regen.kills == no_regen.kills  # 場數一樣，差在 SP 狀態
+    assert no_regen.final_sp == 0              # 沒回復 → 被技能抽乾
+    assert with_regen.final_sp > 100           # 有回復 → SP 撐住
+
+
+def test_online_and_offline_expected_values_align():
+    c = load_content()
+    m = c.get_monster("green_cotton_worm")
+    hero = _hero()
+    on = settle(hero, m, 3600, HuntConfig(), random.Random(1), offline=False, pity_in={})
+    off = settle(hero, m, 3600, HuntConfig(), random.Random(1), offline=True, pity_in={})
+    ratio = off.kills / max(1, on.kills)
+    assert 0.4 < ratio < 0.85

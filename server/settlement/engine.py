@@ -1,7 +1,9 @@
+import copy
 import random
 from dataclasses import dataclass, field
 
 from server.combat.combatant import Combatant
+from server.combat.engine import simulate_fight
 from server.settlement.config import HuntConfig
 from server.settlement.drops import roll_drops
 from server.settlement.economy import zeny_per_kill
@@ -63,6 +65,11 @@ def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
             final_hp=player.hp, final_sp=player.sp,
         )
 
+    if not offline and potential <= cfg.literal_sim_kill_cap:
+        return _settle_literal(player, monster, elapsed_seconds, effective,
+                               time_per_kill, cfg, rng, pity_in,
+                               potion_item_id, potion_heal, potion_count)
+
     return _settle_statistical(player, monster, elapsed_seconds, effective,
                                time_per_kill, potential, prof, cfg, rng, offline,
                                pity_in, potion_item_id, potion_heal, potion_count)
@@ -120,4 +127,72 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
         effective_seconds=used_seconds if retreated else effective,
         pity_out=pity_out, events=events,
         final_hp=player.hp, final_sp=player.sp,
+    )
+
+
+def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
+                    cfg, rng, pity_in, potion_item_id, potion_heal,
+                    potion_count) -> SettlementResult:
+    p = copy.deepcopy(player)
+    p.hp, p.sp = p.max_hp, p.max_sp
+    for s in p.skills:
+        s._cd_left = 0
+
+    potions_left = potion_count
+    potions_used = 0
+    kills = 0
+    retreated = False
+    reason = ""
+    elapsed = 0.0
+    threshold_hp = p.max_hp * cfg.potion_hp_threshold
+
+    while elapsed + time_per_kill <= effective + 1e-9:
+        # 場間補血：血量低於門檻且有補品才補，補到門檻以上或用完
+        if p.hp < threshold_hp and potion_heal > 0:
+            while potions_left > 0 and p.hp < threshold_hp:
+                p.heal(potion_heal)
+                potions_left -= 1
+                potions_used += 1
+        if p.hp < threshold_hp and potions_left <= 0 and potion_heal > 0:
+            retreated, reason = True, "補品用盡，血量見底"
+            break
+
+        foe = Combatant.from_monster(monster)
+        p.statuses = [s for s in p.statuses if s.kind != "dot"]
+        for s in p.skills:
+            s._cd_left = 0
+        r = simulate_fight(p, foe, rng)
+        elapsed += time_per_kill
+        if r.winner == p.name:
+            kills += 1
+        else:
+            retreated, reason = True, "戰鬥中被擊倒"
+            break
+
+        # 場間 SP 回復
+        p.sp = min(p.max_sp, p.sp + round(cfg.sp_regen_per_sec * time_per_kill))
+
+    base_exp = kills * monster.base_exp
+    job_exp = kills * monster.job_exp
+    zeny = kills * zeny_per_kill(monster)
+    drops, pity_out = roll_drops(monster.drops, kills, rng, offline=False,
+                                 pity_in=pity_in, cfg=cfg)
+
+    events: list = []
+    if kills > 0:
+        events.append(KillBatchEvent(monster.name, kills, base_exp, job_exp, zeny))
+    events += _rare_drop_events(monster, drops, cfg)
+    if potions_used:
+        events.append(PotionUsedEvent(potion_item_id or "", potion_item_id or "",
+                                      potions_used, max(0, potions_left)))
+    if retreated:
+        events.append(RetreatEvent(reason, elapsed))
+
+    return SettlementResult(
+        kills=kills, base_exp=base_exp, job_exp=job_exp, zeny=zeny, drops=drops,
+        potions_used=potions_used, retreated=retreated, retreat_reason=reason,
+        real_elapsed_seconds=float(elapsed_seconds),
+        effective_seconds=elapsed if retreated else effective,
+        pity_out=pity_out, events=events,
+        final_hp=p.hp, final_sp=p.sp,
     )
