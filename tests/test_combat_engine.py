@@ -11,6 +11,26 @@ def _mk(name, **kw):
     return Combatant(**base)
 
 
+def test_compound_skill_damage_hits_foe_not_self():
+    # 同時有攻擊 + 自我 buff 的技能，攻擊要打敵人、buff 要加自己
+    combo = ResolvedSkill(
+        "war_cry", "戰吼", 3, "active", 5, 0,
+        [{"type": "physical_hit", "power_pct": [150, 150, 150, 150, 150]},
+         {"type": "buff", "stats": {"atk": [5, 10, 15, 20, 25]}, "duration_s": 60}],
+        "every_turn", 5,
+    )
+    hero = _mk("英雄", atk=60, max_sp=30, skills=[combo])
+    foe = _mk("怪", max_hp=400, flee=0)
+    r = simulate_fight(hero, foe, rng=random.Random(0))
+    assert foe.hp < 400            # 攻擊有打到敵人
+    assert hero.effective_atk > 60  # buff 有生效
+    # 沒有任何一筆「英雄打英雄」的傷害事件（複合技的攻擊分量不會誤傷自己）
+    self_hits = [e for e in r.events
+                 if getattr(e, "actor", None) == "英雄" and getattr(e, "target", None) == "英雄"
+                 and e.kind in ("attack", "skill") and getattr(e, "damage", 0) > 0]
+    assert self_hits == []
+
+
 def test_stronger_combatant_wins():
     r = simulate_fight(_mk("強", atk=80, max_hp=500), _mk("弱", atk=10, max_hp=50),
                        rng=random.Random(0))

@@ -73,6 +73,10 @@ class Combatant:
         return max(0, self.defense + self._stat_mod("defense"))
 
     @property
+    def effective_mdef(self) -> int:
+        return max(0, self.mdef + self._stat_mod("mdef"))
+
+    @property
     def effective_flee(self) -> int:
         return max(0, self.flee + self._stat_mod("flee"))
 

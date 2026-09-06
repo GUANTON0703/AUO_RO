@@ -60,16 +60,13 @@ def _auto_attack(attacker, defender, rng, events):
         events.append(AttackEvent(attacker.name, defender.name, dmg, crit, True))
 
 
-def _is_self_target(skill) -> bool:
-    return any(e.get("type") in ("heal_hp", "buff") for e in skill.effects)
-
-
 def _take_turn(actor, foe, rng, events):
     if actor.stunned:
         return
     skill = _pick_skill(actor)
     if skill and actor.spend_sp(skill.sp_cost):
-        events += cast_skill(actor, actor if _is_self_target(skill) else foe, skill, rng)
+        # cast_skill 內部按 effect 型別分流：heal_hp/buff 作用在 actor，其餘作用在 foe
+        events += cast_skill(actor, foe, skill, rng)
         skill._cd_left = skill.cooldown_rounds
     else:
         _auto_attack(actor, foe, rng, events)
