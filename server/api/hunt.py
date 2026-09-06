@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from server.auth.dependencies import CurrentAccount
 from server.config import get_settings
 from server.content import load_content
+from server.db import connection
 from server.progression import CharacterSnapshot, EquippedPiece, build_player_combatant
 from server.progression.levels import apply_base_exp, apply_job_exp
 from server.repositories import characters as characters_repo
@@ -105,6 +106,21 @@ def start_hunt(body: StartRequest, account_id: CurrentAccount):
             "hunt_hp": player.max_hp, "hunt_sp": player.max_sp}
 
 
+def _no_op_settlement(fresh) -> dict:
+    """別的並發請求已結算過時回這個：目前角色狀態、無增量。"""
+    return {
+        "kills": 0, "base_exp": 0, "job_exp": 0, "zeny": 0, "drops": {},
+        "offline": False, "effective_seconds": 0.0,
+        "retreated": False, "retreat_reason": None, "events": [],
+        "character": {
+            "base_level": fresh["base_level"], "base_exp": fresh["base_exp"],
+            "job_level": fresh["job_level"], "job_exp": fresh["job_exp"],
+            "job_id": fresh["job_id"], "zeny": fresh["zeny"],
+            "hunt_hp": fresh["hunt_hp"], "hunt_sp": fresh["hunt_sp"],
+        },
+    }
+
+
 def _settle_current(row) -> dict:
     if row["hunting_map_id"] is None:
         raise HTTPException(status_code=409, detail="目前沒有在掛機")
@@ -116,7 +132,23 @@ def _settle_current(row) -> dict:
     job = _content.get_job(row["job_id"])
 
     now = datetime.now(timezone.utc)
-    last = datetime.fromisoformat(row["hunt_last_settled_at"])
+    initial_last = row["hunt_last_settled_at"]
+
+    # 併發防護：BEGIN IMMEDIATE 序列化競爭的 status 請求。交易內重讀時間戳，
+    # 若已被別的請求結算過就直接回目前狀態；否則立刻「認領」（寫回 now），
+    # 讓同時進來的第二個請求走上面那條分支、不重複套用結算。
+    with connection.transaction() as conn:
+        current_last = conn.execute(
+            "SELECT hunt_last_settled_at FROM characters WHERE id = ?", (row["id"],)
+        ).fetchone()[0]
+        if current_last != initial_last:
+            return _no_op_settlement(characters_repo.get_character(row["id"]))
+        conn.execute(
+            "UPDATE characters SET hunt_last_settled_at = ? WHERE id = ?",
+            (now.isoformat(), row["id"]),
+        )
+
+    last = datetime.fromisoformat(initial_last)
     if last.tzinfo is None:            # 舊資料或外部寫入的 naive 時間戳，當 UTC
         last = last.replace(tzinfo=timezone.utc)
     elapsed = max(0.0, (now - last).total_seconds())

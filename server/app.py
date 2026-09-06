@@ -1,19 +1,23 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from server.config import get_settings
 from server.db import connection
 
 
-def create_app() -> FastAPI:
-    app = FastAPI(title="ROtxt")
+@asynccontextmanager
+async def _lifespan(app: FastAPI):
+    try:
+        connection._require_path()
+    except RuntimeError:
+        connection.configure(get_settings().db_path)
+    connection.init_db()
+    yield
 
-    @app.on_event("startup")
-    def _startup() -> None:
-        try:
-            connection._require_path()
-        except RuntimeError:
-            connection.configure(get_settings().db_path)
-        connection.init_db()
+
+def create_app() -> FastAPI:
+    app = FastAPI(title="ROtxt", lifespan=_lifespan)
 
     from server.api.accounts import router as accounts_router
 
