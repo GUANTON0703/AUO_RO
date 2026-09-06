@@ -2,7 +2,7 @@ from rich.console import Console
 from rich.prompt import Confirm, IntPrompt, Prompt
 
 from client.api import ApiError
-from client.render import inventory_table, shop_table, storage_table
+from client.render import event_lines, inventory_table, shop_table, storage_table
 from server.content import load_content
 from server.progression.stats import STAT_KEYS, stat_points_available
 
@@ -194,3 +194,66 @@ def jobchange_menu(api, character: dict, console: Console | None = None) -> None
         console.print("[green]轉職成功[/green]")
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
+
+
+def _fmt_remain(seconds: int) -> str:
+    h, rem = divmod(int(seconds), 3600)
+    m = rem // 60
+    if h:
+        return f"剩 {h}h {m}m"
+    return f"剩 {m}m"
+
+
+def mvp_menu(api, character: dict, console: Console | None = None) -> None:
+    console = console or _console
+    try:
+        mvps = api.list_mvp()
+    except ApiError as exc:
+        console.print(f"[red]{exc.detail}[/red]")
+        return
+
+    ready = []
+    for m in mvps:
+        if m["available"]:
+            mark = "[green]可挑戰[/green]"
+            ready.append(m["id"])
+        else:
+            mark = f"[dim]{_fmt_remain(m['seconds_remaining'])}[/dim]"
+        console.print(
+            f"  {m['id']}　{m['name']}　Lv {m['level']}　{m['home_map_name']}　{mark}"
+        )
+    if not ready:
+        console.print("目前沒有可挑戰的 MVP。")
+        return
+
+    target = Prompt.ask("挑戰哪隻（mvp_id，cancel 取消）", default="cancel")
+    if target == "cancel" or target not in ready:
+        if target != "cancel":
+            console.print("[yellow]該 MVP 無法挑戰。[/yellow]")
+        return
+
+    flee = IntPrompt.ask("auto-flee 血線 %（0 = 硬拚）", default=15)
+    if not Confirm.ask(f"確認挑戰 {target}？", default=True):
+        return
+
+    try:
+        result = api.challenge_mvp(target, flee_hp_frac=flee / 100 if flee > 0 else 0.0)
+    except ApiError as exc:
+        console.print(f"[red]{exc.detail}[/red]")
+        return
+
+    for line in event_lines(result.get("events", [])):
+        console.print(line)
+
+    outcome = result.get("outcome")
+    if outcome == "win":
+        drops = result.get("drops") or {}
+        drop_txt = "、".join(f"{k}×{v}" for k, v in drops.items()) or "無"
+        console.print(
+            f"[green]擊殺成功！經驗 +{result.get('base_exp', 0)}/"
+            f"{result.get('job_exp', 0)}　Zeny +{result.get('zeny', 0)}　掉落 {drop_txt}[/green]"
+        )
+    elif outcome == "loss":
+        console.print(f"[red]戰敗，損失經驗 {result.get('exp_penalty', 0)}。[/red]")
+    else:
+        console.print("[yellow]已撤退，未損失經驗（進入短冷卻）。[/yellow]")

@@ -8,6 +8,7 @@ from client.config import SessionStore
 from client.menus import (
     equip_menu,
     jobchange_menu,
+    mvp_menu,
     refine_menu,
     shop_menu,
     skills_menu,
@@ -34,6 +35,7 @@ _HELP = """指令：
   shop        商店買賣
   storage     倉庫存取
   job         轉職
+  mvp         挑戰 MVP 王
   help        本說明
   q / quit    離開
 """
@@ -129,6 +131,7 @@ def run(server_url: str) -> None:
         "stats": stats_menu, "skills": skills_menu, "equip": equip_menu,
         "refine": refine_menu, "socket": socket_menu, "shop": shop_menu,
         "storage": storage_menu, "job": jobchange_menu,
+        "mvp": mvp_menu,
     }
 
     while True:

@@ -54,44 +54,108 @@ def status_panel(character: dict) -> Panel:
     return Panel("\n".join(lines), title="角色狀態", expand=False)
 
 
-def event_lines(events: list[dict]) -> list:
+_COMBAT_KINDS = {"attack", "skill", "fled"}
+
+
+def event_lines(events: list[dict], max_combat_lines: int = 20) -> list:
     out: list = []
+    combat_idx: list[int] = []
     for e in events:
         kind = e.get("kind")
-        if kind == "kill_batch":
-            out.append(
-                Text(
-                    f"擊殺 {e.get('monster_name', '?')} ×{e.get('count', 0)}"
-                    f"　+經驗 {e.get('base_exp', 0)}/{e.get('job_exp', 0)}"
-                    f"　+Zeny {e.get('zeny', 0)}"
-                )
-            )
-        elif kind == "rare_drop":
-            out.append(
-                Text(
-                    f"★ 稀有掉落 {e.get('item_name', e.get('item_id', '?'))} ×{e.get('qty', 1)}",
-                    style="yellow",
-                )
-            )
-        elif kind == "potion_used":
-            out.append(
-                Text(
-                    f"  使用 {e.get('item_name', e.get('item_id', '?'))} ×{e.get('count', 0)}"
-                    f"（剩 {e.get('remaining', 0)}）",
-                    style="dim",
-                )
-            )
-        elif kind == "retreat":
-            out.append(
-                Text(
-                    f"撤退：{e.get('reason', '')}"
-                    f"（撐了 {e.get('seconds_survived', 0):.0f} 秒）",
-                    style="red",
-                )
-            )
-        else:
-            out.append(Text(str(e), style="dim"))
+        if kind == "attack":
+            actor = e.get("actor", "?")
+            target = e.get("target", "?")
+            if not e.get("hit", True):
+                out.append(Text(f"  {actor} 攻擊 {target} → MISS", style="dim"))
+            else:
+                tag = "　暴擊!" if e.get("crit") else ""
+                out.append(Text(
+                    f"  {actor} 攻擊 {target} → {e.get('damage', 0)} 傷害{tag}", style="dim"
+                ))
+            combat_idx.append(len(out) - 1)
+            continue
+        if kind == "skill":
+            out.append(Text(
+                f"  {e.get('actor', '?')} 施放【{e.get('skill_name', e.get('skill_id', '?'))}】"
+                f" → {e.get('damage', 0)}", style="dim"
+            ))
+            combat_idx.append(len(out) - 1)
+            continue
+        if kind == "fled":
+            out.append(Text(
+                f"撤退，剩 {e.get('hp', 0)} HP", style="yellow"
+            ))
+            combat_idx.append(len(out) - 1)
+            continue
+        if kind == "challenge_result":
+            oc = e.get("outcome")
+            label = {"win": "勝利", "loss": "落敗", "fled": "已撤退"}.get(oc, oc)
+            parts = [f"挑戰結果：{label}（{e.get('rounds', 0)} 回合）"]
+            if e.get("base_exp") or e.get("job_exp"):
+                parts.append(f"經驗 +{e.get('base_exp', 0)}/{e.get('job_exp', 0)}")
+            if e.get("zeny"):
+                parts.append(f"Zeny +{e.get('zeny', 0)}")
+            if e.get("exp_penalty"):
+                parts.append(f"經驗 -{e.get('exp_penalty', 0)}")
+            drops = e.get("drops") or {}
+            if drops:
+                parts.append("掉落 " + "、".join(f"{k}×{v}" for k, v in drops.items()))
+            out.append(Text("　".join(parts),
+                            style="green" if oc == "win" else "yellow"))
+            continue
+        _legacy_event_line(out, e, kind)
+
+    if len(combat_idx) > max_combat_lines:
+        keep_head = {combat_idx[i] for i in range(10)}
+        keep_tail = {combat_idx[i] for i in range(len(combat_idx) - 10, len(combat_idx))}
+        omitted = len(combat_idx) - 20
+        new_out: list = []
+        inserted = False
+        for i, line in enumerate(out):
+            if i in combat_idx and i not in keep_head and i not in keep_tail:
+                if not inserted:
+                    new_out.append(Text(f"  …省略 {omitted} 條…", style="dim"))
+                    inserted = True
+                continue
+            new_out.append(line)
+        return new_out
     return out
+
+
+def _legacy_event_line(out: list, e: dict, kind: str) -> None:
+    if kind == "kill_batch":
+        out.append(
+            Text(
+                f"擊殺 {e.get('monster_name', '?')} ×{e.get('count', 0)}"
+                f"　+經驗 {e.get('base_exp', 0)}/{e.get('job_exp', 0)}"
+                f"　+Zeny {e.get('zeny', 0)}"
+            )
+        )
+    elif kind == "rare_drop":
+        out.append(
+            Text(
+                f"★ 稀有掉落 {e.get('item_name', e.get('item_id', '?'))} ×{e.get('qty', 1)}",
+                style="yellow",
+            )
+        )
+    elif kind == "potion_used":
+        out.append(
+            Text(
+                f"  使用 {e.get('item_name', e.get('item_id', '?'))} ×{e.get('count', 0)}"
+                f"（剩 {e.get('remaining', 0)}）",
+                style="dim",
+            )
+        )
+    elif kind == "retreat":
+        out.append(
+            Text(
+                f"撤退：{e.get('reason', '')}"
+                f"（撐了 {e.get('seconds_survived', 0):.0f} 秒）",
+                style="red",
+            )
+        )
+    else:
+        out.append(Text(str(e), style="dim"))
 
 
 def inventory_table(inv: dict) -> Table:

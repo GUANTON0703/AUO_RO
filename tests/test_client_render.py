@@ -58,3 +58,16 @@ def test_shop_table_and_hunt_summary():
     assert "red_potion" in out and "50" in out
     summary = _render(hunt_summary({"kills": 12, "base_exp": 300, "job_exp": 100, "zeny": 500, "effective_seconds": 3600, "retreated": False, "drops": {"jellopy": 3}}))
     assert "12" in summary and "jellopy" in summary
+
+
+def test_event_lines_truncates_long_combat():
+    events = [{"kind": "attack", "actor": "T", "target": "王", "damage": i,
+              "crit": False, "hit": True} for i in range(60)]
+    events.append({"kind": "challenge_result", "outcome": "win", "rounds": 60,
+                   "base_exp": 100, "job_exp": 50, "zeny": 200, "exp_penalty": 0,
+                   "drops": {}})
+    lines = event_lines(events)
+    text = "\n".join(str(getattr(l, "plain", l)) for l in lines)
+    assert "省略 40 條" in text
+    assert "挑戰結果：勝利" in text
+    assert len(lines) == 22  # 10 + 省略 + 10 + result

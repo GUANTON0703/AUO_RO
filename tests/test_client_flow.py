@@ -118,3 +118,41 @@ def test_refine_menu_calls_refine(monkeypatch):
     rec = _RecApi()
     menus.refine_menu(rec, {"id": 1}, Console(record=True))
     assert ("refine", 1, 3) in rec.calls
+
+
+class _MvpApi:
+    def __init__(self):
+        self.calls = []
+
+    def list_mvp(self):
+        return [
+            {"id": "angel_poring", "name": "天使波利", "level": 16,
+             "home_map_id": "mjolnir_mine", "home_map_name": "礦洞",
+             "available": True, "seconds_remaining": 0, "cooldown_hours": 8},
+            {"id": "queen_bee", "name": "蜂后", "level": 19,
+             "home_map_id": "x", "home_map_name": "南野", "available": False,
+             "seconds_remaining": 7200, "cooldown_hours": 12},
+        ]
+
+    def challenge_mvp(self, mvp_id, flee_hp_frac=None):
+        self.calls.append(("challenge_mvp", mvp_id, flee_hp_frac))
+        return {"outcome": "win", "rounds": 12, "base_exp": 500, "job_exp": 200,
+                "zeny": 3000, "exp_penalty": 0,
+                "drops": {"angel_poring_card": 1}, "events": [
+                    {"kind": "attack", "actor": "T", "target": "天使波利",
+                     "damage": 50, "crit": False, "hit": True},
+                    {"kind": "challenge_result", "outcome": "win", "rounds": 12,
+                     "base_exp": 500, "job_exp": 200, "zeny": 3000,
+                     "exp_penalty": 0, "drops": {"angel_poring_card": 1}},
+                ]}
+
+
+def test_mvp_menu_challenges(monkeypatch):
+    from client import menus
+    from rich.console import Console
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "angel_poring"))
+    monkeypatch.setattr(menus.IntPrompt, "ask", staticmethod(lambda *a, **k: 15))
+    monkeypatch.setattr(menus.Confirm, "ask", staticmethod(lambda *a, **k: True))
+    rec = _MvpApi()
+    menus.mvp_menu(rec, {"id": 1}, Console(record=True))
+    assert ("challenge_mvp", "angel_poring", 0.15) in rec.calls

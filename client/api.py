@@ -85,6 +85,16 @@ class ApiClient:
     def hunt_stop(self):
         return self._req("POST", "/api/hunt/stop")
 
+    # --- mvp ---
+    def list_mvp(self):
+        return self._req("GET", "/api/mvp")
+
+    def challenge_mvp(self, mvp_id, flee_hp_frac=None):
+        b = {"mvp_id": mvp_id}
+        if flee_hp_frac is not None:
+            b["flee_hp_frac"] = flee_hp_frac
+        return self._req("POST", "/api/mvp/challenge", json=b)
+
     # --- inventory ---
     def inventory(self, cid):
         return self._req("GET", f"/api/characters/{cid}/inventory")
