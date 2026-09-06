@@ -60,3 +60,61 @@ def test_ensure_logged_in_reuses_saved_token(api, tmp_path, monkeypatch):
     monkeypatch.setattr("client.auth_flow.Prompt.ask", _boom)
     ensure_logged_in(fresh, store, "http://test")
     assert fresh.token == client.token
+
+
+class _RecApi:
+    def __init__(self):
+        self.calls = []
+
+    def inventory(self, cid):
+        return {"items": {}, "equipment": [
+            {"id": 3, "equipment_id": "knife", "refine": 4, "equipped_slot": None, "card_ids": []}
+        ]}
+
+    def shop(self):
+        return {"items": [{"id": "red_potion", "name": "紅藥", "price": 50, "kind": "consumable"}],
+                "equipment": []}
+
+    def allocate_stats(self, cid, deltas):
+        self.calls.append(("allocate_stats", cid, deltas))
+        return {"message": "ok"}
+
+    def buy(self, item_id, qty=1):
+        self.calls.append(("buy", item_id, qty))
+        return {"ok": True, "spent": qty * 50}
+
+    def refine(self, cid, inst_id):
+        self.calls.append(("refine", cid, inst_id))
+        return {"success": True, "refine": 5, "message": "精煉成功"}
+
+
+def test_stats_menu_calls_allocate(monkeypatch):
+    from client import menus
+    from rich.console import Console
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "str"))
+    monkeypatch.setattr(menus.IntPrompt, "ask", staticmethod(lambda *a, **k: 3))
+    rec = _RecApi()
+    menus.stats_menu(rec, {"id": 1, "base_level": 10, "job_id": "swordman"}, Console(record=True))
+    assert ("allocate_stats", 1, {"str": 3}) in rec.calls
+
+
+def test_shop_menu_buys(monkeypatch):
+    from client import menus
+    from rich.console import Console
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(
+        lambda *a, **k: "buy" if k.get("choices") else "red_potion"))
+    monkeypatch.setattr(menus.IntPrompt, "ask", staticmethod(lambda *a, **k: 5))
+    rec = _RecApi()
+    menus.shop_menu(rec, {"id": 1}, Console(record=True))
+    assert ("buy", "red_potion", 5) in rec.calls
+
+
+def test_refine_menu_calls_refine(monkeypatch):
+    from client import menus
+    from rich.console import Console
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "cancel"))
+    monkeypatch.setattr(menus.IntPrompt, "ask", staticmethod(lambda *a, **k: 3))
+    monkeypatch.setattr(menus.Confirm, "ask", staticmethod(lambda *a, **k: True))
+    rec = _RecApi()
+    menus.refine_menu(rec, {"id": 1}, Console(record=True))
+    assert ("refine", 1, 3) in rec.calls
