@@ -1,5 +1,6 @@
 from rich.console import Console
 from rich.prompt import Confirm, IntPrompt, Prompt
+from rich.table import Table
 
 from client.api import ApiError
 from client.render import event_lines, inventory_table, shop_table, storage_table
@@ -202,6 +203,160 @@ def _fmt_remain(seconds: int) -> str:
     if h:
         return f"剩 {h}h {m}m"
     return f"剩 {m}m"
+
+
+_RANK_KEYS = ["base_level", "job_level", "zeny", "cards", "refine"]
+
+
+def rank_menu(api, character: dict, console: Console | None = None) -> None:
+    console = console or _console
+    by = Prompt.ask("排序依據", choices=_RANK_KEYS, default="base_level")
+    try:
+        rows = api.leaderboard(by)
+    except ApiError as exc:
+        console.print(f"[red]{exc.detail}[/red]")
+        return
+    table = Table(title=f"排行榜 · {by}")
+    table.add_column("#", justify="right")
+    table.add_column("角色")
+    table.add_column("帳號")
+    table.add_column(by, justify="right")
+    for i, r in enumerate(rows or [], 1):
+        table.add_row(str(i), str(r.get("character_name", "")),
+                      str(r.get("account", "")), str(r.get("value", "")))
+    console.print(table)
+
+
+def _fmt_trade_items(items) -> str:
+    parts = []
+    for it in items:
+        if it.get("item_id"):
+            parts.append(f"{it['item_id']}×{it['qty']}")
+        else:
+            parts.append(f"裝備#{it.get('equipment_id')}")
+    return "、".join(parts) or "（空）"
+
+
+def _print_trade(console: Console, tbl: dict) -> None:
+    console.print(f"[bold]交易 #{tbl['id']}[/bold]　狀態：{tbl['status']}")
+    items = tbl.get("items") or []
+    fm = [it for it in items if it["side"] == "from"]
+    to = [it for it in items if it["side"] == "to"]
+    console.print(f"  發起方 {'[green]✔[/green]' if tbl['from_confirmed'] else '·'}：{_fmt_trade_items(fm)}")
+    console.print(f"  受邀方 {'[green]✔[/green]' if tbl['to_confirmed'] else '·'}：{_fmt_trade_items(to)}")
+
+
+def _trade_screen(api, tid: int, console: Console) -> None:
+    while True:
+        try:
+            tbl = api.trade_get(tid)
+        except ApiError as exc:
+            console.print(f"[red]{exc.detail}[/red]")
+            return
+        _print_trade(console, tbl)
+        if tbl["status"] != "open":
+            console.print(f"[yellow]交易已結束：{tbl['status']}[/yellow]")
+            return
+        act = Prompt.ask("動作", choices=["put", "confirm", "cancel", "refresh", "back"],
+                         default="refresh")
+        if act == "back":
+            return
+        try:
+            if act == "put":
+                item_id = Prompt.ask("道具 id（留空改放裝備）", default="")
+                if item_id:
+                    qty = IntPrompt.ask("數量", default=1)
+                    api.trade_put(tid, item_id=item_id, qty=qty)
+                else:
+                    eid = IntPrompt.ask("裝備實例 id")
+                    api.trade_put(tid, equipment_instance_id=eid)
+            elif act == "confirm":
+                res = api.trade_confirm(tid) or {}
+                if res.get("status") == "done":
+                    console.print("[green]交易完成！[/green]")
+                    return
+                console.print("[dim]已確認，等待對方。[/dim]")
+            elif act == "cancel":
+                api.trade_cancel(tid)
+                console.print("[yellow]已取消交易。[/yellow]")
+                return
+        except ApiError as exc:
+            console.print(f"[red]{exc.detail}[/red]")
+
+
+def trade_menu(api, character: dict, console: Console | None = None) -> None:
+    console = console or _console
+    try:
+        pend = api.trade_pending() or []
+    except ApiError as exc:
+        console.print(f"[red]{exc.detail}[/red]")
+        return
+    if pend:
+        console.print("別人開給你的交易：")
+        for t in pend:
+            console.print(f"  #{t['id']}　來自帳號 {t.get('from_account')}")
+    choice = Prompt.ask("輸入交易 #id 進入、new 開新交易、cancel 離開", default="cancel")
+    if choice == "cancel":
+        return
+    if choice == "new":
+        who = Prompt.ask("對方帳號名")
+        try:
+            tid = api.trade_offer(who)["trade_id"]
+        except ApiError as exc:
+            console.print(f"[red]{exc.detail}[/red]")
+            return
+    else:
+        try:
+            tid = int(choice)
+        except ValueError:
+            console.print("[red]無效輸入。[/red]")
+            return
+    _trade_screen(api, tid, console)
+
+
+def guild_menu(api, character: dict, console: Console | None = None) -> None:
+    console = console or _console
+    try:
+        mine = api.guild_mine()
+    except ApiError as exc:
+        console.print(f"[red]{exc.detail}[/red]")
+        return
+    if mine:
+        console.print(f"[bold]公會：{mine['name']}[/bold]")
+        for m in mine.get("members") or []:
+            console.print(f"  {m['character_name']}（{m['role']}）")
+        if Prompt.ask("動作", choices=["leave", "back"], default="back") == "leave":
+            try:
+                api.guild_leave()
+                console.print("[green]已退會。[/green]")
+            except ApiError as exc:
+                console.print(f"[red]{exc.detail}[/red]")
+        return
+    try:
+        guilds = api.guild_list() or []
+    except ApiError as exc:
+        console.print(f"[red]{exc.detail}[/red]")
+        return
+    if guilds:
+        console.print("現有公會：")
+        for g in guilds:
+            console.print(f"  #{g['id']}　{g['name']}（{g.get('member_count', 0)} 人）")
+    else:
+        console.print("目前還沒有公會。")
+    choice = Prompt.ask("輸入 join <id> 或 create <名稱>，cancel 離開", default="cancel")
+    if choice == "cancel":
+        return
+    try:
+        if choice.startswith("join "):
+            api.guild_join(int(choice.split(None, 1)[1]))
+            console.print("[green]已加入公會。[/green]")
+        elif choice.startswith("create "):
+            api.guild_create(choice.split(None, 1)[1])
+            console.print("[green]已建立公會。[/green]")
+        else:
+            console.print("[red]無效輸入。[/red]")
+    except (ApiError, ValueError) as exc:
+        console.print(f"[red]{exc}[/red]")
 
 
 def mvp_menu(api, character: dict, console: Console | None = None) -> None:
