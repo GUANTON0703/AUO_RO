@@ -537,3 +537,39 @@ def test_render_screen_survives_markup_in_chat():
     app._render_screen(con, api, {"id": 1, "name": "阿獵"}, None, _state())
     out = con.export_text()
     assert "哈囉" in out and "大家" in out  # 沒 crash，字有出來
+
+
+def test_chat_mode_single_shot_sends_and_returns(monkeypatch):
+    from client import chat as chatmod
+    from rich.console import Console
+
+    class _ChatApi:
+        def __init__(self):
+            self.posted = []
+        def chat_since(self, channel, after=0):
+            return [{"id": 1, "character_name": "路人", "text": "hi"}]
+        def chat_post(self, channel, text):
+            self.posted.append((channel, text))
+
+    api = _ChatApi()
+    monkeypatch.setattr(chatmod.Prompt, "ask", staticmethod(lambda *a, **k: "大家好"))
+    chatmod.chat_mode(api, Console(record=True), has_guild=False)
+    assert api.posted == [("world", "大家好")]
+
+
+def test_chat_mode_blank_does_not_send(monkeypatch):
+    from client import chat as chatmod
+    from rich.console import Console
+
+    class _ChatApi:
+        def __init__(self):
+            self.posted = []
+        def chat_since(self, channel, after=0):
+            return []
+        def chat_post(self, channel, text):
+            self.posted.append((channel, text))
+
+    api = _ChatApi()
+    monkeypatch.setattr(chatmod.Prompt, "ask", staticmethod(lambda *a, **k: "   "))
+    chatmod.chat_mode(api, Console(record=True), has_guild=False)
+    assert api.posted == []

@@ -1,7 +1,6 @@
-import threading
-
 from rich.console import Console
 from rich.markup import escape
+from rich.prompt import Prompt
 
 from client.api import ApiClient, ApiError
 
@@ -10,59 +9,39 @@ def chat_mode(
     api: ApiClient,
     console: Console | None = None,
     has_guild: bool = False,
-    poll_seconds: float = 3.0,
 ) -> None:
+    """單發：印出最近訊息，讓你打一句話送出就回主選單。直接 Enter = 只看不送。
+    收訊息靠主畫面常駐的聊天面板，這裡不做輪詢。"""
     console = console or Console()
 
-    channels = ["world"]
+    channel = "world"
     if has_guild:
         try:
             mine = api.guild_mine()
         except ApiError:
             mine = None
         if mine:
-            channels.append(f"guild:{mine['id']}")
+            pick = Prompt.ask("送到 [w] 世界 / [g] 公會", choices=["w", "g"], default="w")
+            if pick == "g":
+                channel = f"guild:{mine['id']}"
 
-    console.print("[dim]聊天模式：輸入文字送到世界頻道，空行離開。[/dim]")
-    stop = threading.Event()
+    try:
+        msgs = api.chat_since(channel, 0) or []
+    except ApiError:
+        msgs = []
+    for m in msgs[-12:]:
+        name = escape(str(m.get("character_name", "?")))
+        text = escape(str(m.get("text", "")))
+        console.print(f"[cyan]{name}[/cyan]：{text}")
 
-    def _reader() -> None:
-        while not stop.is_set():
-            try:
-                line = input()
-            except (EOFError, RuntimeError):
-                stop.set()
-                return
-            if not line.strip():
-                stop.set()
-                return
-            try:
-                api.chat_post("world", line.strip())
-            except ApiError as exc:
-                console.print(f"[red]送出失敗：{exc.detail}[/red]")
-
-    threading.Thread(target=_reader, daemon=True).start()
-
-    last = {ch: 0 for ch in channels}
-    for ch in channels:
-        try:
-            msgs = api.chat_since(ch, 0) or []
-        except ApiError:
-            continue
-        if msgs:
-            last[ch] = msgs[-1]["id"]
-
-    while not stop.wait(poll_seconds):
-        for ch in channels:
-            try:
-                msgs = api.chat_since(ch, last[ch]) or []
-            except ApiError:
-                continue
-            for m in msgs:
-                last[ch] = m["id"]
-                tag = "" if ch == "world" else "[magenta][公會][/magenta] "
-                name = escape(str(m.get("character_name", "?")))
-                text = escape(str(m.get("text", "")))
-                console.print(f"{tag}[cyan]{name}[/cyan]：{text}")
-
-    console.print("[dim]離開聊天。[/dim]")
+    try:
+        line = Prompt.ask("[dim]說一句（直接 Enter 離開）[/dim]", default="").strip()
+    except (EOFError, KeyboardInterrupt):
+        return
+    if not line:
+        return
+    try:
+        api.chat_post(channel, line)
+        console.print("[green]已送出[/green]")
+    except ApiError as exc:
+        console.print(f"[red]送出失敗：{exc.detail}[/red]")

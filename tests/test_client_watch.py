@@ -67,7 +67,7 @@ def test_watch_handles_api_error(monkeypatch):
 
     con = Console(record=True, width=80)
     watch_hunt(_Boom(), con, poll_seconds=0.01)
-    assert "結算失敗" in con.export_text()
+    assert "出錯" in con.export_text()
 
 
 def test_watch_handles_no_active_hunt_as_normal_state(monkeypatch):

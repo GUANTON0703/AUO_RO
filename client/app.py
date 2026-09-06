@@ -81,13 +81,13 @@ _ALIASES = {
     "hunt": "h", "watch": "v", "status": "s", "inv": "i", "quit": "q", "exit": "q",
 }
 
-_NO_PAUSE = {"h", "hunt", "v", "watch", "q", "quit", "exit"}
+_NO_PAUSE = {"h", "hunt", "v", "watch", "c", "chat", "q", "quit", "exit"}
 
 
 def _try_hunt_status(api: ApiClient) -> dict | None:
     try:
         return api.hunt_status()
-    except ApiError:
+    except Exception:
         return None
 
 
@@ -99,7 +99,7 @@ def _refresh_chat(api: ApiClient, state: dict) -> None:
     for ch in channels:
         try:
             msgs = api.chat_since(ch, state["chat_last"].get(ch, 0)) or []
-        except ApiError:
+        except Exception:
             continue
         if first:
             msgs = msgs[-8:]
@@ -269,7 +269,12 @@ def run(server_url: str) -> None:
 
     last_output = "[bold green]歡迎回來，" + character["name"] + "！[/bold green] 輸入指令代號或直接打字。"
     while True:
-        _render_screen(console, api, character, last_output, state)
+        try:
+            _render_screen(console, api, character, last_output, state)
+        except Exception as exc:
+            import traceback
+            console.print(f"[red]畫面繪製出錯：{exc}[/red]")
+            console.print(f"[dim]{traceback.format_exc()}[/dim]")
         try:
             cmd = Prompt.ask("[cyan]>[/cyan]").strip().lower()
         except (EOFError, KeyboardInterrupt):
@@ -314,6 +319,10 @@ def run(server_url: str) -> None:
                 console.print("未知指令，輸入 help。")
         except ApiError as exc:
             console.print(f"[red]錯誤：{exc.detail}[/red]")
+        except Exception as exc:
+            import traceback
+            console.print(f"[red]指令「{cmd}」出錯：{exc}[/red]")
+            console.print(f"[dim]{traceback.format_exc()}[/dim]")
 
         last_output = None
         if cmd not in _NO_PAUSE:
