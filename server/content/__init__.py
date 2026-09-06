@@ -45,24 +45,32 @@ class Content:
         return [self.get_monster(m) for m in self.maps[map_id].monster_ids]
 
 
-def _index(models, key="id") -> dict:
-    return {getattr(m, key): m for m in models}
+def _index(models, kind: str, key="id") -> dict:
+    out: dict = {}
+    for m in models:
+        k = getattr(m, key)
+        if k in out:
+            raise ContentError(f"{kind} 有重複 id：{k}")
+        out[k] = m
+    return out
 
 
 def load_content(data_dir: Path | None = None) -> Content:
     d = Path(data_dir) if data_dir else _DATA_DIR
     try:
         c = Content(
-            monsters=_index(MonsterDef(**x) for x in _read(d / "monsters.json")),
-            mvps=_index(MvpDef(**x) for x in _read(d / "mvps.json")),
-            maps=_index(MapDef(**x) for x in _read(d / "maps.json")),
-            jobs=_index(JobDef(**x) for x in _read(d / "jobs.json")),
-            skills=_index(SkillDef(**x) for x in _read(d / "skills.json")),
-            equipment=_index(EquipmentDef(**x) for x in _read(d / "equipment.json")),
-            cards=_index(CardDef(**x) for x in _read(d / "cards.json")),
-            items=_index(ItemDef(**x) for x in _read(d / "items.json")),
+            monsters=_index((MonsterDef(**x) for x in _read(d / "monsters.json")), "monsters"),
+            mvps=_index((MvpDef(**x) for x in _read(d / "mvps.json")), "mvps"),
+            maps=_index((MapDef(**x) for x in _read(d / "maps.json")), "maps"),
+            jobs=_index((JobDef(**x) for x in _read(d / "jobs.json")), "jobs"),
+            skills=_index((SkillDef(**x) for x in _read(d / "skills.json")), "skills"),
+            equipment=_index((EquipmentDef(**x) for x in _read(d / "equipment.json")), "equipment"),
+            cards=_index((CardDef(**x) for x in _read(d / "cards.json")), "cards"),
+            items=_index((ItemDef(**x) for x in _read(d / "items.json")), "items"),
             element_chart=ElementChart(**_read(d / "element_chart.json")),
         )
+    except ContentError:
+        raise
     except Exception as exc:
         raise ContentError(f"資料載入失敗：{exc}") from exc
 
@@ -90,6 +98,13 @@ def _check_integrity(c: Content) -> None:
                 raise ContentError(f"職業 {job.id} 引用不存在的技能 {sid}")
         if job.parent_id and job.parent_id not in c.jobs:
             raise ContentError(f"職業 {job.id} 的 parent_id {job.parent_id} 不存在")
+    for skill in c.skills.values():
+        if skill.job_id not in c.jobs:
+            raise ContentError(f"技能 {skill.id} 屬於不存在的職業 {skill.job_id}")
+    for eq in c.equipment.values():
+        for jid in eq.job_ids:
+            if jid not in c.jobs:
+                raise ContentError(f"裝備 {eq.id} 限定不存在的職業 {jid}")
     for drop_owner in list(c.monsters.values()) + list(c.mvps.values()):
         for d in drop_owner.drops:
             if d.item_id not in c.items and d.item_id not in c.equipment and d.item_id not in c.cards:

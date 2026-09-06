@@ -52,6 +52,43 @@ def test_referential_integrity_checked(tiny_data):
         content.load_content(tiny_data)
 
 
+def test_duplicate_id_raises(tiny_data):
+    (tiny_data / "monsters.json").write_text(json.dumps([
+        {"id": "poring", "name": "波利", "level": 1, "element": "earth",
+         "race": "angel", "size": "medium", "role": "glass", "base_exp": 2, "job_exp": 1,
+         "stats": {"max_hp": 50, "max_sp": 0, "atk": 8, "matk": 0, "defense": 0,
+                   "mdef": 0, "hit": 1, "flee": 6, "aspd": 100, "crit": 0},
+         "drops": [], "is_mvp": False},
+        {"id": "poring", "name": "假波利", "level": 9, "element": "fire",
+         "race": "animal", "size": "small", "role": "tank", "base_exp": 9, "job_exp": 4,
+         "stats": {"max_hp": 500, "max_sp": 0, "atk": 20, "matk": 0, "defense": 5,
+                   "mdef": 0, "hit": 9, "flee": 9, "aspd": 100, "crit": 0},
+         "drops": [], "is_mvp": False},
+    ], ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(content.ContentError, match="重複"):
+        content.load_content(tiny_data)
+
+
+def test_skill_pointing_at_unknown_job_raises(tiny_data):
+    (tiny_data / "skills.json").write_text(json.dumps([
+        {"id": "phantom", "name": "幻影", "job_id": "no_such_job", "kind": "passive",
+         "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0,
+         "effects": [], "idle_default": {}}
+    ], ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(content.ContentError):
+        content.load_content(tiny_data)
+
+
+def test_equipment_limiting_unknown_job_raises(tiny_data):
+    (tiny_data / "equipment.json").write_text(json.dumps([
+        {"id": "ghost_blade", "name": "幽刃", "slot": "weapon", "rarity": "common",
+         "stats": {"atk": 10}, "refinable": True, "card_slots": 1,
+         "job_ids": ["no_such_job"], "required_level": 1}
+    ], ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(content.ContentError):
+        content.load_content(tiny_data)
+
+
 def test_default_load_reads_repo_data_dir():
     c = content.load_content()   # 不給路徑 → 讀 repo 的 data/
     assert len(c.monsters) >= 10
