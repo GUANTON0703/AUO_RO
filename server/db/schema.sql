@@ -90,3 +90,10 @@ CREATE TABLE IF NOT EXISTS account_equipment (
 );
 CREATE INDEX IF NOT EXISTS idx_account_items ON account_items(account_id);
 CREATE INDEX IF NOT EXISTS idx_account_equip ON account_equipment(account_id);
+
+CREATE TABLE IF NOT EXISTS character_mvp_cooldowns (
+    character_id INTEGER NOT NULL REFERENCES characters(id),
+    mvp_id       TEXT NOT NULL,
+    available_at TEXT NOT NULL,
+    PRIMARY KEY (character_id, mvp_id)
+);
