@@ -1157,9 +1157,11 @@ git commit -m "docs: 資料 schema 與來源說明；資料管線階段完成"
 
 ### Task 10-G：驗證與 commit
 
-- [ ] `uv run pytest -q` 全綠（含新測試）
-- [ ] `uv run python -m server.admin content check` → monsters ~36 / mvps 8 / cards ~26
-- [ ] 新測試：`test_level_curve_has_no_gap`——1~50 每 5 級區間至少有 1 隻可打的怪
-- [ ] `test_every_equipment_obtainable`
-- [ ] codex review 到 LGTM
-- [ ] commit：`feat: v1 資料擴充——練功路線補完（~36 怪 / 8 MVP / ~26 卡）`
+- [x] `uv run pytest -q` 全綠（含新測試）— 97 passed
+- [x] `uv run python -m server.admin content check` → monsters 42 / mvps 8 / cards 26
+- [x] 新測試：`test_level_curve_has_no_gap`——1~50 每 5 級區間至少有 1 隻可打的怪
+- [x] `test_every_equipment_obtainable`
+- [x] codex review 到 LGTM
+- [x] commit：`feat: v1 資料擴充——練功路線補完（~36 怪 / 8 MVP / ~26 卡）`
+
+> 實作偏離規格處：下水道 `mvp_id` 用 `golden_bug_king`（Lv45）取代規格表的 `queen_bee`（Lv19），與該圖 [38,48] 等級帶一致；`queen_bee` 維持 `home_map_id: prontera_south_field`（與 base 相同，未被任何圖 feature，規格允許 home_map_id 共用）。
