@@ -1,0 +1,12 @@
+[
+  {"id": "jellopy", "name": "壓縮膠", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 2},
+  {"id": "sticky_mucus", "name": "黏黏液", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 10},
+  {"id": "fluff", "name": "絨毛", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 4},
+  {"id": "feather", "name": "羽毛", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 6},
+  {"id": "clover", "name": "幸運草", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 8},
+  {"id": "red_potion", "name": "紅色藥水", "kind": "consumable", "effects": [{"type": "heal_hp", "amount": 45}], "npc_buy": 50, "npc_sell": 25},
+  {"id": "blue_potion", "name": "藍色藥水", "kind": "consumable", "effects": [{"type": "heal_sp", "amount": 40}], "npc_buy": 600, "npc_sell": 300},
+  {"id": "elunium", "name": "艾魯凡", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 0},
+  {"id": "oridecon", "name": "歐里德鋼", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 0},
+  {"id": "fly_wing", "name": "蒼蠅之翼", "kind": "consumable", "effects": [{"type": "teleport"}], "npc_buy": 60, "npc_sell": 30}
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "prontera_east_gate",
+    "name": "普隆德拉野外-東門村郊",
+    "town": "prontera",
+    "level_range": [1, 12],
+    "monster_ids": ["green_cotton_worm", "mad_bunny", "little_boar", "chick", "yoyo_monkey"],
+    "mvp_id": null,
+    "unlock_base_level": 1
+  },
+  {
+    "id": "prontera_south_field",
+    "name": "普隆德拉野外-南門原野",
+    "town": "prontera",
+    "level_range": [9, 20],
+    "monster_ids": ["raccoon", "mushroom", "grass_sprite", "snail"],
+    "mvp_id": null,
+    "unlock_base_level": 8
+  },
+  {
+    "id": "mjolnir_mine",
+    "name": "普隆德拉-礦洞",
+    "town": "prontera",
+    "level_range": [16, 25],
+    "monster_ids": ["grass_sprite", "snail", "tree_sprite"],
+    "mvp_id": null,
+    "unlock_base_level": 14
+  },
+  {
+    "id": "prontera_west_plain",
+    "name": "普隆德拉野外-西門平原",
+    "town": "prontera",
+    "level_range": [1, 30],
+    "monster_ids": ["poring", "tree_sprite"],
+    "mvp_id": null,
+    "unlock_base_level": 1
+  },
+  {
+    "id": "prontera_south_forest",
+    "name": "普隆德拉野外-南區森林",
+    "town": "prontera",
+    "level_range": [31, 40],
+    "monster_ids": ["tree_sprite", "thunder_hedgehog"],
+    "mvp_id": null,
+    "unlock_base_level": 28
+  },
+  {
+    "id": "prontera_sewer",
+    "name": "普隆德拉-王城下水道",
+    "town": "prontera",
+    "level_range": [39, 48],
+    "monster_ids": ["thunder_hedgehog", "wolf", "boar"],
+    "mvp_id": null,
+    "unlock_base_level": 36
+  },
+  {
+    "id": "prontera_north_forest",
+    "name": "普隆德拉野外-北區密林",
+    "town": "prontera",
+    "level_range": [46, 55],
+    "monster_ids": ["wolf", "boar"],
+    "mvp_id": null,
+    "unlock_base_level": 42
+  },
+  {
+    "id": "morroc_oasis",
+    "name": "夢羅克野外-綠洲",
+    "town": "morroc",
+    "level_range": [42, 50],
+    "monster_ids": ["thunder_hedgehog"],
+    "mvp_id": null,
+    "unlock_base_level": 40
+  }
+]

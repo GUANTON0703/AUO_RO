@@ -1,0 +1,14 @@
+{
+  "table": {
+    "neutral": {"ghost": 0.25},
+    "fire": {"earth": 1.5, "water": 0.5, "fire": 0.25, "undead": 1.25},
+    "water": {"fire": 1.5, "water": 0.25, "wind": 0.5, "earth": 1.0},
+    "wind": {"water": 1.5, "wind": 0.25, "earth": 0.5},
+    "earth": {"wind": 1.5, "earth": 0.0, "fire": 1.0},
+    "holy": {"undead": 1.75, "shadow": 1.25, "holy": 0.0},
+    "shadow": {"holy": 1.25, "shadow": 0.0},
+    "undead": {"holy": 1.5},
+    "poison": {"undead": 0.0},
+    "ghost": {"ghost": 1.25, "neutral": 0.25}
+  }
+}
