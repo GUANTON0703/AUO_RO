@@ -30,7 +30,7 @@ from client.render import (
     newbie_hint_panel,
     status_panel,
 )
-from client.ui import choose as _choose
+from client.ui import choose as _choose, choose_many as _choose_many
 from client.watch import watch_hunt
 from server.content import load_content
 
@@ -135,8 +135,19 @@ def _do_hunt(api: ApiClient, character: dict, console: Console) -> None:
     )
     if map_id is None:
         return
+    map_def = _content.maps[map_id]
+    monster_rows = [
+        (f"{mon.name}（Lv {mon.level}）", mid)
+        for mid in map_def.monster_ids
+        for mon in [_content.get_monster(mid)]
+    ]
+    monster_ids = _choose_many(
+        console,
+        "要打哪幾隻怪？留空 = 自動選好打的，可多選（例如 1,3）",
+        monster_rows,
+    )
     try:
-        api.hunt_start(map_id, None)
+        api.hunt_start(map_id, monster_ids)
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return

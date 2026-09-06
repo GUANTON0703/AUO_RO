@@ -1,4 +1,5 @@
 import threading
+import time
 
 from rich.console import Console, Group
 from rich.live import Live
@@ -18,7 +19,7 @@ def _frame(character_panel, status: dict, events: list):
         top.add_row(character_panel, hunt_panel)
     else:
         top = hunt_panel
-    recent = events[-10:] or ["等待伺服器回傳戰鬥事件…"]
+    recent = events[-10:] or ["搜尋目標中…"]
     return Group(
         top,
         Panel(Group(*recent), title="即時戰鬥紀錄", height=14, expand=True),
@@ -40,6 +41,9 @@ def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 1.0,
     threading.Thread(target=_wait_enter, daemon=True).start()
 
     history = []
+    pending = []
+    last_batch_id = None
+    last_pop = time.monotonic()
     last_status = {}
     error = None
     no_hunt_message = None
@@ -58,7 +62,15 @@ def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 1.0,
                 break
             last_status = status
             character_panel = render_status(status) if render_status else None
-            history.extend(event_lines(status.get("events", [])))
+            batch_id = status.get("batch_id")
+            if batch_id is not None and batch_id != last_batch_id:
+                pending.extend(event_lines(status.get("events", [])))
+                last_batch_id = batch_id
+            if pending and time.monotonic() - last_pop >= 1.0:
+                n = 5 if len(pending) > 30 else 1
+                history.extend(pending[:n])
+                del pending[:n]
+                last_pop = time.monotonic()
             live.update(_frame(character_panel, status, history), refresh=True)
             if status.get("retreated") or stop.wait(poll_seconds):
                 break

@@ -73,10 +73,10 @@ class ApiClient:
         return self._req("POST", f"/api/characters/{cid}/resetskills")
 
     # --- hunt ---
-    def hunt_start(self, map_id, monster_id=None):
+    def hunt_start(self, map_id, monster_ids=None):
         b = {"map_id": map_id}
-        if monster_id:
-            b["monster_id"] = monster_id
+        if monster_ids is not None:   # 空 list 也要送：代表「明確自動」，清掉舊指定
+            b["monster_ids"] = monster_ids
         return self._req("POST", "/api/hunt/start", json=b)
 
     def hunt_status(self):

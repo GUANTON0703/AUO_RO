@@ -66,7 +66,7 @@ def main() -> None:
     console.rule("3) 加點後掛機東門村郊 + rewind 40 秒看逐回合事件")
     fresh = next(r for r in api.list_characters() if r["id"] == cid)
     api.allocate_stats(cid, {"str": 5, "vit": 3, "agi": 3})
-    api.hunt_start("prontera_east_gate", "green_cotton_worm")
+    api.hunt_start("prontera_east_gate", ["green_cotton_worm"])
     _rewind(cid, 40)
     status = api.hunt_status()
     kinds = [e.get("kind") for e in status.get("events", [])]

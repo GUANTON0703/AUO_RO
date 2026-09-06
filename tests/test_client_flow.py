@@ -92,6 +92,97 @@ def test_choose_empty_rows_returns_none(monkeypatch):
     assert choose(Console(record=True), "空", []) is None
 
 
+def test_choose_many_parses_multiple_numbers(monkeypatch):
+    from client.ui import choose_many
+    from rich.console import Console
+    monkeypatch.setattr("client.ui.Prompt.ask", lambda *a, **k: "1, 3")
+    rows = [("甲", "a"), ("乙", "b"), ("丙", "c")]
+    assert choose_many(Console(record=True), "選幾個", rows) == ["a", "c"]
+
+
+def test_choose_many_blank_means_auto(monkeypatch):
+    from client.ui import choose_many
+    from rich.console import Console
+    monkeypatch.setattr("client.ui.Prompt.ask", lambda *a, **k: "  ")
+    assert choose_many(Console(record=True), "選幾個", [("甲", "a")]) == []
+
+
+def test_choose_many_reprompts_on_invalid(monkeypatch):
+    from client.ui import choose_many
+    from rich.console import Console
+    answers = iter(["9", "2 1"])
+    monkeypatch.setattr("client.ui.Prompt.ask", lambda *a, **k: next(answers))
+    rows = [("甲", "a"), ("乙", "b")]
+    assert choose_many(Console(record=True), "選幾個", rows) == ["b", "a"]
+
+
+def test_do_hunt_passes_selected_monster_ids(monkeypatch):
+    from client import app
+    from rich.console import Console
+
+    class _HuntApi:
+        def __init__(self):
+            self.calls = []
+
+        def list_characters(self):
+            return [{"id": 1, "base_level": 20, "name": "阿獵"}]
+
+        def hunt_start(self, map_id, monster_ids=None):
+            self.calls.append((map_id, monster_ids))
+
+    monkeypatch.setattr(app, "_choose", lambda *a, **k: "prontera_east_gate")
+    monkeypatch.setattr(app, "_choose_many", lambda *a, **k: ["mad_bunny", "chick"])
+    monkeypatch.setattr(app, "watch_hunt", lambda *a, **k: None)
+    rec = _HuntApi()
+    app._do_hunt(rec, {"id": 1, "base_level": 20, "name": "阿獵"}, Console(record=True))
+    assert rec.calls == [("prontera_east_gate", ["mad_bunny", "chick"])]
+
+
+def test_do_hunt_blank_selection_is_auto(monkeypatch):
+    from client import app
+    from rich.console import Console
+
+    class _HuntApi:
+        def __init__(self):
+            self.calls = []
+
+        def list_characters(self):
+            return [{"id": 1, "base_level": 20, "name": "阿獵"}]
+
+        def hunt_start(self, map_id, monster_ids=None):
+            self.calls.append((map_id, monster_ids))
+
+    monkeypatch.setattr(app, "_choose", lambda *a, **k: "prontera_east_gate")
+    monkeypatch.setattr(app, "_choose_many", lambda *a, **k: [])
+    monkeypatch.setattr(app, "watch_hunt", lambda *a, **k: None)
+    rec = _HuntApi()
+    app._do_hunt(rec, {"id": 1, "base_level": 20, "name": "阿獵"}, Console(record=True))
+    assert rec.calls == [("prontera_east_gate", [])]
+
+
+def test_do_hunt_cancel_on_map_back(monkeypatch):
+    from client import app
+    from rich.console import Console
+
+    class _HuntApi:
+        def __init__(self):
+            self.calls = []
+
+        def list_characters(self):
+            return [{"id": 1, "base_level": 20, "name": "阿獵"}]
+
+        def hunt_start(self, *a, **k):
+            self.calls.append(a)
+
+    monkeypatch.setattr(app, "_choose", lambda *a, **k: None)
+    called = []
+    monkeypatch.setattr(app, "_choose_many", lambda *a, **k: called.append(1) or [])
+    monkeypatch.setattr(app, "watch_hunt", lambda *a, **k: None)
+    rec = _HuntApi()
+    app._do_hunt(rec, {"id": 1, "base_level": 20, "name": "阿獵"}, Console(record=True))
+    assert rec.calls == [] and called == []
+
+
 class _RecApi:
     def __init__(self):
         self.calls = []
