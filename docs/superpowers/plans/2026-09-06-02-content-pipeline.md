@@ -1067,3 +1067,99 @@ git commit -m "docs: 資料 schema 與來源說明；資料管線階段完成"
 - `DropEntry` 可能加 `zeny_min/zeny_max`（Task 7 Step 3）——若加，Task 2 測試要同步，已在 Task 7 註明 ✓
 
 **4. 已知後續：** 技能 / 卡片 / 掉落的 `effects` dict 目前是 `list[dict]` 未型別化；戰鬥引擎階段會加 discriminated union 並回頭驗證 `data/skills.json` `data/cards.json`。本階段資料先照約定的型別字串填。
+
+---
+
+## Task 10: v1 資料擴充（練功路線補完）— 2026-09-06 追加
+
+**問題：** Task 6-7 的 14 怪擠在 1~12 與 42~48，中間 13~41 級沒東西打，三張圖（礦洞/南區森林/下水道）掛的是墊檔怪。玩家練不到二轉。裝備有 21 件無取得來源。
+
+**目標：** 雜怪補到約 36 隻、每張圖有自己真正的 5~7 隻怪 + 1 MVP，等級 1~50 連續。裝備每件至少一個來源。
+
+### Task 10-A：`shared/content.py` 加裝備購買欄位
+
+- `EquipmentDef` 加 `npc_buy: int | None = None`、`npc_sell: int = Field(default=0, ge=0)`。
+- `tests/test_content_schema.py` 追加：入門武器 `npc_buy` 有值的斷言。
+
+### Task 10-B：`data/monsters.json` 擴充到 ~36 隻
+
+**保留現有 14 隻**，新增下列（名字/系/屬性/體型照 ludens 魔物出沒頁；數值 `baseline(level, role)` + 微調）：
+
+| id | name | lv | 地圖 | race | element | size | role |
+|---|---|---|---|---|---|---|---|
+| bee_soldier | 蜂兵 | 14 | prontera_south_field | insect | wind | small | glass |
+| poison_snail | 毒紋蝸牛 | 18 | prontera_south_field | insect | water | medium | tank |
+| mole | 土撥鼠 | 16 | mjolnir_mine | animal | earth | small | normal |
+| red_bat | 紅蝙蝠 | 17 | mjolnir_mine | animal | fire | small | glass |
+| minion_miner | 礦工魔 | 19 | mjolnir_mine | demihuman | earth | small | normal |
+| miner_foreman | 礦工工頭 | 20 | mjolnir_mine | demihuman | earth | large | tank |
+| clay_doll | 泥人 | 22 | mjolnir_mine | formless | water | medium | normal |
+| clay_monster | 泥怪 | 23 | mjolnir_mine | formless | water | large | tank |
+| drop_poring | 水滴波利 | 24 | prontera_west_plain | angel | water | medium | glass |
+| locust | 蝗蟲 | 25 | prontera_west_plain | insect | wind | medium | normal |
+| heavy_locust | 重金屬蝗蟲 | 26 | prontera_west_plain | insect | wind | medium | normal |
+| pobopoli | 波波利 | 27 | prontera_west_plain | angel | wind | medium | glass |
+| ladybug | 瓢蟲 | 31 | prontera_south_forest | insect | wind | small | glass |
+| cramy | 克瑞米 | 32 | prontera_south_forest | insect | wind | small | glass |
+| forest_spirit | 森靈 | 34 | prontera_south_forest | formless | earth | medium | normal |
+| bigfoot_bear | 大腳熊 | 35 | prontera_south_forest | animal | fire | large | tank |
+| white_ghost | 白幽靈 | 37 | prontera_south_forest | undead | wind | small | glass |
+| ghost_poring | 幽靈波利 | 38 | prontera_south_forest | undead | poison | medium | normal |
+| white_rat | 白鼠 | 39 | prontera_sewer | animal | water | small | glass |
+| blue_rat | 藍鼠 | 40 | prontera_sewer | animal | water | small | normal |
+| familiar_thief_bug | 浮勒盜蟲 | 42 | prontera_sewer | insect | poison | medium | normal |
+| poison_spore | 毒魔菇 | 43 | prontera_sewer | demon | poison | medium | normal |
+| golden_bug | 黃金蟲 | 45 | prontera_sewer | insect | fire | large | tank |
+| mal_thief_bug | 瑪勒盜蟲 | 45 | prontera_sewer | insect | poison | medium | normal |
+| mandragora | 曼陀羅魔花 | 49 | prontera_north_forest | demon | shadow | large | normal |
+| evil_sunflower | 邪惡向日葵 | 50 | prontera_north_forest | plant | holy | large | tank |
+| queen_scarab | 女王甲蟲 | 44 | morroc_oasis | angel | holy | small | glass |
+| dragonfly | 龍蠅 | 45 | morroc_oasis | insect | water | small | glass |
+
+（雷極刺蝟已在；綠洲共 3 隻雜怪 + MVP。）
+
+### Task 10-C：`data/maps.json` 校正等級帶與怪群
+
+| id | level_range | unlock | monster_ids | mvp_id |
+|---|---|---|---|---|
+| prontera_east_gate | [1,10] | 1 | green_cotton_worm, mad_bunny, little_boar, chick, yoyo_monkey | angel_poring→改，見下 |
+| prontera_south_field | [8,18] | 8 | raccoon, mushroom, grass_sprite, snail, bee_soldier, poison_snail | fierce_mushroom |
+| prontera_west_plain | [1,30] | 1 | poring, drop_poring, locust, heavy_locust, pobopoli, tree_sprite | choco_monkey |
+| mjolnir_mine | [15,25] | 14 | mole, red_bat, minion_miner, miner_foreman, clay_doll, clay_monster | angel_poring |
+| prontera_south_forest | [28,40] | 26 | ladybug, cramy, forest_spirit, bigfoot_bear, white_ghost, ghost_poring | forest_guardian |
+| prontera_sewer | [38,48] | 36 | white_rat, blue_rat, familiar_thief_bug, poison_spore, golden_bug, mal_thief_bug | queen_bee |
+| prontera_north_forest | [45,55] | 44 | wolf, boar, mandragora, evil_sunflower | curly_boar_king |
+| morroc_oasis | [42,52] | 40 | thunder_hedgehog, queen_scarab, dragonfly | raging_bigfoot |
+
+> `mvp_id` 一圖一隻，其餘 MVP 的 `home_map_id` 可共用。angel_poring 掛礦洞（Lv16 貼齊礦洞帶）。
+
+### Task 10-D：`data/mvps.json` 補到 8 隻
+
+現有 6：angel_poring, fierce_mushroom, queen_bee, forest_guardian, choco_monkey, curly_boar_king。新增 2：
+
+| id | name | lv | home_map_id | cooldown_h | element | race | size |
+|---|---|---|---|---|---|---|---|
+| raging_bigfoot | 狂暴大腳熊 | 36 | morroc_oasis | 12 | fire | animal | large |
+| golden_bug_king | 黃金蟲王 | 45 | prontera_sewer | 24 | fire | insect | large |
+
+（每張圖至少對得到一隻 MVP：east_gate 目前無——可接受，或把 angel_poring 掛 east_gate。實作者判斷，原則：8 張圖至少 6 張有 mvp_id。）
+
+### Task 10-E：裝備來源補完
+
+1. 入門武器 6 把 + 基礎防具（cotton_shirt, sandals, hood…）：填 `npc_buy`（武器 100~1500 Zeny 依 atk、防具 50~800）、`npc_sell` = npc_buy // 2。
+2. 中階裝備（fine / 無 npc_buy 的）：加進新怪的 `drops`（rate 0.02~0.1），依等級帶對應——礦洞怪掉礦洞向裝備、森林怪掉森林向裝備。
+3. legendary 裝備：只從 MVP drops（已有）。
+4. 跑檢查：每件 `equipment` 的 id 要嘛有 `npc_buy`，要嘛出現在某個 monster/mvp 的 drops。新增測試 `test_every_equipment_obtainable`。
+
+### Task 10-F：卡片補到 ~26 張
+
+現有 16。為新怪補 ~8 張雜怪卡（clay_monster→armor DEF、mole→shoes、locust→weapon ASPD、bigfoot_bear→weapon ATK、ghost_poring→garment 暗抗、poison_spore→accessory 毒抗…）+ 新 2 隻 MVP 卡。全部進對應怪 drops。
+
+### Task 10-G：驗證與 commit
+
+- [ ] `uv run pytest -q` 全綠（含新測試）
+- [ ] `uv run python -m server.admin content check` → monsters ~36 / mvps 8 / cards ~26
+- [ ] 新測試：`test_level_curve_has_no_gap`——1~50 每 5 級區間至少有 1 隻可打的怪
+- [ ] `test_every_equipment_obtainable`
+- [ ] codex review 到 LGTM
+- [ ] commit：`feat: v1 資料擴充——練功路線補完（~36 怪 / 8 MVP / ~26 卡）`
