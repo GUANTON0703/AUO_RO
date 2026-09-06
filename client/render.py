@@ -54,6 +54,15 @@ def status_panel(character: dict) -> Panel:
     return Panel("\n".join(lines), title="角色狀態", expand=False)
 
 
+def choose_table(title: str, rows: list) -> Table:
+    table = Table(title=title, expand=False)
+    table.add_column("#", justify="right")
+    table.add_column("選項")
+    for i, (label, _value) in enumerate(rows, 1):
+        table.add_row(str(i), str(label))
+    return table
+
+
 _COMBAT_KINDS = {"attack", "skill", "fled"}
 
 

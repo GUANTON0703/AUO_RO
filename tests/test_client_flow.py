@@ -62,6 +62,36 @@ def test_ensure_logged_in_reuses_saved_token(api, tmp_path, monkeypatch):
     assert fresh.token == client.token
 
 
+def test_choose_returns_value_by_number(monkeypatch):
+    from client import app
+    from rich.console import Console
+    answers = iter(["2"])
+    monkeypatch.setattr("client.app.Prompt.ask", lambda *a, **k: next(answers))
+    rows = [("甲", "a"), ("乙", "b"), ("丙", "c")]
+    assert app._choose(Console(record=True), "選一個", rows) == "b"
+
+
+def test_choose_zero_returns_none(monkeypatch):
+    from client import app
+    from rich.console import Console
+    monkeypatch.setattr("client.app.Prompt.ask", lambda *a, **k: "0")
+    assert app._choose(Console(record=True), "選一個", [("甲", "a")]) is None
+
+
+def test_choose_reprompts_on_garbage(monkeypatch):
+    from client import app
+    from rich.console import Console
+    answers = iter(["x", "99", "1"])
+    monkeypatch.setattr("client.app.Prompt.ask", lambda *a, **k: next(answers))
+    assert app._choose(Console(record=True), "選一個", [("甲", "a"), ("乙", "b")]) == "a"
+
+
+def test_choose_empty_rows_returns_none(monkeypatch):
+    from client import app
+    from rich.console import Console
+    assert app._choose(Console(record=True), "空", []) is None
+
+
 class _RecApi:
     def __init__(self):
         self.calls = []

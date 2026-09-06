@@ -1,5 +1,6 @@
 import httpx
 from rich.console import Console
+from rich.panel import Panel
 from rich.prompt import Prompt
 
 from client.api import ApiClient, ApiError
@@ -47,6 +48,46 @@ _HELP = """指令：
   help        本說明
   q / quit    離開
 """
+
+
+_MENU = [
+    ("h", "掛機"), ("v", "查看掛機"), ("stop", "停止掛機"),
+    ("stats", "加點"), ("skills", "學技能"), ("equip", "裝備"),
+    ("refine", "精煉"), ("socket", "鑲卡"), ("shop", "商店"),
+    ("storage", "倉庫"), ("job", "轉職"), ("mvp", "MVP 王"),
+    ("rank", "排行榜"), ("trade", "交易"), ("guild", "公會"), ("chat", "聊天"),
+    ("i", "背包"), ("s", "狀態"), ("help", "說明"), ("q", "離開"),
+]
+
+_NO_PAUSE = {"h", "hunt", "v", "watch", "q", "quit", "exit"}
+
+
+def _choose(console, title, rows, *, allow_back=True):
+    """rows: [(label, value)]。印編號選單，回選中的 value；allow_back 時 0 回 None。"""
+    if not rows:
+        console.print("[dim](沒有可選項目)[/dim]")
+        return None
+    console.print(f"[bold]{title}[/bold]")
+    for i, (label, _) in enumerate(rows, 1):
+        console.print(f"  [cyan]{i}[/cyan]) {label}")
+    if allow_back:
+        console.print("  [cyan]0[/cyan]) 返回")
+    while True:
+        raw = Prompt.ask("選擇").strip()
+        if raw == "0" and allow_back:
+            return None
+        if raw.isdigit() and 1 <= int(raw) <= len(rows):
+            return rows[int(raw) - 1][1]
+        console.print("[red]請輸入清單上的編號[/red]")
+
+
+def _render_screen(console: Console, api: ApiClient, character: dict, last_output) -> None:
+    console.clear()
+    console.print(status_panel(_merge_sheet(api, _current_character(api, character))))
+    if last_output:
+        console.print(last_output)
+    cols = "　".join(f"[cyan]{k}[/cyan] {label}" for k, label in _MENU)
+    console.print(Panel(cols, title="指令", expand=False))
 
 
 def _merge_sheet(api: ApiClient, character: dict) -> dict:
@@ -131,9 +172,6 @@ def run(server_url: str) -> None:
         return
 
     character = select_or_create_character(api)
-    console.print(f"[bold green]歡迎回來，{character['name']}！[/bold green]")
-    _show_status(api, character, console)
-    console.print("輸入 help 看指令。")
 
     menus = {
         "stats": stats_menu, "skills": skills_menu, "equip": equip_menu,
@@ -143,7 +181,9 @@ def run(server_url: str) -> None:
         "guild": guild_menu,
     }
 
+    last_output = "[bold green]歡迎回來，" + character["name"] + "！[/bold green] 輸入指令代號或直接打字。"
     while True:
+        _render_screen(console, api, character, last_output)
         try:
             cmd = Prompt.ask("[cyan]>[/cyan]").strip().lower()
         except (EOFError, KeyboardInterrupt):
@@ -155,6 +195,8 @@ def run(server_url: str) -> None:
                 break
             elif cmd in ("h", "hunt"):
                 _do_hunt(api, character, console)
+            elif cmd in ("v", "watch"):
+                watch_hunt(api, console)
             elif cmd == "stop":
                 _do_stop(api, console)
             elif cmd in ("s", "status"):
@@ -177,6 +219,13 @@ def run(server_url: str) -> None:
                 console.print("未知指令，輸入 help。")
         except ApiError as exc:
             console.print(f"[red]錯誤：{exc.detail}[/red]")
+
+        last_output = None
+        if cmd not in _NO_PAUSE:
+            try:
+                Prompt.ask("\n[dim]按 Enter 回主選單[/dim]", default="")
+            except (EOFError, KeyboardInterrupt):
+                break
 
     saved = store.load() or {}
     store.save(server_url=server_url, token=api.token, username=saved.get("username"))
