@@ -28,6 +28,30 @@ def choose(console: Console, title: str, rows: list, *, allow_back: bool = True)
         console.print("[red]請輸入清單上的編號[/red]")
 
 
+def choose_many(console: Console, title: str, rows: list, *, allow_back: bool = True):
+    """rows: [(label, value)]。印編號選單，讀逗號或空白分隔的多個編號，回選中的 value list。
+    留空 = 回傳 []（代表自動）。allow_back 目前僅用於提示一致性。"""
+    if not rows:
+        console.print("[dim](沒有可選項目)[/dim]")
+        return []
+    console.print(f"[bold]{title}[/bold]")
+    for i, (label, _) in enumerate(rows, 1):
+        console.print(f"  [cyan]{i}[/cyan]) {label}")
+    while True:
+        raw = Prompt.ask("選擇（可多選，逗號或空白分隔；留空 = 自動）").strip()
+        if not raw:
+            return []
+        parts = raw.replace(",", " ").split()
+        if all(p.isdigit() and 1 <= int(p) <= len(rows) for p in parts):
+            seen = []
+            for p in parts:
+                v = rows[int(p) - 1][1]
+                if v not in seen:
+                    seen.append(v)
+            return seen
+        console.print("[red]請輸入清單上的編號（可多個，例如 1,3），留空 = 自動[/red]")
+
+
 def choose_table(title: str, rows: list) -> Table:
     table = Table(title=title, expand=False)
     table.add_column("#", justify="right")

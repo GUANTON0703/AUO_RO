@@ -21,6 +21,19 @@ class MultipliersRequest(BaseModel):
     drop: float = Field(gt=0, le=100)
 
 
+class HuntSettingsRequest(BaseModel):
+    settle_floor_seconds: float = Field(ge=1, le=600)
+    huntable_win_rate: float = Field(ge=0, le=1)
+
+
+_SETTING_DEFAULTS = {
+    "experience_multiplier": 1.0,
+    "drop_multiplier": 1.0,
+    "settle_floor_seconds": 15.0,
+    "huntable_win_rate": 0.6,
+}
+
+
 def _character(character_id: int):
     with connection.get_connection() as conn:
         row = conn.execute("SELECT * FROM characters WHERE id = ?", (character_id,)).fetchone()
@@ -50,6 +63,33 @@ def set_multipliers(body: MultipliersRequest, _: GMAccount):
     with connection.transaction() as conn:
         conn.executemany("INSERT INTO server_settings(key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", [("experience_multiplier", str(body.experience)), ("drop_multiplier", str(body.drop))])
     return {"experience": body.experience, "drop": body.drop}
+
+
+@router.put("/settings/hunt")
+def set_hunt_settings(body: HuntSettingsRequest, _: GMAccount):
+    with connection.transaction() as conn:
+        conn.executemany(
+            "INSERT INTO server_settings(key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+            [
+                ("settle_floor_seconds", str(body.settle_floor_seconds)),
+                ("huntable_win_rate", str(body.huntable_win_rate)),
+            ],
+        )
+    return {
+        "settle_floor_seconds": body.settle_floor_seconds,
+        "huntable_win_rate": body.huntable_win_rate,
+    }
+
+
+@router.get("/settings")
+def get_server_settings(_: GMAccount):
+    with connection.get_connection() as conn:
+        rows = conn.execute(
+            "SELECT key, value FROM server_settings WHERE key IN (?, ?, ?, ?)",
+            tuple(_SETTING_DEFAULTS),
+        ).fetchall()
+    values = {row["key"]: float(row["value"]) for row in rows}
+    return {key: values.get(key, default) for key, default in _SETTING_DEFAULTS.items()}
 
 
 @router.get("/online-players")

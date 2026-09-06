@@ -1,7 +1,10 @@
 import httpx
-from rich.console import Console
+from rich.console import Console, Group
+from rich.markup import escape
 from rich.panel import Panel
 from rich.prompt import Prompt
+from rich.table import Table
+from rich.text import Text
 
 from client.api import ApiClient, ApiError
 from client.auth_flow import ensure_logged_in, select_or_create_character
@@ -10,6 +13,7 @@ from client.chat import chat_mode
 from client.menus import (
     equip_menu,
     content_menu,
+    gm_menu,
     guild_menu,
     jobchange_menu,
     mvp_menu,
@@ -25,12 +29,13 @@ from client.menus import (
 )
 from client.render import (
     event_lines,
+    hunt_status_panel,
     hunt_summary,
     inventory_table,
     newbie_hint_panel,
     status_panel,
 )
-from client.ui import choose as _choose
+from client.ui import choose as _choose, choose_many as _choose_many
 from client.watch import watch_hunt
 from server.content import load_content
 
@@ -76,15 +81,62 @@ _ALIASES = {
     "hunt": "h", "watch": "v", "status": "s", "inv": "i", "quit": "q", "exit": "q",
 }
 
-_NO_PAUSE = {"h", "hunt", "v", "watch", "q", "quit", "exit"}
+_NO_PAUSE = {"h", "hunt", "v", "watch", "c", "chat", "q", "quit", "exit"}
 
 
-def _render_screen(console: Console, api: ApiClient, character: dict, last_output) -> None:
+def _try_hunt_status(api: ApiClient) -> dict | None:
+    try:
+        return api.hunt_status()
+    except Exception:
+        return None
+
+
+def _refresh_chat(api: ApiClient, state: dict) -> None:
+    channels = ["world"]
+    if state.get("guild_id"):
+        channels.append(f"guild:{state['guild_id']}")
+    first = not state.get("chat_seeded")
+    for ch in channels:
+        try:
+            msgs = api.chat_since(ch, state["chat_last"].get(ch, 0)) or []
+        except Exception:
+            continue
+        if first:
+            msgs = msgs[-8:]
+        for m in msgs:
+            state["chat_last"][ch] = m["id"]
+            tag = "" if ch == "world" else "[magenta][公會][/magenta] "
+            name = escape(str(m.get("character_name", "?")))
+            text = escape(str(m.get("text", "")))
+            state["chat"].append(
+                Text.from_markup(f"{tag}[cyan]{name}[/cyan]：{text}")
+            )
+    del state["chat"][:-40]
+    state["chat_seeded"] = True
+
+
+def _render_screen(console: Console, api: ApiClient, character: dict,
+                   last_output, state: dict) -> None:
     console.clear()
-    console.print(status_panel(_merge_sheet(api, _current_character(api, character))))
+    char_panel = status_panel(_merge_sheet(api, _current_character(api, character)))
+    hunt = _try_hunt_status(api)
+    if hunt and not hunt.get("retreated"):
+        grid = Table.grid(expand=True)
+        grid.add_column(ratio=1)
+        grid.add_column(ratio=1)
+        grid.add_row(char_panel, hunt_status_panel(hunt))
+        console.print(grid)
+    else:
+        console.print(char_panel)
+
+    _refresh_chat(api, state)
+    if state["chat"]:
+        console.print(Panel(Group(*state["chat"][-8:]), title="聊天（c 進入）", expand=False))
+
     if last_output:
         console.print(last_output)
-    cols = "　".join(f"[cyan]{k}[/cyan] {label}" for k, label in _MENU)
+    entries = _MENU + [("gm", "GM管理")] if state.get("is_gm") else _MENU
+    cols = "　".join(f"[cyan]{k}[/cyan] {label}" for k, label in entries)
     console.print(Panel(cols, title="指令", expand=False))
 
 
@@ -135,8 +187,19 @@ def _do_hunt(api: ApiClient, character: dict, console: Console) -> None:
     )
     if map_id is None:
         return
+    map_def = _content.maps[map_id]
+    monster_rows = [
+        (f"{mon.name}（Lv {mon.level}）", mid)
+        for mid in map_def.monster_ids
+        for mon in [_content.get_monster(mid)]
+    ]
+    monster_ids = _choose_many(
+        console,
+        "要打哪幾隻怪？留空 = 自動選好打的，可多選（例如 1,3）",
+        monster_rows,
+    )
     try:
-        api.hunt_start(map_id, None)
+        api.hunt_start(map_id, monster_ids)
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return
@@ -190,9 +253,28 @@ def run(server_url: str) -> None:
         "guild": guild_menu, "content": content_menu, "strategy": strategy_menu,
     }
 
+    state = {"is_gm": False, "chat": [], "chat_last": {}, "chat_seeded": False,
+             "guild_id": None}
+    try:
+        state["is_gm"] = bool((api.me() or {}).get("is_gm"))
+    except ApiError:
+        pass
+    try:
+        g = api.guild_mine()
+        state["guild_id"] = g["id"] if g else None
+    except ApiError:
+        pass
+    if state["is_gm"]:
+        menus["gm"] = gm_menu
+
     last_output = "[bold green]歡迎回來，" + character["name"] + "！[/bold green] 輸入指令代號或直接打字。"
     while True:
-        _render_screen(console, api, character, last_output)
+        try:
+            _render_screen(console, api, character, last_output, state)
+        except Exception as exc:
+            import traceback
+            console.print(f"[red]畫面繪製出錯：{exc}[/red]")
+            console.print(f"[dim]{traceback.format_exc()}[/dim]")
         try:
             cmd = Prompt.ask("[cyan]>[/cyan]").strip().lower()
         except (EOFError, KeyboardInterrupt):
@@ -225,12 +307,22 @@ def run(server_url: str) -> None:
             elif cmd in menus:
                 character = _current_character(api, character)
                 menus[cmd](api, character, console)
+                if cmd == "guild":
+                    try:
+                        g = api.guild_mine()
+                        state["guild_id"] = g["id"] if g else None
+                    except ApiError:
+                        pass
             elif cmd == "help":
                 console.print(_HELP)
             else:
                 console.print("未知指令，輸入 help。")
         except ApiError as exc:
             console.print(f"[red]錯誤：{exc.detail}[/red]")
+        except Exception as exc:
+            import traceback
+            console.print(f"[red]指令「{cmd}」出錯：{exc}[/red]")
+            console.print(f"[dim]{traceback.format_exc()}[/dim]")
 
         last_output = None
         if cmd not in _NO_PAUSE:

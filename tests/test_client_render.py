@@ -66,6 +66,8 @@ def test_shop_table_and_hunt_summary():
 def test_retreat_advice_known_and_unknown():
     assert "紅色藥水" in retreat_advice("補品用盡")
     assert retreat_advice("某個沒定義的原因") == "換個地方打打看，或先提升角色數值。"
+    assert "更弱的地圖" in retreat_advice("此地圖的怪你目前都打不贏")
+    assert retreat_advice("戰鬥中被擊倒") != retreat_advice("某個沒定義的原因")
 
 
 def test_newbie_hint_panel_renders():

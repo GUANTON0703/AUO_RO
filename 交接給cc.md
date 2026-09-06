@@ -1,6 +1,31 @@
 # ROtxt 交接給 CC
 
-最後更新：2026-09-06
+最後更新：2026-09-07
+
+## 2026-09-07 第二批：GM 工具、主選單常駐面板、畫面修復（branch fix/hunt-settlement-decouple，370 passed，Codex LGTM）
+
+- **GM 選單**：GM 帳號登入後多 `g` 指令。調經驗/掉寶倍率、掛機參數（結算地板、勝率門檻，存 `server_settings` 表，`HuntConfig.from_settings` 讀）、給自己角色錢、設經驗值、查線上玩家。後端 `GET /api/me`（回 is_gm）、`PUT /api/admin/settings/hunt`、`GET /api/admin/settings`。
+- **主選單常駐**：掛機時右上角顯示掛機狀態面板；聊天訊息常駐中間（回主選單拉一次、顯示最近 8 條，切選單再回來不消失）。
+- **觀看畫面**：`Live` 改全螢幕緩衝區（修畫面被過高內容擠爆重複顯示）；掛機時間本地補間（不再每 15 秒才跳）；戰鬥紀錄去掉「擊殺 ×N」跟逐擊重複的那行；大批次（離線追趕）直接倒完不逐播。
+- **安全**：聊天名稱/內文、角色名做 rich markup escape（玩家送 `[/]` 會讓別人客戶端崩）；建角擋掉名稱含中括號。
+- 本機 `rotxt.db` 有測試帳號 `livetest1`（一般）、`livetest2`（已授 GM）。使用者原 GM 帳號 `1409313` 不受影響。
+
+## 2026-09-07 第一批：掛機結算重構（已 commit 到同一 branch，Codex LGTM）
+
+改了三個 bug + 一個架構調整：
+
+1. **掛機不進度**：舊版每次輪詢（約 1 秒）就結算一次，切碎的時間湊不滿一場戰鬥、又被標記成已結算 → 時間白燒、擊殺永遠 0。
+   改成「結算地板」：距上次結算未達 `HuntConfig.settle_floor_seconds`（預設 15 秒）且非離線、非停止掛機 → 只回累積值，不重算、不推進時間戳。輪詢頻率與結算頻率脫鉤。
+2. **戰鬥畫面**：伺服器每批結算事件帶 `batch_id`（記憶體暫存 `hunt._last_batch`）。客戶端 `watch.py` 用佇列每秒吐一行，佇列 > 30 條加速；空了顯示「搜尋目標中…」。
+3. **技能點顯示 0**：`skill_points` / `stat_points` 這兩個 DB 欄位從沒被寫過。改成 `server/api/characters.py`、`progression.py` 回傳「算出來的可用點數」（`skill_points_available` / `stat_points_available`）。欄位沒移除。
+4. **選怪**：`h` 選完地圖可多選怪（`client/ui.py` 新增 `choose_many`），留空 = 自動。自動模式只打勝率 ≥ `HuntConfig.huntable_win_rate`（預設 0.6）的怪、在其間輪替；全打不贏就擋下（開始時 400）或撤退回村。手動指定則不套勝率過濾（玩家自己扛）。
+   API：`POST /api/hunt/start` body 從 `monster_id` 改 `monster_ids: list`。帶空 list = 明確自動（清掉舊指定）；完全不帶 = 沿用既有 strategy。舊 `monster_id` 單選仍相容。
+
+新檔：`server/settlement/huntable.py`（勝率過濾 / 起始怪挑選）。
+`tests/conftest.py` 加了 autouse fixture 清 `hunt._strategies` / `hunt._last_batch`（module-level dict 會在測試間互相污染；正式環境角色 id 全域唯一不受影響）。
+
+---
+（以下為 2026-09-06 交接內容）
 
 ## 接手目標
 

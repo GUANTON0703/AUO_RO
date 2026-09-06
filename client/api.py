@@ -73,10 +73,10 @@ class ApiClient:
         return self._req("POST", f"/api/characters/{cid}/resetskills")
 
     # --- hunt ---
-    def hunt_start(self, map_id, monster_id=None):
+    def hunt_start(self, map_id, monster_ids=None):
         b = {"map_id": map_id}
-        if monster_id:
-            b["monster_id"] = monster_id
+        if monster_ids is not None:   # 空 list 也要送：代表「明確自動」，清掉舊指定
+            b["monster_ids"] = monster_ids
         return self._req("POST", "/api/hunt/start", json=b)
 
     def hunt_status(self):
@@ -197,6 +197,33 @@ class ApiClient:
 
     def trade_get(self, tid):
         return self._req("GET", f"/api/trade/{tid}")
+
+    # --- me / GM ---
+    def me(self):
+        return self._req("GET", "/api/me")
+
+    def admin_settings(self):
+        return self._req("GET", "/api/admin/settings")
+
+    def admin_set_multipliers(self, experience, drop):
+        return self._req("PUT", "/api/admin/settings/multipliers",
+                         json={"experience": experience, "drop": drop})
+
+    def admin_set_hunt(self, settle_floor_seconds, huntable_win_rate):
+        return self._req("PUT", "/api/admin/settings/hunt",
+                         json={"settle_floor_seconds": settle_floor_seconds,
+                               "huntable_win_rate": huntable_win_rate})
+
+    def admin_money(self, cid, amount):
+        return self._req("POST", f"/api/admin/characters/{cid}/money",
+                         json={"amount": amount})
+
+    def admin_experience(self, cid, base_exp, job_exp):
+        return self._req("POST", f"/api/admin/characters/{cid}/experience",
+                         json={"base_exp": base_exp, "job_exp": job_exp})
+
+    def admin_online_players(self):
+        return self._req("GET", "/api/admin/online-players")
 
     # --- social: guild ---
     def guild_create(self, name):

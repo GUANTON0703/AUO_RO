@@ -87,12 +87,55 @@ def test_hunt_status_includes_current_target(client, auth, db_helpers):
 def test_hunt_rotates_through_map_monsters(client, auth, db_helpers):
     _, headers, _ = auth
     ch = _ready_char(client, headers, db_helpers, base_level=20)
+    # 自動模式（不指定怪），地圖多隻怪都打得贏 → 每次結算輪替到下一隻
     client.post("/api/hunt/start", headers=headers,
-                json={"map_id": "prontera_south_field", "monster_id": "mushroom"})
-    db_helpers.rewind_hunt(ch["id"], seconds=10)
-    client.get("/api/hunt/status", headers=headers)
-    next_status = client.get("/api/hunt/status", headers=headers).json()
-    assert next_status["monster_id"] != "mushroom"
+                json={"map_id": "prontera_east_gate"})
+    db_helpers.rewind_hunt(ch["id"], seconds=20)
+    m1 = client.get("/api/hunt/status", headers=headers).json()["monster_id"]
+    db_helpers.rewind_hunt(ch["id"], seconds=20)
+    m2 = client.get("/api/hunt/status", headers=headers).json()["monster_id"]
+    assert m1 != m2
+
+
+def test_status_below_floor_does_not_resettle(client, auth, db_helpers):
+    _, headers, _ = auth
+    ch = _ready_char(client, headers, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=headers, json={"map_id": "prontera_east_gate"})
+    db_helpers.rewind_hunt(ch["id"], seconds=20)
+    first = client.get("/api/hunt/status", headers=headers).json()
+    # 只往前 5 秒（未達 15 秒地板）→ 不重算，累積值不變、沒有新事件
+    db_helpers.rewind_hunt(ch["id"], seconds=5)
+    second = client.get("/api/hunt/status", headers=headers).json()
+    assert second["kills"] == first["kills"]
+    assert second["base_exp"] == first["base_exp"]
+    assert second["effective_seconds"] == first["effective_seconds"]
+    assert second["events"] == first["events"]
+    assert second["batch_id"] == first["batch_id"]
+
+
+def test_explicit_monster_ids_bypass_winrate_filter(client, auth, db_helpers):
+    _, headers, _ = auth
+    ch = client.post("/api/characters", headers=headers, json={"name": "硬拚仔"}).json()
+    db_helpers.set_base_level(ch["id"], 8)
+    db_helpers.set_stats(ch["id"], {"str": 1, "agi": 1, "vit": 1, "int": 1,
+                                    "dex": 1, "luk": 1})
+    # 弱角色指定打強怪，伺服器不擋（玩家自己扛）
+    r = client.post("/api/hunt/start", headers=headers,
+                    json={"map_id": "prontera_south_field",
+                          "monster_ids": ["poison_snail"]})
+    assert r.status_code == 200
+    assert r.json()["monster_id"] == "poison_snail"
+
+
+def test_auto_mode_all_unwinnable_refuses_start(client, auth, db_helpers):
+    _, headers, _ = auth
+    ch = client.post("/api/characters", headers=headers, json={"name": "菜雞"}).json()
+    db_helpers.set_base_level(ch["id"], 8)
+    db_helpers.set_stats(ch["id"], {"str": 1, "agi": 1, "vit": 1, "int": 1,
+                                    "dex": 1, "luk": 1})
+    r = client.post("/api/hunt/start", headers=headers,
+                    json={"map_id": "prontera_south_field"})
+    assert r.status_code == 400
 
 
 def test_offline_gap_applies_efficiency(client, auth, db_helpers):

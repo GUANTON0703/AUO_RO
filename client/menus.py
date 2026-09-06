@@ -579,3 +579,74 @@ def mvp_menu(api, character: dict, console: Console | None = None) -> None:
         console.print(f"[red]戰敗，損失經驗 {result.get('exp_penalty', 0)}。[/red]")
     else:
         console.print("[yellow]已撤退，未損失經驗（進入短冷卻）。[/yellow]")
+
+
+def _ask_float(console: Console, label: str, current: float) -> float | None:
+    raw = Prompt.ask(f"{label}（目前 {current}）", default=str(current)).strip()
+    try:
+        return float(raw)
+    except ValueError:
+        console.print("[red]要輸入數字[/red]")
+        return None
+
+
+def gm_menu(api, character: dict, console: Console | None = None) -> None:
+    console = console or _console
+    while True:
+        try:
+            s = api.admin_settings()
+        except ApiError as exc:
+            console.print(f"[red]{exc.detail}[/red]")
+            return
+        console.print(
+            f"[dim]目前：經驗×{s.get('experience_multiplier')}　掉寶×{s.get('drop_multiplier')}"
+            f"　結算地板 {s.get('settle_floor_seconds')}s　勝率門檻 {s.get('huntable_win_rate')}[/dim]"
+        )
+        action = choose(console, "GM 管理", [
+            ("經驗 / 掉寶倍率", "mult"),
+            ("掛機參數（結算地板、勝率門檻）", "hunt"),
+            ("給自己角色金錢", "money"),
+            ("直接設定自己角色經驗值", "exp"),
+            ("查看線上玩家", "online"),
+        ])
+        if action is None:
+            return
+        try:
+            if action == "mult":
+                exp = _ask_float(console, "經驗倍率", s.get("experience_multiplier", 1.0))
+                drop = _ask_float(console, "掉寶倍率", s.get("drop_multiplier", 1.0))
+                if exp is None or drop is None:
+                    continue
+                api.admin_set_multipliers(exp, drop)
+                console.print("[green]已更新倍率[/green]")
+            elif action == "hunt":
+                floor = _ask_float(console, "結算地板秒數", s.get("settle_floor_seconds", 15.0))
+                wr = _ask_float(console, "勝率門檻（0~1）", s.get("huntable_win_rate", 0.6))
+                if floor is None or wr is None:
+                    continue
+                api.admin_set_hunt(floor, wr)
+                console.print("[green]已更新掛機參數[/green]")
+            elif action == "money":
+                amt = IntPrompt.ask("加多少 Zeny（可負）")
+                r = api.admin_money(_cid(character), amt)
+                console.print(f"[green]目前 Zeny：{r.get('zeny')}[/green]")
+            elif action == "exp":
+                be = IntPrompt.ask("Base 經驗值")
+                je = IntPrompt.ask("Job 經驗值")
+                r = api.admin_experience(_cid(character), be, je)
+                console.print(f"[green]已設定：Base {r.get('base_exp')} / Job {r.get('job_exp')}[/green]")
+            elif action == "online":
+                rows = api.admin_online_players() or []
+                table = Table(title="線上玩家")
+                table.add_column("帳號")
+                table.add_column("角色")
+                table.add_column("Base", justify="right")
+                table.add_column("Job", justify="right")
+                table.add_column("Zeny", justify="right")
+                for r in rows:
+                    table.add_row(str(r.get("username", "")), str(r.get("name", "") or "-"),
+                                  str(r.get("base_level", "")), str(r.get("job_level", "")),
+                                  str(r.get("zeny", "")))
+                console.print(table)
+        except ApiError as exc:
+            console.print(f"[red]{exc.detail}[/red]")

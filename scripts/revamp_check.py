@@ -50,7 +50,9 @@ def main() -> None:
     cid = ch["id"]
 
     console.rule("1) _render_screen（置頂狀態）")
-    _render_screen(console, api, ch, "（上一個動作的輸出會出現在這）")
+    _state = {"is_gm": False, "chat": [], "chat_last": {}, "chat_seeded": False,
+              "guild_id": None}
+    _render_screen(console, api, ch, "（上一個動作的輸出會出現在這）", _state)
 
     console.rule("2) stats_menu 配點器（選 str 3 次再完成）")
     answers = iter(["1", "1", "1", "0"])
@@ -66,7 +68,7 @@ def main() -> None:
     console.rule("3) 加點後掛機東門村郊 + rewind 40 秒看逐回合事件")
     fresh = next(r for r in api.list_characters() if r["id"] == cid)
     api.allocate_stats(cid, {"str": 5, "vit": 3, "agi": 3})
-    api.hunt_start("prontera_east_gate", "green_cotton_worm")
+    api.hunt_start("prontera_east_gate", ["green_cotton_worm"])
     _rewind(cid, 40)
     status = api.hunt_status()
     kinds = [e.get("kind") for e in status.get("events", [])]
@@ -75,12 +77,13 @@ def main() -> None:
                   f"kill_batch：{'kill_batch' in kinds}")
     api.hunt_stop()
 
-    console.rule("4) 不加點掛機 rewind 3h → 撤退 + 建議")
+    console.rule("4) 菜雞硬指定強怪 rewind 3h → 撤退 + 建議")
     api2 = ApiClient(api._http)
     api2.register(invites.create_invite(), "weak", "password123")
     api2.login("weak", "password123")
     w = api2.create_character("菜雞")
-    api2.hunt_start("prontera_east_gate")
+    # 全 1 新手自動模式會被擋下；指定強怪硬掛才會演到「撤退」
+    api2.hunt_start("prontera_east_gate", ["yoyo_monkey"])
     _rewind(w["id"], 3 * 3600)
     st = api2.hunt_stop()
     console.print(f"retreated={st.get('retreated')}  reason={st.get('retreat_reason')!r}")

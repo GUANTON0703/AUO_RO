@@ -1,3 +1,4 @@
+from rich.markup import escape
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -81,7 +82,7 @@ def status_panel(character: dict) -> Panel:
     job_need = job_exp_for_next(c.get("job_level", 1), tier)
 
     lines = [
-        f"[bold]{c.get('name', '?')}[/bold]　{_job_name(job_id)}",
+        f"[bold]{escape(str(c.get('name', '?')))}[/bold]　{_job_name(job_id)}",
         f"Base Lv {c.get('base_level', 1)}  {_bar(c.get('base_exp', 0), base_need)}",
         f"Job  Lv {c.get('job_level', 1)}  {_bar(c.get('job_exp', 0), job_need)}",
     ]
@@ -109,9 +110,10 @@ def newbie_hint_panel() -> Panel:
     )
 
 
-def hunt_status_panel(status: dict) -> Panel:
+def hunt_status_panel(status: dict, elapsed_seconds: float | None = None) -> Panel:
     state = "撤退" if status.get("retreated") else "進行中"
     monster = status.get("monster_name") or status.get("monster_id", "未知")
+    secs = status.get("effective_seconds", 0) if elapsed_seconds is None else elapsed_seconds
     lines = [
         f"狀態：{state}",
         f"目標：{monster}",
@@ -119,7 +121,7 @@ def hunt_status_panel(status: dict) -> Panel:
         f"Base EXP：+{status.get('base_exp', 0)}",
         f"Job EXP：+{status.get('job_exp', 0)}",
         f"Zeny：+{status.get('zeny', 0)}",
-        f"掛機時間：{status.get('effective_seconds', 0):.0f} 秒",
+        f"掛機時間：{secs:.0f} 秒",
     ]
     return Panel("\n".join(lines), title="掛機狀態", expand=False)
 
@@ -127,6 +129,7 @@ def hunt_status_panel(status: dict) -> Panel:
 _ADVICE = {
     "戰鬥中被擊倒": "這裡的怪太強。先 stats 加點提升力量/體質，或換更低等的地圖，或 shop 買裝備。",
     "打不過這裡的怪": "完全打不動。回東門村郊打最弱的怪，或先加點、買武器。",
+    "此地圖的怪你目前都打不贏": "先 stats 加點提升力量/體質，或 h 換更弱的地圖。",
     "沒有補品，血量見底": "帶紅色藥水再來（shop 買），或打更弱的怪讓自然回血跟得上。",
     "補品用盡，血量見底": "補品不夠。多買幾瓶紅色藥水，或換更好打的怪。",
     "補品用盡": "補品不夠。多買幾瓶紅色藥水。",
@@ -143,8 +146,15 @@ _COMBAT_KINDS = {"attack", "skill", "fled"}
 def event_lines(events: list[dict], max_combat_lines: int = 20) -> list:
     out: list = []
     combat_idx: list[int] = []
+    # 有逐擊事件時，「擊殺 Y ×N」的批次摘要跟逐擊的「擊倒了 Y」重複，跳過摘要。
+    # 離線統計結算沒有逐擊事件，這時才靠 kill_batch 顯示成果。
+    has_blow_by_blow = any(
+        e.get("kind") in ("attack", "skill", "kill") for e in events
+    )
     for e in events:
         kind = e.get("kind")
+        if kind == "kill_batch" and has_blow_by_blow:
+            continue
         if kind == "attack":
             actor = e.get("actor", "?")
             target = e.get("target", "?")
