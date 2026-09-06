@@ -142,11 +142,12 @@ def test_get_server_settings_defaults_then_updates(client):
     _make_gm("gmget")
     headers = {"Authorization": f"Bearer {_login(client, 'gmget').json()['token']}"}
 
+    from server.settlement.config import HuntConfig
     assert client.get("/api/admin/settings", headers=headers).json() == {
         "experience_multiplier": 1.0,
         "drop_multiplier": 1.0,
-        "settle_floor_seconds": 15.0,
-        "huntable_win_rate": 0.6,
+        "settle_floor_seconds": HuntConfig().settle_floor_seconds,
+        "huntable_win_rate": HuntConfig().huntable_win_rate,
     }
 
     client.put("/api/admin/settings/multipliers", json={"experience": 3.0, "drop": 2.0}, headers=headers)

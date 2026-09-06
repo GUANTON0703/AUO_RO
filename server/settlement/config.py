@@ -18,8 +18,8 @@ class HuntConfig:
     boss_retreat_rate: float = 0.01
     experience_multiplier: float = 1.0
     drop_multiplier: float = 1.0
-    settle_floor_seconds: float = 15.0   # 距上次結算未達這個秒數就不重算，只回累積值
-    huntable_win_rate: float = 0.6       # 自動選怪 / 輪替時，勝率低於此值的怪不打
+    settle_floor_seconds: float = 3.0    # 結算防抖：距上次結算未達這個秒數就只回累積值
+    huntable_win_rate: float = 0.85      # 自動選怪 / 輪替時，勝率低於此值的怪不打
 
     @classmethod
     def from_settings(cls, settings) -> "HuntConfig":

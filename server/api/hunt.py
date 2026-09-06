@@ -1,7 +1,7 @@
 import json
 import random
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -26,6 +26,13 @@ _STAT_KEYS = ("str", "agi", "vit", "int", "dex", "luk")
 _strategies: dict[int, HuntStrategy] = {}
 # character_id -> {"batch_id": iso 時間戳, "events": [...]}；記憶體暫存，重啟掉了無所謂
 _last_batch: dict[int, dict] = {}
+# character_id -> (快取鍵, 可打怪清單)；避免每次結算都重跑勝率模擬
+_hunt_meta: dict[int, tuple] = {}
+
+
+def _forget_hunt(cid: int) -> None:
+    _last_batch.pop(cid, None)
+    _hunt_meta.pop(cid, None)
 
 
 def _now_iso() -> str:
@@ -73,6 +80,7 @@ def get_hunt_strategy(character_id: int, account_id: CurrentAccount):
 def put_hunt_strategy(character_id: int, body: HuntStrategyRequest, account_id: CurrentAccount):
     _owned_character(character_id, account_id)
     _strategies[character_id] = HuntStrategy(**body.model_dump())
+    _hunt_meta.pop(character_id, None)   # 策略改了，可打怪清單要重算
     return body.model_dump()
 
 
@@ -156,7 +164,7 @@ def start_hunt(body: StartRequest, account_id: CurrentAccount):
         started_at=now, last_settled_at=now,
         hp=player.max_hp, sp=player.max_sp,
     )
-    _last_batch.pop(row["id"], None)
+    _forget_hunt(row["id"])
     return {"map_id": body.map_id, "monster_id": monster_id,
             "hunt_hp": player.max_hp, "hunt_sp": player.max_sp}
 
@@ -216,8 +224,9 @@ def _settle_current(row, *, force=False) -> dict:
     elapsed = max(0.0, (now - last).total_seconds())
     offline = elapsed > settings.online_grace_seconds
 
-    # 結算地板：距上次結算未達門檻、又不是離線、也不是強制（停止掛機）
-    # → 只回累積值，不重算、不推進時間戳。輪詢頻率因此與結算頻率脫鉤。
+    # 結算防抖：距上次結算太近就只回累積值，不重算（省 CPU/寫入）。
+    # 這個門檻很小（預設幾秒），不影響「感覺有在跑」。真正的防浪費靠下面的
+    # 「只用掉湊完整場的時間、剩下留給下次」。
     if not force and not offline and elapsed < cfg.settle_floor_seconds:
         return _accumulated_snapshot(row)
 
@@ -249,6 +258,17 @@ def _settle_current(row, *, force=False) -> dict:
         potion_item_id=potion_id, potion_heal=potion_heal, potion_count=potion_count,
     )
 
+    # 這次沒湊出任何一場戰鬥（時間還在攢）→ 撤銷剛才的「認領」，什麼都不寫，
+    # 直接回累積值。下次時間夠了再結算。這樣一直輪詢也不會燒掉零碎時間。
+    if not offline and not result.retreated and result.kills == 0 \
+            and result.consumed_seconds <= 0:
+        with connection.get_connection() as conn:
+            conn.execute(
+                "UPDATE characters SET hunt_last_settled_at = ? WHERE id = ?",
+                (initial_last, row["id"]),
+            )
+        return _accumulated_snapshot(characters_repo.get_character(row["id"]))
+
     new_bl, new_bexp, _ = apply_base_exp(row["base_level"], row["base_exp"], result.base_exp)
     new_jl, new_jexp, _ = apply_job_exp(row["job_level"], row["job_exp"],
                                         result.job_exp, job.tier)
@@ -260,48 +280,82 @@ def _settle_current(row, *, force=False) -> dict:
     inventory.apply_drops(row["id"], result.drops)
     if potion_id and result.potions_used:
         inventory.consume_item(row["id"], potion_id, result.potions_used)
+
+    # 線上結算只「用掉」湊完整場戰鬥的時間，剩下的留給下次 → 玩家一直輪詢
+    # 也不會把零碎時間燒光。離線批次結算則整段吃掉。
+    if force or offline:
+        settled_until = now
+        hunt_secs_delta = result.effective_seconds
+    else:
+        settled_until = min(now, last + timedelta(seconds=result.consumed_seconds))
+        hunt_secs_delta = result.consumed_seconds
+
     characters_repo.update_hunt_progress(
         row["id"], hp=result.final_hp, sp=result.final_sp,
-        last_settled_at=now.isoformat(),
+        last_settled_at=settled_until.isoformat(),
         kills=result.kills, base_exp=result.base_exp,
         job_exp=result.job_exp, zeny=result.zeny,
-        seconds=result.effective_seconds,
+        seconds=hunt_secs_delta,
     )
 
     retreated = result.retreated
     retreat_reason = result.retreat_reason
     if retreated:
         characters_repo.clear_hunt_state(row["id"])
+        _hunt_meta.pop(row["id"], None)
     else:
         after = characters_repo.get_character(row["id"])
+        map_def = _content.maps[row["hunting_map_id"]]
+        strategy = _strategies.get(row["id"], HuntStrategy())
         pick_player = build_player_combatant(
             _snapshot(after, hp=after["hunt_hp"], sp=after["hunt_sp"]), _content
         )
-        map_def = _content.maps[row["hunting_map_id"]]
-        strategy = _strategies.get(row["id"], HuntStrategy())
-        candidates = huntable_monsters(
-            pick_player, map_def, strategy, _content, random.Random(),
+        # 快取鍵涵蓋所有影響「能不能打」的東西：戰鬥數值（含裝備/加點/技能
+        # 的結果）、勝率門檻、指定/排除清單。任何一項變了就重跑模擬。
+        meta_key = (
+            round(pick_player.atk), round(pick_player.matk), round(pick_player.max_hp),
+            round(pick_player.max_sp), round(pick_player.hit), round(pick_player.flee),
+            round(pick_player.defense), round(pick_player.mdef), round(pick_player.crit),
+            pick_player.aspd, after["learned_skills"],
             cfg.huntable_win_rate,
+            tuple(sorted(strategy.include_monsters)),
+            tuple(sorted(strategy.exclude_monsters)),
         )
+        cached = _hunt_meta.get(row["id"])
+        if cached and cached[0] == meta_key:
+            candidates = cached[1]
+        else:
+            candidates = huntable_monsters(
+                pick_player, map_def, strategy, _content, random.Random(),
+                cfg.huntable_win_rate,
+            )
+            _hunt_meta[row["id"]] = (meta_key, candidates)
         if not candidates:
             characters_repo.clear_hunt_state(row["id"])
+            _hunt_meta.pop(row["id"], None)
             retreated = True
             retreat_reason = "此地圖的怪你目前都打不贏"
         else:
             cur = row["hunting_monster_id"]
-            idx = candidates.index(cur) if cur in candidates else -1
-            nxt = candidates[(idx + 1) % len(candidates)]
-            if nxt != cur:
-                characters_repo.update_hunt_target(row["id"], nxt)
+            if cur not in candidates:
+                characters_repo.update_hunt_target(row["id"], candidates[0])
+            elif result.kills > 0 and len(candidates) > 1:
+                # 打完一批才輪替，換隻怪打；只是在攢時間就不動目標
+                idx = candidates.index(cur)
+                characters_repo.update_hunt_target(
+                    row["id"], candidates[(idx + 1) % len(candidates)]
+                )
 
     batch_id = now.isoformat()
     events = [asdict(e) for e in result.events]
     _last_batch[row["id"]] = {"batch_id": batch_id, "events": events}
 
     fresh = characters_repo.get_character(row["id"])
+    # 輪替後目標可能已換，回傳新的（撤退清空後 fall back 到這次打的那隻）
+    cur_mid = fresh["hunting_monster_id"] or row["hunting_monster_id"]
     return {
-        "monster_id": row["hunting_monster_id"],
-        "monster_name": monster.name,
+        "monster_id": cur_mid,
+        "monster_name": _content.get_monster(cur_mid).name,
         "batch_id": batch_id,
         "kills": fresh["hunt_kills"],
         "base_exp": fresh["hunt_base_exp"],
@@ -327,5 +381,5 @@ def stop_hunt(account_id: CurrentAccount):
     row = _current_character(account_id)
     out = _settle_current(row, force=True)
     characters_repo.clear_hunt_state(row["id"])
-    _last_batch.pop(row["id"], None)
+    _forget_hunt(row["id"])
     return out

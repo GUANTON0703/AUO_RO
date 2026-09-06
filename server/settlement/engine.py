@@ -28,6 +28,9 @@ class SettlementResult:
     retreat_reason: str = ""
     real_elapsed_seconds: float = 0.0
     effective_seconds: float = 0.0
+    # 這次結算實際「用掉」的線上秒數（湊完整場戰鬥的部分）。剩下的留給下次，
+    # 避免玩家一直輪詢時零碎時間被丟掉。離線批次結算則等於全部時間。
+    consumed_seconds: float = 0.0
     pity_out: dict = field(default_factory=dict)
     events: list = field(default_factory=list)
     final_hp: int = 0
@@ -151,6 +154,8 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
         potions_used=potions_used, retreated=retreated, retreat_reason=reason,
         real_elapsed_seconds=float(elapsed_seconds),
         effective_seconds=used_seconds if retreated else effective,
+        # 線上結算只用掉「湊完整場」的時間；離線走 now，這個值不會被用到
+        consumed_seconds=used_seconds,
         pity_out=pity_out, events=events,
         final_hp=player.hp, final_sp=player.sp,
     )
@@ -221,7 +226,8 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
         kills=kills, base_exp=base_exp, job_exp=job_exp, zeny=zeny, drops=drops,
         potions_used=potions_used, retreated=retreated, retreat_reason=reason,
         real_elapsed_seconds=float(elapsed_seconds),
-        effective_seconds=elapsed if retreated else effective,
+        effective_seconds=elapsed,
+        consumed_seconds=elapsed,
         pity_out=pity_out, events=events,
         final_hp=p.hp, final_sp=p.sp,
     )
