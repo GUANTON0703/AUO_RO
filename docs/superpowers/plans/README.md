@@ -38,3 +38,5 @@
 - 客戶端 TUI：rich
 - 測試：pytest + httpx（TestClient）
 - 部署：Docker → J1900
+
+| 12 | 客戶端改版 | 全選單化/置頂狀態/加點配點器/掛機看戰鬥/撤退建議 | 10 | `2026-09-06-12-client-revamp.md` |
