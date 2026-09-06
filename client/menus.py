@@ -5,7 +5,12 @@ from rich.table import Table
 from client.api import ApiError
 from client.render import event_lines, inventory_table, shop_table, storage_table
 from server.content import load_content
-from server.progression.stats import STAT_KEYS, stat_points_available
+from server.progression.stats import (
+    STAT_KEYS, STAT_MAX, raise_cost, stat_points_available,
+)
+
+_STAT_ZH = {"str": "力量", "agi": "敏捷", "vit": "體質",
+            "int": "智力", "dex": "靈巧", "luk": "幸運"}
 
 _content = load_content()
 _console = Console()
@@ -22,22 +27,50 @@ def _report(console: Console, result) -> None:
         console.print("[green]完成[/green]")
 
 
+def _cost_run(frm, to):
+    return sum(raise_cost(v) for v in range(frm, to))
+
+
 def stats_menu(api, character: dict, console: Console | None = None) -> None:
     console = console or _console
-    stats = {k: character.get(f"stat_{k}", 1) for k in STAT_KEYS}
-    avail = stat_points_available(character.get("base_level", 1), stats)
-    console.print("目前屬性：" + "　".join(f"{k.upper()} {v}" for k, v in stats.items()))
-    console.print(f"可用屬性點：約 {avail}")
-    which = Prompt.ask("加哪個屬性", choices=list(STAT_KEYS))
-    amount = IntPrompt.ask("加幾點", default=1)
-    if amount <= 0:
+    cur = {k: character.get(f"stat_{k}", 1) for k in STAT_KEYS}
+    pending = {k: 0 for k in STAT_KEYS}
+    base_level = character.get("base_level", 1)
+
+    while True:
+        spent = sum(_cost_run(cur[k], cur[k] + pending[k]) for k in STAT_KEYS)
+        avail = stat_points_available(base_level, cur) - spent
+        console.print(f"\n可用點數：[bold]{avail}[/bold]")
+        for i, k in enumerate(STAT_KEYS, 1):
+            v = cur[k] + pending[k]
+            cost = raise_cost(v)
+            afford = ("" if (avail >= cost and v < STAT_MAX)
+                      else "  [dim](點數不足)[/dim]" if v < STAT_MAX
+                      else "  [dim](已滿)[/dim]")
+            console.print(f"  [cyan]{i}[/cyan]) {_STAT_ZH[k]} {v}　→ +1 需 {cost} 點{afford}")
+        console.print("  [cyan]0[/cyan]) 完成")
+        raw = Prompt.ask("加哪個").strip()
+        if raw == "0":
+            break
+        if raw.isdigit() and 1 <= int(raw) <= 6:
+            k = STAT_KEYS[int(raw) - 1]
+            v = cur[k] + pending[k]
+            if v < STAT_MAX and avail >= raise_cost(v):
+                pending[k] += 1
+            else:
+                console.print("[red]加不了[/red]")
+        else:
+            console.print("[red]輸入 1-6 或 0[/red]")
+
+    deltas = {k: n for k, n in pending.items() if n > 0}
+    if not deltas:
+        console.print("沒有加點。")
         return
     try:
-        result = api.allocate_stats(_cid(character), {which: amount})
-    except ApiError as exc:
-        console.print(f"[red]{exc.detail}[/red]")
-        return
-    _report(console, result)
+        api.allocate_stats(character["id"], deltas)
+        console.print(f"[green]已加：{deltas}[/green]")
+    except Exception as exc:
+        console.print(f"[red]加點失敗：{exc}[/red]")
 
 
 def skills_menu(api, character: dict, console: Console | None = None) -> None:

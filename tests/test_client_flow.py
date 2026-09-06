@@ -121,11 +121,32 @@ class _RecApi:
 def test_stats_menu_calls_allocate(monkeypatch):
     from client import menus
     from rich.console import Console
-    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "str"))
-    monkeypatch.setattr(menus.IntPrompt, "ask", staticmethod(lambda *a, **k: 3))
+    answers = iter(["1", "1", "1", "0"])
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: next(answers)))
     rec = _RecApi()
-    menus.stats_menu(rec, {"id": 1, "base_level": 10, "job_id": "swordman"}, Console(record=True))
+    menus.stats_menu(rec, {"id": 1, "base_level": 10, "job_id": "swordman",
+                           "stat_str": 1, "stat_agi": 1, "stat_vit": 1,
+                           "stat_int": 1, "stat_dex": 1, "stat_luk": 1}, Console(record=True))
     assert ("allocate_stats", 1, {"str": 3}) in rec.calls
+
+
+def test_stats_menu_shows_costs_and_batches(monkeypatch):
+    from client.menus import stats_menu
+    calls = {}
+
+    class FakeApi:
+        def allocate_stats(self, cid, deltas):
+            calls["deltas"] = deltas
+            return {"stat_str": 1 + deltas.get("str", 0)}
+
+    answers = iter(["1", "1", "0"])
+    monkeypatch.setattr("client.menus.Prompt.ask", lambda *a, **k: next(answers))
+    from rich.console import Console
+    stats_menu(FakeApi(), {"id": 1, "base_level": 20,
+                           "stat_str": 1, "stat_agi": 1, "stat_vit": 1,
+                           "stat_int": 1, "stat_dex": 1, "stat_luk": 1},
+               Console())
+    assert calls["deltas"] == {"str": 2}
 
 
 def test_shop_menu_buys(monkeypatch):
