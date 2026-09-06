@@ -19,7 +19,8 @@ router = APIRouter(prefix="/api/characters", tags=["characters"])
 
 
 class CreateCharacterRequest(BaseModel):
-    name: str = Field(min_length=1, max_length=24)
+    # 不允許 [ ] —— 客戶端用 rich markup 渲染名字，方括號會讓畫面解析失敗
+    name: str = Field(min_length=1, max_length=24, pattern=r"^[^\[\]]+$")
 
 
 def _to_public(row) -> CharacterPublic:

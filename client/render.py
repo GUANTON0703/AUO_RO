@@ -1,3 +1,4 @@
+from rich.markup import escape
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -81,7 +82,7 @@ def status_panel(character: dict) -> Panel:
     job_need = job_exp_for_next(c.get("job_level", 1), tier)
 
     lines = [
-        f"[bold]{c.get('name', '?')}[/bold]　{_job_name(job_id)}",
+        f"[bold]{escape(str(c.get('name', '?')))}[/bold]　{_job_name(job_id)}",
         f"Base Lv {c.get('base_level', 1)}  {_bar(c.get('base_exp', 0), base_need)}",
         f"Job  Lv {c.get('job_level', 1)}  {_bar(c.get('job_exp', 0), job_need)}",
     ]

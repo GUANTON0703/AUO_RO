@@ -1,6 +1,7 @@
 import threading
 
 from rich.console import Console
+from rich.markup import escape
 
 from client.api import ApiClient, ApiError
 
@@ -60,6 +61,8 @@ def chat_mode(
             for m in msgs:
                 last[ch] = m["id"]
                 tag = "" if ch == "world" else "[magenta][公會][/magenta] "
-                console.print(f"{tag}[cyan]{m['character_name']}[/cyan]：{m['text']}")
+                name = escape(str(m.get("character_name", "?")))
+                text = escape(str(m.get("text", "")))
+                console.print(f"{tag}[cyan]{name}[/cyan]：{text}")
 
     console.print("[dim]離開聊天。[/dim]")
