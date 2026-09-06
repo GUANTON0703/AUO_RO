@@ -418,3 +418,122 @@ def test_trade_menu_opens_new_then_cancel(monkeypatch):
     menus.trade_menu(rec, {"id": 1}, Console(record=True))
     assert ("trade_offer", "bob") in rec.calls
     assert ("trade_cancel", 7) in rec.calls
+
+
+class _ScreenApi:
+    def __init__(self, hunt=None, chat=None):
+        self._hunt = hunt
+        self._chat = list(chat or [])
+        self.mult_calls = []
+
+    def list_characters(self):
+        return [{"id": 1, "name": "阿獵", "base_level": 3, "job_id": "novice",
+                 "location_map": "prontera_east_gate"}]
+
+    def sheet(self, cid):
+        return {"max_hp": 50, "max_sp": 12, "hunt_hp": 40, "hunt_sp": 10}
+
+    def hunt_status(self):
+        from client.api import ApiError
+        if self._hunt is None:
+            raise ApiError(409, "沒有在掛機")
+        return self._hunt
+
+    def chat_since(self, channel, after=0):
+        if channel != "world":
+            return []
+        return [m for m in self._chat if m["id"] > after]
+
+    def guild_mine(self):
+        return None
+
+    def me(self):
+        return {"account_id": 1, "username": "u", "role": "player", "is_gm": False}
+
+    def admin_settings(self):
+        return {"experience_multiplier": 1.0, "drop_multiplier": 1.0,
+                "settle_floor_seconds": 15.0, "huntable_win_rate": 0.6}
+
+    def admin_set_multipliers(self, experience, drop):
+        self.mult_calls.append((experience, drop))
+
+
+def _state():
+    return {"is_gm": False, "chat": [], "chat_last": {}, "chat_seeded": False,
+            "guild_id": None}
+
+
+def test_render_screen_shows_hunt_panel_when_hunting(monkeypatch):
+    from client import app
+    from rich.console import Console
+    api = _ScreenApi(hunt={"monster_name": "綠棉蟲", "kills": 5, "base_exp": 12,
+                           "job_exp": 6, "zeny": 4, "effective_seconds": 90,
+                           "retreated": False})
+    con = Console(record=True, width=100)
+    app._render_screen(con, api, {"id": 1, "name": "阿獵"}, None, _state())
+    out = con.export_text()
+    assert "掛機狀態" in out and "綠棉蟲" in out
+
+
+def test_render_screen_shows_recent_chat(monkeypatch):
+    from client import app
+    from rich.console import Console
+    api = _ScreenApi(chat=[{"id": 1, "character_name": "路人", "text": "哈囉大家"}])
+    con = Console(record=True, width=100)
+    st = _state()
+    app._render_screen(con, api, {"id": 1, "name": "阿獵"}, None, st)
+    out = con.export_text()
+    assert "哈囉大家" in out and "路人" in out
+
+
+def test_render_screen_gm_entry_only_for_gm():
+    from client import app
+    from rich.console import Console
+    api = _ScreenApi()
+    con = Console(record=True, width=100)
+    st = _state()
+    app._render_screen(con, api, {"id": 1, "name": "阿獵"}, None, st)
+    assert "GM管理" not in con.export_text()
+    st["is_gm"] = True
+    con2 = Console(record=True, width=100)
+    app._render_screen(con2, api, {"id": 1, "name": "阿獵"}, None, st)
+    assert "GM管理" in con2.export_text()
+
+
+def test_refresh_chat_seeds_then_increments():
+    from client import app
+    msgs = [{"id": i, "character_name": "A", "text": f"m{i}"} for i in range(1, 13)]
+    api = _ScreenApi(chat=msgs)
+    st = _state()
+    app._refresh_chat(api, st)
+    # 第一次只取最後 8 條
+    assert len(st["chat"]) == 8
+    assert st["chat_last"]["world"] == 12
+    # 之後新增一條，只帶新的
+    api._chat.append({"id": 13, "character_name": "A", "text": "m13"})
+    app._refresh_chat(api, st)
+    assert len(st["chat"]) == 9
+
+
+def test_gm_menu_sets_multipliers(monkeypatch):
+    from client import menus
+    from rich.console import Console
+    api = _ScreenApi()
+    actions = iter(["mult", None])  # 選倍率一次，第二圈返回
+    monkeypatch.setattr(menus, "choose", lambda *a, **k: next(actions))
+    monkeypatch.setattr(menus.Prompt, "ask",
+                        staticmethod(lambda *a, **k: next(iter(["2"]))
+                                     if "經驗" in a[0] else "3"))
+    menus.gm_menu(api, {"id": 1}, Console(record=True))
+    assert api.mult_calls == [(2.0, 3.0)]
+
+
+def test_render_screen_survives_markup_in_chat():
+    from client import app
+    from rich.console import Console
+    api = _ScreenApi(chat=[{"id": 1, "character_name": "壞[人]",
+                            "text": "哈囉[/]大家[bold]注意"}])
+    con = Console(record=True, width=100)
+    app._render_screen(con, api, {"id": 1, "name": "阿獵"}, None, _state())
+    out = con.export_text()
+    assert "哈囉" in out and "大家" in out  # 沒 crash，字有出來

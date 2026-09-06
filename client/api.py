@@ -198,6 +198,33 @@ class ApiClient:
     def trade_get(self, tid):
         return self._req("GET", f"/api/trade/{tid}")
 
+    # --- me / GM ---
+    def me(self):
+        return self._req("GET", "/api/me")
+
+    def admin_settings(self):
+        return self._req("GET", "/api/admin/settings")
+
+    def admin_set_multipliers(self, experience, drop):
+        return self._req("PUT", "/api/admin/settings/multipliers",
+                         json={"experience": experience, "drop": drop})
+
+    def admin_set_hunt(self, settle_floor_seconds, huntable_win_rate):
+        return self._req("PUT", "/api/admin/settings/hunt",
+                         json={"settle_floor_seconds": settle_floor_seconds,
+                               "huntable_win_rate": huntable_win_rate})
+
+    def admin_money(self, cid, amount):
+        return self._req("POST", f"/api/admin/characters/{cid}/money",
+                         json={"amount": amount})
+
+    def admin_experience(self, cid, base_exp, job_exp):
+        return self._req("POST", f"/api/admin/characters/{cid}/experience",
+                         json={"base_exp": base_exp, "job_exp": job_exp})
+
+    def admin_online_players(self):
+        return self._req("GET", "/api/admin/online-players")
+
     # --- social: guild ---
     def guild_create(self, name):
         return self._req("POST", "/api/guild", json={"name": name})
