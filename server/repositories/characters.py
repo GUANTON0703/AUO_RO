@@ -1,7 +1,10 @@
+import json
 import sqlite3
 from datetime import datetime, timezone
 
 from server.db import connection
+
+_STAT_COLS = ("str", "agi", "vit", "int", "dex", "luk")
 
 
 class NameTakenError(Exception):
@@ -74,6 +77,95 @@ def get_character(character_id: int):
         return conn.execute(
             "SELECT * FROM characters WHERE id = ?", (character_id,)
         ).fetchone()
+
+
+def set_hunt_state(character_id: int, *, map_id, monster_id, started_at,
+                   last_settled_at, hp, sp) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            """
+            UPDATE characters SET
+                hunting_map_id = ?, hunting_monster_id = ?, hunt_started_at = ?,
+                hunt_last_settled_at = ?, hunt_hp = ?, hunt_sp = ?
+            WHERE id = ?
+            """,
+            (map_id, monster_id, started_at, last_settled_at, hp, sp, character_id),
+        )
+
+
+def clear_hunt_state(character_id: int) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            """
+            UPDATE characters SET
+                hunting_map_id = NULL, hunting_monster_id = NULL,
+                hunt_started_at = NULL, hunt_last_settled_at = NULL,
+                hunt_hp = NULL, hunt_sp = NULL
+            WHERE id = ?
+            """,
+            (character_id,),
+        )
+
+
+def update_hunt_progress(character_id: int, *, hp, sp, last_settled_at) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            "UPDATE characters SET hunt_hp = ?, hunt_sp = ?, hunt_last_settled_at = ? WHERE id = ?",
+            (hp, sp, last_settled_at, character_id),
+        )
+
+
+def apply_progression(character_id: int, *, base_level: int, base_exp: int,
+                      job_level: int, job_exp: int, zeny_delta: int) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            """
+            UPDATE characters SET
+                base_level = ?, base_exp = ?, job_level = ?, job_exp = ?,
+                zeny = zeny + ?
+            WHERE id = ?
+            """,
+            (base_level, base_exp, job_level, job_exp, zeny_delta, character_id),
+        )
+
+
+def merge_hunt_loot(character_id: int, loot_delta: dict, pity_replace: dict) -> None:
+    with connection.get_connection() as conn:
+        row = conn.execute(
+            "SELECT hunt_loot FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()
+        loot = json.loads(row["hunt_loot"]) if row and row["hunt_loot"] else {}
+        for k, v in (loot_delta or {}).items():
+            loot[k] = loot.get(k, 0) + v
+        conn.execute(
+            "UPDATE characters SET hunt_loot = ?, hunt_pity = ? WHERE id = ?",
+            (json.dumps(loot), json.dumps(pity_replace or {}), character_id),
+        )
+
+
+def set_learned_skills(character_id: int, learned: dict) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            "UPDATE characters SET learned_skills = ? WHERE id = ?",
+            (json.dumps(learned or {}), character_id),
+        )
+
+
+def set_stats(character_id: int, stats: dict) -> None:
+    cols = ", ".join(f"stat_{k} = ?" for k in _STAT_COLS)
+    with connection.get_connection() as conn:
+        conn.execute(
+            f"UPDATE characters SET {cols} WHERE id = ?",
+            (*(int(stats[k]) for k in _STAT_COLS), character_id),
+        )
+
+
+def set_job(character_id: int, job_id: str, job_level: int, job_exp: int) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            "UPDATE characters SET job_id = ?, job_level = ?, job_exp = ? WHERE id = ?",
+            (job_id, job_level, job_exp, character_id),
+        )
 
 
 def delete_character(character_id: int, account_id: int) -> bool:

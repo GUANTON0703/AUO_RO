@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from server.db import connection
@@ -81,3 +83,42 @@ def test_delete_wrong_owner_is_noop(account_id):
     row = characters.create_character(account_id, "別人的", location_map="m")
     assert characters.delete_character(row["id"], other) is False
     assert characters.get_character(row["id"]) is not None
+
+
+def test_hunt_state_round_trips(account_id):
+    row = characters.create_character(account_id, "掛機仔", location_map="m")
+    characters.set_hunt_state(row["id"], map_id="prontera_east_gate",
+                              monster_id="poring", started_at="T0", last_settled_at="T0",
+                              hp=100, sp=20)
+    got = characters.get_character(row["id"])
+    assert got["hunting_map_id"] == "prontera_east_gate"
+    assert got["hunt_hp"] == 100
+    characters.clear_hunt_state(row["id"])
+    assert characters.get_character(row["id"])["hunting_map_id"] is None
+
+
+def test_apply_progression_updates_level_exp_zeny(account_id):
+    row = characters.create_character(account_id, "練功仔", location_map="m")
+    characters.apply_progression(row["id"], base_level=5, base_exp=120,
+                                 job_level=3, job_exp=40, zeny_delta=500)
+    got = characters.get_character(row["id"])
+    assert got["base_level"] == 5 and got["zeny"] == 500
+
+
+def test_merge_hunt_loot_and_pity(account_id):
+    row = characters.create_character(account_id, "撿寶仔", location_map="m")
+    characters.merge_hunt_loot(row["id"], {"jellopy": 10}, {"poring_card": 300})
+    characters.merge_hunt_loot(row["id"], {"jellopy": 5, "clover": 2}, {"poring_card": 500})
+    got = characters.get_character(row["id"])
+    assert json.loads(got["hunt_loot"]) == {"jellopy": 15, "clover": 2}
+    assert json.loads(got["hunt_pity"]) == {"poring_card": 500}
+
+
+def test_set_stats_and_job_and_skills(account_id):
+    row = characters.create_character(account_id, "轉職仔", location_map="m")
+    characters.set_stats(row["id"], {"str": 9, "agi": 3, "vit": 4, "int": 1, "dex": 5, "luk": 2})
+    characters.set_job(row["id"], "swordman", 1, 0)
+    characters.set_learned_skills(row["id"], {"bash": 3})
+    got = characters.get_character(row["id"])
+    assert got["stat_str"] == 9 and got["job_id"] == "swordman" and got["job_level"] == 1
+    assert json.loads(got["learned_skills"]) == {"bash": 3}

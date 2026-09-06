@@ -38,7 +38,18 @@ CREATE TABLE IF NOT EXISTS characters (
     skill_points INTEGER NOT NULL DEFAULT 0,
     zeny         INTEGER NOT NULL DEFAULT 0,
     location_map TEXT NOT NULL,
-    created_at   TEXT NOT NULL
+    created_at   TEXT NOT NULL,
+    hunting_map_id       TEXT,
+    hunting_monster_id   TEXT,
+    hunt_started_at      TEXT,
+    hunt_last_settled_at TEXT,
+    hunt_hp              INTEGER,
+    hunt_sp              INTEGER,
+    hunt_pity            TEXT NOT NULL DEFAULT '{}',
+    hunt_loot            TEXT NOT NULL DEFAULT '{}',
+    learned_skills       TEXT NOT NULL DEFAULT '{}',
+    equipped_items       TEXT NOT NULL DEFAULT '[]',
+    socketed_cards       TEXT NOT NULL DEFAULT '[]'
 );
 
 CREATE INDEX IF NOT EXISTS idx_characters_account ON characters(account_id);
