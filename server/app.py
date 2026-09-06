@@ -59,6 +59,10 @@ def create_app() -> FastAPI:
 
     app.include_router(trade_router)
 
+    from server.api.guild import router as guild_router
+
+    app.include_router(guild_router)
+
     @app.get("/health")
     def health() -> dict:
         return {"status": "ok"}

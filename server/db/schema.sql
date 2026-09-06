@@ -125,3 +125,17 @@ CREATE TABLE IF NOT EXISTS trade_items (
     equipment_id  INTEGER
 );
 CREATE INDEX IF NOT EXISTS idx_trade_items ON trade_items(trade_id);
+
+CREATE TABLE IF NOT EXISTS guilds (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    name              TEXT NOT NULL UNIQUE,
+    leader_account_id INTEGER NOT NULL REFERENCES accounts(id),
+    created_at        TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS guild_members (
+    guild_id       INTEGER NOT NULL REFERENCES guilds(id),
+    account_id     INTEGER NOT NULL UNIQUE REFERENCES accounts(id),
+    character_name TEXT NOT NULL,
+    role           TEXT NOT NULL DEFAULT 'member',
+    joined_at      TEXT NOT NULL
+);
