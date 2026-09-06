@@ -1,6 +1,23 @@
 # ROtxt 交接給 CC
 
-最後更新：2026-09-06
+最後更新：2026-09-07
+
+## 2026-09-07 掛機結算重構（未 commit，測試 358 passed，Codex LGTM）
+
+改了三個 bug + 一個架構調整：
+
+1. **掛機不進度**：舊版每次輪詢（約 1 秒）就結算一次，切碎的時間湊不滿一場戰鬥、又被標記成已結算 → 時間白燒、擊殺永遠 0。
+   改成「結算地板」：距上次結算未達 `HuntConfig.settle_floor_seconds`（預設 15 秒）且非離線、非停止掛機 → 只回累積值，不重算、不推進時間戳。輪詢頻率與結算頻率脫鉤。
+2. **戰鬥畫面**：伺服器每批結算事件帶 `batch_id`（記憶體暫存 `hunt._last_batch`）。客戶端 `watch.py` 用佇列每秒吐一行，佇列 > 30 條加速；空了顯示「搜尋目標中…」。
+3. **技能點顯示 0**：`skill_points` / `stat_points` 這兩個 DB 欄位從沒被寫過。改成 `server/api/characters.py`、`progression.py` 回傳「算出來的可用點數」（`skill_points_available` / `stat_points_available`）。欄位沒移除。
+4. **選怪**：`h` 選完地圖可多選怪（`client/ui.py` 新增 `choose_many`），留空 = 自動。自動模式只打勝率 ≥ `HuntConfig.huntable_win_rate`（預設 0.6）的怪、在其間輪替；全打不贏就擋下（開始時 400）或撤退回村。手動指定則不套勝率過濾（玩家自己扛）。
+   API：`POST /api/hunt/start` body 從 `monster_id` 改 `monster_ids: list`。帶空 list = 明確自動（清掉舊指定）；完全不帶 = 沿用既有 strategy。舊 `monster_id` 單選仍相容。
+
+新檔：`server/settlement/huntable.py`（勝率過濾 / 起始怪挑選）。
+`tests/conftest.py` 加了 autouse fixture 清 `hunt._strategies` / `hunt._last_batch`（module-level dict 會在測試間互相污染；正式環境角色 id 全域唯一不受影響）。
+
+---
+（以下為 2026-09-06 交接內容）
 
 ## 接手目標
 
