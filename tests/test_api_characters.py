@@ -69,3 +69,11 @@ def test_logout_then_use_token_fails(client, auth):
     token, headers, _ = auth
     client.delete("/api/sessions", headers=headers)
     assert client.get("/api/characters", headers=headers).status_code == 401
+
+
+def test_new_character_has_starter_kit(client, auth):
+    _, headers, _ = auth
+    ch = client.post("/api/characters", headers=headers, json={"name": "新兵"}).json()
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=headers).json()
+    assert inv["items"].get("red_potion", 0) > 0
+    assert len(inv["equipment"]) >= 1

@@ -54,3 +54,10 @@ def test_apply_drops_routes_equipment_vs_items(char):
     assert inv["items"]["jellopy"] == 20
     assert inv["items"]["poring_card"] == 1
     assert sum(1 for e in inv["equipment"] if e["equipment_id"] == "knife") == 2
+
+
+def test_grant_starter_kit(char):
+    inventory.grant_starter_kit(char)
+    inv = inventory.list_inventory(char)
+    assert inv["items"]["red_potion"] >= 5
+    assert any(e["equipment_id"] == "knife" for e in inv["equipment"])

@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from server.auth.dependencies import CurrentAccount
 from server.config import get_settings
 from server.repositories import characters as characters_repo
+from server.repositories import inventory
 from shared.models import CharacterPublic
 
 router = APIRouter(prefix="/api/characters", tags=["characters"])
@@ -57,6 +58,7 @@ def create_character(body: CreateCharacterRequest, account_id: CurrentAccount):
             status_code=409,
             detail=f"已達角色數上限（{settings.max_characters_per_account}）",
         )
+    inventory.grant_starter_kit(row["id"])
     return _to_public(row)
 
 

@@ -1,6 +1,7 @@
 def _char(client, headers, db_helpers, lv=20):
     ch = client.post("/api/characters", headers=headers, json={"name": "裝備哥"}).json()
     db_helpers.set_base_level(ch["id"], lv)
+    db_helpers.clear_inventory(ch["id"])
     return ch
 
 

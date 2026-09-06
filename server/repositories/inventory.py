@@ -123,6 +123,12 @@ def list_equipped(character_id: int) -> list[dict]:
         ]
 
 
+def grant_starter_kit(character_id: int) -> None:
+    add_equipment(character_id, "knife")
+    add_item(character_id, "red_potion", 10)
+    add_item(character_id, "fly_wing", 5)
+
+
 def apply_drops(character_id: int, drops: dict) -> None:
     content = load_content()
     for item_id, qty in (drops or {}).items():
