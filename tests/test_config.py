@@ -6,6 +6,8 @@ from server import config
 def test_defaults():
     s = config.Settings()
     assert s.db_path == "rotxt.db"
+    assert s.server_host == "127.0.0.1"
+    assert s.server_port == 8000
     assert s.token_ttl_hours == 720
     assert s.max_characters_per_account == 3
     assert s.starting_map == "prontera_east_gate"

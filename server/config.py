@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="ROTXT_", env_file=".env", extra="ignore")
 
     db_path: str = "rotxt.db"
+    server_host: str = "127.0.0.1"
+    server_port: int = 8000
     token_ttl_hours: int = 720
     max_characters_per_account: int = 3
     starting_map: str = "prontera_east_gate"
