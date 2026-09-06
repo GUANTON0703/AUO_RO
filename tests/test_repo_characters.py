@@ -23,6 +23,35 @@ def test_create_defaults_to_novice(account_id):
     assert row["location_map"] == "prontera_east_gate"
 
 
+def test_create_within_limit_blocks_at_cap(account_id):
+    for n in ["甲", "乙"]:
+        assert characters.create_within_limit(account_id, n, "m", max_count=2) is not None
+    assert characters.create_within_limit(account_id, "丙", "m", max_count=2) is None
+    assert characters.count_for_account(account_id) == 2
+
+
+def test_create_within_limit_rejects_duplicate_name(account_id):
+    characters.create_within_limit(account_id, "重複", "m", max_count=3)
+    with pytest.raises(characters.NameTakenError):
+        characters.create_within_limit(account_id, "重複", "m", max_count=3)
+
+
+def test_create_within_limit_is_atomic_under_concurrency(account_id):
+    from concurrent.futures import ThreadPoolExecutor
+
+    characters.create_within_limit(account_id, "已有", "m", max_count=3)
+
+    def attempt(name: str):
+        return characters.create_within_limit(account_id, name, "m", max_count=3)
+
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        results = list(pool.map(attempt, ["a", "b", "c"]))
+
+    created = [r for r in results if r is not None]
+    assert len(created) == 2  # 上限 3，已有 1，只能再進 2
+    assert characters.count_for_account(account_id) == 3
+
+
 def test_list_and_count_scoped_to_account(account_id):
     other = accounts.create_account("other", "h")
     characters.create_character(account_id, "甲", location_map="m")

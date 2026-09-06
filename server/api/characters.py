@@ -43,14 +43,20 @@ def list_characters(account_id: CurrentAccount):
 @router.post("", status_code=201, response_model=CharacterPublic)
 def create_character(body: CreateCharacterRequest, account_id: CurrentAccount):
     settings = get_settings()
-    if characters_repo.count_for_account(account_id) >= settings.max_characters_per_account:
-        raise HTTPException(status_code=409, detail=f"已達角色數上限（{settings.max_characters_per_account}）")
     try:
-        row = characters_repo.create_character(
-            account_id, body.name, location_map=settings.starting_map
+        row = characters_repo.create_within_limit(
+            account_id,
+            body.name,
+            location_map=settings.starting_map,
+            max_count=settings.max_characters_per_account,
         )
     except characters_repo.NameTakenError:
         raise HTTPException(status_code=409, detail="角色名稱已被使用")
+    if row is None:
+        raise HTTPException(
+            status_code=409,
+            detail=f"已達角色數上限（{settings.max_characters_per_account}）",
+        )
     return _to_public(row)
 
 

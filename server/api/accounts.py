@@ -28,15 +28,14 @@ class TokenResponse(BaseModel):
 
 @router.post("/accounts", status_code=201, response_model=AccountPublic)
 def register(body: RegisterRequest):
-    if not invites.is_available(body.invite_code):
-        raise HTTPException(status_code=400, detail="邀請碼無效或已被使用")
     try:
-        account_id = accounts_repo.create_account(
-            body.username, passwords.hash_password(body.password)
+        account_id = accounts_repo.register_with_invite(
+            body.username, passwords.hash_password(body.password), body.invite_code
         )
+    except invites.InviteError:
+        raise HTTPException(status_code=400, detail="邀請碼無效或已被使用")
     except accounts_repo.UsernameTakenError:
         raise HTTPException(status_code=409, detail="帳號名稱已被使用")
-    invites.consume_invite(body.invite_code, account_id)
     return AccountPublic(id=account_id, username=body.username)
 
 

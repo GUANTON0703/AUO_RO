@@ -1,7 +1,10 @@
 import subprocess
 import sys
+from pathlib import Path
 
 from server.db import connection
+
+_REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_invite_subcommand_creates_codes(tmp_path, monkeypatch):
@@ -11,7 +14,7 @@ def test_invite_subcommand_creates_codes(tmp_path, monkeypatch):
         [sys.executable, "-m", "server.admin", "invite", "--count", "3"],
         capture_output=True,
         text=True,
-        cwd="H:/創業/ROtxt",
+        cwd=str(_REPO_ROOT),
     )
     assert result.returncode == 0
     printed = [ln for ln in result.stdout.splitlines() if ln.strip()]

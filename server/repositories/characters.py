@@ -29,6 +29,32 @@ def create_character(account_id: int, name: str, location_map: str):
         raise NameTakenError(name) from exc
 
 
+def create_within_limit(
+    account_id: int, name: str, location_map: str, max_count: int
+):
+    """在單一 IMMEDIATE 交易內檢查角色數上限並建立。
+    已達上限回傳 None；名稱重複丟 NameTakenError。"""
+    with connection.transaction() as conn:
+        count = conn.execute(
+            "SELECT COUNT(*) AS c FROM characters WHERE account_id = ?", (account_id,)
+        ).fetchone()["c"]
+        if count >= max_count:
+            return None
+        try:
+            cur = conn.execute(
+                """
+                INSERT INTO characters (account_id, name, location_map, created_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                (account_id, name, location_map, _now()),
+            )
+        except sqlite3.IntegrityError as exc:
+            raise NameTakenError(name) from exc
+        return conn.execute(
+            "SELECT * FROM characters WHERE id = ?", (cur.lastrowid,)
+        ).fetchone()
+
+
 def list_for_account(account_id: int):
     with connection.get_connection() as conn:
         return conn.execute(
