@@ -64,11 +64,12 @@ def test_hunt_status_returns_cumulative_session_totals(client, auth, db_helpers)
     ch = _ready_char(client, headers, db_helpers, base_level=20)
     client.post("/api/hunt/start", headers=headers,
                 json={"map_id": "prontera_south_field"})
-    db_helpers.rewind_hunt(ch["id"], seconds=12)
+    db_helpers.rewind_hunt(ch["id"], seconds=90)
     first = client.get("/api/hunt/status", headers=headers).json()
-    db_helpers.rewind_hunt(ch["id"], seconds=5)
+    db_helpers.rewind_hunt(ch["id"], seconds=90)
     second = client.get("/api/hunt/status", headers=headers).json()
-    assert second["effective_seconds"] > first["effective_seconds"]
+    assert first["kills"] > 0
+    assert second["effective_seconds"] >= first["effective_seconds"]
     assert second["kills"] >= first["kills"]
     assert second["base_exp"] >= first["base_exp"]
     assert second["zeny"] >= first["zeny"]
@@ -101,10 +102,10 @@ def test_status_below_floor_does_not_resettle(client, auth, db_helpers):
     _, headers, _ = auth
     ch = _ready_char(client, headers, db_helpers, base_level=20)
     client.post("/api/hunt/start", headers=headers, json={"map_id": "prontera_east_gate"})
-    db_helpers.rewind_hunt(ch["id"], seconds=20)
+    db_helpers.rewind_hunt(ch["id"], seconds=60)
     first = client.get("/api/hunt/status", headers=headers).json()
-    # 只往前 5 秒（未達 15 秒地板）→ 不重算，累積值不變、沒有新事件
-    db_helpers.rewind_hunt(ch["id"], seconds=5)
+    # 只往前 1 秒（未達結算防抖門檻）→ 不重算，累積值不變、沒有新事件
+    db_helpers.rewind_hunt(ch["id"], seconds=1)
     second = client.get("/api/hunt/status", headers=headers).json()
     assert second["kills"] == first["kills"]
     assert second["base_exp"] == first["base_exp"]
@@ -206,3 +207,21 @@ def test_levelup_from_hunting(client, auth, db_helpers):
     before = client.get("/api/characters", headers=headers).json()[0]["base_level"]
     r = client.get("/api/hunt/status", headers=headers).json()
     assert r["character"]["base_level"] >= before
+
+
+def test_online_time_accumulates_across_short_polls(client, auth, db_helpers):
+    """每次只前進幾秒（過了防抖門檻但湊不滿一場戰鬥），連續輪詢，
+    零碎時間不會被丟掉，最後照樣累積出擊殺。"""
+    _, headers, _ = auth
+    ch = client.post("/api/characters", headers=headers, json={"name": "碎時間"}).json()
+    db_helpers.set_base_level(ch["id"], 10)
+    db_helpers.set_stats(ch["id"], {"str": 18, "agi": 8, "vit": 14, "int": 1,
+                                    "dex": 10, "luk": 1})
+    db_helpers.give_item(ch["id"], "red_potion", 50)
+    client.post("/api/hunt/start", headers=headers,
+                json={"map_id": "prontera_east_gate", "monster_ids": ["mad_bunny"]})
+    for _ in range(8):
+        db_helpers.rewind_hunt(ch["id"], seconds=5)
+        body = client.get("/api/hunt/status", headers=headers).json()
+    assert body["kills"] > 0
+    assert body["base_exp"] > 0
