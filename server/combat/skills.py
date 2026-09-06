@@ -36,7 +36,8 @@ def _physical_skill(caster, target, skill, eff, rng):
     for _ in range(hits):
         if rng.random() >= hit_chance(caster.effective_hit, target.effective_flee):
             continue
-        dmg = physical_damage(round(caster.effective_atk * power), target.effective_defense)
+        dmg = physical_damage(round(caster.effective_atk * power), target.effective_defense,
+                              soft_def=target.soft_def)
         if rng.random() < crit_chance(caster.effective_crit):
             dmg = round(dmg * CRIT_MULTIPLIER)
         target.take_damage(dmg)
@@ -50,7 +51,8 @@ def _magic_skill(caster, target, skill, eff, rng):
     hits = _seq(eff.get("hits", 1), skill.level)
     total = 0
     for _ in range(hits):
-        dmg = magic_damage(round(caster.effective_matk * power), target.effective_mdef)
+        dmg = magic_damage(round(caster.effective_matk * power), target.effective_mdef,
+                           soft_mdef=target.soft_mdef)
         target.take_damage(dmg)
         total += dmg
     return [SkillEvent(actor=caster.name, target=target.name, skill_id=skill.skill_id,

@@ -1,40 +1,1113 @@
 [
-  {"id": "basic_attack_boost", "name": "基礎攻擊", "job_id": "novice", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "atk", "amount": [2, 4, 6, 8, 10]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-  {"id": "first_aid", "name": "急救", "job_id": "novice", "kind": "active", "max_level": 5, "sp_cost": [3, 3, 4, 4, 5], "cooldown_s": 0, "effects": [{"type": "heal_hp", "flat": [15, 20, 25, 30, 35]}], "idle_default": {"enabled": true, "trigger": "hp_below_50", "priority": 2}},
-
-  {"id": "bash", "name": "爆裂波動", "job_id": "swordman", "kind": "active", "max_level": 5, "sp_cost": [8, 9, 10, 11, 12], "cooldown_s": 0, "effects": [{"type": "physical_hit", "power_pct": [130, 145, 160, 175, 190]}], "idle_default": {"enabled": true, "trigger": "every_turn", "priority": 3}},
-  {"id": "magnum_break", "name": "魔法爆炸", "job_id": "swordman", "kind": "active", "max_level": 5, "sp_cost": [12, 14, 16, 18, 20], "cooldown_s": 3, "effects": [{"type": "aoe", "element": "fire", "power_pct": [120, 140, 160, 180, 200]}], "idle_default": {"enabled": true, "trigger": "cooldown_ready", "priority": 2}},
-  {"id": "provoke", "name": "挑釁", "job_id": "swordman", "kind": "active", "max_level": 5, "sp_cost": [6, 7, 8, 9, 10], "cooldown_s": 0, "effects": [{"type": "debuff", "stat": "defense", "pct": [-5, -8, -11, -14, -17], "duration_s": 30}], "idle_default": {"enabled": false, "trigger": "every_turn", "priority": 1}},
-  {"id": "endure", "name": "忍耐", "job_id": "swordman", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "mdef", "amount": [1, 2, 3, 4, 5]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-  {"id": "sword_mastery", "name": "劍術訓練", "job_id": "swordman", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "atk", "amount": [4, 8, 12, 16, 20]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-
-  {"id": "fire_bolt", "name": "火箭術", "job_id": "mage", "kind": "active", "max_level": 5, "sp_cost": [12, 15, 18, 21, 24], "cooldown_s": 0, "effects": [{"type": "magic_hit", "element": "fire", "power_pct": [100, 150, 200, 250, 300], "hits": [1, 2, 3, 4, 5]}], "idle_default": {"enabled": true, "trigger": "every_turn", "priority": 3}},
-  {"id": "cold_bolt", "name": "冰箭術", "job_id": "mage", "kind": "active", "max_level": 5, "sp_cost": [12, 15, 18, 21, 24], "cooldown_s": 0, "effects": [{"type": "magic_hit", "element": "water", "power_pct": [100, 150, 200, 250, 300], "hits": [1, 2, 3, 4, 5]}], "idle_default": {"enabled": true, "trigger": "every_turn", "priority": 2}},
-  {"id": "lightning_bolt", "name": "雷擊術", "job_id": "mage", "kind": "active", "max_level": 5, "sp_cost": [12, 15, 18, 21, 24], "cooldown_s": 0, "effects": [{"type": "magic_hit", "element": "wind", "power_pct": [100, 150, 200, 250, 300], "hits": [1, 2, 3, 4, 5]}], "idle_default": {"enabled": true, "trigger": "every_turn", "priority": 2}},
-  {"id": "soul_strike", "name": "靈魂攻擊", "job_id": "mage", "kind": "active", "max_level": 5, "sp_cost": [10, 12, 14, 16, 18], "cooldown_s": 0, "effects": [{"type": "magic_hit", "element": "ghost", "power_pct": [110, 140, 170, 200, 230]}], "idle_default": {"enabled": true, "trigger": "every_turn", "priority": 1}},
-  {"id": "increase_sp", "name": "SP回復提升", "job_id": "mage", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "max_sp", "amount": [10, 20, 30, 40, 50]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-
-  {"id": "double_strafe", "name": "二連矢", "job_id": "archer", "kind": "active", "max_level": 5, "sp_cost": [8, 10, 12, 14, 16], "cooldown_s": 0, "effects": [{"type": "physical_hit", "power_pct": [130, 160, 190, 220, 250], "hits": 2}], "idle_default": {"enabled": true, "trigger": "every_turn", "priority": 3}},
-  {"id": "arrow_shower", "name": "箭雨", "job_id": "archer", "kind": "active", "max_level": 5, "sp_cost": [10, 12, 14, 16, 18], "cooldown_s": 2, "effects": [{"type": "aoe", "power_pct": [90, 110, 130, 150, 170]}], "idle_default": {"enabled": true, "trigger": "cooldown_ready", "priority": 2}},
-  {"id": "owls_eye", "name": "鷹眼", "job_id": "archer", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "dex", "amount": [1, 2, 3, 4, 5]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-  {"id": "vultures_eye", "name": "鷲眼", "job_id": "archer", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "hit", "amount": [3, 6, 9, 12, 15]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-  {"id": "improve_concentration", "name": "專注提升", "job_id": "archer", "kind": "active", "max_level": 5, "sp_cost": [14, 16, 18, 20, 22], "cooldown_s": 0, "effects": [{"type": "buff", "stats": {"agi": [2, 4, 6, 8, 10], "dex": [2, 4, 6, 8, 10]}, "duration_s": 120}], "idle_default": {"enabled": true, "trigger": "sp_available", "priority": 1}},
-
-  {"id": "heal", "name": "治癒術", "job_id": "acolyte", "kind": "active", "max_level": 5, "sp_cost": [10, 13, 16, 19, 22], "cooldown_s": 0, "effects": [{"type": "heal_hp", "matk_pct": [120, 160, 200, 240, 280]}], "idle_default": {"enabled": true, "trigger": "hp_below_50", "priority": 2}},
-  {"id": "blessing", "name": "祝福", "job_id": "acolyte", "kind": "active", "max_level": 5, "sp_cost": [16, 18, 20, 22, 24], "cooldown_s": 0, "effects": [{"type": "buff", "stats": {"str": [1, 2, 3, 4, 5], "int": [1, 2, 3, 4, 5], "dex": [1, 2, 3, 4, 5]}, "duration_s": 120}], "idle_default": {"enabled": true, "trigger": "sp_available", "priority": 1}},
-  {"id": "increase_agi", "name": "敏捷提升", "job_id": "acolyte", "kind": "active", "max_level": 5, "sp_cost": [12, 14, 16, 18, 20], "cooldown_s": 0, "effects": [{"type": "buff", "stats": {"agi": [3, 4, 5, 6, 7]}, "duration_s": 120}], "idle_default": {"enabled": true, "trigger": "sp_available", "priority": 1}},
-  {"id": "holy_light", "name": "聖光", "job_id": "acolyte", "kind": "active", "max_level": 5, "sp_cost": [10, 12, 14, 16, 18], "cooldown_s": 0, "effects": [{"type": "magic_hit", "element": "holy", "power_pct": [115, 140, 165, 190, 215]}], "idle_default": {"enabled": true, "trigger": "every_turn", "priority": 3}},
-  {"id": "divine_protection", "name": "神術防護", "job_id": "acolyte", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "mdef", "amount": [2, 4, 6, 8, 10]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-
-  {"id": "mammonite", "name": "金錢之擊", "job_id": "merchant", "kind": "active", "max_level": 5, "sp_cost": [8, 9, 10, 11, 12], "cooldown_s": 0, "effects": [{"type": "physical_hit", "power_pct": [150, 180, 210, 240, 270], "zeny_cost": [100, 200, 300, 400, 500]}], "idle_default": {"enabled": true, "trigger": "every_turn", "priority": 3}},
-  {"id": "cart_revolution", "name": "手推車攻擊", "job_id": "merchant", "kind": "active", "max_level": 5, "sp_cost": [8, 10, 12, 14, 16], "cooldown_s": 2, "effects": [{"type": "aoe", "power_pct": [150, 165, 180, 195, 210]}], "idle_default": {"enabled": true, "trigger": "cooldown_ready", "priority": 2}},
-  {"id": "enlarge_weight", "name": "負重提升", "job_id": "merchant", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "atk", "amount": [1, 2, 3, 4, 5]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-  {"id": "discount", "name": "折扣", "job_id": "merchant", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "luk", "amount": [1, 2, 3, 4, 5]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-  {"id": "vending", "name": "擺攤", "job_id": "merchant", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "max_sp", "amount": [2, 4, 6, 8, 10]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-
-  {"id": "double_attack", "name": "二段攻擊", "job_id": "thief", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "proc", "event": "on_attack", "chance_pct": [15, 20, 25, 30, 35], "effect": "extra_hit"}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}},
-  {"id": "envenom", "name": "致命毒擊", "job_id": "thief", "kind": "active", "max_level": 5, "sp_cost": [8, 10, 12, 14, 16], "cooldown_s": 0, "effects": [{"type": "physical_hit", "element": "poison", "power_pct": [110, 130, 150, 170, 190], "debuff": "poison"}], "idle_default": {"enabled": true, "trigger": "every_turn", "priority": 3}},
-  {"id": "steal", "name": "偷竊", "job_id": "thief", "kind": "active", "max_level": 5, "sp_cost": [6, 6, 7, 7, 8], "cooldown_s": 0, "effects": [{"type": "proc", "event": "on_hit", "chance_pct": [20, 28, 36, 44, 52], "effect": "steal_loot"}], "idle_default": {"enabled": true, "trigger": "every_turn", "priority": 1}},
-  {"id": "hiding", "name": "隱藏", "job_id": "thief", "kind": "active", "max_level": 5, "sp_cost": [10, 10, 12, 12, 14], "cooldown_s": 3, "effects": [{"type": "buff", "stats": {"flee": [20, 25, 30, 35, 40]}, "duration_s": 30}], "idle_default": {"enabled": false, "trigger": "hp_below_30", "priority": 2}},
-  {"id": "improve_dodge", "name": "閃躲提升", "job_id": "thief", "kind": "passive", "max_level": 5, "sp_cost": [0, 0, 0, 0, 0], "cooldown_s": 0, "effects": [{"type": "passive_stat", "stat": "flee", "amount": [3, 6, 9, 12, 15]}], "idle_default": {"enabled": true, "trigger": "passive", "priority": 0}}
+  {
+    "id": "basic_attack_boost",
+    "name": "基礎攻擊",
+    "job_id": "novice",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "first_aid",
+    "name": "急救",
+    "job_id": "novice",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      3,
+      3,
+      4,
+      4,
+      5
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "heal_hp",
+        "flat": [
+          15,
+          20,
+          25,
+          30,
+          35
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_50",
+      "priority": 2
+    }
+  },
+  {
+    "id": "bash",
+    "name": "爆裂波動",
+    "job_id": "swordman",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          130,
+          145,
+          160,
+          175,
+          190
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    }
+  },
+  {
+    "id": "magnum_break",
+    "name": "魔法爆炸",
+    "job_id": "swordman",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "fire",
+        "power_pct": [
+          120,
+          140,
+          160,
+          180,
+          200
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    }
+  },
+  {
+    "id": "provoke",
+    "name": "挑釁",
+    "job_id": "swordman",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "defense",
+        "pct": [
+          -5,
+          -8,
+          -11,
+          -14,
+          -17
+        ],
+        "duration_s": 30
+      }
+    ],
+    "idle_default": {
+      "enabled": false,
+      "trigger": "every_turn",
+      "priority": 1
+    }
+  },
+  {
+    "id": "endure",
+    "name": "忍耐",
+    "job_id": "swordman",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "mdef",
+        "amount": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "sword_mastery",
+    "name": "劍術訓練",
+    "job_id": "swordman",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "fire_bolt",
+    "name": "火箭術",
+    "job_id": "mage",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "element": "fire",
+        "power_pct": [
+          90,
+          95,
+          100,
+          105,
+          110
+        ],
+        "hits": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    }
+  },
+  {
+    "id": "cold_bolt",
+    "name": "冰箭術",
+    "job_id": "mage",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "element": "water",
+        "power_pct": [
+          90,
+          95,
+          100,
+          105,
+          110
+        ],
+        "hits": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    }
+  },
+  {
+    "id": "lightning_bolt",
+    "name": "雷擊術",
+    "job_id": "mage",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "element": "wind",
+        "power_pct": [
+          90,
+          95,
+          100,
+          105,
+          110
+        ],
+        "hits": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    }
+  },
+  {
+    "id": "soul_strike",
+    "name": "靈魂攻擊",
+    "job_id": "mage",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "element": "ghost",
+        "power_pct": [
+          110,
+          140,
+          170,
+          200,
+          230
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 1
+    }
+  },
+  {
+    "id": "increase_sp",
+    "name": "SP回復提升",
+    "job_id": "mage",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "max_sp",
+        "amount": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "double_strafe",
+    "name": "二連矢",
+    "job_id": "archer",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          130,
+          160,
+          190,
+          220,
+          250
+        ],
+        "hits": 2
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    }
+  },
+  {
+    "id": "arrow_shower",
+    "name": "箭雨",
+    "job_id": "archer",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "aoe",
+        "power_pct": [
+          90,
+          110,
+          130,
+          150,
+          170
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    }
+  },
+  {
+    "id": "owls_eye",
+    "name": "鷹眼",
+    "job_id": "archer",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "dex",
+        "amount": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "vultures_eye",
+    "name": "鷲眼",
+    "job_id": "archer",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "hit",
+        "amount": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "improve_concentration",
+    "name": "專注提升",
+    "job_id": "archer",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      14,
+      16,
+      18,
+      20,
+      22
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "agi": [
+            2,
+            4,
+            6,
+            8,
+            10
+          ],
+          "dex": [
+            2,
+            4,
+            6,
+            8,
+            10
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    }
+  },
+  {
+    "id": "heal",
+    "name": "治癒術",
+    "job_id": "acolyte",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      13,
+      16,
+      19,
+      22
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "heal_hp",
+        "matk_pct": [
+          120,
+          160,
+          200,
+          240,
+          280
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_50",
+      "priority": 2
+    }
+  },
+  {
+    "id": "blessing",
+    "name": "祝福",
+    "job_id": "acolyte",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      16,
+      18,
+      20,
+      22,
+      24
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "str": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "int": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "dex": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    }
+  },
+  {
+    "id": "increase_agi",
+    "name": "敏捷提升",
+    "job_id": "acolyte",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "agi": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    }
+  },
+  {
+    "id": "holy_light",
+    "name": "聖光",
+    "job_id": "acolyte",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "element": "holy",
+        "power_pct": [
+          115,
+          140,
+          165,
+          190,
+          215
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    }
+  },
+  {
+    "id": "divine_protection",
+    "name": "神術防護",
+    "job_id": "acolyte",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "mdef",
+        "amount": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "mammonite",
+    "name": "金錢之擊",
+    "job_id": "merchant",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          150,
+          180,
+          210,
+          240,
+          270
+        ],
+        "zeny_cost": [
+          100,
+          200,
+          300,
+          400,
+          500
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    }
+  },
+  {
+    "id": "cart_revolution",
+    "name": "手推車攻擊",
+    "job_id": "merchant",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "aoe",
+        "power_pct": [
+          150,
+          165,
+          180,
+          195,
+          210
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    }
+  },
+  {
+    "id": "enlarge_weight",
+    "name": "負重提升",
+    "job_id": "merchant",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "discount",
+    "name": "折扣",
+    "job_id": "merchant",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "luk",
+        "amount": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "vending",
+    "name": "擺攤",
+    "job_id": "merchant",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "max_sp",
+        "amount": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "double_attack",
+    "name": "二段攻擊",
+    "job_id": "thief",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "proc",
+        "event": "on_attack",
+        "chance_pct": [
+          15,
+          20,
+          25,
+          30,
+          35
+        ],
+        "effect": "extra_hit"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "envenom",
+    "name": "致命毒擊",
+    "job_id": "thief",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "poison",
+        "power_pct": [
+          110,
+          130,
+          150,
+          170,
+          190
+        ],
+        "debuff": "poison"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    }
+  },
+  {
+    "id": "steal",
+    "name": "偷竊",
+    "job_id": "thief",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      6,
+      6,
+      7,
+      7,
+      8
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "proc",
+        "event": "on_hit",
+        "chance_pct": [
+          20,
+          28,
+          36,
+          44,
+          52
+        ],
+        "effect": "steal_loot"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 1
+    }
+  },
+  {
+    "id": "hiding",
+    "name": "隱藏",
+    "job_id": "thief",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      10,
+      12,
+      12,
+      14
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "flee": [
+            20,
+            25,
+            30,
+            35,
+            40
+          ]
+        },
+        "duration_s": 30
+      }
+    ],
+    "idle_default": {
+      "enabled": false,
+      "trigger": "hp_below_30",
+      "priority": 2
+    }
+  },
+  {
+    "id": "improve_dodge",
+    "name": "閃躲提升",
+    "job_id": "thief",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "flee",
+        "amount": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  }
 ]

@@ -52,8 +52,13 @@ def _auto_attack(attacker, defender, rng, events):
             events.append(AttackEvent(attacker.name, defender.name, 0, False, False))
             continue
         crit = rng.random() < crit_chance(attacker.effective_crit)
-        base = attacker.effective_matk if attacker.is_caster else attacker.effective_atk
-        dmg = physical_damage(base, defender.effective_defense)
+        if attacker.is_caster:
+            from server.combat.formulas import magic_damage
+            dmg = magic_damage(attacker.effective_matk, defender.effective_mdef,
+                               soft_mdef=defender.soft_mdef)
+        else:
+            dmg = physical_damage(attacker.effective_atk, defender.effective_defense,
+                                  soft_def=defender.soft_def)
         if crit:
             dmg = round(dmg * CRIT_MULTIPLIER)
         defender.take_damage(dmg)

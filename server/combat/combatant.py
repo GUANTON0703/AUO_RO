@@ -41,6 +41,8 @@ class Combatant:
     aspd: int
     crit: int
     is_caster: bool = False
+    soft_def: int = 0     # 平減物理傷害（Pre-Renewal VIT 軟防）
+    soft_mdef: int = 0    # 平減魔法傷害
     skills: list[ResolvedSkill] = field(default_factory=list)
     statuses: list = field(default_factory=list)  # server.combat.status.Status
     hp: int = field(default=0)
@@ -111,4 +113,5 @@ class Combatant:
             name=m.name, max_hp=s.max_hp, max_sp=s.max_sp, atk=s.atk, matk=s.matk,
             defense=s.defense, mdef=s.mdef, hit=s.hit, flee=s.flee, aspd=s.aspd,
             crit=s.crit, is_caster=(s.matk > s.atk),
+            soft_def=m.level // 4, soft_mdef=m.level // 6,
         )

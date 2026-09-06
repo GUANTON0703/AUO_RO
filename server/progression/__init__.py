@@ -65,10 +65,14 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     eq = _sum_equipment_stats(content, snap.equipped_item_ids)
     passives = _passive_stat_bonus(content, snap.learned_skills)
 
-    max_hp = round(40 + snap.base_level * job.hp_per_level * (1 + VIT / 100))
-    max_sp = round(11 + snap.base_level * job.sp_per_level * (1 + INT / 100))
-    atk = STR + (STR // 10) ** 2 + DEX // 5 + LUK // 5 + eq.get("atk", 0) + passives.get("atk", 0)
-    matk = INT + (INT // 7) ** 2 + eq.get("matk", 0) + passives.get("matk", 0)
+    # HP/SP 隨等級加速成長（配合怪物 HP 公式的 level² 項），玩家才打得動同級怪
+    lv = snap.base_level
+    max_hp = round((40 + lv * job.hp_per_level * (1.5 + lv / 12)) * (1 + VIT / 60))
+    max_sp = round((11 + lv * job.sp_per_level * (1.2 + lv / 25)) * (1 + INT / 80))
+    atk = round((STR + (STR // 10) ** 2 + DEX // 5 + LUK // 5 + eq.get("atk", 0)
+                 + passives.get("atk", 0)) * (1 + lv / 50))
+    matk = round((INT + (INT // 7) ** 2 + eq.get("matk", 0)
+                  + passives.get("matk", 0)) * (1 + lv / 50))
     defense = min(95, eq.get("def", 0) + VIT // 2 + passives.get("defense", 0))
     mdef = min(95, eq.get("mdef", 0) + INT // 2)
     hit = snap.base_level + DEX + eq.get("hit", 0)
@@ -102,6 +106,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         hit=max(0, derived["hit"]), flee=max(0, derived["flee"]),
         aspd=max(1, min(193, aspd)), crit=max(0, derived["crit"]),
         is_caster=(derived["matk"] > derived["atk"]),
+        soft_def=VIT // 3, soft_mdef=INT // 4,
         skills=resolved,
         hp=snap.hp if snap.hp is not None else 0,
         sp=snap.sp if snap.sp is not None else 0,

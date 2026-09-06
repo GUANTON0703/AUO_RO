@@ -5,14 +5,16 @@ def _clamp(v: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, v))
 
 
-def physical_damage(atk: int, target_defense: int, element_multiplier: float = 1.0) -> int:
+def physical_damage(atk: int, target_defense: int, element_multiplier: float = 1.0,
+                    soft_def: int = 0) -> int:
     reduction = _clamp(target_defense, 0, 95) / 100
-    return max(1, round(atk * (1 - reduction) * element_multiplier))
+    return max(1, round(atk * (1 - reduction) * element_multiplier) - max(0, soft_def))
 
 
-def magic_damage(matk: int, target_mdef: int, element_multiplier: float = 1.0) -> int:
+def magic_damage(matk: int, target_mdef: int, element_multiplier: float = 1.0,
+                 soft_mdef: int = 0) -> int:
     reduction = _clamp(target_mdef, 0, 95) / 100
-    return max(1, round(matk * (1 - reduction) * element_multiplier))
+    return max(1, round(matk * (1 - reduction) * element_multiplier) - max(0, soft_mdef))
 
 
 def hit_chance(attacker_hit: int, target_flee: int) -> float:
