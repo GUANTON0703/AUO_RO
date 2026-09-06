@@ -6,6 +6,20 @@ from fastapi.testclient import TestClient
 from server.db import connection
 
 
+@pytest.fixture(autouse=True)
+def _reset_hunt_memory():
+    """掛機模組用 module-level dict 存每個角色的策略與事件批次。
+    正式環境角色 id 全域唯一不會撞，但測試每次都是新 DB、角色 id 從 1 開始，
+    會沿用上一個測試留下的狀態。每個測試前後清乾淨。"""
+    from server.api import hunt
+
+    hunt._strategies.clear()
+    hunt._last_batch.clear()
+    yield
+    hunt._strategies.clear()
+    hunt._last_batch.clear()
+
+
 @pytest.fixture
 def client(tmp_path):
     connection.configure(str(tmp_path / "test.db"))

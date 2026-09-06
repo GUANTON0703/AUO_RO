@@ -15,6 +15,7 @@ from server.progression.levels import apply_base_exp, apply_job_exp
 from server.repositories import characters as characters_repo
 from server.repositories import inventory
 from server.settlement import HuntConfig, settle
+from server.settlement.huntable import huntable_monsters, pick_start_monster
 from server.settlement.strategy import HuntStrategy
 
 router = APIRouter(prefix="/api/hunt", tags=["hunt"])
@@ -23,6 +24,8 @@ _content = load_content()
 
 _STAT_KEYS = ("str", "agi", "vit", "int", "dex", "luk")
 _strategies: dict[int, HuntStrategy] = {}
+# character_id -> {"batch_id": iso 時間戳, "events": [...]}；記憶體暫存，重啟掉了無所謂
+_last_batch: dict[int, dict] = {}
 
 
 def _now_iso() -> str:
@@ -31,7 +34,8 @@ def _now_iso() -> str:
 
 class StartRequest(BaseModel):
     map_id: str
-    monster_id: str | None = None
+    monster_ids: list[str] | None = None
+    monster_id: str | None = None   # 舊版單選相容
 
 
 class HuntStrategyRequest(BaseModel):
@@ -106,13 +110,6 @@ def _pick_potion(character_id: int):
     return best
 
 
-def _pick_monster(map_def, base_level: int) -> str:
-    return min(
-        map_def.monster_ids,
-        key=lambda mid: abs(_content.get_monster(mid).level - base_level),
-    )
-
-
 @router.post("/start")
 def start_hunt(body: StartRequest, account_id: CurrentAccount):
     row = _current_character(account_id)
@@ -124,52 +121,110 @@ def start_hunt(body: StartRequest, account_id: CurrentAccount):
             status_code=400,
             detail=f"Base Level 未達地圖解鎖需求（{map_def.unlock_base_level}）",
         )
-    monster_id = body.monster_id or _pick_monster(map_def, row["base_level"])
+
+    # monster_ids 有帶（含空 list = 明確要自動）→ 覆蓋指定怪；
+    # 完全沒帶 → 沿用既有 strategy 的 include_monsters。
+    if body.monster_ids is not None:
+        picked = list(body.monster_ids)
+    elif body.monster_id:
+        picked = [body.monster_id]
+    else:
+        picked = None
+
     strategy = _strategies.get(row["id"], HuntStrategy())
-    if monster_id not in map_def.monster_ids or not strategy.allows(monster_id):
-        raise HTTPException(status_code=400, detail="該怪不在此地圖")
+    if picked is not None:
+        for mid in picked:
+            if mid not in map_def.monster_ids:
+                raise HTTPException(status_code=400, detail="該怪不在此地圖")
+        strategy.include_monsters = picked
+    _strategies[row["id"]] = strategy
 
     player = build_player_combatant(_snapshot(row), _content)
+    cfg = HuntConfig.from_settings(get_settings())
+    monster_id = pick_start_monster(
+        player, map_def, strategy, _content, random.Random(), cfg.huntable_win_rate
+    )
+    if monster_id is None:
+        raise HTTPException(
+            status_code=400,
+            detail="這張地圖的怪你現在都打不贏，先加點或換更弱的地圖。",
+        )
+
     now = _now_iso()
     characters_repo.set_hunt_state(
         row["id"], map_id=body.map_id, monster_id=monster_id,
         started_at=now, last_settled_at=now,
         hp=player.max_hp, sp=player.max_sp,
     )
+    _last_batch.pop(row["id"], None)
     return {"map_id": body.map_id, "monster_id": monster_id,
             "hunt_hp": player.max_hp, "hunt_sp": player.max_sp}
 
 
+def _character_block(row) -> dict:
+    return {
+        "base_level": row["base_level"], "base_exp": row["base_exp"],
+        "job_level": row["job_level"], "job_exp": row["job_exp"],
+        "job_id": row["job_id"], "zeny": row["zeny"],
+        "hunt_hp": row["hunt_hp"], "hunt_sp": row["hunt_sp"],
+    }
+
+
 def _no_op_settlement(fresh) -> dict:
     """別的並發請求已結算過時回這個：目前角色狀態、無增量。"""
+    batch = _last_batch.get(fresh["id"], {})
     return {
         "monster_id": fresh["hunting_monster_id"],
         "monster_name": _content.get_monster(fresh["hunting_monster_id"]).name,
+        "batch_id": batch.get("batch_id"),
         "kills": fresh["hunt_kills"], "base_exp": fresh["hunt_base_exp"],
         "job_exp": fresh["hunt_job_exp"], "zeny": fresh["hunt_zeny"], "drops": {},
         "offline": False, "effective_seconds": fresh["hunt_seconds"],
         "retreated": False, "retreat_reason": None, "events": [],
-        "character": {
-            "base_level": fresh["base_level"], "base_exp": fresh["base_exp"],
-            "job_level": fresh["job_level"], "job_exp": fresh["job_exp"],
-            "job_id": fresh["job_id"], "zeny": fresh["zeny"],
-            "hunt_hp": fresh["hunt_hp"], "hunt_sp": fresh["hunt_sp"],
-        },
+        "character": _character_block(fresh),
     }
 
 
-def _settle_current(row) -> dict:
+def _accumulated_snapshot(row) -> dict:
+    """未達結算地板時回這個：目前場次累積值 + 最後一批事件，不重算、不寫入。"""
+    batch = _last_batch.get(row["id"], {})
+    return {
+        "monster_id": row["hunting_monster_id"],
+        "monster_name": _content.get_monster(row["hunting_monster_id"]).name,
+        "batch_id": batch.get("batch_id"),
+        "kills": row["hunt_kills"], "base_exp": row["hunt_base_exp"],
+        "job_exp": row["hunt_job_exp"], "zeny": row["hunt_zeny"], "drops": {},
+        "offline": False, "effective_seconds": row["hunt_seconds"],
+        "retreated": False, "retreat_reason": None,
+        "events": batch.get("events", []),
+        "character": _character_block(row),
+    }
+
+
+def _settle_current(row, *, force=False) -> dict:
     if row["hunting_map_id"] is None:
         raise HTTPException(status_code=409, detail="目前沒有在掛機")
 
     settings = get_settings()
+    cfg = HuntConfig.from_settings(settings)
+
+    now = datetime.now(timezone.utc)
+    initial_last = row["hunt_last_settled_at"]
+    last = datetime.fromisoformat(initial_last)
+    if last.tzinfo is None:            # 舊資料或外部寫入的 naive 時間戳，當 UTC
+        last = last.replace(tzinfo=timezone.utc)
+    elapsed = max(0.0, (now - last).total_seconds())
+    offline = elapsed > settings.online_grace_seconds
+
+    # 結算地板：距上次結算未達門檻、又不是離線、也不是強制（停止掛機）
+    # → 只回累積值，不重算、不推進時間戳。輪詢頻率因此與結算頻率脫鉤。
+    if not force and not offline and elapsed < cfg.settle_floor_seconds:
+        return _accumulated_snapshot(row)
+
     snap = _snapshot(row, hp=row["hunt_hp"], sp=row["hunt_sp"])
     player = build_player_combatant(snap, _content)
     monster = _content.get_monster(row["hunting_monster_id"])
     job = _content.get_job(row["job_id"])
-
-    now = datetime.now(timezone.utc)
-    initial_last = row["hunt_last_settled_at"]
 
     # 併發防護：BEGIN IMMEDIATE 序列化競爭的 status 請求。交易內重讀時間戳，
     # 若已被別的請求結算過就直接回目前狀態；否則立刻「認領」（寫回 now），
@@ -185,17 +240,11 @@ def _settle_current(row) -> dict:
             (now.isoformat(), row["id"]),
         )
 
-    last = datetime.fromisoformat(initial_last)
-    if last.tzinfo is None:            # 舊資料或外部寫入的 naive 時間戳，當 UTC
-        last = last.replace(tzinfo=timezone.utc)
-    elapsed = max(0.0, (now - last).total_seconds())
-    offline = elapsed > settings.online_grace_seconds
-
     potion_id, potion_heal, potion_count = _pick_potion(row["id"])
 
     rng = random.Random(hash(row["hunt_last_settled_at"]) & 0xFFFFFFFF)
     result = settle(
-        player, monster, elapsed, HuntConfig.from_settings(settings), rng,
+        player, monster, elapsed, cfg, rng,
         offline=offline, pity_in=json.loads(row["hunt_pity"]),
         potion_item_id=potion_id, potion_heal=potion_heal, potion_count=potion_count,
     )
@@ -218,21 +267,42 @@ def _settle_current(row) -> dict:
         job_exp=result.job_exp, zeny=result.zeny,
         seconds=result.effective_seconds,
     )
-    if result.retreated:
+
+    retreated = result.retreated
+    retreat_reason = result.retreat_reason
+    if retreated:
         characters_repo.clear_hunt_state(row["id"])
     else:
+        after = characters_repo.get_character(row["id"])
+        pick_player = build_player_combatant(
+            _snapshot(after, hp=after["hunt_hp"], sp=after["hunt_sp"]), _content
+        )
         map_def = _content.maps[row["hunting_map_id"]]
         strategy = _strategies.get(row["id"], HuntStrategy())
-        candidates = [mid for mid in map_def.monster_ids if strategy.allows(mid)]
-        if result.effective_seconds >= HuntConfig.from_settings(settings).round_seconds and candidates:
-            current_index = candidates.index(row["hunting_monster_id"])
-            next_monster = candidates[(current_index + 1) % len(candidates)]
-            characters_repo.update_hunt_target(row["id"], next_monster)
+        candidates = huntable_monsters(
+            pick_player, map_def, strategy, _content, random.Random(),
+            cfg.huntable_win_rate,
+        )
+        if not candidates:
+            characters_repo.clear_hunt_state(row["id"])
+            retreated = True
+            retreat_reason = "此地圖的怪你目前都打不贏"
+        else:
+            cur = row["hunting_monster_id"]
+            idx = candidates.index(cur) if cur in candidates else -1
+            nxt = candidates[(idx + 1) % len(candidates)]
+            if nxt != cur:
+                characters_repo.update_hunt_target(row["id"], nxt)
+
+    batch_id = now.isoformat()
+    events = [asdict(e) for e in result.events]
+    _last_batch[row["id"]] = {"batch_id": batch_id, "events": events}
 
     fresh = characters_repo.get_character(row["id"])
     return {
         "monster_id": row["hunting_monster_id"],
         "monster_name": monster.name,
+        "batch_id": batch_id,
         "kills": fresh["hunt_kills"],
         "base_exp": fresh["hunt_base_exp"],
         "job_exp": fresh["hunt_job_exp"],
@@ -240,15 +310,10 @@ def _settle_current(row) -> dict:
         "drops": result.drops,
         "offline": offline,
         "effective_seconds": fresh["hunt_seconds"],
-        "retreated": result.retreated,
-        "retreat_reason": result.retreat_reason,
-        "events": [asdict(e) for e in result.events],
-        "character": {
-            "base_level": fresh["base_level"], "base_exp": fresh["base_exp"],
-            "job_level": fresh["job_level"], "job_exp": fresh["job_exp"],
-            "job_id": fresh["job_id"], "zeny": fresh["zeny"],
-            "hunt_hp": fresh["hunt_hp"], "hunt_sp": fresh["hunt_sp"],
-        },
+        "retreated": retreated,
+        "retreat_reason": retreat_reason,
+        "events": events,
+        "character": _character_block(fresh),
     }
 
 
@@ -260,6 +325,7 @@ def hunt_status(account_id: CurrentAccount):
 @router.post("/stop")
 def stop_hunt(account_id: CurrentAccount):
     row = _current_character(account_id)
-    out = _settle_current(row)
+    out = _settle_current(row, force=True)
     characters_repo.clear_hunt_state(row["id"])
+    _last_batch.pop(row["id"], None)
     return out
