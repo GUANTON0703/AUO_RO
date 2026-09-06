@@ -1,5 +1,14 @@
+from server.config import get_settings
 from server.db import connection
 from server.repositories import accounts, characters
+from server.settlement.config import HuntConfig
+
+
+def _make_gm(name):
+    gm_id = _make_account(name)
+    with connection.get_connection() as conn:
+        conn.execute("UPDATE accounts SET role = ? WHERE id = ?", ("GM遊戲管理者", gm_id))
+    return gm_id
 
 
 def _make_account(username, password="password123"):
@@ -59,3 +68,96 @@ def test_gm_can_set_bounded_multipliers(client):
     assert response.status_code == 200
     assert response.json() == {"experience": 2.0, "drop": 1.5}
     assert client.put("/api/admin/settings/multipliers", json={"experience": 0, "drop": 1}, headers=headers).status_code == 422
+
+
+def test_me_reports_gm_flag(client):
+    _make_account("plain")
+    plain_token = _login(client, "plain").json()["token"]
+    resp = client.get("/api/me", headers={"Authorization": f"Bearer {plain_token}"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["username"] == "plain"
+    assert body["role"] == "player"
+    assert body["is_gm"] is False
+
+    _make_gm("bighand")
+    gm_token = _login(client, "bighand").json()["token"]
+    gm_body = client.get("/api/me", headers={"Authorization": f"Bearer {gm_token}"}).json()
+    assert gm_body["is_gm"] is True
+    assert gm_body["role"] == "GM遊戲管理者"
+
+
+def test_me_requires_auth(client):
+    assert client.get("/api/me").status_code == 401
+
+
+def test_gm_can_set_hunt_settings(client):
+    _make_account("plainhunt")
+    plain_token = _login(client, "plainhunt").json()["token"]
+    assert client.put(
+        "/api/admin/settings/hunt",
+        json={"settle_floor_seconds": 30, "huntable_win_rate": 0.7},
+        headers={"Authorization": f"Bearer {plain_token}"},
+    ).status_code == 403
+
+    _make_gm("gmhunt")
+    headers = {"Authorization": f"Bearer {_login(client, 'gmhunt').json()['token']}"}
+    resp = client.put(
+        "/api/admin/settings/hunt",
+        json={"settle_floor_seconds": 30, "huntable_win_rate": 0.7},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {"settle_floor_seconds": 30.0, "huntable_win_rate": 0.7}
+
+    with connection.get_connection() as conn:
+        rows = dict(
+            conn.execute(
+                "SELECT key, value FROM server_settings WHERE key IN ('settle_floor_seconds', 'huntable_win_rate')"
+            ).fetchall()
+        )
+    assert rows == {"settle_floor_seconds": "30.0", "huntable_win_rate": "0.7"}
+
+    cfg = HuntConfig.from_settings(get_settings())
+    assert cfg.settle_floor_seconds == 30.0
+    assert cfg.huntable_win_rate == 0.7
+
+
+def test_hunt_settings_bounds(client):
+    _make_gm("gmbounds")
+    headers = {"Authorization": f"Bearer {_login(client, 'gmbounds').json()['token']}"}
+    assert client.put(
+        "/api/admin/settings/hunt",
+        json={"settle_floor_seconds": 30, "huntable_win_rate": 1.5},
+        headers=headers,
+    ).status_code == 422
+    assert client.put(
+        "/api/admin/settings/hunt",
+        json={"settle_floor_seconds": 0.5, "huntable_win_rate": 0.6},
+        headers=headers,
+    ).status_code == 422
+
+
+def test_get_server_settings_defaults_then_updates(client):
+    _make_gm("gmget")
+    headers = {"Authorization": f"Bearer {_login(client, 'gmget').json()['token']}"}
+
+    assert client.get("/api/admin/settings", headers=headers).json() == {
+        "experience_multiplier": 1.0,
+        "drop_multiplier": 1.0,
+        "settle_floor_seconds": 15.0,
+        "huntable_win_rate": 0.6,
+    }
+
+    client.put("/api/admin/settings/multipliers", json={"experience": 3.0, "drop": 2.0}, headers=headers)
+    client.put(
+        "/api/admin/settings/hunt",
+        json={"settle_floor_seconds": 45, "huntable_win_rate": 0.55},
+        headers=headers,
+    )
+    assert client.get("/api/admin/settings", headers=headers).json() == {
+        "experience_multiplier": 3.0,
+        "drop_multiplier": 2.0,
+        "settle_floor_seconds": 45.0,
+        "huntable_win_rate": 0.55,
+    }

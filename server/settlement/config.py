@@ -23,18 +23,28 @@ class HuntConfig:
 
     @classmethod
     def from_settings(cls, settings) -> "HuntConfig":
-        experience_multiplier = 1.0
-        drop_multiplier = 1.0
+        defaults = cls()
+        experience_multiplier = defaults.experience_multiplier
+        drop_multiplier = defaults.drop_multiplier
+        settle_floor_seconds = defaults.settle_floor_seconds
+        huntable_win_rate = defaults.huntable_win_rate
         try:
             from server.db import connection
             with connection.get_connection() as conn:
                 rows = conn.execute(
-                    "SELECT key, value FROM server_settings WHERE key IN (?, ?)",
-                    ("experience_multiplier", "drop_multiplier"),
+                    "SELECT key, value FROM server_settings WHERE key IN (?, ?, ?, ?)",
+                    (
+                        "experience_multiplier",
+                        "drop_multiplier",
+                        "settle_floor_seconds",
+                        "huntable_win_rate",
+                    ),
                 ).fetchall()
             values = {row[0]: float(row[1]) for row in rows}
-            experience_multiplier = values.get("experience_multiplier", 1.0)
-            drop_multiplier = values.get("drop_multiplier", 1.0)
+            experience_multiplier = values.get("experience_multiplier", experience_multiplier)
+            drop_multiplier = values.get("drop_multiplier", drop_multiplier)
+            settle_floor_seconds = values.get("settle_floor_seconds", settle_floor_seconds)
+            huntable_win_rate = values.get("huntable_win_rate", huntable_win_rate)
         except (RuntimeError, OSError):
             pass
         return cls(
@@ -42,4 +52,6 @@ class HuntConfig:
             offline_cap_hours=settings.offline_cap_hours,
             experience_multiplier=experience_multiplier,
             drop_multiplier=drop_multiplier,
+            settle_floor_seconds=settle_floor_seconds,
+            huntable_win_rate=huntable_win_rate,
         )

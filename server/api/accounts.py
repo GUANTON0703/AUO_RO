@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from server.auth import invites, passwords, tokens
-from server.auth.dependencies import TokenAndAccount
+from server.auth.dependencies import CurrentAccount, TokenAndAccount
 from server.config import get_settings
 from server.repositories import accounts as accounts_repo
 from shared.models import AccountPublic
@@ -24,6 +24,13 @@ class LoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     token: str
     account_id: int
+
+
+class MeResponse(BaseModel):
+    account_id: int
+    username: str
+    role: str
+    is_gm: bool
 
 
 @router.post("/accounts", status_code=201, response_model=AccountPublic)
@@ -50,6 +57,20 @@ def login(body: LoginRequest):
         raise HTTPException(status_code=401, detail="帳號或密碼錯誤")
     token = tokens.issue_token(row["id"], get_settings().token_ttl_hours)
     return TokenResponse(token=token, account_id=row["id"])
+
+
+@router.get("/me", response_model=MeResponse)
+def me(account_id: CurrentAccount):
+    row = accounts_repo.get_account(account_id)
+    if row is None:
+        raise HTTPException(status_code=401, detail="帳號不存在")
+    role = row["role"]
+    return MeResponse(
+        account_id=account_id,
+        username=row["username"],
+        role=role,
+        is_gm=role == "GM遊戲管理者",
+    )
 
 
 @router.delete("/sessions", status_code=204)
