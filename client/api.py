@@ -47,6 +47,9 @@ class ApiClient:
     def create_character(self, name):
         return self._req("POST", "/api/characters", json={"name": name})
 
+    def sheet(self, cid):
+        return self._req("GET", f"/api/characters/{cid}/sheet")
+
     def delete_character(self, cid):
         return self._req("DELETE", f"/api/characters/{cid}")
 

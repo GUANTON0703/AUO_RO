@@ -1,11 +1,17 @@
+import json
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from server.auth.dependencies import CurrentAccount
 from server.config import get_settings
+from server.content import load_content
+from server.progression import CharacterSnapshot, EquippedPiece, build_player_combatant
 from server.repositories import characters as characters_repo
 from server.repositories import inventory
 from shared.models import CharacterPublic
+
+_STAT_KEYS = ("str", "agi", "vit", "int", "dex", "luk")
 
 router = APIRouter(prefix="/api/characters", tags=["characters"])
 
@@ -60,6 +66,46 @@ def create_character(body: CreateCharacterRequest, account_id: CurrentAccount):
         )
     inventory.grant_starter_kit(row["id"])
     return _to_public(row)
+
+
+@router.get("/{character_id}/sheet")
+def character_sheet(character_id: int, account_id: CurrentAccount):
+    row = characters_repo.get_character(character_id)
+    if row is None or row["account_id"] != account_id:
+        raise HTTPException(status_code=404, detail="找不到角色")
+    content = load_content()
+    snap = CharacterSnapshot(
+        name=row["name"],
+        job_id=row["job_id"],
+        base_level=row["base_level"],
+        job_level=row["job_level"],
+        stats={k: row[f"stat_{k}"] for k in _STAT_KEYS},
+        learned_skills=json.loads(row["learned_skills"]),
+        equipped=[
+            EquippedPiece(
+                equipment_id=e["equipment_id"],
+                refine=e["refine"],
+                card_ids=list(e["card_ids"]),
+            )
+            for e in inventory.list_equipped(character_id)
+        ],
+    )
+    c = build_player_combatant(snap, content)
+    return {
+        "max_hp": c.max_hp,
+        "max_sp": c.max_sp,
+        "atk": c.atk,
+        "matk": c.matk,
+        "defense": c.defense,
+        "mdef": c.mdef,
+        "hit": c.hit,
+        "flee": c.flee,
+        "aspd": c.aspd,
+        "crit": c.crit,
+        "is_caster": c.is_caster,
+        "hunt_hp": row["hunt_hp"] if row["hunt_hp"] is not None else c.max_hp,
+        "hunt_sp": row["hunt_sp"] if row["hunt_sp"] is not None else c.max_sp,
+    }
 
 
 @router.delete("/{character_id}", status_code=204)

@@ -57,6 +57,21 @@ def test_hunt_start_status_stop(api):
     client.hunt_stop()
 
 
+def test_sheet_returns_derived_combat_stats(api):
+    client, code = api
+    client.register(code, "sheetp", "password123")
+    client.login("sheetp", "password123")
+    ch = client.create_character("數值王")
+    sheet = client.sheet(ch["id"])
+    for key in (
+        "max_hp", "max_sp", "atk", "matk", "defense", "mdef",
+        "hit", "flee", "aspd", "crit", "is_caster", "hunt_hp", "hunt_sp",
+    ):
+        assert key in sheet
+    assert sheet["max_hp"] > 0
+    assert sheet["hunt_hp"] == sheet["max_hp"]  # 沒在掛機回 max
+
+
 def test_shop_and_inventory(api):
     client, code = api
     client.register(code, "player4", "password123")
