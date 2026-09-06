@@ -81,3 +81,13 @@ def test_shop_and_inventory(api):
     assert "items" in inv and "equipment" in inv
     shop = client.shop()
     assert any(i["id"] == "red_potion" for i in shop["items"])
+
+
+def test_content_query_client_methods(api):
+    client, code = api
+    client.register(code, "contentapi", "password123")
+    client.login("contentapi", "password123")
+    client.create_character("查詢者")
+    assert client.content_monster("poring")["drops"]
+    assert client.content_item("red_potion")["kind"] == "consumable"
+    assert "requirements" in client.content_equipment("queen_staff")

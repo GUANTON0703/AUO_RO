@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     offline_efficiency: float = 0.6
     offline_cap_hours: int = 8
-    online_grace_seconds: int = 120
+    online_grace_seconds: int = 30
 
 
 @lru_cache

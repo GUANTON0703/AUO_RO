@@ -64,3 +64,8 @@ def init_db() -> None:
     ddl = _SCHEMA.read_text(encoding="utf-8")
     with get_connection() as conn:
         conn.executescript(ddl)
+        account_columns = {
+            row[1] for row in conn.execute("PRAGMA table_info(accounts)").fetchall()
+        }
+        if "role" not in account_columns:
+            conn.execute("ALTER TABLE accounts ADD COLUMN role TEXT NOT NULL DEFAULT 'player'")

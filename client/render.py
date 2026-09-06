@@ -30,6 +30,42 @@ def _item_name(item_id: str) -> str:
     return item_id
 
 
+def content_monster_panel(monster: dict) -> Panel:
+    table = Table(title=f"{monster.get('name', '?')}　Lv {monster.get('level', '?')}")
+    table.add_column("掉落物")
+    table.add_column("機率")
+    table.add_column("數量")
+    for drop in monster.get("drops") or []:
+        qty = f"{drop.get('min_qty', 1)}-{drop.get('max_qty', 1)}"
+        table.add_row(drop.get("item_name", drop.get("item_id", "?")),
+                      f"{drop.get('rate', 0) * 100:.1f}%", qty)
+    return table
+
+
+def content_equipment_panel(equipment: dict) -> Panel:
+    lines = [f"部位：{equipment.get('slot', '?')}",
+             f"能力：{equipment.get('stats') or '無'}"]
+    req = equipment.get("requirements") or {}
+    if req.get("met") is False:
+        lines.append("[red]未達成條件：" + "、".join(req.get("reasons") or ["未知"]) + "[/red]")
+    else:
+        lines.append("[green]已符合裝備條件[/green]")
+    return Panel("\n".join(lines), title=equipment.get("name", "裝備詳情"), expand=False)
+
+
+def content_item_panel(item: dict) -> Panel:
+    lines = [f"類型：{item.get('kind', '?')}"]
+    effects = item.get("effects") or []
+    for effect in effects:
+        if effect.get("type") == "heal_hp":
+            lines.append(f"恢復 HP：{effect.get('amount', 0)}")
+        elif effect.get("type") == "heal_sp":
+            lines.append(f"恢復 SP：{effect.get('amount', 0)}")
+        else:
+            lines.append(f"效果：{effect}")
+    return Panel("\n".join(lines), title=item.get("name", "物品詳情"), expand=False)
+
+
 def _bar(cur: int, total: int, width: int = 20) -> str:
     total = max(total, 1)
     ratio = max(0.0, min(1.0, cur / total))
@@ -170,7 +206,13 @@ def event_lines(events: list[dict], max_combat_lines: int = 20) -> list:
 
 
 def _legacy_event_line(out: list, e: dict, kind: str) -> None:
-    if kind == "kill_batch":
+    if kind == "find_monster":
+        out.append(Text("正在尋找怪物…", style="dim"))
+    elif kind == "fly_wing":
+        out.append(Text("找不到合適目標，使用蒼蠅翼尋找下一處…", style="yellow"))
+    elif kind == "boss_retreat":
+        out.append(Text("遇到 Boss，使用蒼蠅翼飛走！", style="yellow"))
+    elif kind == "kill_batch":
         out.append(
             Text(
                 f"擊殺 {e.get('monster_name', '?')} ×{e.get('count', 0)}"

@@ -85,6 +85,12 @@ class ApiClient:
     def hunt_stop(self):
         return self._req("POST", "/api/hunt/stop")
 
+    def hunt_strategy(self, cid):
+        return self._req("GET", f"/api/hunt/strategy/{cid}")
+
+    def set_hunt_strategy(self, cid, strategy):
+        return self._req("PUT", f"/api/hunt/strategy/{cid}", json=strategy)
+
     # --- mvp ---
     def list_mvp(self):
         return self._req("GET", "/api/mvp")
@@ -128,6 +134,19 @@ class ApiClient:
     # --- shop / storage ---
     def shop(self):
         return self._req("GET", "/api/shop")
+
+    # --- player content query ---
+    def content_monster(self, monster_id):
+        return self._req("GET", f"/api/content/monsters/{monster_id}")
+
+    def content_item(self, item_id):
+        return self._req("GET", f"/api/content/items/{item_id}")
+
+    def content_card(self, card_id):
+        return self._req("GET", f"/api/content/cards/{card_id}")
+
+    def content_equipment(self, equipment_id):
+        return self._req("GET", f"/api/content/equipment/{equipment_id}")
 
     def buy(self, item_id, qty=1):
         return self._req("POST", "/api/shop/buy", json={"item_id": item_id, "qty": qty})

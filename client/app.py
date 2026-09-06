@@ -9,6 +9,7 @@ from client.config import SessionStore
 from client.chat import chat_mode
 from client.menus import (
     equip_menu,
+    content_menu,
     guild_menu,
     jobchange_menu,
     mvp_menu,
@@ -20,6 +21,7 @@ from client.menus import (
     stats_menu,
     storage_menu,
     trade_menu,
+    strategy_menu,
 )
 from client.render import (
     event_lines,
@@ -62,13 +64,15 @@ _MENU = [
     ("k", "技能"), ("e", "裝備"), ("r", "精煉"), ("o", "鑲卡"),
     ("b", "商店"), ("w", "倉庫"), ("j", "轉職"), ("m", "MVP"),
     ("l", "排行"), ("t", "交易"), ("g", "公會"), ("c", "聊天"),
-    ("i", "背包"), ("s", "狀態"), ("?", "說明"), ("q", "離開"),
+    ("i", "背包"), ("d", "資料"), ("u", "掛機設定"), ("s", "狀態"),
+    ("?", "說明"), ("q", "離開"),
 ]
 
 _ALIASES = {
     "x": "stop", "a": "stats", "k": "skills", "e": "equip", "r": "refine",
     "o": "socket", "b": "shop", "w": "storage", "j": "job", "m": "mvp",
     "l": "rank", "t": "trade", "g": "guild", "c": "chat", "?": "help",
+    "d": "content", "u": "strategy",
     "hunt": "h", "watch": "v", "status": "s", "inv": "i", "quit": "q", "exit": "q",
 }
 
@@ -190,7 +194,7 @@ def run(server_url: str) -> None:
         "refine": refine_menu, "socket": socket_menu, "shop": shop_menu,
         "storage": storage_menu, "job": jobchange_menu,
         "mvp": mvp_menu, "rank": rank_menu, "trade": trade_menu,
-        "guild": guild_menu,
+        "guild": guild_menu, "content": content_menu, "strategy": strategy_menu,
     }
 
     last_output = "[bold green]歡迎回來，" + character["name"] + "！[/bold green] 輸入指令代號或直接打字。"

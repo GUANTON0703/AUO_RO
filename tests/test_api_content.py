@@ -1,0 +1,22 @@
+def test_player_can_query_monster_drops_and_item_details(client, auth):
+    _token, h, _account = auth
+    ch = client.post("/api/characters", headers=h, json={"name": "查詢者"}).json()
+    monster = client.get("/api/content/monsters/poring", headers=h)
+    assert monster.status_code == 200
+    body = monster.json()
+    assert body["name"] == "波利"
+    assert body["drops"][0]["item_name"] == "壓縮膠"
+    assert body["drops"][0]["rate"] == 0.7
+    item = client.get("/api/content/items/red_potion", headers=h)
+    assert item.status_code == 200 and item.json()["kind"] == "consumable"
+
+
+def test_equipment_details_include_player_requirement_state(client, auth, db_helpers):
+    _token, h, _account = auth
+    ch = client.post("/api/characters", headers=h, json={"name": "查詢者"}).json()
+    db_helpers.set_base_level(ch["id"], 1)
+    result = client.get("/api/content/equipment/queen_staff", headers=h)
+    assert result.status_code == 200
+    req = result.json()["requirements"]
+    assert req["met"] is False
+    assert req["reasons"]

@@ -33,3 +33,18 @@ class RetreatEvent:
     reason: str
     seconds_survived: float
     kind: str = "retreat"
+
+
+@dataclass
+class FindMonsterEvent:
+    kind: str = "find_monster"
+
+
+@dataclass
+class FlyWingEvent:
+    kind: str = "fly_wing"
+
+
+@dataclass
+class BossRetreatEvent:
+    kind: str = "boss_retreat"

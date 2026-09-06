@@ -3,7 +3,10 @@ from rich.prompt import Confirm, IntPrompt, Prompt
 from rich.table import Table
 
 from client.api import ApiError
-from client.render import event_lines, inventory_table, shop_table, storage_table
+from client.render import (
+    content_equipment_panel, content_item_panel, content_monster_panel,
+    event_lines, inventory_table, shop_table, storage_table,
+)
 from client.ui import choose
 from server.content import load_content
 from server.loot.refine import (
@@ -80,6 +83,40 @@ def stats_menu(api, character: dict, console: Console | None = None) -> None:
         console.print(f"[green]已加：{deltas}[/green]")
     except Exception as exc:
         console.print(f"[red]加點失敗：{exc}[/red]")
+
+
+def content_menu(api, character: dict, console: Console | None = None) -> None:
+    console = console or _console
+    kind = choose(console, "查詢資料", [("怪物掉落", "monster"), ("物品效果", "item"), ("裝備條件", "equipment")])
+    if kind is None:
+        return
+    if kind == "monster":
+        rows = [(f"{m.name}（Lv {m.level}）", m.id) for m in _content.monsters.values()]
+        target = choose(console, "選擇怪物", rows)
+        if target is not None:
+            console.print(content_monster_panel(api.content_monster(target)))
+    elif kind == "item":
+        rows = [(f"{i.name}（{i.id}）", i.id) for i in _content.items.values()]
+        target = choose(console, "選擇物品", rows)
+        if target is not None:
+            console.print(content_item_panel(api.content_item(target)))
+    else:
+        rows = [(f"{e.name}（Lv {e.required_level}）", e.id) for e in _content.equipment.values()]
+        target = choose(console, "選擇裝備", rows)
+        if target is not None:
+            console.print(content_equipment_panel(api.content_equipment(target)))
+
+
+def strategy_menu(api, character: dict, console: Console | None = None) -> None:
+    console = console or _console
+    strategy = api.hunt_strategy(_cid(character))
+    action = choose(console, "掛機設定", [("遇到 Boss 飛走", "boss"), ("自動喝水", "potion"), ("自動買水", "buy"), ("自動賣物", "sell")])
+    if action is None:
+        return
+    key = {"boss": "flee_on_boss", "potion": "auto_potion", "buy": "buy_potions", "sell": "sell_items"}[action]
+    strategy[key] = not strategy.get(key, False)
+    api.set_hunt_strategy(_cid(character), strategy)
+    console.print(f"[green]已更新掛機設定：{key} = {strategy[key]}[/green]")
 
 
 def skills_menu(api, character: dict, console: Console | None = None) -> None:

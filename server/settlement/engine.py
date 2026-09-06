@@ -11,6 +11,7 @@ from server.settlement.economy import zeny_per_kill
 from server.settlement.events import (
     KillBatchEvent, PotionUsedEvent, RareDropEvent, RetreatEvent,
 )
+from server.settlement.strategy import choose_hunt_event
 from server.settlement.profile import estimate_fight_profile
 from shared.content import MonsterDef
 
@@ -47,6 +48,15 @@ def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
            potion_item_id: str | None = None, potion_heal: int = 0,
            potion_count: int = 0) -> SettlementResult:
 
+    random_event = choose_hunt_event(monster.role == "boss", rng, cfg)
+    if random_event and random_event.kind == "boss_retreat":
+        return SettlementResult(
+            kills=0, base_exp=0, job_exp=0, zeny=0, retreated=True,
+            retreat_reason="遇到 Boss，使用蒼蠅翼飛走",
+            real_elapsed_seconds=float(elapsed_seconds), events=[random_event],
+            pity_out=dict(pity_in), final_hp=player.hp, final_sp=player.sp,
+        )
+
     if offline:
         capped = min(elapsed_seconds, cfg.offline_cap_hours * 3600)
         effective = capped * cfg.offline_efficiency
@@ -67,13 +77,16 @@ def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
         )
 
     if not offline and potential <= cfg.literal_sim_kill_cap:
-        return _settle_literal(player, monster, elapsed_seconds, effective,
+        result = _settle_literal(player, monster, elapsed_seconds, effective,
                                time_per_kill, cfg, rng, pity_in,
                                potion_item_id, potion_heal, potion_count)
-
-    return _settle_statistical(player, monster, elapsed_seconds, effective,
+    else:
+        result = _settle_statistical(player, monster, elapsed_seconds, effective,
                                time_per_kill, potential, prof, cfg, rng, offline,
                                pity_in, potion_item_id, potion_heal, potion_count)
+    if random_event:
+        result.events.insert(0, random_event)
+    return result
 
 
 def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_kill,
@@ -117,8 +130,8 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
         potions_used = min(potion_count, math.ceil(healing_needed / potion_heal))
     used_seconds = kills * time_per_kill
 
-    base_exp = kills * monster.base_exp
-    job_exp = kills * monster.job_exp
+    base_exp = round(kills * monster.base_exp * cfg.experience_multiplier)
+    job_exp = round(kills * monster.job_exp * cfg.experience_multiplier)
     zeny = kills * zeny_per_kill(monster)
     drops, pity_out = roll_drops(monster.drops, kills, rng, offline=offline,
                                  pity_in=pity_in, cfg=cfg)
@@ -188,8 +201,8 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
         p.sp = min(p.max_sp, p.sp + round(cfg.sp_regen_per_sec * time_per_kill))
         p.heal(round(p.max_hp * cfg.hp_regen_frac_per_sec * time_per_kill))
 
-    base_exp = kills * monster.base_exp
-    job_exp = kills * monster.job_exp
+    base_exp = round(kills * monster.base_exp * cfg.experience_multiplier)
+    job_exp = round(kills * monster.job_exp * cfg.experience_multiplier)
     zeny = kills * zeny_per_kill(monster)
     drops, pity_out = roll_drops(monster.drops, kills, rng, offline=False,
                                  pity_in=pity_in, cfg=cfg)

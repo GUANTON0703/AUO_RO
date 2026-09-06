@@ -2,8 +2,17 @@ CREATE TABLE IF NOT EXISTS accounts (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     username      TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
-    created_at    TEXT NOT NULL
+    created_at    TEXT NOT NULL,
+    role          TEXT NOT NULL DEFAULT 'player'
 );
+
+CREATE TABLE IF NOT EXISTS server_settings (
+    key        TEXT PRIMARY KEY,
+    value      TEXT NOT NULL
+);
+
+INSERT OR IGNORE INTO server_settings (key, value) VALUES ('experience_multiplier', '1.0');
+INSERT OR IGNORE INTO server_settings (key, value) VALUES ('drop_multiplier', '1.0');
 
 CREATE TABLE IF NOT EXISTS invite_codes (
     code            TEXT PRIMARY KEY,

@@ -15,11 +15,12 @@ def roll_drops(entries: list[DropEntry], kills: int, rng: random.Random,
         is_rare = e.rate < cfg.rare_drop_cutoff
 
         if not is_rare:
+            rate = min(1.0, e.rate * cfg.drop_multiplier)
             if offline:
-                qty = round(kills * e.rate * avg_qty)
+                qty = round(kills * rate * avg_qty)
             else:
                 qty = sum(rng.randint(e.min_qty, e.max_qty)
-                          for _ in range(kills) if rng.random() < e.rate)
+                          for _ in range(kills) if rng.random() < rate)
             if qty:
                 got[e.item_id] = got.get(e.item_id, 0) + qty
             continue
@@ -28,9 +29,10 @@ def roll_drops(entries: list[DropEntry], kills: int, rng: random.Random,
         if kills <= 0:
             hits = 0
         elif offline:
-            hits = rng.binomialvariate(kills, e.rate) if e.rate > 0 else 0
+            hits = rng.binomialvariate(kills, min(1.0, e.rate * cfg.drop_multiplier)) if e.rate > 0 else 0
         else:
-            hits = sum(1 for _ in range(kills) if rng.random() < e.rate)
+            rate = min(1.0, e.rate * cfg.drop_multiplier)
+            hits = sum(1 for _ in range(kills) if rng.random() < rate)
 
         counter = pity.get(e.item_id, 0) + kills
         if hits > 0:

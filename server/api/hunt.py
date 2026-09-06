@@ -1,6 +1,7 @@
 import json
 import random
 from dataclasses import asdict
+from dataclasses import asdict
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException
@@ -15,12 +16,14 @@ from server.progression.levels import apply_base_exp, apply_job_exp
 from server.repositories import characters as characters_repo
 from server.repositories import inventory
 from server.settlement import HuntConfig, settle
+from server.settlement.strategy import HuntStrategy
 
 router = APIRouter(prefix="/api/hunt", tags=["hunt"])
 
 _content = load_content()
 
 _STAT_KEYS = ("str", "agi", "vit", "int", "dex", "luk")
+_strategies: dict[int, HuntStrategy] = {}
 
 
 def _now_iso() -> str:
@@ -32,11 +35,42 @@ class StartRequest(BaseModel):
     monster_id: str | None = None
 
 
+class HuntStrategyRequest(BaseModel):
+    include_monsters: list[str] = []
+    exclude_monsters: list[str] = []
+    flee_on_boss: bool = True
+    auto_potion: bool = True
+    potion_item_id: str | None = None
+    buy_potions: bool = False
+    sell_items: bool = False
+
+
 def _current_character(account_id: int):
     rows = characters_repo.list_for_account(account_id)
     if not rows:
         raise HTTPException(status_code=404, detail="沒有角色")
     return rows[0]
+
+
+def _owned_character(character_id: int, account_id: int):
+    row = next((r for r in characters_repo.list_for_account(account_id) if r["id"] == character_id), None)
+    if row is None:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    return row
+
+
+@router.get("/strategy/{character_id}")
+def get_hunt_strategy(character_id: int, account_id: CurrentAccount):
+    _owned_character(character_id, account_id)
+    strategy = _strategies.get(character_id, HuntStrategy())
+    return HuntStrategyRequest.model_validate(asdict(strategy)).model_dump()
+
+
+@router.put("/strategy/{character_id}")
+def put_hunt_strategy(character_id: int, body: HuntStrategyRequest, account_id: CurrentAccount):
+    _owned_character(character_id, account_id)
+    _strategies[character_id] = HuntStrategy(**body.model_dump())
+    return body.model_dump()
 
 
 def _snapshot(row, *, hp=None, sp=None) -> CharacterSnapshot:
@@ -92,7 +126,8 @@ def start_hunt(body: StartRequest, account_id: CurrentAccount):
             detail=f"Base Level 未達地圖解鎖需求（{map_def.unlock_base_level}）",
         )
     monster_id = body.monster_id or _pick_monster(map_def, row["base_level"])
-    if monster_id not in map_def.monster_ids:
+    strategy = _strategies.get(row["id"], HuntStrategy())
+    if monster_id not in map_def.monster_ids or not strategy.allows(monster_id):
         raise HTTPException(status_code=400, detail="該怪不在此地圖")
 
     player = build_player_combatant(_snapshot(row), _content)

@@ -66,6 +66,18 @@ def test_offline_applies_efficiency_and_cap():
     assert r.base_exp == r.kills * poring.base_exp
 
 
+def test_server_multipliers_affect_settlement_rewards():
+    c = load_content()
+    poring = c.get_monster("poring")
+    cfg = HuntConfig(experience_multiplier=2.0, drop_multiplier=1.0,
+                     find_monster_rate=0.0, fly_wing_rate=0.0,
+                     boss_retreat_rate=0.0)
+    r = settle(_hero(), poring, elapsed_seconds=3600, cfg=cfg,
+               rng=random.Random(0), offline=True, pity_in={})
+    assert r.base_exp == r.kills * poring.base_exp * 2
+    assert r.job_exp == r.kills * poring.job_exp * 2
+
+
 def test_online_no_penalty():
     c = load_content()
     poring = c.get_monster("poring")

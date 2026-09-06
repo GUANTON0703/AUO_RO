@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends, Header, HTTPException
 
 from server.auth import tokens
+from server.db import connection
 
 
 def _extract_bearer(authorization: str | None) -> str:
@@ -31,3 +32,14 @@ def get_token_and_account(
 
 CurrentAccount = Annotated[int, Depends(get_current_account)]
 TokenAndAccount = Annotated[tuple[str, int], Depends(get_token_and_account)]
+
+
+def require_gm(account_id: CurrentAccount) -> int:
+    with connection.get_connection() as conn:
+        row = conn.execute("SELECT role FROM accounts WHERE id = ?", (account_id,)).fetchone()
+    if row is None or row["role"] != "GM遊戲管理者":
+        raise HTTPException(status_code=403, detail="需要 GM遊戲管理者 權限")
+    return account_id
+
+
+GMAccount = Annotated[int, Depends(require_gm)]

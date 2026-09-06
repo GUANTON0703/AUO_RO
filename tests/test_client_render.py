@@ -73,6 +73,22 @@ def test_newbie_hint_panel_renders():
     assert "新手指引" in out and "stats" in out
 
 
+def test_content_panels_show_drop_rates_and_red_unmet_requirement():
+    from client.render import content_equipment_panel, content_monster_panel
+    monster = _render(content_monster_panel({
+        "name": "波利", "level": 1,
+        "drops": [{"item_name": "壓縮膠", "rate": 0.7, "min_qty": 1, "max_qty": 1}],
+    }))
+    assert "70.0%" in monster and "壓縮膠" in monster
+    equipment_panel = content_equipment_panel({
+        "name": "女王之杖", "slot": "weapon", "stats": {"matk": 30},
+        "requirements": {"met": False, "reasons": ["職業不符"]},
+    })
+    equipment = _render(equipment_panel)
+    assert "職業不符" in equipment
+    assert "red" in str(equipment_panel.renderable)
+
+
 def test_hunt_summary_shows_retreat_reason():
     out = _render(hunt_summary({"kills": 0, "base_exp": 0, "job_exp": 0, "zeny": 0,
                                 "effective_seconds": 100, "retreated": True,
@@ -104,3 +120,13 @@ def test_event_lines_truncates_long_combat():
     assert "省略 40 條" in text
     assert "挑戰結果：勝利" in text
     assert len(lines) == 22  # 10 + 省略 + 10 + result
+
+
+def test_event_lines_shows_hunt_status_events():
+    lines = event_lines([
+        {"kind": "find_monster"},
+        {"kind": "fly_wing"},
+        {"kind": "boss_retreat"},
+    ])
+    text = "\n".join(str(getattr(line, "plain", line)) for line in lines)
+    assert "尋找怪物" in text and "蒼蠅翼" in text and "Boss" in text
