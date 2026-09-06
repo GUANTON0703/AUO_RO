@@ -79,6 +79,9 @@ def load_content(data_dir: Path | None = None) -> Content:
 
 
 def _check_integrity(c: Content) -> None:
+    overlap = set(c.monsters) & set(c.mvps)
+    if overlap:
+        raise ContentError(f"怪物與 MVP 共用 id：{sorted(overlap)}")
     all_monsters = set(c.monsters) | set(c.mvps)
     for m in c.maps.values():
         for mid in m.monster_ids:

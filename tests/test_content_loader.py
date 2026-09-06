@@ -69,6 +69,19 @@ def test_duplicate_id_raises(tiny_data):
         content.load_content(tiny_data)
 
 
+def test_monster_and_mvp_sharing_id_raises(tiny_data):
+    (tiny_data / "mvps.json").write_text(json.dumps([
+        {"id": "poring", "name": "波利王", "level": 20, "element": "earth",
+         "race": "angel", "size": "large", "role": "boss", "base_exp": 200, "job_exp": 100,
+         "stats": {"max_hp": 9000, "max_sp": 0, "atk": 80, "matk": 0, "defense": 20,
+                   "mdef": 0, "hit": 20, "flee": 20, "aspd": 110, "crit": 5},
+         "drops": [], "is_mvp": True, "cooldown_hours": 8,
+         "home_map_id": "prontera_east_gate"},
+    ], ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(content.ContentError, match="共用 id"):
+        content.load_content(tiny_data)
+
+
 def test_skill_pointing_at_unknown_job_raises(tiny_data):
     (tiny_data / "skills.json").write_text(json.dumps([
         {"id": "phantom", "name": "幻影", "job_id": "no_such_job", "kind": "passive",
