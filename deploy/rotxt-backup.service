@@ -1,0 +1,7 @@
+[Unit]
+Description=ROtxt SQLite 每日備份
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/srv/rotxt/backup.sh

@@ -1,0 +1,10 @@
+services:
+  rotxt:
+    image: rotxt:latest
+    container_name: rotxt
+    restart: unless-stopped
+    env_file: /srv/rotxt/rotxt.env
+    volumes:
+      - /srv/rotxt/data:/data
+    ports:
+      - "127.0.0.1:8010:8000"
