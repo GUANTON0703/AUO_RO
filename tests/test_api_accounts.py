@@ -10,14 +10,14 @@ def test_register_with_valid_invite(client, invite_code):
 def test_register_rejects_bad_invite(client):
     resp = client.post(
         "/api/accounts",
-        json={"invite_code": "BAD-BAD0-BAD1", "username": "x", "password": "password123"},
+        json={"invite_code": "BAD-BAD0-BAD1", "username": "zoe", "password": "password123"},
     )
     assert resp.status_code == 400
 
 
 def test_register_rejects_reused_invite(client, invite_code):
-    first = {"invite_code": invite_code, "username": "a", "password": "password123"}
-    second = {"invite_code": invite_code, "username": "b", "password": "password123"}
+    first = {"invite_code": invite_code, "username": "ann", "password": "password123"}
+    second = {"invite_code": invite_code, "username": "ben", "password": "password123"}
     assert client.post("/api/accounts", json=first).status_code == 201
     assert client.post("/api/accounts", json=second).status_code == 400
 
@@ -34,7 +34,15 @@ def test_register_rejects_duplicate_username(client):
 def test_register_rejects_short_password(client, invite_code):
     resp = client.post(
         "/api/accounts",
-        json={"invite_code": invite_code, "username": "x", "password": "short"},
+        json={"invite_code": invite_code, "username": "zoe", "password": "short"},
+    )
+    assert resp.status_code == 422
+
+
+def test_register_rejects_short_username(client, invite_code):
+    resp = client.post(
+        "/api/accounts",
+        json={"invite_code": invite_code, "username": "ab", "password": "password123"},
     )
     assert resp.status_code == 422
 
@@ -52,9 +60,9 @@ def test_login_returns_token(client, invite_code):
 def test_login_rejects_wrong_password(client, invite_code):
     client.post(
         "/api/accounts",
-        json={"invite_code": invite_code, "username": "u", "password": "password123"},
+        json={"invite_code": invite_code, "username": "uma", "password": "password123"},
     )
-    resp = client.post("/api/sessions", json={"username": "u", "password": "nope"})
+    resp = client.post("/api/sessions", json={"username": "uma", "password": "nope"})
     assert resp.status_code == 401
 
 
