@@ -55,6 +55,10 @@ def create_app() -> FastAPI:
 
     app.include_router(chat_router)
 
+    from server.api.trade import router as trade_router
+
+    app.include_router(trade_router)
+
     @app.get("/health")
     def health() -> dict:
         return {"status": "ok"}

@@ -107,3 +107,21 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     created_at     TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_chat_channel ON chat_messages(channel, id);
+
+CREATE TABLE IF NOT EXISTS trades (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    from_account    INTEGER NOT NULL REFERENCES accounts(id),
+    to_account      INTEGER NOT NULL REFERENCES accounts(id),
+    status          TEXT NOT NULL DEFAULT 'open',
+    from_confirmed  INTEGER NOT NULL DEFAULT 0,
+    to_confirmed    INTEGER NOT NULL DEFAULT 0,
+    created_at      TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS trade_items (
+    trade_id      INTEGER NOT NULL REFERENCES trades(id),
+    side          TEXT NOT NULL,
+    item_id       TEXT,
+    qty           INTEGER,
+    equipment_id  INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_trade_items ON trade_items(trade_id);
