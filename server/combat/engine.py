@@ -1,7 +1,7 @@
 import random
 from dataclasses import dataclass, field
 
-from server.combat.events import AttackEvent, KillEvent
+from server.combat.events import AttackEvent, FledEvent, KillEvent
 from server.combat.formulas import (
     CRIT_MULTIPLIER, attacks_this_round, crit_chance, hit_chance, physical_damage,
 )
@@ -15,7 +15,7 @@ MAX_ROUNDS_DEFAULT = 500
 class FightResult:
     winner: str | None
     loser: str | None
-    outcome: str            # "win" / "stalemate"
+    outcome: str            # "win" / "stalemate" / "fled"
     rounds: int
     winner_hp: int
     loser_hp: int
@@ -77,7 +77,8 @@ def _take_turn(actor, foe, rng, events):
         _auto_attack(actor, foe, rng, events)
 
 
-def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAULT) -> FightResult:
+def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAULT,
+                   flee_hp_frac: float = 0.0) -> FightResult:
     events: list = []
     rounds = 0
     # 先手：aspd 高者先，平手 a 先
@@ -91,6 +92,9 @@ def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAUL
                     s._cd_left -= 1
         if not (a.alive and b.alive):
             break
+        if flee_hp_frac > 0 and a.alive and a.hp < a.max_hp * flee_hp_frac:
+            events.append(FledEvent(actor=a.name, hp=a.hp))
+            return FightResult(None, None, "fled", rounds, a.hp, b.hp, events)
         _take_turn(first, second, rng, events)
         if second.alive:
             _take_turn(second, first, rng, events)

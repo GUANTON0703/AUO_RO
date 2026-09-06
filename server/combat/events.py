@@ -67,3 +67,12 @@ class StatusExpiredEvent(CombatEvent):
 
     def __post_init__(self):
         self.kind = "status_expired"
+
+
+@dataclass
+class FledEvent(CombatEvent):
+    actor: str
+    hp: int
+
+    def __post_init__(self):
+        self.kind = "fled"

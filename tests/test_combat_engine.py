@@ -72,6 +72,23 @@ def test_skill_fires_by_trigger_and_costs_sp():
     assert hero.sp < 30   # 有消耗
 
 
+def test_fight_flees_when_first_combatant_low():
+    strong_boss = _mk("王", atk=200, max_hp=99999, defense=50)
+    hero = _mk("勇者", atk=30, max_hp=1000)
+    r = simulate_fight(hero, strong_boss, rng=random.Random(0), flee_hp_frac=0.3)
+    assert r.outcome == "fled"
+    assert hero.hp > 0
+    assert hero.hp <= hero.max_hp * 0.35
+
+
+def test_flee_disabled_fights_to_death():
+    strong_boss = _mk("王", atk=200, max_hp=99999, defense=50)
+    hero = _mk("勇者", atk=30, max_hp=1000)
+    r = simulate_fight(hero, strong_boss, rng=random.Random(0), flee_hp_frac=0.0)
+    assert r.outcome == "win"
+    assert r.winner == "王"
+
+
 def test_deterministic_with_same_seed():
     a1 = simulate_fight(_mk("A"), _mk("B"), rng=random.Random(7))
     a2 = simulate_fight(_mk("A"), _mk("B"), rng=random.Random(7))
