@@ -4,7 +4,11 @@ from rich.table import Table
 
 from client.api import ApiError
 from client.render import event_lines, inventory_table, shop_table, storage_table
+from client.ui import choose
 from server.content import load_content
+from server.loot.refine import (
+    refine_ore_for, refine_zeny_cost, success_rate,
+)
 from server.progression.stats import (
     STAT_KEYS, STAT_MAX, raise_cost, stat_points_available,
 )
@@ -25,6 +29,11 @@ def _report(console: Console, result) -> None:
         console.print(result["message"])
     else:
         console.print("[green]完成[/green]")
+
+
+def _eq_name(equipment_id: str) -> str:
+    eq = _content.equipment.get(equipment_id)
+    return eq.name if eq else equipment_id
 
 
 def _cost_run(frm, to):
@@ -76,16 +85,25 @@ def stats_menu(api, character: dict, console: Console | None = None) -> None:
 def skills_menu(api, character: dict, console: Console | None = None) -> None:
     console = console or _console
     job_id = character.get("job_id", "novice")
-    skills = [s for s in _content.skills.values() if s.job_id == job_id]
-    if not skills:
-        console.print("此職業沒有可學技能。")
+    learned = character.get("learned_skills") or {}
+    points = character.get("skill_points", 0)
+    rows = []
+    for s in _content.skills.values():
+        if s.job_id != job_id:
+            continue
+        have = learned.get(s.id, 0)
+        if have >= s.max_level:
+            continue
+        rows.append((f"{s.name}  Lv{have}/{s.max_level}  +1 需 1 點", s.id))
+    if not rows:
+        console.print("沒有可學的本職技能。")
         return
-    for s in skills:
-        console.print(f"  {s.id}　{s.name}（{s.kind}，max {s.max_level}）")
-    skill_id = Prompt.ask("學哪個技能（skill_id）")
-    level = IntPrompt.ask("學到幾級", default=1)
+    skill_id = choose(console, f"學哪個技能（剩 {points} 技能點）", rows)
+    if skill_id is None:
+        return
+    target = learned.get(skill_id, 0) + 1
     try:
-        api.learn_skill(_cid(character), skill_id, level)
+        api.learn_skill(_cid(character), skill_id, target)
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return
@@ -97,18 +115,23 @@ def equip_menu(api, character: dict, console: Console | None = None) -> None:
     inv = api.inventory(_cid(character))
     console.print(inventory_table(inv))
     equipment = inv.get("equipment") or []
-    if not equipment:
-        console.print("背包沒有裝備。")
-        return
-    inst = IntPrompt.ask("穿哪件（裝備 #編號，0 取消）", default=0)
-    if inst:
+
+    bag = [e for e in equipment if not e.get("equipped_slot")]
+    rows = [(f"#{e['id']} {_eq_name(e.get('equipment_id'))} +{e.get('refine', 0)}", e["id"])
+            for e in bag]
+    inst = choose(console, "穿哪件裝備", rows)
+    if inst is not None:
         try:
             api.equip(_cid(character), inst)
             console.print("[green]已裝備[/green]")
         except ApiError as exc:
             console.print(f"[red]{exc.detail}[/red]")
-    if Confirm.ask("要卸下某個部位嗎", default=False):
-        slot = Prompt.ask("部位（weapon/armor/...）")
+
+    worn = [e for e in equipment if e.get("equipped_slot")]
+    rows = [(f"{e['equipped_slot']}：{_eq_name(e.get('equipment_id'))}", e["equipped_slot"])
+            for e in worn]
+    slot = choose(console, "卸下哪個部位", rows)
+    if slot is not None:
         try:
             api.unequip(_cid(character), slot)
             console.print("[green]已卸下[/green]")
@@ -119,18 +142,20 @@ def equip_menu(api, character: dict, console: Console | None = None) -> None:
 def refine_menu(api, character: dict, console: Console | None = None) -> None:
     console = console or _console
     inv = api.inventory(_cid(character))
-    refinable = [
-        e for e in (inv.get("equipment") or [])
-        if getattr(_content.equipment.get(e.get("equipment_id")), "refinable", False)
-    ]
-    if not refinable:
-        console.print("沒有可精煉的裝備。")
-        return
-    for e in refinable:
-        eq = _content.equipment.get(e["equipment_id"])
-        console.print(f"  #{e['id']} {eq.name} +{e.get('refine', 0)}")
-    inst = IntPrompt.ask("精煉哪件（#編號，0 取消）", default=0)
-    if not inst:
+    rows = []
+    for e in inv.get("equipment") or []:
+        eq = _content.equipment.get(e.get("equipment_id"))
+        if not getattr(eq, "refinable", False):
+            continue
+        cur = e.get("refine", 0)
+        ore = refine_ore_for(eq.slot)
+        zeny = refine_zeny_cost(cur)
+        pct = success_rate(cur) * 100
+        rows.append(
+            (f"#{e['id']} {eq.name} +{cur}  需 {ore}×1 + {zeny}z  成功率 {pct:.0f}%", e["id"])
+        )
+    inst = choose(console, "精煉哪件裝備", rows)
+    if inst is None:
         return
     if not Confirm.ask("確認精煉（可能失敗降級）", default=True):
         return
@@ -145,23 +170,25 @@ def refine_menu(api, character: dict, console: Console | None = None) -> None:
 def socket_menu(api, character: dict, console: Console | None = None) -> None:
     console = console or _console
     inv = api.inventory(_cid(character))
-    cards = {
-        iid: qty for iid, qty in (inv.get("items") or {}).items()
+    cards = [
+        (f"{iid}×{qty}", iid) for iid, qty in (inv.get("items") or {}).items()
         if iid in _content.cards
-    }
+    ]
     slotted = []
     for e in inv.get("equipment") or []:
         eq = _content.equipment.get(e.get("equipment_id"))
         if eq and len(e.get("card_ids") or []) < getattr(eq, "card_slots", 0):
-            slotted.append((e, eq))
+            free = eq.card_slots - len(e.get("card_ids") or [])
+            slotted.append((f"#{e['id']} {eq.name}（空孔 {free}）", e["id"]))
     if not slotted or not cards:
         console.print("沒有可鑲嵌的裝備或卡片。")
         return
-    for e, eq in slotted:
-        console.print(f"  #{e['id']} {eq.name}（空孔 {eq.card_slots - len(e.get('card_ids') or [])}）")
-    console.print("卡片：" + "　".join(f"{k}×{v}" for k, v in cards.items()))
-    inst = IntPrompt.ask("鑲到哪件（#編號）")
-    card_id = Prompt.ask("哪張卡（card_id）")
+    inst = choose(console, "鑲到哪件裝備", slotted)
+    if inst is None:
+        return
+    card_id = choose(console, "鑲哪張卡", cards)
+    if card_id is None:
+        return
     try:
         api.socket(_cid(character), inst, card_id)
         console.print("[green]已鑲嵌[/green]")
@@ -173,16 +200,42 @@ def shop_menu(api, character: dict, console: Console | None = None) -> None:
     console = console or _console
     shop = api.shop()
     console.print(shop_table(shop))
-    action = Prompt.ask("動作", choices=["buy", "sell", "cancel"], default="cancel")
-    if action == "cancel":
+    action = choose(console, "商店", [("買", "buy"), ("賣", "sell")])
+    if action is None:
         return
-    item_id = Prompt.ask("道具 id")
-    qty = IntPrompt.ask("數量", default=1)
-    try:
-        if action == "buy":
+    if action == "buy":
+        rows = [(f"{i.get('name', i['id'])}  {i.get('price', '?')}z", i["id"])
+                for i in (shop.get("items") or [])]
+        rows += [(f"{e.get('name', e['id'])}  {e.get('price', '?')}z", e["id"])
+                 for e in (shop.get("equipment") or [])]
+        item_id = choose(console, "買什麼", rows)
+        if item_id is None:
+            return
+        qty = IntPrompt.ask("數量", default=1)
+        try:
             result = api.buy(item_id, qty)
+        except ApiError as exc:
+            console.print(f"[red]{exc.detail}[/red]")
+            return
+        console.print(f"[green]{result}[/green]")
+        return
+
+    inv = api.inventory(_cid(character))
+    rows = [(f"{iid}×{qty}", ("item", iid))
+            for iid, qty in (inv.get("items") or {}).items()]
+    rows += [(f"#{e['id']} {_eq_name(e.get('equipment_id'))} +{e.get('refine', 0)}",
+              ("equip", e["id"]))
+             for e in (inv.get("equipment") or []) if not e.get("equipped_slot")]
+    picked = choose(console, "賣什麼", rows)
+    if picked is None:
+        return
+    kind, ref = picked
+    try:
+        if kind == "item":
+            qty = IntPrompt.ask("數量", default=1)
+            result = api.sell(item_id=ref, qty=qty)
         else:
-            result = api.sell(item_id=item_id, qty=qty)
+            result = api.sell(equipment_instance_id=ref)
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return
@@ -191,12 +244,18 @@ def shop_menu(api, character: dict, console: Console | None = None) -> None:
 
 def storage_menu(api, character: dict, console: Console | None = None) -> None:
     console = console or _console
-    console.print(storage_table(api.storage()))
-    console.print(inventory_table(api.inventory(_cid(character))))
-    action = Prompt.ask("動作", choices=["deposit", "withdraw", "cancel"], default="cancel")
-    if action == "cancel":
+    storage = api.storage()
+    inv = api.inventory(_cid(character))
+    console.print(storage_table(storage))
+    console.print(inventory_table(inv))
+    action = choose(console, "倉庫", [("存入", "deposit"), ("取出", "withdraw")])
+    if action is None:
         return
-    item_id = Prompt.ask("道具 id")
+    src = inv if action == "deposit" else storage
+    rows = [(f"{iid}×{qty}", iid) for iid, qty in (src.get("items") or {}).items()]
+    item_id = choose(console, "哪個物品", rows)
+    if item_id is None:
+        return
     qty = IntPrompt.ask("數量", default=1)
     try:
         if action == "deposit":
@@ -212,16 +271,17 @@ def jobchange_menu(api, character: dict, console: Console | None = None) -> None
     console = console or _console
     job_id = character.get("job_id", "novice")
     job_level = character.get("job_level", 1)
-    targets = [j for j in _content.jobs.values() if getattr(j, "parent_id", None) == job_id]
-    if not targets:
-        console.print("目前職業沒有可轉的下一職。")
-        return
-    for j in targets:
+    rows = []
+    for j in _content.jobs.values():
+        if getattr(j, "parent_id", None) != job_id:
+            continue
         need = getattr(j, "change_job_level", 1)
-        mark = "可轉" if job_level >= need else f"需 Job Lv {need}"
-        console.print(f"  {j.id}　{j.name}（{mark}）")
-    target = Prompt.ask("轉哪個（job_id，cancel 取消）", default="cancel")
-    if target == "cancel":
+        if job_level >= need:
+            rows.append((j.name, j.id))
+        else:
+            console.print(f"  [dim]{j.name}（需 Job Lv {need}）[/dim]")
+    target = choose(console, "轉哪個職業", rows)
+    if target is None:
         return
     try:
         api.jobchange(_cid(character), target)
@@ -290,9 +350,11 @@ def _trade_screen(api, tid: int, console: Console) -> None:
         if tbl["status"] != "open":
             console.print(f"[yellow]交易已結束：{tbl['status']}[/yellow]")
             return
-        act = Prompt.ask("動作", choices=["put", "confirm", "cancel", "refresh", "back"],
-                         default="refresh")
-        if act == "back":
+        act = choose(console, "動作", [
+            ("放入物品/裝備", "put"), ("確認交易", "confirm"),
+            ("取消交易", "cancel"), ("重新整理", "refresh"),
+        ])
+        if act is None or act == "back":
             return
         try:
             if act == "put":
@@ -324,25 +386,19 @@ def trade_menu(api, character: dict, console: Console | None = None) -> None:
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return
-    if pend:
-        console.print("別人開給你的交易：")
-        for t in pend:
-            console.print(f"  #{t['id']}　來自帳號 {t.get('from_account')}")
-    choice = Prompt.ask("輸入交易 #id 進入、new 開新交易、cancel 離開", default="cancel")
-    if choice == "cancel":
+    rows = [("開新交易", ("new", None))]
+    for t in pend:
+        rows.append((f"#{t['id']}　來自帳號 {t.get('from_account')}", ("open", t["id"])))
+    picked = choose(console, "交易", rows)
+    if picked is None:
         return
-    if choice == "new":
+    kind, tid = picked
+    if kind == "new":
         who = Prompt.ask("對方帳號名")
         try:
             tid = api.trade_offer(who)["trade_id"]
         except ApiError as exc:
             console.print(f"[red]{exc.detail}[/red]")
-            return
-    else:
-        try:
-            tid = int(choice)
-        except ValueError:
-            console.print("[red]無效輸入。[/red]")
             return
     _trade_screen(api, tid, console)
 
@@ -358,7 +414,7 @@ def guild_menu(api, character: dict, console: Console | None = None) -> None:
         console.print(f"[bold]公會：{mine['name']}[/bold]")
         for m in mine.get("members") or []:
             console.print(f"  {m['character_name']}（{m['role']}）")
-        if Prompt.ask("動作", choices=["leave", "back"], default="back") == "leave":
+        if choose(console, "動作", [("退出公會", "leave")]) == "leave":
             try:
                 api.guild_leave()
                 console.print("[green]已退會。[/green]")
@@ -370,26 +426,30 @@ def guild_menu(api, character: dict, console: Console | None = None) -> None:
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return
-    if guilds:
-        console.print("現有公會：")
-        for g in guilds:
-            console.print(f"  #{g['id']}　{g['name']}（{g.get('member_count', 0)} 人）")
-    else:
-        console.print("目前還沒有公會。")
-    choice = Prompt.ask("輸入 join <id> 或 create <名稱>，cancel 離開", default="cancel")
-    if choice == "cancel":
+    rows = [("建立新公會", ("create", None))]
+    for g in guilds:
+        rows.append((f"{g['name']}（{g.get('member_count', 0)} 人）", ("join", g["id"])))
+    picked = choose(console, "公會", rows)
+    if picked is None:
         return
+    kind, gid = picked
     try:
-        if choice.startswith("join "):
-            api.guild_join(int(choice.split(None, 1)[1]))
-            console.print("[green]已加入公會。[/green]")
-        elif choice.startswith("create "):
-            api.guild_create(choice.split(None, 1)[1])
+        if kind == "create":
+            name = Prompt.ask("公會名稱")
+            api.guild_create(name)
             console.print("[green]已建立公會。[/green]")
         else:
-            console.print("[red]無效輸入。[/red]")
+            api.guild_join(gid)
+            console.print("[green]已加入公會。[/green]")
     except (ApiError, ValueError) as exc:
         console.print(f"[red]{exc}[/red]")
+
+
+_FLEE_CHOICES = [
+    ("[建議] 血剩 15% 就撤", 0.15),
+    ("血剩 30% 就撤", 0.30),
+    ("硬拚到底", 0.0),
+]
 
 
 def mvp_menu(api, character: dict, console: Console | None = None) -> None:
@@ -400,32 +460,33 @@ def mvp_menu(api, character: dict, console: Console | None = None) -> None:
         console.print(f"[red]{exc.detail}[/red]")
         return
 
-    ready = []
+    rows = []
     for m in mvps:
         if m["available"]:
-            mark = "[green]可挑戰[/green]"
-            ready.append(m["id"])
+            rows.append(
+                (f"{m['name']}　Lv {m['level']}　{m['home_map_name']}", m["id"])
+            )
         else:
-            mark = f"[dim]{_fmt_remain(m['seconds_remaining'])}[/dim]"
-        console.print(
-            f"  {m['id']}　{m['name']}　Lv {m['level']}　{m['home_map_name']}　{mark}"
-        )
-    if not ready:
+            console.print(
+                f"  [dim]{m['name']}　Lv {m['level']}　"
+                f"{_fmt_remain(m['seconds_remaining'])}[/dim]"
+            )
+    if not rows:
         console.print("目前沒有可挑戰的 MVP。")
         return
 
-    target = Prompt.ask("挑戰哪隻（mvp_id，cancel 取消）", default="cancel")
-    if target == "cancel" or target not in ready:
-        if target != "cancel":
-            console.print("[yellow]該 MVP 無法挑戰。[/yellow]")
+    target = choose(console, "挑戰哪隻 MVP", rows)
+    if target is None:
         return
 
-    flee = IntPrompt.ask("auto-flee 血線 %（0 = 硬拚）", default=15)
+    flee = choose(console, "auto-flee 血線", _FLEE_CHOICES)
+    if flee is None:
+        return
     if not Confirm.ask(f"確認挑戰 {target}？", default=True):
         return
 
     try:
-        result = api.challenge_mvp(target, flee_hp_frac=flee / 100 if flee > 0 else 0.0)
+        result = api.challenge_mvp(target, flee_hp_frac=flee)
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return

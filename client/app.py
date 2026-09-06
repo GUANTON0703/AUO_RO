@@ -21,7 +21,14 @@ from client.menus import (
     storage_menu,
     trade_menu,
 )
-from client.render import event_lines, hunt_summary, inventory_table, status_panel
+from client.render import (
+    event_lines,
+    hunt_summary,
+    inventory_table,
+    newbie_hint_panel,
+    status_panel,
+)
+from client.ui import choose as _choose
 from client.watch import watch_hunt
 from server.content import load_content
 
@@ -60,25 +67,6 @@ _MENU = [
 ]
 
 _NO_PAUSE = {"h", "hunt", "v", "watch", "q", "quit", "exit"}
-
-
-def _choose(console, title, rows, *, allow_back=True):
-    """rows: [(label, value)]。印編號選單，回選中的 value；allow_back 時 0 回 None。"""
-    if not rows:
-        console.print("[dim](沒有可選項目)[/dim]")
-        return None
-    console.print(f"[bold]{title}[/bold]")
-    for i, (label, _) in enumerate(rows, 1):
-        console.print(f"  [cyan]{i}[/cyan]) {label}")
-    if allow_back:
-        console.print("  [cyan]0[/cyan]) 返回")
-    while True:
-        raw = Prompt.ask("選擇").strip()
-        if raw == "0" and allow_back:
-            return None
-        if raw.isdigit() and 1 <= int(raw) <= len(rows):
-            return rows[int(raw) - 1][1]
-        console.print("[red]請輸入清單上的編號[/red]")
 
 
 def _render_screen(console: Console, api: ApiClient, character: dict, last_output) -> None:
@@ -172,6 +160,15 @@ def run(server_url: str) -> None:
         return
 
     character = select_or_create_character(api)
+
+    fresh = _current_character(api, character)
+    if sum(fresh.get(f"stat_{k}", 1) for k in
+           ("str", "agi", "vit", "int", "dex", "luk")) <= 8:
+        console.print(newbie_hint_panel())
+        try:
+            Prompt.ask("\n[dim]按 Enter 開始[/dim]", default="")
+        except (EOFError, KeyboardInterrupt):
+            return
 
     menus = {
         "stats": stats_menu, "skills": skills_menu, "equip": equip_menu,

@@ -4,6 +4,8 @@ from client.render import (
     event_lines,
     hunt_summary,
     inventory_table,
+    newbie_hint_panel,
+    retreat_advice,
     shop_table,
     status_panel,
 )
@@ -58,6 +60,23 @@ def test_shop_table_and_hunt_summary():
     assert "red_potion" in out and "50" in out
     summary = _render(hunt_summary({"kills": 12, "base_exp": 300, "job_exp": 100, "zeny": 500, "effective_seconds": 3600, "retreated": False, "drops": {"jellopy": 3}}))
     assert "12" in summary and "jellopy" in summary
+
+
+def test_retreat_advice_known_and_unknown():
+    assert "紅色藥水" in retreat_advice("補品用盡")
+    assert retreat_advice("某個沒定義的原因") == "換個地方打打看，或先提升角色數值。"
+
+
+def test_newbie_hint_panel_renders():
+    out = _render(newbie_hint_panel())
+    assert "新手指引" in out and "stats" in out
+
+
+def test_hunt_summary_shows_retreat_reason():
+    out = _render(hunt_summary({"kills": 0, "base_exp": 0, "job_exp": 0, "zeny": 0,
+                                "effective_seconds": 100, "retreated": True,
+                                "retreat_reason": "補品用盡"}))
+    assert "補品用盡" in out
 
 
 def test_event_lines_truncates_long_combat():

@@ -3,7 +3,7 @@ import threading
 from rich.console import Console
 
 from client.api import ApiClient
-from client.render import event_lines, hunt_summary
+from client.render import event_lines, hunt_summary, retreat_advice
 
 
 def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 5.0) -> None:
@@ -29,6 +29,9 @@ def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 5.0) -> N
             console.print(line)
         if status.get("retreated"):
             console.print(hunt_summary(status))
+            console.print(
+                f"[yellow]建議：{retreat_advice(status.get('retreat_reason', ''))}[/yellow]"
+            )
             console.print("[yellow]已撤退，掛機結束。[/yellow]")
             break
         if stop.wait(poll_seconds):

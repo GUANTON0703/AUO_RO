@@ -36,3 +36,4 @@ class CharacterPublic(BaseModel):
     skill_points: int
     zeny: int
     location_map: str
+    learned_skills: dict[str, int] = {}

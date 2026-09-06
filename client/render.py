@@ -54,13 +54,28 @@ def status_panel(character: dict) -> Panel:
     return Panel("\n".join(lines), title="角色狀態", expand=False)
 
 
-def choose_table(title: str, rows: list) -> Table:
-    table = Table(title=title, expand=False)
-    table.add_column("#", justify="right")
-    table.add_column("選項")
-    for i, (label, _value) in enumerate(rows, 1):
-        table.add_row(str(i), str(label))
-    return table
+def newbie_hint_panel() -> Panel:
+    return Panel(
+        "你的角色還很弱，建議依序：\n"
+        "  1. [cyan]stats[/cyan] 加點——先把 力量 和 體質 拉到 10 以上\n"
+        "  2. [cyan]skills[/cyan] 學技能——先點主力輸出技（劍士→爆裂波動）\n"
+        "  3. [cyan]shop[/cyan] 商店——買紅色藥水補血\n"
+        "  4. [cyan]h[/cyan] 掛機——去「東門村郊」打最弱的怪",
+        title="新手指引", border_style="yellow",
+    )
+
+
+_ADVICE = {
+    "戰鬥中被擊倒": "這裡的怪太強。先 stats 加點提升力量/體質，或換更低等的地圖，或 shop 買裝備。",
+    "打不過這裡的怪": "完全打不動。回東門村郊打最弱的怪，或先加點、買武器。",
+    "沒有補品，血量見底": "帶紅色藥水再來（shop 買），或打更弱的怪讓自然回血跟得上。",
+    "補品用盡，血量見底": "補品不夠。多買幾瓶紅色藥水，或換更好打的怪。",
+    "補品用盡": "補品不夠。多買幾瓶紅色藥水。",
+}
+
+
+def retreat_advice(reason: str) -> str:
+    return _ADVICE.get(reason, "換個地方打打看，或先提升角色數值。")
 
 
 _COMBAT_KINDS = {"attack", "skill", "fled"}

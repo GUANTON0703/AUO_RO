@@ -63,33 +63,33 @@ def test_ensure_logged_in_reuses_saved_token(api, tmp_path, monkeypatch):
 
 
 def test_choose_returns_value_by_number(monkeypatch):
-    from client import app
+    from client.ui import choose
     from rich.console import Console
     answers = iter(["2"])
-    monkeypatch.setattr("client.app.Prompt.ask", lambda *a, **k: next(answers))
+    monkeypatch.setattr("client.ui.Prompt.ask", lambda *a, **k: next(answers))
     rows = [("甲", "a"), ("乙", "b"), ("丙", "c")]
-    assert app._choose(Console(record=True), "選一個", rows) == "b"
+    assert choose(Console(record=True), "選一個", rows) == "b"
 
 
 def test_choose_zero_returns_none(monkeypatch):
-    from client import app
+    from client.ui import choose
     from rich.console import Console
-    monkeypatch.setattr("client.app.Prompt.ask", lambda *a, **k: "0")
-    assert app._choose(Console(record=True), "選一個", [("甲", "a")]) is None
+    monkeypatch.setattr("client.ui.Prompt.ask", lambda *a, **k: "0")
+    assert choose(Console(record=True), "選一個", [("甲", "a")]) is None
 
 
 def test_choose_reprompts_on_garbage(monkeypatch):
-    from client import app
+    from client.ui import choose
     from rich.console import Console
     answers = iter(["x", "99", "1"])
-    monkeypatch.setattr("client.app.Prompt.ask", lambda *a, **k: next(answers))
-    assert app._choose(Console(record=True), "選一個", [("甲", "a"), ("乙", "b")]) == "a"
+    monkeypatch.setattr("client.ui.Prompt.ask", lambda *a, **k: next(answers))
+    assert choose(Console(record=True), "選一個", [("甲", "a"), ("乙", "b")]) == "a"
 
 
 def test_choose_empty_rows_returns_none(monkeypatch):
-    from client import app
+    from client.ui import choose
     from rich.console import Console
-    assert app._choose(Console(record=True), "空", []) is None
+    assert choose(Console(record=True), "空", []) is None
 
 
 class _RecApi:
@@ -150,10 +150,11 @@ def test_stats_menu_shows_costs_and_batches(monkeypatch):
 
 
 def test_shop_menu_buys(monkeypatch):
-    from client import menus
+    from client import menus, ui
     from rich.console import Console
-    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(
-        lambda *a, **k: "buy" if k.get("choices") else "red_potion"))
+    # ui.choose: 買(1) → 商品第一項(1)
+    answers = iter(["1", "1"])
+    monkeypatch.setattr(ui.Prompt, "ask", staticmethod(lambda *a, **k: next(answers)))
     monkeypatch.setattr(menus.IntPrompt, "ask", staticmethod(lambda *a, **k: 5))
     rec = _RecApi()
     menus.shop_menu(rec, {"id": 1}, Console(record=True))
@@ -161,10 +162,9 @@ def test_shop_menu_buys(monkeypatch):
 
 
 def test_refine_menu_calls_refine(monkeypatch):
-    from client import menus
+    from client import menus, ui
     from rich.console import Console
-    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "cancel"))
-    monkeypatch.setattr(menus.IntPrompt, "ask", staticmethod(lambda *a, **k: 3))
+    monkeypatch.setattr(ui.Prompt, "ask", staticmethod(lambda *a, **k: "1"))
     monkeypatch.setattr(menus.Confirm, "ask", staticmethod(lambda *a, **k: True))
     rec = _RecApi()
     menus.refine_menu(rec, {"id": 1}, Console(record=True))
@@ -199,10 +199,11 @@ class _MvpApi:
 
 
 def test_mvp_menu_challenges(monkeypatch):
-    from client import menus
+    from client import menus, ui
     from rich.console import Console
-    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "angel_poring"))
-    monkeypatch.setattr(menus.IntPrompt, "ask", staticmethod(lambda *a, **k: 15))
+    # ui.choose: 選 MVP(1) → 血線 15%(1)
+    answers = iter(["1", "1"])
+    monkeypatch.setattr(ui.Prompt, "ask", staticmethod(lambda *a, **k: next(answers)))
     monkeypatch.setattr(menus.Confirm, "ask", staticmethod(lambda *a, **k: True))
     rec = _MvpApi()
     menus.mvp_menu(rec, {"id": 1}, Console(record=True))
@@ -263,28 +264,33 @@ def test_rank_menu_calls_leaderboard(monkeypatch):
 
 
 def test_guild_menu_create(monkeypatch):
-    from client import menus
+    from client import menus, ui
     from rich.console import Console
-    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "create 波利獵人團"))
+    # ui.choose 選「建立新公會」(1)；menus.Prompt.ask 問公會名稱
+    monkeypatch.setattr(ui.Prompt, "ask", staticmethod(lambda *a, **k: "1"))
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "波利獵人團"))
     rec = _SocialApi(mine=None)
     menus.guild_menu(rec, {"id": 1}, Console(record=True))
     assert ("guild_create", "波利獵人團") in rec.calls
 
 
 def test_guild_menu_join(monkeypatch):
-    from client import menus
+    from client import menus, ui
     from rich.console import Console
-    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "join 1"))
+    # rows: 1=建立新公會, 2=波利團 → 選 2
+    monkeypatch.setattr(ui.Prompt, "ask", staticmethod(lambda *a, **k: "2"))
     rec = _SocialApi(mine=None)
     menus.guild_menu(rec, {"id": 1}, Console(record=True))
     assert ("guild_join", 1) in rec.calls
 
 
 def test_trade_menu_opens_new_then_cancel(monkeypatch):
-    from client import menus
+    from client import menus, ui
     from rich.console import Console
-    answers = iter(["new", "bob", "cancel"])
-    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: next(answers)))
+    # ui.choose: 交易選單選「開新交易」(1)；_trade_screen 動作選「取消交易」
+    ui_answers = iter(["1", "3"])
+    monkeypatch.setattr(ui.Prompt, "ask", staticmethod(lambda *a, **k: next(ui_answers)))
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "bob"))
     rec = _SocialApi()
     menus.trade_menu(rec, {"id": 1}, Console(record=True))
     assert ("trade_offer", "bob") in rec.calls

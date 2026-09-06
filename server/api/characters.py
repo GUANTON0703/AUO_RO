@@ -39,6 +39,7 @@ def _to_public(row) -> CharacterPublic:
         skill_points=row["skill_points"],
         zeny=row["zeny"],
         location_map=row["location_map"],
+        learned_skills=json.loads(row["learned_skills"]),
     )
 
 
