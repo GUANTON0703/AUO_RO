@@ -120,6 +120,8 @@ def sell(body: SellRequest, account_id: CurrentAccount):
     item = _content.items.get(body.item_id)
     if item is None:
         raise HTTPException(status_code=400, detail="道具不存在")
+    if item.npc_sell <= 0:
+        raise HTTPException(status_code=400, detail="這個道具 NPC 不收")
     gained = item.npc_sell * body.qty
     with connection.transaction() as conn:
         row = conn.execute(
