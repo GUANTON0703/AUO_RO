@@ -13,6 +13,34 @@ def _hero(**kw):
     return Combatant(**base)
 
 
+def test_short_offline_session_no_phantom_potions():
+    # 5 分鐘離線打會掉血的怪，初始滿血緩衝夠 → 不該消耗補品
+    c = load_content()
+    r = settle(_hero(max_hp=3000, defense=10), c.get_monster("wolf"),
+               elapsed_seconds=300, cfg=HuntConfig(), rng=random.Random(0),
+               offline=True, pity_in={}, potion_item_id="rp", potion_heal=45,
+               potion_count=500)
+    assert r.potions_used == 0
+    assert r.retreated is False
+
+
+def test_partial_winrate_retreats_early_by_death():
+    # 勉強能贏但常輸的對戰 → 幾何分布，撐不了整場 8h
+    c = load_content()
+    marginal = _hero(max_hp=1400, atk=120, defense=8, flee=40)
+    r = settle(marginal, c.get_monster("wolf"), elapsed_seconds=8 * 3600,
+               cfg=HuntConfig(), rng=random.Random(3), offline=True, pity_in={},
+               potion_item_id="rp", potion_heal=45, potion_count=9999)
+    if 0.0 < _wr(marginal, c) < 1.0:
+        assert r.retreated is True
+
+
+def _wr(player, content):
+    from server.settlement.profile import estimate_fight_profile
+    return estimate_fight_profile(player, content.get_monster("wolf"),
+                                  random.Random(3), samples=20).win_rate
+
+
 def _skill_hero():
     c = load_content()
     bash_def = c.skills["bash"]

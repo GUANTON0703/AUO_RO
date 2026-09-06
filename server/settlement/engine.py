@@ -1,4 +1,5 @@
 import copy
+import math
 import random
 from dataclasses import dataclass, field
 
@@ -82,26 +83,37 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
     retreated = False
     reason = ""
 
-    need_potion_per_fight = 0.0
-    if prof.avg_damage_taken > 0 and potion_heal > 0:
-        need_potion_per_fight = prof.avg_damage_taken / potion_heal
-
     max_kills = potential
-    if prof.avg_damage_taken > 0:
-        if potion_heal <= 0 or potion_count <= 0:
-            sustainable = int(player.max_hp / max(1.0, prof.avg_damage_taken))
-            if sustainable < potential:
+
+    # 1) 勝率 < 1 → 早晚會輸一場（= 陣亡）。幾何分布：平均 win_rate/(1-win_rate) 場後陣亡。
+    if prof.win_rate < 1.0:
+        expected_before_death = int(prof.win_rate / (1.0 - prof.win_rate))
+        if expected_before_death < max_kills:
+            max_kills = expected_before_death
+            retreated, reason = True, "戰鬥中被擊倒"
+
+    # 2) 補品 / 血量能撐幾場。初始緩衝 = 現在血量掉到門檻前能吸收的傷害。
+    dmg = prof.avg_damage_taken
+    if dmg > 0:
+        threshold_hp = player.max_hp * cfg.potion_hp_threshold
+        buffer_hp = max(0.0, player.hp - threshold_hp)
+        if potion_heal > 0 and potion_count > 0:
+            sustainable = int((buffer_hp + potion_count * potion_heal) / dmg)
+            if sustainable < max_kills:
+                max_kills = sustainable
+                retreated, reason = True, "補品用盡"
+        else:
+            sustainable = int(player.hp / dmg)
+            if sustainable < max_kills:
                 max_kills = sustainable
                 retreated, reason = True, "沒有補品，血量見底"
-        else:
-            affordable = int(potion_count / need_potion_per_fight)
-            if affordable < potential:
-                max_kills = affordable
-                retreated, reason = True, "補品用盡"
 
-    kills = round(prof.win_rate * max_kills)
-    if need_potion_per_fight > 0:
-        potions_used = min(potion_count, round(kills * need_potion_per_fight))
+    kills = max(0, max_kills)
+    if potion_heal > 0 and dmg > 0:
+        threshold_hp = player.max_hp * cfg.potion_hp_threshold
+        buffer_hp = max(0.0, player.hp - threshold_hp)
+        healing_needed = max(0.0, kills * dmg - buffer_hp)
+        potions_used = min(potion_count, math.ceil(healing_needed / potion_heal))
     used_seconds = kills * time_per_kill
 
     base_exp = kills * monster.base_exp
@@ -133,8 +145,8 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
 def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
                     cfg, rng, pity_in, potion_item_id, potion_heal,
                     potion_count) -> SettlementResult:
+    # 從玩家目前的掛機狀態續算（不重置滿血），這樣連續掛機才會累積掉血
     p = copy.deepcopy(player)
-    p.hp, p.sp = p.max_hp, p.max_sp
     for s in p.skills:
         s._cd_left = 0
 
