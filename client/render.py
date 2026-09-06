@@ -154,6 +154,10 @@ def _legacy_event_line(out: list, e: dict, kind: str) -> None:
                 style="red",
             )
         )
+    elif kind == "kill":
+        out.append(Text(f"{e.get('actor', '?')} 擊倒了 {e.get('target', '?')}", style="bold"))
+    elif kind in ("status_applied", "status_expired"):
+        pass  # 狀態變化不逐條顯示
     else:
         out.append(Text(str(e), style="dim"))
 
