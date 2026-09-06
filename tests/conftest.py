@@ -45,6 +45,10 @@ class _DbHelpers:
     def set_job_level(self, character_id, job_level):
         self._exec("UPDATE characters SET job_level = ? WHERE id = ?", (job_level, character_id))
 
+    def set_job(self, character_id, job_id, job_level=1, job_exp=0):
+        from server.repositories import characters as repo
+        repo.set_job(character_id, job_id, job_level, job_exp)
+
     def set_base_level(self, character_id, base_level):
         self._exec("UPDATE characters SET base_level = ? WHERE id = ?", (base_level, character_id))
 
@@ -59,6 +63,11 @@ class _DbHelpers:
     def give_item(self, character_id, item_id, qty):
         from server.repositories import inventory
         inventory.add_item(character_id, item_id, qty)
+
+    def clear_inventory(self, character_id):
+        with connection.get_connection() as conn:
+            conn.execute("DELETE FROM character_items WHERE character_id = ?", (character_id,))
+            conn.execute("DELETE FROM character_equipment WHERE character_id = ?", (character_id,))
 
     def set_zeny(self, character_id, amount):
         self._exec("UPDATE characters SET zeny = ? WHERE id = ?", (amount, character_id))

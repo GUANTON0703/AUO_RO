@@ -169,9 +169,14 @@ def set_job(character_id: int, job_id: str, job_level: int, job_exp: int) -> Non
 
 
 def delete_character(character_id: int, account_id: int) -> bool:
-    with connection.get_connection() as conn:
-        cur = conn.execute(
-            "DELETE FROM characters WHERE id = ? AND account_id = ?",
+    with connection.transaction() as conn:
+        owned = conn.execute(
+            "SELECT 1 FROM characters WHERE id = ? AND account_id = ?",
             (character_id, account_id),
-        )
-        return cur.rowcount > 0
+        ).fetchone()
+        if not owned:
+            return False
+        conn.execute("DELETE FROM character_items WHERE character_id = ?", (character_id,))
+        conn.execute("DELETE FROM character_equipment WHERE character_id = ?", (character_id,))
+        conn.execute("DELETE FROM characters WHERE id = ?", (character_id,))
+        return True

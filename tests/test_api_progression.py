@@ -57,3 +57,26 @@ def test_learn_skill_after_jobchange(client, auth, db_helpers):
                     json={"skill_id": "bash", "level": 3})
     assert r.status_code == 200
     assert r.json()["learned_skills"]["bash"] == 3
+
+
+def test_reset_stats_refunds_points(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = client.post("/api/characters", headers=h, json={"name": "重來"}).json()
+    db_helpers.set_base_level(ch["id"], 20)
+    client.post(f"/api/characters/{ch['id']}/stats", headers=h, json={"str": 10})
+    r = client.post(f"/api/characters/{ch['id']}/resetstats", headers=h)
+    assert r.status_code == 200
+    assert r.json()["stat_str"] == 1
+    r2 = client.post(f"/api/characters/{ch['id']}/stats", headers=h, json={"str": 10})
+    assert r2.status_code == 200
+
+
+def test_reset_skills_clears_learned(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = client.post("/api/characters", headers=h, json={"name": "忘招"}).json()
+    db_helpers.set_job(ch["id"], "swordman", 10, 0)
+    client.post(f"/api/characters/{ch['id']}/skills", headers=h, json={"skill_id": "bash", "level": 3})
+    r = client.post(f"/api/characters/{ch['id']}/resetskills", headers=h)
+    assert r.status_code == 200
+    r2 = client.post(f"/api/characters/{ch['id']}/skills", headers=h, json={"skill_id": "bash", "level": 5})
+    assert r2.status_code == 200

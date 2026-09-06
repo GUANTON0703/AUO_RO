@@ -4,7 +4,9 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from server.auth.dependencies import CurrentAccount
+from server.config import get_settings
 from server.content import load_content
+from server.db import connection
 from server.progression.skills import can_learn, skill_points_available
 from server.progression.stats import STAT_KEYS, STAT_MAX, stat_points_available
 from server.repositories import characters as characters_repo
@@ -77,6 +79,36 @@ def learn_skill(character_id: int, body: SkillRequest, account_id: CurrentAccoun
         raise HTTPException(status_code=400, detail=reason)
     learned[body.skill_id] = body.level
     characters_repo.set_learned_skills(character_id, learned)
+    return _public(_owned(character_id, account_id))
+
+
+def _charge_zeny(character_id: int, cost: int) -> None:
+    with connection.transaction() as conn:
+        row = conn.execute(
+            "SELECT zeny FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()
+        if row["zeny"] < cost:
+            raise HTTPException(status_code=400, detail="Zeny 不足")
+        conn.execute(
+            "UPDATE characters SET zeny = zeny - ? WHERE id = ?", (cost, character_id)
+        )
+
+
+@router.post("/{character_id}/resetstats")
+def reset_stats(character_id: int, account_id: CurrentAccount):
+    row = _owned(character_id, account_id)
+    if not get_settings().stat_reset_free:
+        _charge_zeny(character_id, row["base_level"] * 100)
+    characters_repo.set_stats(character_id, {k: 1 for k in STAT_KEYS})
+    return _public(_owned(character_id, account_id))
+
+
+@router.post("/{character_id}/resetskills")
+def reset_skills(character_id: int, account_id: CurrentAccount):
+    row = _owned(character_id, account_id)
+    if not get_settings().skill_reset_free:
+        _charge_zeny(character_id, row["job_level"] * 50)
+    characters_repo.set_learned_skills(character_id, {})
     return _public(_owned(character_id, account_id))
 
 
