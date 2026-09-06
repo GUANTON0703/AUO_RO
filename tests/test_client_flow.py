@@ -156,3 +156,85 @@ def test_mvp_menu_challenges(monkeypatch):
     rec = _MvpApi()
     menus.mvp_menu(rec, {"id": 1}, Console(record=True))
     assert ("challenge_mvp", "angel_poring", 0.15) in rec.calls
+
+
+class _SocialApi:
+    def __init__(self, mine=None, guilds=None, pending=None):
+        self.calls = []
+        self._mine = mine
+        self._guilds = guilds if guilds is not None else [
+            {"id": 1, "name": "波利團", "member_count": 2}
+        ]
+        self._pending = pending if pending is not None else []
+
+    def leaderboard(self, by="base_level"):
+        self.calls.append(("leaderboard", by))
+        return [{"character_name": "高手", "account": "a", "value": 40}]
+
+    def guild_mine(self):
+        return self._mine
+
+    def guild_list(self):
+        return self._guilds
+
+    def guild_join(self, gid):
+        self.calls.append(("guild_join", gid))
+
+    def guild_create(self, name):
+        self.calls.append(("guild_create", name))
+
+    def guild_leave(self):
+        self.calls.append(("guild_leave",))
+
+    def trade_pending(self):
+        return self._pending
+
+    def trade_offer(self, who):
+        self.calls.append(("trade_offer", who))
+        return {"trade_id": 7}
+
+    def trade_get(self, tid):
+        return {"id": tid, "status": "open", "from_confirmed": 0,
+                "to_confirmed": 0, "items": []}
+
+    def trade_cancel(self, tid):
+        self.calls.append(("trade_cancel", tid))
+        return {"status": "cancelled"}
+
+
+def test_rank_menu_calls_leaderboard(monkeypatch):
+    from client import menus
+    from rich.console import Console
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "zeny"))
+    rec = _SocialApi()
+    menus.rank_menu(rec, {"id": 1}, Console(record=True))
+    assert ("leaderboard", "zeny") in rec.calls
+
+
+def test_guild_menu_create(monkeypatch):
+    from client import menus
+    from rich.console import Console
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "create 波利獵人團"))
+    rec = _SocialApi(mine=None)
+    menus.guild_menu(rec, {"id": 1}, Console(record=True))
+    assert ("guild_create", "波利獵人團") in rec.calls
+
+
+def test_guild_menu_join(monkeypatch):
+    from client import menus
+    from rich.console import Console
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: "join 1"))
+    rec = _SocialApi(mine=None)
+    menus.guild_menu(rec, {"id": 1}, Console(record=True))
+    assert ("guild_join", 1) in rec.calls
+
+
+def test_trade_menu_opens_new_then_cancel(monkeypatch):
+    from client import menus
+    from rich.console import Console
+    answers = iter(["new", "bob", "cancel"])
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(lambda *a, **k: next(answers)))
+    rec = _SocialApi()
+    menus.trade_menu(rec, {"id": 1}, Console(record=True))
+    assert ("trade_offer", "bob") in rec.calls
+    assert ("trade_cancel", 7) in rec.calls

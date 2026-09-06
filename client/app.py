@@ -5,16 +5,20 @@ from rich.prompt import Prompt
 from client.api import ApiClient, ApiError
 from client.auth_flow import ensure_logged_in, select_or_create_character
 from client.config import SessionStore
+from client.chat import chat_mode
 from client.menus import (
     equip_menu,
+    guild_menu,
     jobchange_menu,
     mvp_menu,
+    rank_menu,
     refine_menu,
     shop_menu,
     skills_menu,
     socket_menu,
     stats_menu,
     storage_menu,
+    trade_menu,
 )
 from client.render import event_lines, hunt_summary, inventory_table, status_panel
 from client.watch import watch_hunt
@@ -36,6 +40,10 @@ _HELP = """指令：
   storage     倉庫存取
   job         轉職
   mvp         挑戰 MVP 王
+  rank        排行榜
+  trade       面對面交易
+  guild       公會
+  chat        世界／公會聊天（空行離開）
   help        本說明
   q / quit    離開
 """
@@ -131,7 +139,8 @@ def run(server_url: str) -> None:
         "stats": stats_menu, "skills": skills_menu, "equip": equip_menu,
         "refine": refine_menu, "socket": socket_menu, "shop": shop_menu,
         "storage": storage_menu, "job": jobchange_menu,
-        "mvp": mvp_menu,
+        "mvp": mvp_menu, "rank": rank_menu, "trade": trade_menu,
+        "guild": guild_menu,
     }
 
     while True:
@@ -152,6 +161,13 @@ def run(server_url: str) -> None:
                 character = _show_status(api, character, console)
             elif cmd in ("i", "inv"):
                 console.print(inventory_table(api.inventory(character["id"])))
+            elif cmd == "chat":
+                has_guild = False
+                try:
+                    has_guild = api.guild_mine() is not None
+                except ApiError:
+                    pass
+                chat_mode(api, console, has_guild)
             elif cmd in menus:
                 character = _current_character(api, character)
                 menus[cmd](api, character, console)
