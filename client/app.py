@@ -58,13 +58,19 @@ _HELP = """指令：
 
 
 _MENU = [
-    ("h", "掛機"), ("v", "查看掛機"), ("stop", "停止掛機"),
-    ("stats", "加點"), ("skills", "學技能"), ("equip", "裝備"),
-    ("refine", "精煉"), ("socket", "鑲卡"), ("shop", "商店"),
-    ("storage", "倉庫"), ("job", "轉職"), ("mvp", "MVP 王"),
-    ("rank", "排行榜"), ("trade", "交易"), ("guild", "公會"), ("chat", "聊天"),
-    ("i", "背包"), ("s", "狀態"), ("help", "說明"), ("q", "離開"),
+    ("h", "掛機"), ("v", "查看"), ("x", "停止"), ("a", "加點"),
+    ("k", "技能"), ("e", "裝備"), ("r", "精煉"), ("o", "鑲卡"),
+    ("b", "商店"), ("w", "倉庫"), ("j", "轉職"), ("m", "MVP"),
+    ("l", "排行"), ("t", "交易"), ("g", "公會"), ("c", "聊天"),
+    ("i", "背包"), ("s", "狀態"), ("?", "說明"), ("q", "離開"),
 ]
+
+_ALIASES = {
+    "x": "stop", "a": "stats", "k": "skills", "e": "equip", "r": "refine",
+    "o": "socket", "b": "shop", "w": "storage", "j": "job", "m": "mvp",
+    "l": "rank", "t": "trade", "g": "guild", "c": "chat", "?": "help",
+    "hunt": "h", "watch": "v", "status": "s", "inv": "i", "quit": "q", "exit": "q",
+}
 
 _NO_PAUSE = {"h", "hunt", "v", "watch", "q", "quit", "exit"}
 
@@ -137,8 +143,8 @@ def _do_hunt(api: ApiClient, character: dict, console: Console) -> None:
     except ApiError as exc:
         console.print(f"[red]{exc.detail}[/red]")
         return
-    watch_hunt(api, console, render_status=lambda _status: _render_screen(
-        console, api, character, None
+    watch_hunt(api, console, render_status=lambda _status: status_panel(
+        _merge_sheet(api, _current_character(api, character))
     ))
 
 
@@ -196,14 +202,15 @@ def run(server_url: str) -> None:
             break
         if not cmd:
             continue
+        cmd = _ALIASES.get(cmd, cmd)
         try:
             if cmd in ("q", "quit", "exit"):
                 break
             elif cmd in ("h", "hunt"):
                 _do_hunt(api, character, console)
             elif cmd in ("v", "watch"):
-                watch_hunt(api, console, render_status=lambda _status: _render_screen(
-                    console, api, character, None
+                watch_hunt(api, console, render_status=lambda _status: status_panel(
+                    _merge_sheet(api, _current_character(api, character))
                 ))
             elif cmd == "stop":
                 _do_stop(api, console)

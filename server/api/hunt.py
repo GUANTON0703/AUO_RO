@@ -109,6 +109,8 @@ def start_hunt(body: StartRequest, account_id: CurrentAccount):
 def _no_op_settlement(fresh) -> dict:
     """別的並發請求已結算過時回這個：目前角色狀態、無增量。"""
     return {
+        "monster_id": fresh["hunting_monster_id"],
+        "monster_name": _content.get_monster(fresh["hunting_monster_id"]).name,
         "kills": 0, "base_exp": 0, "job_exp": 0, "zeny": 0, "drops": {},
         "offline": False, "effective_seconds": 0.0,
         "retreated": False, "retreat_reason": None, "events": [],
@@ -183,6 +185,8 @@ def _settle_current(row) -> dict:
 
     fresh = characters_repo.get_character(row["id"])
     return {
+        "monster_id": row["hunting_monster_id"],
+        "monster_name": monster.name,
         "kills": result.kills,
         "base_exp": result.base_exp,
         "job_exp": result.job_exp,

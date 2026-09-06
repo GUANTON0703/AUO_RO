@@ -3,6 +3,7 @@ from rich.console import Console
 from client.render import (
     event_lines,
     hunt_summary,
+    hunt_status_panel,
     inventory_table,
     newbie_hint_panel,
     retreat_advice,
@@ -77,6 +78,19 @@ def test_hunt_summary_shows_retreat_reason():
                                 "effective_seconds": 100, "retreated": True,
                                 "retreat_reason": "補品用盡"}))
     assert "補品用盡" in out
+
+
+def test_hunt_status_panel_shows_live_progress():
+    out = _render(hunt_status_panel({
+        "monster_id": "poring", "kills": 7, "base_exp": 70, "job_exp": 35,
+        "zeny": 21, "effective_seconds": 42, "retreated": False,
+    }))
+    assert "擊殺" in out and "Base EXP" in out and "Job EXP" in out
+
+
+def test_inventory_prefers_chinese_item_names():
+    out = _render(inventory_table({"items": {"red_potion": 10}, "equipment": []}))
+    assert "紅色藥水" in out
 
 
 def test_event_lines_truncates_long_combat():

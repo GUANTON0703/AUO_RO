@@ -59,6 +59,16 @@ def test_start_then_status_accrues_progress(client, auth, db_helpers):
     assert any(e["kind"] == "kill_batch" for e in body["events"])
 
 
+def test_hunt_status_includes_current_target(client, auth, db_helpers):
+    _, headers, _ = auth
+    _ready_char(client, headers, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=headers,
+                json={"map_id": "prontera_south_field", "monster_id": "mushroom"})
+    body = client.get("/api/hunt/status", headers=headers).json()
+    assert body["monster_id"] == "mushroom"
+    assert body["monster_name"] == "魔菇"
+
+
 def test_offline_gap_applies_efficiency(client, auth, db_helpers):
     _, headers, _ = auth
     ch = _ready_char(client, headers, db_helpers, base_level=20)
