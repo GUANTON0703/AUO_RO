@@ -1,1 +1,19 @@
-[]
+[
+  {"id": "poring_card", "name": "波利卡片", "monster_id": "poring", "slot": "armor", "drop_rate": 0.001, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 100}]},
+  {"id": "green_cotton_worm_card", "name": "綠棉蟲卡片", "monster_id": "green_cotton_worm", "slot": "garment", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 10}]},
+  {"id": "mad_bunny_card", "name": "瘋兔卡片", "monster_id": "mad_bunny", "slot": "accessory", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "agi", "amount": 2}]},
+  {"id": "mushroom_card", "name": "魔菇卡片", "monster_id": "mushroom", "slot": "armor", "drop_rate": 0.003, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 60}, {"type": "flat_stat", "stat": "defense", "amount": 2}]},
+  {"id": "snail_card", "name": "蝸牛卡片", "monster_id": "snail", "slot": "shoes", "drop_rate": 0.003, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 50}, {"type": "flat_stat", "stat": "max_sp", "amount": 20}]},
+  {"id": "tree_sprite_card", "name": "樹精卡片", "monster_id": "tree_sprite", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "earth", "pct": 15}]},
+  {"id": "wolf_card", "name": "狼卡片", "monster_id": "wolf", "slot": "weapon", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 15}, {"type": "flat_stat", "stat": "crit", "amount": 3}]},
+  {"id": "thunder_hedgehog_card", "name": "雷極刺蝟卡片", "monster_id": "thunder_hedgehog", "slot": "weapon", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 10}, {"type": "on_hit_proc", "chance_pct": 5, "effect": "stun"}]},
+  {"id": "raccoon_card", "name": "狸貓卡片", "monster_id": "raccoon", "slot": "head", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "max_sp", "amount": 30}]},
+  {"id": "grass_sprite_card", "name": "草精卡片", "monster_id": "grass_sprite", "slot": "garment", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "mdef", "amount": 5}]},
+
+  {"id": "angel_poring_card", "name": "天使波利卡片", "monster_id": "angel_poring", "slot": "accessory", "drop_rate": 0.03, "effects": [{"type": "flat_stat", "stat": "str", "amount": 1}, {"type": "flat_stat", "stat": "agi", "amount": 1}, {"type": "flat_stat", "stat": "vit", "amount": 1}, {"type": "flat_stat", "stat": "int", "amount": 1}, {"type": "flat_stat", "stat": "dex", "amount": 1}, {"type": "flat_stat", "stat": "luk", "amount": 1}]},
+  {"id": "fierce_mushroom_card", "name": "兇猛魔菇卡片", "monster_id": "fierce_mushroom", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 800}, {"type": "percent_stat", "stat": "max_hp", "pct": 5}]},
+  {"id": "queen_bee_card", "name": "蜂后卡片", "monster_id": "queen_bee", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 30}, {"type": "flat_stat", "stat": "aspd", "amount": 5}]},
+  {"id": "forest_guardian_card", "name": "森林守衛卡片", "monster_id": "forest_guardian", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "percent_stat", "stat": "defense", "pct": 20}]},
+  {"id": "choco_monkey_card", "name": "巧克猴卡片", "monster_id": "choco_monkey", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "demihuman", "pct": 20}]},
+  {"id": "curly_boar_king_card", "name": "卷鬃山豬王卡片", "monster_id": "curly_boar_king", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 15}]}
+]

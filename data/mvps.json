@@ -1,1 +1,134 @@
-[]
+[
+  {
+    "id": "angel_poring",
+    "name": "天使波利",
+    "level": 16,
+    "element": "holy",
+    "race": "angel",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 2000,
+    "job_exp": 1000,
+    "cooldown_hours": 8,
+    "home_map_id": "mjolnir_mine",
+    "is_mvp": true,
+    "stats": {"max_hp": 7085, "max_sp": 0, "atk": 61, "matk": 31, "defense": 19, "mdef": 5, "hit": 26, "flee": 21, "aspd": 110, "crit": 5},
+    "drops": [
+      {"item_id": "angel_poring_card", "rate": 0.03},
+      {"item_id": "angel_wing", "rate": 0.15},
+      {"item_id": "clip", "rate": 0.2},
+      {"item_id": "elunium", "rate": 0.3}
+    ],
+    "lore": "傳說中會帶來好運的波利，背後長著一對小小的天使翅膀。"
+  },
+  {
+    "id": "fierce_mushroom",
+    "name": "兇猛魔菇",
+    "level": 17,
+    "element": "water",
+    "race": "plant",
+    "size": "medium",
+    "role": "boss",
+    "base_exp": 2300,
+    "job_exp": 1150,
+    "cooldown_hours": 8,
+    "home_map_id": "prontera_south_field",
+    "is_mvp": true,
+    "stats": {"max_hp": 7681, "max_sp": 0, "atk": 64, "matk": 33, "defense": 20, "mdef": 5, "hit": 27, "flee": 22, "aspd": 110, "crit": 5},
+    "drops": [
+      {"item_id": "fierce_mushroom_card", "rate": 0.03},
+      {"item_id": "mushroom_helm", "rate": 0.15},
+      {"item_id": "hard_leather_armor", "rate": 0.12},
+      {"item_id": "elunium", "rate": 0.3}
+    ],
+    "lore": "吸飽了南門原野地下水的巨大魔菇，孢子帶有腐蝕性。"
+  },
+  {
+    "id": "queen_bee",
+    "name": "蜂后",
+    "level": 19,
+    "element": "wind",
+    "race": "insect",
+    "size": "small",
+    "role": "boss",
+    "base_exp": 2900,
+    "job_exp": 1450,
+    "cooldown_hours": 12,
+    "home_map_id": "prontera_south_field",
+    "is_mvp": true,
+    "stats": {"max_hp": 8939, "max_sp": 0, "atk": 71, "matk": 36, "defense": 23, "mdef": 6, "hit": 30, "flee": 24, "aspd": 110, "crit": 5},
+    "drops": [
+      {"item_id": "queen_bee_card", "rate": 0.03},
+      {"item_id": "queen_staff", "rate": 0.12},
+      {"item_id": "bee_wing_mantle", "rate": 0.18},
+      {"item_id": "oridecon", "rate": 0.3}
+    ],
+    "lore": "統治整片蜂巢的女王，揮動毒針的速度快得肉眼難以捕捉。"
+  },
+  {
+    "id": "forest_guardian",
+    "name": "森林守衛",
+    "level": 29,
+    "element": "earth",
+    "race": "formless",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 5000,
+    "job_exp": 2500,
+    "cooldown_hours": 12,
+    "home_map_id": "prontera_south_forest",
+    "is_mvp": true,
+    "stats": {"max_hp": 16523, "max_sp": 0, "atk": 103, "matk": 53, "defense": 35, "mdef": 9, "hit": 45, "flee": 34, "aspd": 110, "crit": 5},
+    "drops": [
+      {"item_id": "forest_guardian_card", "rate": 0.03},
+      {"item_id": "guardian_greatsword", "rate": 0.1},
+      {"item_id": "guardian_shield", "rate": 0.15},
+      {"item_id": "oridecon", "rate": 0.3}
+    ],
+    "lore": "由古木與泥土凝聚而成的守護者，擅自砍伐森林的人會被它盯上。"
+  },
+  {
+    "id": "choco_monkey",
+    "name": "巧克猴",
+    "level": 30,
+    "element": "earth",
+    "race": "animal",
+    "size": "small",
+    "role": "boss",
+    "base_exp": 5400,
+    "job_exp": 2700,
+    "cooldown_hours": 12,
+    "home_map_id": "prontera_west_plain",
+    "is_mvp": true,
+    "stats": {"max_hp": 17400, "max_sp": 0, "atk": 106, "matk": 55, "defense": 36, "mdef": 9, "hit": 46, "flee": 35, "aspd": 110, "crit": 5},
+    "drops": [
+      {"item_id": "choco_monkey_card", "rate": 0.03},
+      {"item_id": "choco_boots", "rate": 0.15},
+      {"item_id": "jur", "rate": 0.2},
+      {"item_id": "oridecon", "rate": 0.3}
+    ],
+    "lore": "全身沾滿可可的頑皮猴王，出手偷東西的速度連盜賊都自嘆不如。"
+  },
+  {
+    "id": "curly_boar_king",
+    "name": "卷鬃山豬王",
+    "level": 48,
+    "element": "fire",
+    "race": "animal",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 12000,
+    "job_exp": 6000,
+    "cooldown_hours": 24,
+    "home_map_id": "prontera_north_forest",
+    "is_mvp": true,
+    "stats": {"max_hp": 36883, "max_sp": 0, "atk": 164, "matk": 85, "defense": 58, "mdef": 14, "hit": 74, "flee": 53, "aspd": 110, "crit": 5},
+    "drops": [
+      {"item_id": "curly_boar_king_card", "rate": 0.03},
+      {"item_id": "boar_king_axe", "rate": 0.1},
+      {"item_id": "curly_horn_helm", "rate": 0.15},
+      {"item_id": "elunium", "rate": 0.3}
+    ],
+    "lore": "帶領整個豬群的老王，捲曲的鬃毛下是刀槍不入的厚皮。"
+  }
+]

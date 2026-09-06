@@ -14,7 +14,7 @@
     "town": "prontera",
     "level_range": [9, 20],
     "monster_ids": ["raccoon", "mushroom", "grass_sprite", "snail"],
-    "mvp_id": null,
+    "mvp_id": "fierce_mushroom",
     "unlock_base_level": 8
   },
   {
@@ -23,7 +23,7 @@
     "town": "prontera",
     "level_range": [16, 25],
     "monster_ids": ["grass_sprite", "snail", "tree_sprite"],
-    "mvp_id": null,
+    "mvp_id": "angel_poring",
     "unlock_base_level": 14
   },
   {
@@ -32,7 +32,7 @@
     "town": "prontera",
     "level_range": [1, 30],
     "monster_ids": ["poring", "tree_sprite"],
-    "mvp_id": null,
+    "mvp_id": "choco_monkey",
     "unlock_base_level": 1
   },
   {
@@ -41,7 +41,7 @@
     "town": "prontera",
     "level_range": [31, 40],
     "monster_ids": ["tree_sprite", "thunder_hedgehog"],
-    "mvp_id": null,
+    "mvp_id": "forest_guardian",
     "unlock_base_level": 28
   },
   {
@@ -59,7 +59,7 @@
     "town": "prontera",
     "level_range": [46, 55],
     "monster_ids": ["wolf", "boar"],
-    "mvp_id": null,
+    "mvp_id": "curly_boar_king",
     "unlock_base_level": 42
   },
   {
