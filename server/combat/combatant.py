@@ -56,6 +56,38 @@ class Combatant:
     def alive(self) -> bool:
         return self.hp > 0
 
+    def _stat_mod(self, stat: str) -> int:
+        return sum(s.magnitude for s in self.statuses
+                   if s.kind == "stat_mod" and s.stat == stat)
+
+    @property
+    def effective_atk(self) -> int:
+        return max(0, self.atk + self._stat_mod("atk"))
+
+    @property
+    def effective_matk(self) -> int:
+        return max(0, self.matk + self._stat_mod("matk"))
+
+    @property
+    def effective_defense(self) -> int:
+        return max(0, self.defense + self._stat_mod("defense"))
+
+    @property
+    def effective_flee(self) -> int:
+        return max(0, self.flee + self._stat_mod("flee"))
+
+    @property
+    def effective_hit(self) -> int:
+        return max(0, self.hit + self._stat_mod("hit"))
+
+    @property
+    def effective_crit(self) -> int:
+        return max(0, self.crit + self._stat_mod("crit"))
+
+    @property
+    def stunned(self) -> bool:
+        return any(s.kind == "stun" for s in self.statuses)
+
     def take_damage(self, amount: int) -> None:
         self.hp = max(0, self.hp - max(0, amount))
 
