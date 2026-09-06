@@ -43,6 +43,10 @@ def create_app() -> FastAPI:
 
     app.include_router(storage_router)
 
+    from server.api.mvp import router as mvp_router
+
+    app.include_router(mvp_router)
+
     @app.get("/health")
     def health() -> dict:
         return {"status": "ok"}
