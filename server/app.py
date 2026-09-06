@@ -47,6 +47,10 @@ def create_app() -> FastAPI:
 
     app.include_router(mvp_router)
 
+    from server.api.leaderboard import router as leaderboard_router
+
+    app.include_router(leaderboard_router)
+
     @app.get("/health")
     def health() -> dict:
         return {"status": "ok"}
