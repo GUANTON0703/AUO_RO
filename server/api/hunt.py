@@ -43,8 +43,7 @@ def _snapshot(row, *, hp=None, sp=None) -> CharacterSnapshot:
         base_level=row["base_level"], job_level=row["job_level"],
         stats={k: row[f"stat_{k}"] for k in _STAT_KEYS},
         learned_skills=json.loads(row["learned_skills"]),
-        equipped_item_ids=json.loads(row["equipped_items"]),
-        socketed_card_ids=json.loads(row["socketed_cards"]),
+        equipped=[],
         hp=hp, sp=sp,
     )
 

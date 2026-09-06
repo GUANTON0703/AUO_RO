@@ -1,6 +1,14 @@
 from dataclasses import dataclass, field
 
 from server.combat.combatant import Combatant, ResolvedSkill
+from server.loot import refine as refine_mod
+
+
+@dataclass
+class EquippedPiece:
+    equipment_id: str
+    refine: int = 0
+    card_ids: list = field(default_factory=list)
 
 
 @dataclass
@@ -11,20 +19,20 @@ class CharacterSnapshot:
     job_level: int
     stats: dict
     learned_skills: dict = field(default_factory=dict)
-    equipped_item_ids: list = field(default_factory=list)
-    socketed_card_ids: list = field(default_factory=list)
+    equipped: list = field(default_factory=list)
     hp: int | None = None
     sp: int | None = None
 
 
-def _sum_equipment_stats(content, item_ids: list) -> dict:
+def _sum_equipment_stats(content, pieces: list) -> dict:
     acc: dict = {}
-    for iid in item_ids:
-        eq = content.equipment.get(iid)
+    for piece in pieces:
+        eq = content.equipment.get(piece.equipment_id)
         if not eq:
             continue
+        bonus = refine_mod.refine_stat_bonus(eq.stats, piece.refine)
         for k, v in eq.stats.items():
-            acc[k] = acc.get(k, 0) + v
+            acc[k] = acc.get(k, 0) + v + bonus.get(k, 0)
     return acc
 
 
@@ -62,7 +70,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     s = snap.stats
     STR, AGI, VIT, INT, DEX, LUK = (s["str"], s["agi"], s["vit"], s["int"], s["dex"], s["luk"])
 
-    eq = _sum_equipment_stats(content, snap.equipped_item_ids)
+    eq = _sum_equipment_stats(content, snap.equipped)
     passives = _passive_stat_bonus(content, snap.learned_skills)
 
     # HP/SP 隨等級加速成長（配合怪物 HP 公式的 level² 項），玩家才打得動同級怪
@@ -83,7 +91,8 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     derived = {"max_hp": max_hp, "max_sp": max_sp, "atk": atk, "matk": matk,
                "defense": defense, "mdef": mdef, "hit": hit, "flee": flee,
                "crit": crit}
-    _apply_card_effects(content, snap.socketed_card_ids, derived)
+    card_ids = [cid for piece in snap.equipped for cid in piece.card_ids]
+    _apply_card_effects(content, card_ids, derived)
 
     resolved = []
     for sid, lvl in snap.learned_skills.items():

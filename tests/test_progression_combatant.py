@@ -1,11 +1,11 @@
-from server.progression import build_player_combatant, CharacterSnapshot
+from server.progression import build_player_combatant, CharacterSnapshot, EquippedPiece
 from server.content import load_content
 
 
 def _snap(**kw):
     base = dict(name="測試", job_id="swordman", base_level=15, job_level=8,
                 stats={"str": 30, "agi": 15, "vit": 20, "int": 5, "dex": 18, "luk": 8},
-                learned_skills={"bash": 3}, equipped_item_ids=[], socketed_card_ids=[],
+                learned_skills={"bash": 3}, equipped=[],
                 hp=None, sp=None)
     base.update(kw)
     return CharacterSnapshot(**base)
@@ -24,17 +24,45 @@ def test_derived_stats_from_primary():
 
 def test_equipment_adds_stats():
     c = load_content()
-    bare = build_player_combatant(_snap(equipped_item_ids=[]), c)
-    armed = build_player_combatant(_snap(equipped_item_ids=["knife"]), c)
+    bare = build_player_combatant(_snap(equipped=[]), c)
+    armed = build_player_combatant(_snap(equipped=[EquippedPiece(equipment_id="knife")]), c)
     assert armed.atk > bare.atk
 
 
 def test_card_flat_stat_applies():
     c = load_content()
-    plain = build_player_combatant(_snap(equipped_item_ids=["cotton_shirt"]), c)
+    plain = build_player_combatant(
+        _snap(equipped=[EquippedPiece(equipment_id="cotton_shirt")]), c)
     carded = build_player_combatant(
-        _snap(equipped_item_ids=["cotton_shirt"], socketed_card_ids=["poring_card"]), c)
+        _snap(equipped=[EquippedPiece(equipment_id="cotton_shirt", card_ids=["poring_card"])]), c)
     assert carded.max_hp > plain.max_hp
+
+
+def test_refined_equipment_adds_more_stats():
+    c = load_content()
+
+    def snap(pieces):
+        return CharacterSnapshot(name="P", job_id="swordman", base_level=20, job_level=10,
+                                 stats={"str": 30, "agi": 15, "vit": 20, "int": 5, "dex": 18, "luk": 8},
+                                 learned_skills={"bash": 1}, equipped=pieces)
+
+    plain = build_player_combatant(snap([EquippedPiece(equipment_id="knife", refine=0, card_ids=[])]), c)
+    r7 = build_player_combatant(snap([EquippedPiece(equipment_id="knife", refine=7, card_ids=[])]), c)
+    assert r7.atk > plain.atk
+
+
+def test_socketed_card_via_piece():
+    c = load_content()
+    snap = CharacterSnapshot(name="P", job_id="swordman", base_level=20, job_level=10,
+                             stats={"str": 30, "agi": 15, "vit": 20, "int": 5, "dex": 18, "luk": 8},
+                             learned_skills={"bash": 1},
+                             equipped=[EquippedPiece(equipment_id="cotton_shirt", refine=0,
+                                                     card_ids=["poring_card"])])
+    plain_snap = CharacterSnapshot(name="P", job_id="swordman", base_level=20, job_level=10,
+                                   stats={"str": 30, "agi": 15, "vit": 20, "int": 5, "dex": 18, "luk": 8},
+                                   learned_skills={"bash": 1},
+                                   equipped=[EquippedPiece(equipment_id="cotton_shirt", refine=0, card_ids=[])])
+    assert build_player_combatant(snap, c).max_hp > build_player_combatant(plain_snap, c).max_hp
 
 
 def test_learned_active_skills_become_resolved():
