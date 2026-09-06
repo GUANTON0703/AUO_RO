@@ -54,3 +54,22 @@ CREATE TABLE IF NOT EXISTS characters (
 
 CREATE INDEX IF NOT EXISTS idx_characters_account ON characters(account_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_account ON sessions(account_id);
+
+CREATE TABLE IF NOT EXISTS character_items (
+    character_id INTEGER NOT NULL REFERENCES characters(id),
+    item_id      TEXT NOT NULL,
+    qty          INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (character_id, item_id)
+);
+
+CREATE TABLE IF NOT EXISTS character_equipment (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    character_id  INTEGER NOT NULL REFERENCES characters(id),
+    equipment_id  TEXT NOT NULL,
+    refine        INTEGER NOT NULL DEFAULT 0,
+    equipped_slot TEXT,
+    card_ids      TEXT NOT NULL DEFAULT '[]',
+    acquired_at   TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_char_items ON character_items(character_id);
+CREATE INDEX IF NOT EXISTS idx_char_equip ON character_equipment(character_id);
