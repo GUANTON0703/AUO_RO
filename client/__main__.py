@@ -2,9 +2,11 @@ import argparse
 
 from client.app import run
 from client.config import SessionStore
+from client.terminal import prepare_windows_console
 
 
 def main() -> None:
+    prepare_windows_console()
     parser = argparse.ArgumentParser(prog="client", description="ROtxt 終端機客戶端")
     parser.add_argument("--server", default=None, help="伺服器網址")
     args = parser.parse_args()

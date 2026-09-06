@@ -41,10 +41,12 @@ def status_panel(character: dict) -> Panel:
         f"Base Lv {c.get('base_level', 1)}  {_bar(c.get('base_exp', 0), base_need)}",
         f"Job  Lv {c.get('job_level', 1)}  {_bar(c.get('job_exp', 0), job_need)}",
     ]
-    if "hp" in c or "max_hp" in c:
-        lines.append(f"HP {_bar(c.get('hp', 0), c.get('max_hp', 0))}")
-    if "sp" in c or "max_sp" in c:
-        lines.append(f"SP {_bar(c.get('sp', 0), c.get('max_sp', 0))}")
+    hp_cur = c.get("hp", c.get("hunt_hp"))
+    sp_cur = c.get("sp", c.get("hunt_sp"))
+    if hp_cur is not None or "max_hp" in c:
+        lines.append(f"HP {_bar(hp_cur or 0, c.get('max_hp', 0))}")
+    if sp_cur is not None or "max_sp" in c:
+        lines.append(f"SP {_bar(sp_cur or 0, c.get('max_sp', 0))}")
     lines.append(f"Zeny {c.get('zeny', 0)}")
     loc = c.get("location_map") or c.get("hunting_map_id")
     if loc:

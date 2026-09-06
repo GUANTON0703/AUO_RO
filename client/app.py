@@ -106,7 +106,10 @@ def _do_stop(api: ApiClient, console: Console) -> None:
 
 
 def run(server_url: str) -> None:
-    console = Console()
+    from client.terminal import make_console, prepare_windows_console
+
+    prepare_windows_console()
+    console = make_console()
     store = SessionStore()
     http = httpx.Client(base_url=server_url, timeout=30.0)
     api = ApiClient(http)
