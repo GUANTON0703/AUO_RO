@@ -48,7 +48,7 @@ def status_panel(character: dict) -> Panel:
     if sp_cur is not None or "max_sp" in c:
         lines.append(f"SP {_bar(sp_cur or 0, c.get('max_sp', 0))}")
     lines.append(f"Zeny {c.get('zeny', 0)}")
-    loc = c.get("location_map") or c.get("hunting_map_id")
+    loc = c.get("hunting_map_id") or c.get("location_map")
     if loc:
         lines.append(f"地點 {_map_name(loc)}")
     return Panel("\n".join(lines), title="角色狀態", expand=False)

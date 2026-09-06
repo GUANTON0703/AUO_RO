@@ -117,6 +117,8 @@ def _settle_current(row) -> dict:
 
     now = datetime.now(timezone.utc)
     last = datetime.fromisoformat(row["hunt_last_settled_at"])
+    if last.tzinfo is None:            # 舊資料或外部寫入的 naive 時間戳，當 UTC
+        last = last.replace(tzinfo=timezone.utc)
     elapsed = max(0.0, (now - last).total_seconds())
     offline = elapsed > settings.online_grace_seconds
 
