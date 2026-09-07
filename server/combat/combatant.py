@@ -47,6 +47,12 @@ class Combatant:
     statuses: list = field(default_factory=list)  # server.combat.status.Status
     hp: int = field(default=0)
     sp: int = field(default=0)
+    element: str = "neutral"                       # 受擊方屬性判定
+    race: str = "formless"                         # 受擊方種族判定
+    attack_element: str = "neutral"               # 物理攻擊帶的屬性（武器/附魔卡）
+    element_resist: dict = field(default_factory=dict)  # {element: 減傷%}
+    race_bonus: dict = field(default_factory=dict)      # {race: 加傷%}
+    procs: dict = field(default_factory=dict)           # 被動觸發 {effect: 機率%}
 
     def __post_init__(self):
         if self.hp == 0:
@@ -114,4 +120,6 @@ class Combatant:
             defense=s.defense, mdef=s.mdef, hit=s.hit, flee=s.flee, aspd=s.aspd,
             crit=s.crit, is_caster=(s.matk > s.atk),
             soft_def=m.level // 4, soft_mdef=m.level // 6,
+            element=getattr(m.element, "value", m.element),
+            race=getattr(m.race, "value", m.race),
         )

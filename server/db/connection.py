@@ -60,29 +60,59 @@ def transaction():
         conn.close()
 
 
+def _cols(conn: sqlite3.Connection, table: str) -> set[str]:
+    return {row[1] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+
+
+def _add_col(conn: sqlite3.Connection, table: str, name: str, definition: str) -> None:
+    if name not in _cols(conn, table):
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {name} {definition}")
+
+
+def _migration_1(conn: sqlite3.Connection) -> None:
+    """v1 期間手寫的那批 ALTER，整理成第一個 migration。"""
+    _add_col(conn, "accounts", "role", "TEXT NOT NULL DEFAULT 'player'")
+    for name, definition in (
+        ("hunt_kills", "INTEGER NOT NULL DEFAULT 0"),
+        ("hunt_base_exp", "INTEGER NOT NULL DEFAULT 0"),
+        ("hunt_job_exp", "INTEGER NOT NULL DEFAULT 0"),
+        ("hunt_zeny", "INTEGER NOT NULL DEFAULT 0"),
+        ("hunt_seconds", "REAL NOT NULL DEFAULT 0"),
+    ):
+        _add_col(conn, "characters", name, definition)
+    conn.execute(
+        "UPDATE character_equipment SET equipped_slot = 'accessory1' "
+        "WHERE equipped_slot = 'accessory'"
+    )
+
+
+# (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
+_MIGRATIONS: list[tuple[int, "callable"]] = [
+    (1, _migration_1),
+]
+
+
+def _apply_migrations(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS schema_migrations "
+        "(version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL)"
+    )
+    done = {
+        row[0] for row in conn.execute("SELECT version FROM schema_migrations").fetchall()
+    }
+    from datetime import datetime, timezone
+    for version, fn in sorted(_MIGRATIONS):
+        if version in done:
+            continue
+        fn(conn)
+        conn.execute(
+            "INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)",
+            (version, datetime.now(timezone.utc).isoformat()),
+        )
+
+
 def init_db() -> None:
     ddl = _SCHEMA.read_text(encoding="utf-8")
     with get_connection() as conn:
         conn.executescript(ddl)
-        account_columns = {
-            row[1] for row in conn.execute("PRAGMA table_info(accounts)").fetchall()
-        }
-        if "role" not in account_columns:
-            conn.execute("ALTER TABLE accounts ADD COLUMN role TEXT NOT NULL DEFAULT 'player'")
-        character_columns = {
-            row[1] for row in conn.execute("PRAGMA table_info(characters)").fetchall()
-        }
-        for name, definition in (
-            ("hunt_kills", "INTEGER NOT NULL DEFAULT 0"),
-            ("hunt_base_exp", "INTEGER NOT NULL DEFAULT 0"),
-            ("hunt_job_exp", "INTEGER NOT NULL DEFAULT 0"),
-            ("hunt_zeny", "INTEGER NOT NULL DEFAULT 0"),
-            ("hunt_seconds", "REAL NOT NULL DEFAULT 0"),
-        ):
-            if name not in character_columns:
-                conn.execute(f"ALTER TABLE characters ADD COLUMN {name} {definition}")
-        # 飾品從單格改成左右兩格：舊資料的 'accessory' 併到左格
-        conn.execute(
-            "UPDATE character_equipment SET equipped_slot = 'accessory1' "
-            "WHERE equipped_slot = 'accessory'"
-        )
+        _apply_migrations(conn)

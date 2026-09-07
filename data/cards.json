@@ -27,5 +27,9 @@
   {"id": "mandragora_card", "name": "曼陀羅魔花卡片", "monster_id": "mandragora", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "shadow", "pct": 10}, {"type": "flat_stat", "stat": "mdef", "amount": 5}]},
 
   {"id": "raging_bigfoot_card", "name": "狂暴大腳熊卡片", "monster_id": "raging_bigfoot", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "animal", "pct": 20}, {"type": "flat_stat", "stat": "atk", "amount": 15}]},
-  {"id": "golden_bug_king_card", "name": "黃金蟲王卡片", "monster_id": "golden_bug_king", "slot": "accessory", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "insect", "pct": 20}]}
+  {"id": "golden_bug_king_card", "name": "黃金蟲王卡片", "monster_id": "golden_bug_king", "slot": "accessory", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "insect", "pct": 20}]},
+  {"id": "flame_endow_card", "name": "火焰附魔卡片", "monster_id": "red_bat", "slot": "weapon", "drop_rate": 0.004, "effects": [{"type": "weapon_element", "element": "fire"}]},
+  {"id": "frost_endow_card", "name": "冰霜附魔卡片", "monster_id": "blue_rat", "slot": "weapon", "drop_rate": 0.004, "effects": [{"type": "weapon_element", "element": "water"}]},
+  {"id": "gale_endow_card", "name": "疾風附魔卡片", "monster_id": "bee_soldier", "slot": "weapon", "drop_rate": 0.004, "effects": [{"type": "weapon_element", "element": "wind"}]},
+  {"id": "seismic_endow_card", "name": "大地附魔卡片", "monster_id": "miner_foreman", "slot": "weapon", "drop_rate": 0.004, "effects": [{"type": "weapon_element", "element": "earth"}]}
 ]

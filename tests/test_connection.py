@@ -47,3 +47,15 @@ def test_commit_on_success_rollback_on_error(tmp_path):
         pass
     with connection.get_connection() as conn:
         assert conn.execute("SELECT COUNT(*) c FROM accounts").fetchone()["c"] == 0
+
+
+def test_migrations_recorded_and_idempotent(tmp_path):
+    connection.configure(str(tmp_path / "t.db"))
+    connection.init_db()
+    connection.init_db()   # 再跑一次不該重複套用或報錯
+    with connection.get_connection() as conn:
+        versions = {r[0] for r in conn.execute(
+            "SELECT version FROM schema_migrations").fetchall()}
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(characters)").fetchall()}
+    assert 1 in versions
+    assert "hunt_kills" in cols   # migration 1 加的欄位在

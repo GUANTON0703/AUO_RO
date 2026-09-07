@@ -38,3 +38,19 @@ def test_not_enough_points():
     ok, _ = can_learn(c, "swordman", "bash", target_level=3,
                       current_learned={}, points_available=1)
     assert ok is False
+
+
+def test_can_learn_blocks_missing_prerequisite():
+    from server.content import load_content
+    c = load_content()
+    # 找一個有 requires 的二轉技能
+    gated = next(s for s in c.skills.values() if s.requires)
+    req_id, req_lv = next(iter(gated.requires.items()))
+    ok, reason = can_learn(c, character_job=gated.job_id, skill_id=gated.id,
+                           target_level=1, current_learned={}, points_available=99)
+    assert ok is False and "需先點" in reason
+    # 前置點滿就能學
+    ok2, _ = can_learn(c, character_job=gated.job_id, skill_id=gated.id,
+                       target_level=1, current_learned={req_id: req_lv},
+                       points_available=99)
+    assert ok2 is True

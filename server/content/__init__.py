@@ -101,10 +101,27 @@ def _check_integrity(c: Content) -> None:
                 raise ContentError(f"職業 {job.id} 引用不存在的技能 {sid}")
         if job.parent_id and job.parent_id not in c.jobs:
             raise ContentError(f"職業 {job.id} 的 parent_id {job.parent_id} 不存在")
+    _ELEMENTS = {"neutral", "water", "earth", "fire", "wind", "poison",
+                 "holy", "shadow", "ghost", "undead"}
     for skill in c.skills.values():
         if skill.job_id not in c.jobs:
             raise ContentError(f"技能 {skill.id} 屬於不存在的職業 {skill.job_id}")
+        for req_id in skill.requires:
+            if req_id not in c.skills:
+                raise ContentError(f"技能 {skill.id} 的前置 {req_id} 不存在")
+            # 前置必須是同職業或前職鏈上的技能
+            chain = {skill.job_id}
+            j = c.jobs.get(skill.job_id)
+            while j and j.parent_id:
+                chain.add(j.parent_id)
+                j = c.jobs.get(j.parent_id)
+            if c.skills[req_id].job_id not in chain:
+                raise ContentError(
+                    f"技能 {skill.id} 的前置 {req_id} 不在本職或前職鏈上"
+                )
     for eq in c.equipment.values():
+        if eq.element not in _ELEMENTS:
+            raise ContentError(f"裝備 {eq.id} 的 element {eq.element} 不合法")
         for jid in eq.job_ids:
             if jid not in c.jobs:
                 raise ContentError(f"裝備 {eq.id} 限定不存在的職業 {jid}")

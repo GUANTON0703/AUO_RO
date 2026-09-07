@@ -110,3 +110,27 @@ def test_deterministic_with_same_seed():
     a1 = simulate_fight(_mk("A"), _mk("B"), rng=random.Random(7))
     a2 = simulate_fight(_mk("A"), _mk("B"), rng=random.Random(7))
     assert a1.rounds == a2.rounds and a1.winner == a2.winner
+
+
+def test_double_attack_proc_adds_hits():
+    plain = _mk("普通", atk=20, aspd=100)
+    dbl = _mk("連擊", atk=20, aspd=100)
+    dbl.procs = {"extra_hit": 100}          # 100% 觸發
+    mob1 = _mk("怪A", max_hp=99999, flee=0, aspd=1)
+    mob2 = _mk("怪B", max_hp=99999, flee=0, aspd=1)
+    simulate_fight(plain, mob1, rng=random.Random(3), max_rounds=5)
+    simulate_fight(dbl, mob2, rng=random.Random(3), max_rounds=5)
+    assert (99999 - mob2.hp) > (99999 - mob1.hp) * 1.5
+
+
+def test_race_bonus_increases_damage():
+    plain = _mk("普通", atk=50, aspd=100)
+    slayer = _mk("剋星", atk=50, aspd=100)
+    slayer.race_bonus = {"insect": 100}     # 對蟲 +100%
+    bug1 = _mk("蟲A", max_hp=99999, flee=0, aspd=1)
+    bug1.race = "insect"
+    bug2 = _mk("蟲B", max_hp=99999, flee=0, aspd=1)
+    bug2.race = "insect"
+    simulate_fight(plain, bug1, rng=random.Random(4), max_rounds=3)
+    simulate_fight(slayer, bug2, rng=random.Random(4), max_rounds=3)
+    assert (99999 - bug2.hp) > (99999 - bug1.hp) * 1.5

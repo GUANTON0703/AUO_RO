@@ -144,6 +144,17 @@ def test_buff_skill_logs_cast_and_reports_active_buff():
     assert r.kills > 0                       # 補完 buff 還是會去打怪
 
 
+def test_steal_proc_gives_bonus_zeny():
+    c = load_content()
+    kw = dict(elapsed_seconds=300, cfg=HuntConfig(), offline=False, pity_in={})
+    dry = settle(_hero(), c.get_monster("poring"), rng=random.Random(3), **kw)
+    thief = _hero()
+    thief.procs = {"steal_loot": 100}     # 每擊必偷
+    wet = settle(thief, c.get_monster("poring"), rng=random.Random(3), **kw)
+    assert wet.kills == dry.kills          # 場數一樣
+    assert wet.zeny > dry.zeny             # 偷竊多撈
+
+
 def test_zeny_and_drops_accumulate():
     c = load_content()
     m = c.get_monster("green_cotton_worm")

@@ -1,6 +1,7 @@
 import random
 from dataclasses import dataclass, field
 
+from server.combat import elements
 from server.combat.events import AttackEvent, FledEvent, HealEvent, KillEvent
 from server.combat.formulas import (
     CRIT_MULTIPLIER, attacks_this_round, crit_chance, hit_chance, physical_damage,
@@ -21,6 +22,7 @@ class FightResult:
     loser_hp: int
     events: list = field(default_factory=list)
     potions_used: int = 0   # 戰鬥中喝掉的補品數（只有玩家 a 會喝）
+    stole: bool = False      # 這場有偷竊成功
 
 
 def _buff_already_up(c, skill) -> bool:
@@ -64,26 +66,45 @@ def _trigger_ok(c, trigger: str) -> bool:
     return False
 
 
+def _one_hit(attacker, defender, rng, events):
+    """打一擊。回 True = 有命中。"""
+    hit = rng.random() < hit_chance(attacker.effective_hit, defender.effective_flee)
+    if not hit:
+        events.append(AttackEvent(attacker.name, defender.name, 0, False, False))
+        return False
+    crit = rng.random() < crit_chance(attacker.effective_crit)
+    mult, resist, race = elements.damage_mods(attacker, defender, None)
+    if attacker.is_caster:
+        from server.combat.formulas import magic_damage
+        dmg = magic_damage(attacker.effective_matk, defender.effective_mdef,
+                           element_multiplier=mult, soft_mdef=defender.soft_mdef,
+                           resist_pct=resist, race_pct=race)
+    else:
+        dmg = physical_damage(attacker.effective_atk, defender.effective_defense,
+                              element_multiplier=mult, soft_def=defender.soft_def,
+                              resist_pct=resist, race_pct=race)
+    if crit:
+        dmg = round(dmg * CRIT_MULTIPLIER)
+    defender.take_damage(dmg)
+    events.append(AttackEvent(attacker.name, defender.name, dmg, crit, True))
+    steal = attacker.procs.get("steal_loot", 0) if hasattr(attacker, "procs") else 0
+    if steal and not any(getattr(e, "skill_id", "") == "steal" for e in events) \
+            and rng.random() < steal / 100:
+        from server.combat.events import SkillEvent
+        events.append(SkillEvent(actor=attacker.name, target=defender.name,
+                                 skill_id="steal", skill_name="偷竊"))
+    return True
+
+
 def _auto_attack(attacker, defender, rng, events):
     for _ in range(attacks_this_round(attacker.aspd, rng)):
         if not defender.alive:
             break
-        hit = rng.random() < hit_chance(attacker.effective_hit, defender.effective_flee)
-        if not hit:
-            events.append(AttackEvent(attacker.name, defender.name, 0, False, False))
-            continue
-        crit = rng.random() < crit_chance(attacker.effective_crit)
-        if attacker.is_caster:
-            from server.combat.formulas import magic_damage
-            dmg = magic_damage(attacker.effective_matk, defender.effective_mdef,
-                               soft_mdef=defender.soft_mdef)
-        else:
-            dmg = physical_damage(attacker.effective_atk, defender.effective_defense,
-                                  soft_def=defender.soft_def)
-        if crit:
-            dmg = round(dmg * CRIT_MULTIPLIER)
-        defender.take_damage(dmg)
-        events.append(AttackEvent(attacker.name, defender.name, dmg, crit, True))
+        landed = _one_hit(attacker, defender, rng, events)
+        # 二段攻擊：命中後依機率追加一擊
+        extra = attacker.procs.get("extra_hit", 0) if hasattr(attacker, "procs") else 0
+        if landed and extra and defender.alive and rng.random() < extra / 100:
+            _one_hit(attacker, defender, rng, events)
 
 
 def _take_turn(actor, foe, rng, events, min_sp_frac: float = 0.0):
@@ -134,7 +155,7 @@ def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAUL
         if flee_hp_frac > 0 and a.alive and a.hp < a.max_hp * flee_hp_frac:
             events.append(FledEvent(actor=a.name, hp=a.hp))
             return FightResult(None, None, "fled", rounds, a.hp, b.hp, events,
-                               potions_used)
+                               potions_used, _stole(events))
         _predrink(first)
         _take_turn(first, second, rng, events,
                    a_skill_min_sp_frac if first is a else 0.0)
@@ -145,8 +166,12 @@ def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAUL
 
     if a.alive and b.alive:
         return FightResult(None, None, "stalemate", rounds, a.hp, b.hp, events,
-                           potions_used)
+                           potions_used, _stole(events))
     winner, loser = (a, b) if a.alive else (b, a)
     events.append(KillEvent(actor=winner.name, target=loser.name))
     return FightResult(winner.name, loser.name, "win", rounds, winner.hp,
-                       loser.hp, events, potions_used)
+                       loser.hp, events, potions_used, _stole(events))
+
+
+def _stole(events) -> bool:
+    return any(getattr(e, "skill_id", "") == "steal" for e in events)

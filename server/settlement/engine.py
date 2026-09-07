@@ -199,6 +199,7 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
     potions_left = potion_count
     potions_used = 0
     kills = 0
+    steal_hits = 0
     combat_events: list = []
     retreated = False
     reason = ""
@@ -231,6 +232,8 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
         elapsed += time_per_kill
         if r.winner == p.name:
             kills += 1
+            if r.stole:
+                steal_hits += 1
         elif r.potions_used > 0 and potions_left <= 0:
             retreated, reason = True, "補品用盡，血量見底"
             break
@@ -244,7 +247,9 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
 
     base_exp = round(kills * monster.base_exp * cfg.experience_multiplier)
     job_exp = round(kills * monster.job_exp * cfg.experience_multiplier)
-    zeny = round(kills * zeny_per_kill(monster) * cfg.zeny_multiplier)
+    # 偷竊：成功的場次額外撈半隻怪的 Zeny
+    steal_zeny = round(steal_hits * zeny_per_kill(monster) * 0.5 * cfg.zeny_multiplier)
+    zeny = round(kills * zeny_per_kill(monster) * cfg.zeny_multiplier) + steal_zeny
     drops, pity_out = roll_drops(monster.drops, kills, rng, offline=False,
                                  pity_in=pity_in, cfg=cfg)
 

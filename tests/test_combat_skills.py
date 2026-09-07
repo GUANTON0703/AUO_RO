@@ -61,3 +61,42 @@ def test_passive_effect_is_noop():
                        "passive", 0)
     evs = cast_skill(caster, target, rs, rng)
     assert evs == []
+
+
+def test_element_multiplier_and_resist_apply():
+    from server.combat import elements
+    # fire 對 earth = 1.5x（照 element_chart.json）
+    fire_atk = _c("火法", matk=100, atk=1)
+    earth_mob = _c("地怪", max_hp=99999, flee=0)
+    earth_mob.element = "earth"
+    water_mob = _c("水怪", max_hp=99999, flee=0)
+    water_mob.element = "water"
+    rs = ResolvedSkill("fb", "火球", 1, "active", 0, 0,
+                       [{"type": "magic_hit", "element": "fire", "power_pct": [100]}],
+                       "every_turn", 1)
+    cast_skill(_c("火法", matk=100), earth_mob, rs, random.Random(1))
+    cast_skill(_c("火法", matk=100), water_mob, rs, random.Random(1))
+    assert (99999 - earth_mob.hp) > (99999 - water_mob.hp)  # 剋地 > 剋水
+
+    resist_mob = _c("抗火怪", max_hp=99999, flee=0)
+    resist_mob.element = "neutral"
+    resist_mob.element_resist = {"fire": 50}
+    plain_mob = _c("普通怪", max_hp=99999, flee=0)
+    cast_skill(_c("火法", matk=100), resist_mob, rs, random.Random(1))
+    cast_skill(_c("火法", matk=100), plain_mob, rs, random.Random(1))
+    assert (99999 - resist_mob.hp) < (99999 - plain_mob.hp)
+
+
+def test_envenom_applies_poison_dot():
+    from server.combat.status import tick_statuses
+    caster = _c("刺客", atk=100)
+    target = _c("怪", max_hp=99999, flee=0)
+    rs = ResolvedSkill("envenom", "毒擊", 3, "active", 12, 0,
+                       [{"type": "physical_hit", "element": "poison",
+                         "power_pct": [110, 130, 150, 170, 190], "debuff": "poison"}],
+                       "every_turn", 1)
+    cast_skill(caster, target, rs, random.Random(1))
+    assert any(s.kind == "dot" for s in target.statuses)
+    hp_before = target.hp
+    tick_statuses(target, [])
+    assert target.hp < hp_before  # 中毒每回合扣血

@@ -36,19 +36,51 @@ def _sum_equipment_stats(content, pieces: list) -> dict:
     return acc
 
 
-def _apply_card_effects(content, card_ids: list, out: dict) -> None:
-    for cid in card_ids:
-        card = content.cards.get(cid)
-        if not card:
+def _apply_card_effects(content, pieces: list, derived: dict) -> dict:
+    """把卡片效果套進 derived（數值），並回傳戰鬥用的 {resist, race, atk_element}。
+    附魔卡（weapon_element）只有鑲在武器上才算。"""
+    combat = {"resist": {}, "race": {}, "atk_element": None}
+    for piece in pieces:
+        eq = content.equipment.get(piece.equipment_id)
+        slot = eq.slot if eq else None
+        for cid in piece.card_ids:
+            card = content.cards.get(cid)
+            if not card:
+                continue
+            for eff in card.effects:
+                t = eff.get("type")
+                if t == "flat_stat":
+                    derived[eff["stat"]] = derived.get(eff["stat"], 0) + eff["amount"]
+                elif t == "percent_stat":
+                    base = derived.get(eff["stat"], 0)
+                    derived[eff["stat"]] = round(base * (1 + eff["pct"] / 100))
+                elif t == "element_resist":
+                    combat["resist"][eff["element"]] = (
+                        combat["resist"].get(eff["element"], 0) + eff["pct"])
+                elif t == "race_damage":
+                    combat["race"][eff["race"]] = (
+                        combat["race"].get(eff["race"], 0) + eff["pct"])
+                elif t == "weapon_element" and slot == "weapon":
+                    combat["atk_element"] = eff["element"]
+                # on_hit_proc：走技能路線的 proc，卡片 proc 暫不支援
+    return combat
+
+
+def _passive_procs(content, learned: dict) -> dict:
+    """被動技能的觸發機率 {effect: 機率%}（例：double_attack → {extra_hit: 25}）。"""
+    out: dict = {}
+    for sid, lvl in learned.items():
+        sk = content.skills.get(sid)
+        if not sk or sk.kind != "passive":
             continue
-        for eff in card.effects:
-            t = eff.get("type")
-            if t == "flat_stat":
-                out[eff["stat"]] = out.get(eff["stat"], 0) + eff["amount"]
-            elif t == "percent_stat":
-                base = out.get(eff["stat"], 0)
-                out[eff["stat"]] = round(base * (1 + eff["pct"] / 100))
-            # element_resist / race_damage / proc：戰鬥引擎 v1 尚未支援，略過
+        for eff in sk.effects:
+            if eff.get("type") != "proc":
+                continue
+            seq = eff.get("chance_pct", [0])
+            val = seq[min(lvl, len(seq)) - 1] if isinstance(seq, list) else seq
+            key = eff.get("effect", "")
+            out[key] = max(out.get(key, 0), val)
+    return out
 
 
 def _passive_stat_bonus(content, learned: dict) -> dict:
@@ -91,8 +123,14 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     derived = {"max_hp": max_hp, "max_sp": max_sp, "atk": atk, "matk": matk,
                "defense": defense, "mdef": mdef, "hit": hit, "flee": flee,
                "crit": crit}
-    card_ids = [cid for piece in snap.equipped for cid in piece.card_ids]
-    _apply_card_effects(content, card_ids, derived)
+    combat_mods = _apply_card_effects(content, snap.equipped, derived)
+
+    # 攻擊屬性：武器本身屬性 → 附魔卡覆蓋
+    weapon = next((content.equipment.get(p.equipment_id) for p in snap.equipped
+                   if content.equipment.get(p.equipment_id)
+                   and content.equipment[p.equipment_id].slot == "weapon"), None)
+    attack_element = combat_mods["atk_element"] or (
+        weapon.element if weapon else "neutral")
 
     resolved = []
     for sid, lvl in snap.learned_skills.items():
@@ -117,6 +155,10 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         is_caster=(derived["matk"] > derived["atk"]),
         soft_def=VIT // 3, soft_mdef=INT // 4,
         skills=resolved,
+        attack_element=attack_element,
+        element_resist=combat_mods["resist"],
+        race_bonus=combat_mods["race"],
+        procs=_passive_procs(content, snap.learned_skills),
         hp=snap.hp if snap.hp is not None else 0,
         sp=snap.sp if snap.sp is not None else 0,
     )

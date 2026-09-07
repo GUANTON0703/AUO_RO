@@ -16,4 +16,8 @@ def can_learn(content, character_job: str, skill_id: str, target_level: int,
         return False, "已達或超過該等級"
     if target_level - have > points_available:
         return False, "技能點不足"
+    for req_id, req_lv in (skill.requires or {}).items():
+        if current_learned.get(req_id, 0) < req_lv:
+            req_name = content.skills[req_id].name if req_id in content.skills else req_id
+            return False, f"需先點「{req_name}」到 Lv{req_lv}"
     return True, ""

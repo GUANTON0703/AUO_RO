@@ -109,12 +109,13 @@ class SkillDef(BaseModel):
     cooldown_s: float = 0.0
     effects: list[dict] = Field(default_factory=list)   # 型別化延到戰鬥引擎階段
     idle_default: dict = Field(default_factory=dict)
+    requires: dict[str, int] = Field(default_factory=dict)  # {前置技能id: 需要等級}
 
 
 class JobDef(BaseModel):
     id: str
     name: str
-    tier: Literal["novice", "first", "second"]
+    tier: Literal["novice", "first", "second", "third"]
     parent_id: str | None = None
     change_job_level: int = Field(default=10, ge=1)   # 轉入此職所需的前職 Job Level
     hp_per_level: float = Field(gt=0)
@@ -128,6 +129,7 @@ class EquipmentDef(BaseModel):
     slot: Literal["weapon", "offhand", "head", "armor", "garment", "shoes", "accessory"]
     rarity: Literal["common", "fine", "legendary"]
     stats: dict = Field(default_factory=dict)
+    element: str = "neutral"          # 武器屬性；防具留 neutral
     refinable: bool = True
     card_slots: int = Field(default=0, ge=0, le=4)
     job_ids: list[str] = Field(default_factory=list)   # 空 = 全職可用

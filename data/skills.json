@@ -1012,14 +1012,14 @@
     "id": "steal",
     "name": "偷竊",
     "job_id": "thief",
-    "kind": "active",
+    "kind": "passive",
     "max_level": 5,
     "sp_cost": [
-      6,
-      6,
-      7,
-      7,
-      8
+      0,
+      0,
+      0,
+      0,
+      0
     ],
     "cooldown_s": 0,
     "effects": [
@@ -1027,19 +1027,19 @@
         "type": "proc",
         "event": "on_hit",
         "chance_pct": [
-          20,
-          28,
-          36,
-          44,
-          52
+          6,
+          9,
+          12,
+          15,
+          18
         ],
         "effect": "steal_loot"
       }
     ],
     "idle_default": {
       "enabled": true,
-      "trigger": "every_turn",
-      "priority": 1
+      "trigger": "passive",
+      "priority": 0
     }
   },
   {
@@ -1108,6 +1108,1742 @@
       "enabled": true,
       "trigger": "passive",
       "priority": 0
+    }
+  },
+  {
+    "id": "riding_mastery",
+    "name": "騎乘精通",
+    "job_id": "knight",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "max_hp",
+        "amount": [
+          20,
+          40,
+          60,
+          80,
+          100
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "spear_mastery",
+    "name": "長矛精通",
+    "job_id": "knight",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "bowling_bash",
+    "name": "猛擊",
+    "job_id": "knight",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      14,
+      16,
+      18,
+      20,
+      22
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          160,
+          190,
+          220,
+          250,
+          280
+        ],
+        "hits": [
+          2,
+          2,
+          2,
+          2,
+          2
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "bash": 5
+    }
+  },
+  {
+    "id": "spear_boomerang",
+    "name": "拋擲長矛",
+    "job_id": "knight",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "neutral",
+        "power_pct": [
+          140,
+          170,
+          200,
+          230,
+          260
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "twohand_quicken",
+    "name": "二刀加速",
+    "job_id": "knight",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      20,
+      22,
+      24,
+      26,
+      28
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "aspd": [
+            10,
+            15,
+            20,
+            25,
+            30
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "shield_charge",
+    "name": "盾牌衝撞",
+    "job_id": "knight",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          130,
+          150,
+          170,
+          190,
+          210
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "brandish_spear",
+    "name": "氣絕劍",
+    "job_id": "knight",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      18,
+      21,
+      24,
+      27,
+      30
+    ],
+    "cooldown_s": 4,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "neutral",
+        "power_pct": [
+          200,
+          240,
+          280,
+          320,
+          360
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "spear_mastery": 3
+    }
+  },
+  {
+    "id": "auto_berserk",
+    "name": "自動狂暴",
+    "job_id": "knight",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      8,
+      8,
+      8,
+      8
+    ],
+    "cooldown_s": 6,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "atk": [
+            15,
+            20,
+            25,
+            30,
+            35
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_50",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "frost_armor",
+    "name": "寒冰盾",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      20,
+      23,
+      26,
+      29,
+      32
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "mdef": [
+            3,
+            5,
+            7,
+            9,
+            11
+          ]
+        },
+        "duration_s": 90
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "amplify_magic",
+    "name": "放大魔力",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      18,
+      20,
+      22,
+      24,
+      26
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "matk": [
+            10,
+            15,
+            20,
+            25,
+            30
+          ]
+        },
+        "duration_s": 90
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "jupitel_thunder",
+    "name": "朱庇特之雷",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      14,
+      17,
+      20,
+      23,
+      26
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "element": "wind",
+        "power_pct": [
+          120,
+          145,
+          170,
+          195,
+          220
+        ],
+        "hits": [
+          1,
+          2,
+          2,
+          3,
+          3
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    },
+    "requires": {
+      "lightning_bolt": 1
+    }
+  },
+  {
+    "id": "water_ball",
+    "name": "水球",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      15,
+      18,
+      21,
+      24,
+      27
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "element": "water",
+        "power_pct": [
+          130,
+          160,
+          190,
+          220,
+          250
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    },
+    "requires": {
+      "cold_bolt": 1
+    }
+  },
+  {
+    "id": "quagmire",
+    "name": "寂靜術",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "agi",
+        "pct": [
+          -10,
+          -15,
+          -20,
+          -25,
+          -30
+        ],
+        "duration_s": 20
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "heavens_drive",
+    "name": "地雷震",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      18,
+      21,
+      24,
+      27,
+      30
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "earth",
+        "power_pct": [
+          110,
+          130,
+          150,
+          170,
+          190
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "storm_gust",
+    "name": "暴風雪",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      28,
+      32,
+      36,
+      40,
+      44
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "water",
+        "power_pct": [
+          140,
+          170,
+          200,
+          230,
+          260
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "cold_bolt": 5
+    }
+  },
+  {
+    "id": "meteor_storm",
+    "name": "隕石術",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      30,
+      35,
+      40,
+      45,
+      50
+    ],
+    "cooldown_s": 4,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "fire",
+        "power_pct": [
+          150,
+          185,
+          220,
+          255,
+          290
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "fire_bolt": 5
+    }
+  },
+  {
+    "id": "beast_bane",
+    "name": "野獸剋星",
+    "job_id": "hunter",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "true_sight",
+    "name": "鷹眼銳利",
+    "job_id": "hunter",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "crit",
+        "amount": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "blitz_beat",
+    "name": "鷹眼連擊",
+    "job_id": "hunter",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "proc",
+        "event": "on_attack",
+        "chance_pct": [
+          15,
+          20,
+          25,
+          30,
+          35
+        ],
+        "effect": "extra_hit"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "owls_eye": 1
+    }
+  },
+  {
+    "id": "steel_crow",
+    "name": "鋼鐵烏鴉",
+    "job_id": "hunter",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "blitz_beat": 1
+    }
+  },
+  {
+    "id": "charge_arrow",
+    "name": "蓄力箭",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          150,
+          175,
+          200,
+          225,
+          250
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "double_strafe": 1
+    }
+  },
+  {
+    "id": "sharp_shooting",
+    "name": "銳利射擊",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      16,
+      19,
+      22,
+      25,
+      28
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "neutral",
+        "power_pct": [
+          180,
+          215,
+          250,
+          285,
+          320
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "double_strafe": 5
+    }
+  },
+  {
+    "id": "phantasmic_arrow",
+    "name": "魅影箭",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "ghost",
+        "power_pct": [
+          120,
+          140,
+          160,
+          180,
+          200
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "wind_walk",
+    "name": "順風",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      20,
+      23,
+      26,
+      29,
+      32
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "agi": [
+            2,
+            4,
+            6,
+            8,
+            10
+          ],
+          "flee": [
+            5,
+            8,
+            11,
+            14,
+            17
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {
+      "improve_concentration": 1
+    }
+  },
+  {
+    "id": "magnificat",
+    "name": "主禱文",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      16,
+      18,
+      20,
+      22,
+      24
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "max_sp": [
+            10,
+            20,
+            30,
+            40,
+            50
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "gloria",
+    "name": "榮光",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      16,
+      18,
+      20,
+      22,
+      24
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "luk": [
+            5,
+            8,
+            11,
+            14,
+            17
+          ]
+        },
+        "duration_s": 30
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "slow_poison",
+    "name": "緩速毒",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "vit": [
+            2,
+            4,
+            6,
+            8,
+            10
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "kyrie_eleison",
+    "name": "天使之護",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      20,
+      23,
+      26,
+      29,
+      32
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "mdef": [
+            4,
+            6,
+            8,
+            10,
+            12
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_50",
+      "priority": 2
+    },
+    "requires": {
+      "blessing": 1
+    }
+  },
+  {
+    "id": "lex_divina",
+    "name": "破咒術",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "mdef",
+        "pct": [
+          -10,
+          -14,
+          -18,
+          -22,
+          -26
+        ],
+        "duration_s": 20
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "aspersio",
+    "name": "聖靈之光",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      14,
+      17,
+      20,
+      23,
+      26
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "element": "holy",
+        "power_pct": [
+          130,
+          160,
+          190,
+          220,
+          250
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    },
+    "requires": {
+      "holy_light": 3
+    }
+  },
+  {
+    "id": "turn_undead",
+    "name": "驅逐惡魔",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      18,
+      20,
+      22,
+      24,
+      26
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "element": "holy",
+        "power_pct": [
+          160,
+          200,
+          240,
+          280,
+          320
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "heal": 3
+    }
+  },
+  {
+    "id": "magnus_exorcismus",
+    "name": "大判決",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      30,
+      35,
+      40,
+      45,
+      50
+    ],
+    "cooldown_s": 5,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "holy",
+        "power_pct": [
+          150,
+          185,
+          220,
+          255,
+          290
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "turn_undead": 1
+    }
+  },
+  {
+    "id": "weapon_perfection",
+    "name": "武器完美",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "skin_tempering",
+    "name": "金剛之身",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "defense",
+        "amount": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "smith_mastery",
+    "name": "鑄造精通",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "power_thrust",
+    "name": "極限精神",
+    "job_id": "blacksmith",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      16,
+      18,
+      20,
+      22,
+      24
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "atk": [
+            10,
+            15,
+            20,
+            25,
+            30
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "adrenaline_rush",
+    "name": "腎上腺素",
+    "job_id": "blacksmith",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      20,
+      23,
+      26,
+      29,
+      32
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "aspd": [
+            10,
+            15,
+            20,
+            25,
+            30
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {
+      "mammonite": 1
+    }
+  },
+  {
+    "id": "over_thrust",
+    "name": "狂暴之力",
+    "job_id": "blacksmith",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      24,
+      27,
+      30,
+      33,
+      36
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "atk": [
+            20,
+            28,
+            36,
+            44,
+            52
+          ]
+        },
+        "duration_s": 90
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 2
+    },
+    "requires": {
+      "power_thrust": 3
+    }
+  },
+  {
+    "id": "maximize_power",
+    "name": "全力揮擊",
+    "job_id": "blacksmith",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      8,
+      8,
+      8,
+      8
+    ],
+    "cooldown_s": 4,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "atk": [
+            12,
+            16,
+            20,
+            24,
+            28
+          ]
+        },
+        "duration_s": 30
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "hammer_fall",
+    "name": "鎚擊",
+    "job_id": "blacksmith",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "flee",
+        "pct": [
+          -15,
+          -20,
+          -25,
+          -30,
+          -35
+        ],
+        "duration_s": 10
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "katar_mastery",
+    "name": "匕首精通",
+    "job_id": "assassin",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "dual_wield",
+    "name": "左右手互擊",
+    "job_id": "assassin",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "enchant_poison",
+    "name": "附毒術",
+    "job_id": "assassin",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      14,
+      16,
+      18,
+      20,
+      22
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "atk": [
+            6,
+            9,
+            12,
+            15,
+            18
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {
+      "envenom": 1
+    }
+  },
+  {
+    "id": "cloaking",
+    "name": "隱匿",
+    "job_id": "assassin",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "flee": [
+            15,
+            20,
+            25,
+            30,
+            35
+          ]
+        },
+        "duration_s": 30
+      }
+    ],
+    "idle_default": {
+      "enabled": false,
+      "trigger": "hp_below_30",
+      "priority": 2
+    },
+    "requires": {
+      "hiding": 1
+    }
+  },
+  {
+    "id": "sonic_blow",
+    "name": "音速衝擊",
+    "job_id": "assassin",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      16,
+      19,
+      22,
+      25,
+      28
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          80,
+          95,
+          110,
+          125,
+          140
+        ],
+        "hits": [
+          4,
+          4,
+          4,
+          4,
+          4
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "double_attack": 1
+    }
+  },
+  {
+    "id": "grimtooth",
+    "name": "地毒牙",
+    "job_id": "assassin",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "poison",
+        "power_pct": [
+          110,
+          130,
+          150,
+          170,
+          190
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "venom_dust",
+    "name": "毒粉",
+    "job_id": "assassin",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "defense",
+        "pct": [
+          -8,
+          -11,
+          -14,
+          -17,
+          -20
+        ],
+        "duration_s": 20
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {
+      "envenom": 1
+    }
+  },
+  {
+    "id": "venom_splasher",
+    "name": "毒液噴濺",
+    "job_id": "assassin",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      18,
+      21,
+      24,
+      27,
+      30
+    ],
+    "cooldown_s": 4,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "poison",
+        "power_pct": [
+          130,
+          160,
+          190,
+          220,
+          250
+        ],
+        "debuff": "poison"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "envenom": 3
     }
   }
 ]
