@@ -79,4 +79,26 @@ def create_app() -> FastAPI:
     def health() -> dict:
         return {"status": "ok"}
 
+    _mount_web(app)
     return app
+
+
+def _mount_web(app: FastAPI) -> None:
+    """有 web/ 目錄就把網頁前端掛在根路徑（同源、免 CORS）。"""
+    from pathlib import Path
+
+    web_dir = Path(__file__).resolve().parent.parent / "web"
+    if not (web_dir / "index.html").exists():
+        return
+    from fastapi.staticfiles import StaticFiles
+    from starlette.requests import Request
+
+    @app.middleware("http")
+    async def _no_stale_assets(request: Request, call_next):
+        resp = await call_next(request)
+        if not request.url.path.startswith("/api"):
+            # 前端更新後使用者不用手動清快取；仍走 ETag/Last-Modified 條件請求
+            resp.headers["Cache-Control"] = "no-cache"
+        return resp
+
+    app.mount("/", StaticFiles(directory=str(web_dir), html=True), name="web")

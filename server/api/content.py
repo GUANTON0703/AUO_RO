@@ -28,6 +28,23 @@ def _get(kind: str, item_id: str):
     return item
 
 
+@router.get("/catalog")
+def catalog(account_id: CurrentAccount):
+    """網頁前端一次抓齊靜態內容（地圖 / 怪 / 物品 / 裝備 / 卡 / 職業 / 技能）。"""
+    def dump(coll):
+        return {k: v.model_dump(mode="json") for k, v in coll.items()}
+    return {
+        "maps": dump(_content.maps),
+        "monsters": dump(_content.monsters),
+        "mvps": dump(_content.mvps),
+        "items": dump(_content.items),
+        "equipment": dump(_content.equipment),
+        "cards": dump(_content.cards),
+        "jobs": dump(_content.jobs),
+        "skills": dump(_content.skills),
+    }
+
+
 @router.get("/monsters/{monster_id}")
 def monster_detail(monster_id: str, account_id: CurrentAccount):
     monster = _content.monsters.get(monster_id) or _content.mvps.get(monster_id)

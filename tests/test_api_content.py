@@ -20,3 +20,14 @@ def test_equipment_details_include_player_requirement_state(client, auth, db_hel
     req = result.json()["requirements"]
     assert req["met"] is False
     assert req["reasons"]
+
+
+def test_catalog_returns_full_content_pack(client, auth):
+    _token, h, _account = auth
+    r = client.get("/api/content/catalog", headers=h)
+    assert r.status_code == 200
+    body = r.json()
+    for key in ("maps", "monsters", "items", "equipment", "cards", "jobs", "skills"):
+        assert key in body and body[key]
+    assert body["maps"]["prontera_east_gate"]["name"]
+    assert body["monsters"]["poring"]["name"] == "波利"
