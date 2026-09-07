@@ -113,6 +113,8 @@ Screens.home = {
     this._stopDrip();
     this._stopChat();
     this._worldSeen = 0;
+    this._dmSeen = 0;
+    this._dmOpen = null;
     this._queue = [];
     this._shown = [];
     this._lastBatch = null;
@@ -437,20 +439,37 @@ Screens.home = {
     };
   },
 
-  // ---- 世界頻道（狀態頁可收合，預設關）----
+  // ---- 頻道（狀態頁可收合，預設關；世界 / 私人分頁）----
   _worldChatOpen() {
     try { return localStorage.getItem("rotxt_worldchat_open") === "1"; }
     catch (_) { return false; }
   },
+  _chatTabPref() {
+    try { return localStorage.getItem("rotxt_chattab") === "dm" ? "dm" : "world"; }
+    catch (_) { return "world"; }
+  },
   _worldChatHtml() {
     const open = this._worldChatOpen();
+    const tab = this._chatTab || (this._chatTab = this._chatTabPref());
+    const tb = (id, zh) =>
+      `<button class="btn small ${tab === id ? "primary" : ""}" data-ctab="${id}">${zh}</button>`;
     return `<details class="card" id="world-box"${open ? " open" : ""}>` +
-      `<summary style="cursor:pointer;font-weight:600">世界頻道</summary>` +
-      `<div class="log" id="home-world-log"><span class="dim">${
-        open ? "載入中…" : "展開以顯示"}</span></div>` +
-      `<div class="row" style="margin-top:8px">` +
-      `<input id="home-world-input" placeholder="說點什麼…" maxlength="200" style="flex:1">` +
-      `<button class="btn primary" id="home-world-send">送出</button></div>` +
+      `<summary style="cursor:pointer;font-weight:600">頻道</summary>` +
+      `<div class="row tight" style="margin:6px 0">${tb("world", "世界")}${tb("dm", "私人")}</div>` +
+      `<div id="cpane-world"${tab === "dm" ? " hidden" : ""}>` +
+        `<div class="log" id="home-world-log"><span class="dim">${
+          open ? "載入中…" : "展開以顯示"}</span></div>` +
+        `<div class="row" style="margin-top:8px">` +
+        `<input id="home-world-input" placeholder="說點什麼…" maxlength="200" style="flex:1">` +
+        `<button class="btn primary" id="home-world-send">送出</button></div>` +
+      `</div>` +
+      `<div id="cpane-dm"${tab === "world" ? " hidden" : ""}>` +
+        `<div id="dm-body"><span class="dim">${open ? "載入中…" : "展開以顯示"}</span></div>` +
+        `<div class="row" style="margin-top:8px">` +
+        `<input id="dm-to" placeholder="對方角色名" maxlength="24" style="flex:1">` +
+        `<input id="dm-text" placeholder="密語內容" maxlength="200" style="flex:2">` +
+        `<button class="btn primary" id="dm-send">送出</button></div>` +
+      `</div>` +
       `</details>`;
   },
   _wireWorldChat() {
@@ -461,6 +480,9 @@ Screens.home = {
       if (box.open) this._startChat();
       else this._stopChat();
     };
+    document.querySelectorAll("#world-box [data-ctab]").forEach((b) => {
+      b.onclick = () => this._switchChatTab(b.dataset.ctab);
+    });
     const inp = document.querySelector("#home-world-input");
     const btn = document.querySelector("#home-world-send");
     if (inp && btn) {
@@ -479,28 +501,86 @@ Screens.home = {
       btn.onclick = send;
       inp.onkeydown = (e) => { if (e.key === "Enter") send(); };
     }
+    const dto = document.querySelector("#dm-to");
+    const dtx = document.querySelector("#dm-text");
+    const dsend = document.querySelector("#dm-send");
+    if (dto && dtx && dsend) {
+      const send = async () => {
+        if (this._wsending) return;
+        const to = dto.value.trim(), t = dtx.value.trim();
+        if (!to || !t) return;
+        this._wsending = true; dsend.disabled = true;
+        try {
+          const m = await API.whisper(to, t);
+          dtx.value = "";
+          this._dmOpen = m.channel;              // 送出後直接進到這段對話
+          this._dmSeen = 0;
+          await this._dmTick();
+        } catch (e) { App.toast(e.detail || "送出失敗", true); }
+        this._wsending = false; dsend.disabled = false;
+      };
+      dsend.onclick = send;
+      dtx.onkeydown = (e) => { if (e.key === "Enter") send(); };
+    }
+    const dmBody = document.querySelector("#dm-body");
+    if (dmBody) {
+      dmBody.onclick = (e) => {
+        const back = e.target.closest("[data-dm-back]");
+        if (back) { this._dmOpen = null; this._dmSeen = 0; this._dmTick(); return; }
+        const row = e.target.closest("[data-dm-channel]");
+        if (row) {
+          this._dmOpen = row.dataset.dmChannel;
+          this._dmSeen = 0;
+          const to = document.querySelector("#dm-to");
+          if (to) to.value = row.dataset.dmName || "";
+          this._dmTick();
+        }
+      };
+    }
     if (box.open) this._startChat();
+  },
+  _switchChatTab(tab) {
+    if (tab === this._chatTab) return;
+    this._chatTab = tab;
+    try { localStorage.setItem("rotxt_chattab", tab); } catch (_) {}
+    document.querySelectorAll("#world-box [data-ctab]").forEach((b) =>
+      b.classList.toggle("primary", b.dataset.ctab === tab));
+    const w = document.querySelector("#cpane-world");
+    const d = document.querySelector("#cpane-dm");
+    if (w) w.hidden = tab !== "world";
+    if (d) d.hidden = tab !== "dm";
+    this._startChat();
   },
   _startChat() {
     this._stopChat();
     this._chatGen = (this._chatGen || 0) + 1;
     this._worldSeen = 0;
+    this._dmSeen = 0;
+    this._dmOpen = null;
     const log = document.querySelector("#home-world-log");
     if (log) { log.innerHTML = "<span class='dim'>載入中…</span>"; log.dataset.empty = "1"; }
-    this._chatTick();
-    this._chatTimer = setInterval(() => this._chatTick(), 4000);
+    const db = document.querySelector("#dm-body");
+    if (db) db.innerHTML = "<span class='dim'>載入中…</span>";
+    this._pollChannel();
+    this._chatTimer = setInterval(() => this._pollChannel(), 4000);
   },
   _stopChat() {
     this._chatGen = (this._chatGen || 0) + 1;   // 作廢進行中的請求
     if (this._chatTimer) { clearInterval(this._chatTimer); this._chatTimer = null; }
     this._chatBusy = false;
   },
+  _pollChannel() {
+    return this._chatTab === "dm" ? this._dmTick() : this._chatTick();
+  },
+  _chatVisible() {
+    const box = document.querySelector("#world-box");
+    return S.view === "home" && box && box.open;
+  },
   async _chatTick() {
     if (this._chatBusy) return;                 // 上一輪還沒回來就跳過，不重疊
     const gen = this._chatGen;
-    const box = document.querySelector("#world-box");
     const log = document.querySelector("#home-world-log");
-    if (S.view !== "home" || !box || !box.open || !log) return;
+    if (!this._chatVisible() || !log) return;
     this._chatBusy = true;
     try {
       const first = !this._worldSeen;
@@ -508,7 +588,7 @@ Screens.home = {
         ? await API.chatRecent("world", 25)
         : await API.chatSince("world", this._worldSeen);
       // 請求回來時若這輪已被作廢（切頁 / 重開），整批丟掉，不動畫面也不動 _worldSeen
-      if (gen === this._chatGen && S.view === "home" && box.open) {
+      if (gen === this._chatGen && this._chatVisible() && this._chatTab === "world") {
         for (const m of msgs) this._worldSeen = Math.max(this._worldSeen || 0, m.id);
         const row = (m) =>
           `<div><span class="dim">${esc(m.character_name)}：</span>${esc(m.text)}</div>`;
@@ -524,6 +604,52 @@ Screens.home = {
       }
     } catch (_) {}
     if (gen === this._chatGen) this._chatBusy = false;   // 只有當前這輪能放開鎖
+  },
+  async _dmTick() {
+    if (this._chatBusy) return;
+    const gen = this._chatGen;
+    const body = document.querySelector("#dm-body");
+    if (!this._chatVisible() || !body) return;
+    this._chatBusy = true;
+    try {
+      if (this._dmOpen) {
+        const first = !this._dmSeen;
+        const msgs = first
+          ? await API.chatRecent(this._dmOpen, 30)
+          : await API.chatSince(this._dmOpen, this._dmSeen);
+        if (gen === this._chatGen && this._chatVisible()
+            && this._chatTab === "dm" && this._dmOpen) {
+          for (const m of msgs) this._dmSeen = Math.max(this._dmSeen || 0, m.id);
+          const mine = (n) => n === (S.char && S.char.name);
+          const row = (m) => `<div><span class="dim">${
+            mine(m.character_name) ? "我" : esc(m.character_name)}：</span>${esc(m.text)}</div>`;
+          if (first) {
+            body.innerHTML = `<div><a href="#" data-dm-back>← 返回私訊列表</a></div>` +
+              `<div class="log" id="dm-log">${
+                msgs.length ? msgs.map(row).join("") : "<span class='dim'>還沒有訊息</span>"}</div>`;
+          } else if (msgs.length) {
+            const dl = document.querySelector("#dm-log");
+            if (dl) {
+              dl.insertAdjacentHTML("beforeend", msgs.map(row).join(""));
+              while (dl.children.length > 80) dl.removeChild(dl.firstChild);
+            }
+          }
+          const dl = document.querySelector("#dm-log");
+          if (dl) dl.scrollTop = dl.scrollHeight;
+        }
+      } else {
+        const threads = await API.chatThreads();
+        if (gen === this._chatGen && this._chatVisible()
+            && this._chatTab === "dm" && !this._dmOpen) {
+          body.innerHTML = threads.length
+            ? threads.map((t) => `<div class="item" data-dm-channel="${esc(t.channel)}" ` +
+                `data-dm-name="${esc(t.other_name)}" style="cursor:pointer">` +
+                `<div>${esc(t.other_name)}<div class="sub">${esc(t.last_text)}</div></div></div>`).join("")
+            : "<span class='dim'>還沒有私訊。下面輸入對方角色名開聊。</span>";
+        }
+      }
+    } catch (_) {}
+    if (gen === this._chatGen) this._chatBusy = false;
   },
 
   _logLines(events) {

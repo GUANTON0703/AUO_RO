@@ -95,6 +95,8 @@ const API = (() => {
     chatRecent: (channel, n) =>
       get(`/chat?channel=${encodeURIComponent(channel)}&recent=${n || 30}`),
     chatPost: (channel, text) => post("/chat", { channel, text }),
+    chatThreads: () => get("/chat/threads"),
+    whisper: (to_name, text) => post("/chat/whisper", { to_name, text }),
     guildMine: () => get("/guild/mine"),
     guildList: () => get("/guild"),
     guildCreate: (name) => post("/guild", { name }),
