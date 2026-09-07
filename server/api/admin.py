@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -26,6 +28,10 @@ class MultipliersRequest(BaseModel):
 class HuntSettingsRequest(BaseModel):
     settle_floor_seconds: float = Field(ge=1, le=600)
     huntable_win_rate: float = Field(ge=0, le=1)
+
+
+class AnnouncementRequest(BaseModel):
+    text: str = Field(default="", max_length=500)
 
 
 _SETTING_DEFAULTS = {
@@ -93,6 +99,24 @@ def set_hunt_settings(body: HuntSettingsRequest, _: GMAccount):
         "settle_floor_seconds": body.settle_floor_seconds,
         "huntable_win_rate": body.huntable_win_rate,
     }
+
+
+@router.put("/settings/announcement")
+def set_announcement(body: AnnouncementRequest, _: GMAccount):
+    text = body.text.strip()
+    now = datetime.now(timezone.utc).isoformat()
+    with connection.transaction() as conn:
+        if text:
+            conn.executemany(
+                "INSERT INTO server_settings(key, value) VALUES (?, ?) "
+                "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+                [("announcement", text), ("announcement_at", now)],
+            )
+        else:
+            conn.execute(
+                "DELETE FROM server_settings WHERE key IN ('announcement', 'announcement_at')"
+            )
+    return {"text": text, "updated_at": now if text else None}
 
 
 @router.get("/settings")

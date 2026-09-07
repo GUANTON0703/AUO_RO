@@ -311,6 +311,11 @@
           <input id="gm-je" type="number" placeholder="job_exp" style="flex:1">
           <button class="btn small" id="gm-xp">設經驗</button>
         </div>
+        <div class="section-title" style="margin-top:10px"><span class="k">公告</span></div>
+        <div class="row">
+          <input id="gm-ann" placeholder="留空 = 清除公告" maxlength="500" style="flex:1">
+          <button class="btn small" id="gm-ann-save">發布</button>
+        </div>
         <div class="section-title" style="margin-top:10px"><span class="k">線上玩家</span>
           <button class="btn small ghost" id="gm-online-refresh">刷新</button></div>
         <div class="list" id="gm-online"></div>
@@ -370,9 +375,19 @@
         } catch (e) { App.toast(e.detail || "失敗", true); }
       };
       document.querySelector("#gm-online-refresh").onclick = showOnline;
+      document.querySelector("#gm-ann-save").onclick = async () => {
+        try {
+          const r = await API.adminSetAnnouncement(document.querySelector("#gm-ann").value);
+          App.toast(r.text ? "公告已發布" : "公告已清除");
+        } catch (e) { App.toast(e.detail || "失敗", true); }
+      };
 
       await showSettings();
       await showOnline();
+      API.announcement().then((a) => {
+        const el = document.querySelector("#gm-ann");
+        if (el && a) el.value = a.text || "";
+      }).catch(() => {});
     },
   };
 })();

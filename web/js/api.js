@@ -116,6 +116,8 @@ const API = (() => {
 
     // content / admin
     catalog: () => get("/content/catalog"),
+    announcement: () => get("/announcement"),
+    adminSetAnnouncement: (text) => put("/admin/settings/announcement", { text }),
     adminSettings: () => get("/admin/settings"),
     adminSetMultipliers: (experience, drop, zeny) =>
       put("/admin/settings/multipliers", { experience, drop, zeny }),

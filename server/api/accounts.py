@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from server.auth import invites, passwords, tokens
 from server.auth.dependencies import CurrentAccount, TokenAndAccount
 from server.config import get_settings
+from server.db import connection
 from server.repositories import accounts as accounts_repo
 from shared.models import AccountPublic
 
@@ -31,6 +32,11 @@ class MeResponse(BaseModel):
     username: str
     role: str
     is_gm: bool
+
+
+class AnnouncementResponse(BaseModel):
+    text: str
+    updated_at: str | None = None
 
 
 @router.post("/accounts", status_code=201, response_model=AccountPublic)
@@ -72,6 +78,17 @@ def me(account_id: CurrentAccount):
         role=role,
         is_gm=role == "GM遊戲管理者",
     )
+
+
+@router.get("/announcement", response_model=AnnouncementResponse)
+def get_announcement(_: CurrentAccount):
+    with connection.get_connection() as conn:
+        rows = dict(conn.execute(
+            "SELECT key, value FROM server_settings "
+            "WHERE key IN ('announcement', 'announcement_at')"
+        ).fetchall())
+    return AnnouncementResponse(text=rows.get("announcement", ""),
+                                updated_at=rows.get("announcement_at"))
 
 
 @router.delete("/sessions", status_code=204)

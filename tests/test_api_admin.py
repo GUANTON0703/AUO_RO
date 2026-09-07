@@ -183,3 +183,29 @@ def test_zeny_multiplier_scales_hunt_income(client, auth, db_helpers):
     assert body["kills"] > 0
     # 10x：每殺一隻 zeny 明顯高於基礎值（基礎約 level*1.5+base_exp*0.3）
     assert body["zeny"] > body["kills"] * 30
+
+
+def test_announcement_set_by_gm_read_by_anyone(client):
+    _make_gm("gm_announce")
+    player_id = _make_account("plain_reader")
+    gm_h = {"Authorization": f"Bearer {_login(client, 'gm_announce').json()['token']}"}
+    pl_h = {"Authorization": f"Bearer {_login(client, 'plain_reader').json()['token']}"}
+
+    # 一開始沒有公告
+    assert client.get("/api/announcement", headers=pl_h).json()["text"] == ""
+
+    # 一般玩家不能設定公告
+    assert client.put("/api/admin/settings/announcement",
+                      json={"text": "偷改"}, headers=pl_h).status_code == 403
+
+    # GM 設定後，任何登入帳號都讀得到
+    r = client.put("/api/admin/settings/announcement",
+                   json={"text": "今晚 8 點雙倍經驗"}, headers=gm_h)
+    assert r.status_code == 200
+    got = client.get("/api/announcement", headers=pl_h).json()
+    assert got["text"] == "今晚 8 點雙倍經驗"
+    assert got["updated_at"]
+
+    # 空字串 = 清掉公告
+    client.put("/api/admin/settings/announcement", json={"text": ""}, headers=gm_h)
+    assert client.get("/api/announcement", headers=pl_h).json()["text"] == ""

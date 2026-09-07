@@ -125,6 +125,7 @@ Screens.home = {
     this._sheet = await API.sheet(S.char.id).catch(() => null);
     S._sheet = this._sheet;
     this._strategy = await API.huntStrategy(S.char.id).catch(() => null);
+    this._announce = await API.announcement().catch(() => null);
     let status = null;
     try { status = await API.huntStatus(); } catch (e) { if (e.status !== 409) throw e; }
     // status 這一趟可能撿到裝備，所以裝備清單在它之後才抓
@@ -363,7 +364,13 @@ Screens.home = {
     const hp = status?.character?.hunt_hp ?? sheet.hunt_hp ?? sheet.max_hp ?? 0;
     const sp = status?.character?.hunt_sp ?? sheet.hunt_sp ?? sheet.max_sp ?? 0;
 
-    let html = `
+    const ann = this._announce && this._announce.text;
+    let html = ann
+      ? `<div class="card" style="border-left:3px solid var(--accent)">
+           <div class="sub" style="font-weight:600">📢 公告</div>
+           <div style="white-space:pre-wrap;margin-top:4px">${esc(ann)}</div></div>`
+      : "";
+    html += `
       <div class="card">
         <div class="section-title"><h2>${esc(c.name)}</h2>
           <span class="pill">${esc(jobName(c.job_id))}</span></div>
