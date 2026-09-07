@@ -407,6 +407,9 @@ Screens.home = {
         else out.push(`<span class="${e.crit ? "crit" : "hit"}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${e.damage}${e.crit ? " 暴擊!" : ""}</span>`);
       } else if (e.kind === "kill") {
         out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}</span>`);
+      } else if (e.kind === "heal") {
+        const how = e.source === "potion" ? "喝藥水" : "施放治療";
+        out.push(`<span class="dim">  ${esc(e.actor)} ${how} 回復 ${e.amount}</span>`);
       } else if (e.kind === "kill_batch" && !bbb) {
         out.push(`<span class="kill">擊殺 ${esc(e.monster_name)} ×${e.count}　+經驗 ${e.base_exp}/${e.job_exp}　+Zeny ${e.zeny}</span>`);
       } else if (e.kind === "potion_used") {

@@ -35,6 +35,7 @@ class HealEvent(CombatEvent):
     actor: str
     target: str
     amount: int
+    source: str = "skill"      # "skill" 或 "potion"
 
     def __post_init__(self):
         self.kind = "heal"

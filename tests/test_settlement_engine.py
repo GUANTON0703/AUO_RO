@@ -109,6 +109,24 @@ def test_potions_consumed_and_can_run_out():
         assert r.retreated is True
 
 
+def test_potions_drunk_mid_fight_prevent_one_shot_death():
+    # 脆皮英雄打會痛的怪：沒水一場就被打死，有水就能靠喝水撐過去
+    c = load_content()
+    foe = c.get_monster("wolf")
+    kw = dict(elapsed_seconds=180, cfg=HuntConfig(), offline=False, pity_in={})
+
+    dry = settle(_hero(max_hp=260, defense=0, aspd=120), foe,
+                 rng=random.Random(7), potion_item_id=None, potion_count=0, **kw)
+    wet = settle(_hero(max_hp=260, defense=0, aspd=120), foe,
+                 rng=random.Random(7), potion_item_id="red_potion",
+                 potion_heal=200, potion_count=300, **kw)
+
+    assert wet.kills > dry.kills
+    assert wet.potions_used > 0
+    assert any(getattr(e, "kind", "") == "heal" and getattr(e, "source", "") == "potion"
+               for e in wet.events)
+
+
 def test_zeny_and_drops_accumulate():
     c = load_content()
     m = c.get_monster("green_cotton_worm")

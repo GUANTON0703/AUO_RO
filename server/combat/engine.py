@@ -1,7 +1,7 @@
 import random
 from dataclasses import dataclass, field
 
-from server.combat.events import AttackEvent, FledEvent, KillEvent
+from server.combat.events import AttackEvent, FledEvent, HealEvent, KillEvent
 from server.combat.formulas import (
     CRIT_MULTIPLIER, attacks_this_round, crit_chance, hit_chance, physical_damage,
 )
@@ -20,6 +20,7 @@ class FightResult:
     winner_hp: int
     loser_hp: int
     events: list = field(default_factory=list)
+    potions_used: int = 0   # 戰鬥中喝掉的補品數（只有玩家 a 會喝）
 
 
 def _pick_skill(c):
@@ -78,9 +79,26 @@ def _take_turn(actor, foe, rng, events):
 
 
 def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAULT,
-                   flee_hp_frac: float = 0.0) -> FightResult:
+                   flee_hp_frac: float = 0.0, *, a_potions: int = 0,
+                   a_potion_heal: int = 0, a_potion_hp_frac: float = 0.0) -> FightResult:
     events: list = []
     rounds = 0
+    potions_used = 0
+
+    def _predrink(actor):
+        """輪到玩家行動前，血量低於門檻就連喝補品到門檻以上或喝完。"""
+        nonlocal potions_used
+        if actor is not a or a_potion_heal <= 0 or not a.alive:
+            return
+        healed = 0
+        while potions_used < a_potions and a.hp < a.max_hp * a_potion_hp_frac:
+            before = a.hp
+            a.heal(a_potion_heal)
+            healed += a.hp - before
+            potions_used += 1
+        if healed > 0:
+            events.append(HealEvent(a.name, a.name, healed, source="potion"))
+
     # 先手：aspd 高者先，平手 a 先
     first, second = (a, b) if a.aspd >= b.aspd else (b, a)
     while a.alive and b.alive and rounds < max_rounds:
@@ -94,13 +112,18 @@ def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAUL
             break
         if flee_hp_frac > 0 and a.alive and a.hp < a.max_hp * flee_hp_frac:
             events.append(FledEvent(actor=a.name, hp=a.hp))
-            return FightResult(None, None, "fled", rounds, a.hp, b.hp, events)
+            return FightResult(None, None, "fled", rounds, a.hp, b.hp, events,
+                               potions_used)
+        _predrink(first)
         _take_turn(first, second, rng, events)
         if second.alive:
+            _predrink(second)
             _take_turn(second, first, rng, events)
 
     if a.alive and b.alive:
-        return FightResult(None, None, "stalemate", rounds, a.hp, b.hp, events)
+        return FightResult(None, None, "stalemate", rounds, a.hp, b.hp, events,
+                           potions_used)
     winner, loser = (a, b) if a.alive else (b, a)
     events.append(KillEvent(actor=winner.name, target=loser.name))
-    return FightResult(winner.name, loser.name, "win", rounds, winner.hp, loser.hp, events)
+    return FightResult(winner.name, loser.name, "win", rounds, winner.hp,
+                       loser.hp, events, potions_used)

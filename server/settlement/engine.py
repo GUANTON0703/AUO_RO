@@ -195,11 +195,19 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
         p.statuses = [s for s in p.statuses if s.kind != "dot"]
         for s in p.skills:
             s._cd_left = 0
-        r = simulate_fight(p, foe, rng)
+        # 補品也能在戰鬥中喝：血量掉到門檻以下就補，撐過那些一場就會被打死的怪
+        r = simulate_fight(p, foe, rng, a_potions=potions_left,
+                           a_potion_heal=potion_heal,
+                           a_potion_hp_frac=cfg.potion_hp_threshold)
         combat_events.extend(r.events)
+        potions_left -= r.potions_used
+        potions_used += r.potions_used
         elapsed += time_per_kill
         if r.winner == p.name:
             kills += 1
+        elif r.potions_used > 0 and potions_left <= 0:
+            retreated, reason = True, "補品用盡，血量見底"
+            break
         else:
             retreated, reason = True, "戰鬥中被擊倒"
             break
