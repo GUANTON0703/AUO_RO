@@ -87,7 +87,7 @@ class MonsterDef(BaseModel):
 class MapDef(BaseModel):
     id: str
     name: str
-    town: Literal["prontera", "morroc"]
+    town: Literal["prontera", "morroc", "payon", "geffen"]
     level_range: list[int] = Field(min_length=2, max_length=2)
     monster_ids: list[str] = Field(default_factory=list)
     mvp_id: str | None = None

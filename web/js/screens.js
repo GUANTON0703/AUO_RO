@@ -19,6 +19,7 @@ const jobName = (id) => S.catalog?.jobs?.[id]?.name || id;
 const jobTier = (id) => S.catalog?.jobs?.[id]?.tier || "first";
 const monName = (id) => S.catalog?.monsters?.[id]?.name || S.catalog?.mvps?.[id]?.name || id;
 const mapName = (id) => S.catalog?.maps?.[id]?.name || id;
+const TOWN_ZH = { prontera: "普隆德拉", morroc: "摩洛克", payon: "斐揚", geffen: "吉芬" };
 const itemName = (id) =>
   S.catalog?.items?.[id]?.name || S.catalog?.equipment?.[id]?.name ||
   S.catalog?.cards?.[id]?.name || id;
@@ -690,27 +691,60 @@ Screens.home = {
 Screens.hunt = {
   async mount() {
     const bl = S.char.base_level;
-    const maps = Object.values(S.catalog.maps)
+    this._maps = Object.values(S.catalog.maps)
       .filter((m) => bl >= (m.unlock_base_level || 1))
       .sort((a, b) => (a.unlock_base_level || 1) - (b.unlock_base_level || 1));
     this._picked = new Set();
     this._mapId = null;
     this._strategy = await API.huntStrategy(S.char.id).catch(() => ({}));
 
-    let html = `<div class="card"><h3>選狩獵地圖</h3><div class="list" id="maplist">`;
-    for (const m of maps) {
-      html += `<button class="btn choice" data-map="${m.id}">
-        ${esc(m.name)}<div class="sub">解鎖 Lv ${m.unlock_base_level || 1}
-        ・${m.monster_ids.map(monName).join("、")}</div></button>`;
-    }
-    if (!maps.length) html += `<p class="muted">還沒有解鎖的地圖。</p>`;
-    html += `</div></div><div id="monsterpick"></div>` + this._strategyCard();
-    view().innerHTML = html;
+    const regions = [...new Set(this._maps.map((m) => m.town))];
+    try {
+      const saved = localStorage.getItem("rotxt_hunt_region");
+      this._region = saved && regions.includes(saved) ? saved : "";
+    } catch (_) { this._region = ""; }
 
-    view().querySelectorAll("[data-map]").forEach((b) => {
+    const regSel = regions.length > 1
+      ? `<select id="hunt-region" style="width:100%;margin-bottom:8px">` +
+        `<option value="">全部地區</option>` +
+        regions.map((r) => `<option value="${r}"${this._region === r ? " selected" : ""}>${
+          esc(TOWN_ZH[r] || r)}</option>`).join("") + `</select>`
+      : "";
+
+    let html = `<div class="card"><h3>選狩獵地圖</h3>${regSel}<div class="list" id="maplist"></div></div>` +
+      `<div id="monsterpick"></div>` + this._strategyCard();
+    view().innerHTML = html;
+    this._renderMapList();
+
+    const rs = document.querySelector("#hunt-region");
+    if (rs) rs.onchange = () => {
+      this._region = rs.value;
+      try { localStorage.setItem("rotxt_hunt_region", this._region); } catch (_) {}
+      // 選過的地圖被篩掉了就清掉選擇，避免用被隱藏的地圖開打
+      if (this._mapId && this._region
+          && S.catalog.maps[this._mapId]?.town !== this._region) {
+        this._mapId = null;
+        this._picked.clear();
+        const mp = document.querySelector("#monsterpick");
+        if (mp) mp.innerHTML = "";
+      }
+      this._renderMapList();
+    };
+    this._wireStrategy();
+  },
+
+  _renderMapList() {
+    const box = document.querySelector("#maplist");
+    if (!box) return;
+    const maps = this._maps.filter((m) => !this._region || m.town === this._region);
+    box.innerHTML = maps.map((m) => `<button class="btn choice" data-map="${m.id}">
+        ${esc(m.name)}<div class="sub">解鎖 Lv ${m.unlock_base_level || 1}
+        ・${m.monster_ids.map(monName).join("、")}</div></button>`).join("")
+      || `<p class="muted">這個地區還沒有解鎖的地圖。</p>`;
+    box.querySelectorAll("[data-map]").forEach((b) => {
+      b.classList.toggle("sel", b.dataset.map === this._mapId);
       b.onclick = () => { this._selectMap(b.dataset.map); };
     });
-    this._wireStrategy();
   },
 
   _strategyCard() {

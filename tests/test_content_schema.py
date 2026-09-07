@@ -67,6 +67,10 @@ def test_map_def():
                mvp_id=None, unlock_base_level=1)
     assert m.town == "prontera"
 
+    payon = MapDef(id="payon_cave_1", name="斐揚洞窟 1F", town="payon",
+                   level_range=[20, 35], monster_ids=["zombie"], unlock_base_level=18)
+    assert payon.town == "payon"
+
 
 def test_skill_def_effects_are_structured():
     from shared.content import SkillDef
