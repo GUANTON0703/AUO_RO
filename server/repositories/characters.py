@@ -79,6 +79,30 @@ def get_character(character_id: int):
         ).fetchone()
 
 
+def get_character_by_name(name: str):
+    with connection.get_connection() as conn:
+        return conn.execute(
+            "SELECT * FROM characters WHERE name = ? COLLATE NOCASE", (name,)
+        ).fetchone()
+
+
+def names_for_accounts(account_ids: list[int]) -> dict[int, str]:
+    """帳號 id -> 第一個角色名，用在交易顯示對方是誰。"""
+    if not account_ids:
+        return {}
+    placeholders = ",".join("?" * len(account_ids))
+    with connection.get_connection() as conn:
+        rows = conn.execute(
+            f"SELECT account_id, name FROM characters "
+            f"WHERE account_id IN ({placeholders}) ORDER BY id",
+            tuple(account_ids),
+        ).fetchall()
+    out: dict[int, str] = {}
+    for r in rows:
+        out.setdefault(r["account_id"], r["name"])
+    return out
+
+
 def set_hunt_state(character_id: int, *, map_id, monster_id, started_at,
                    last_settled_at, hp, sp) -> None:
     with connection.get_connection() as conn:

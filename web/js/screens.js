@@ -111,6 +111,8 @@ const Screens = {};
 Screens.home = {
   async mount() {
     this._stopDrip();
+    this._stopChat();
+    this._worldSeen = 0;
     this._queue = [];
     this._shown = [];
     this._lastBatch = null;
@@ -298,27 +300,28 @@ Screens.home = {
     const eqs = (inv && inv.equipment) || [];
     const bySlot = {};
     for (const e of eqs) if (e.equipped_slot) bySlot[e.equipped_slot] = e;
+    const worn = SLOT_ORDER.filter(([s]) => bySlot[s]).length;
+    let open = false;
+    try { open = localStorage.getItem("rotxt_equip_open") === "1"; } catch (_) {}
     const rows = SLOT_ORDER.map(([slot, zh]) => {
       const e = bySlot[slot];
       if (!e) {
         return `<div class="kv"><span class="k">${zh}</span>` +
           `<span class="dim">未裝備</span></div>`;
       }
-      const rf = e.refine ? ` <span class="pill good">+${e.refine}</span>` : "";
+      const rf = e.refine ? ` +${e.refine}` : "";
       const def = S.catalog?.equipment?.[e.equipment_id];
       const n = def?.card_slots || 0;
       const cards = (e.card_ids || []).map((c) => esc(itemName(c)));
-      let cardTxt = "";
-      if (n) {
-        const filled = cards.join("、");
-        const empty = n - cards.length;
-        cardTxt = `<div class="sub">卡：${filled || "－"}` +
-          `${empty > 0 ? `（空 ${empty} 孔）` : ""}</div>`;
-      }
-      return `<div class="kv" style="align-items:flex-start"><span class="k">${zh}</span>` +
-        `<span style="text-align:right">${esc(itemName(e.equipment_id))}${rf}${cardTxt}</span></div>`;
+      const tail = n
+        ? ` <span class="dim">[${cards.join("、") || `空 ${n} 孔`}]</span>` : "";
+      return `<div class="kv"><span class="k">${zh}</span>` +
+        `<span>${esc(itemName(e.equipment_id))}${rf}${tail}</span></div>`;
     }).join("");
-    return `<div class="card" id="equip-box"><h3>裝備</h3>${rows}</div>`;
+    return `<details class="card" id="equip-box"${open ? " open" : ""}` +
+      ` ontoggle="try{localStorage.setItem('rotxt_equip_open',this.open?'1':'0')}catch(e){}">` +
+      `<summary style="cursor:pointer;font-weight:600">裝備（${worn}/${SLOT_ORDER.length}）</summary>` +
+      rows + `</details>`;
   },
   async _refreshEquip() {
     this._inv = await API.inventory(S.char.id).catch(() => this._inv);
@@ -377,9 +380,11 @@ Screens.home = {
       html += `<div class="card"><h3>沒有在掛機</h3>
         <button class="btn primary block" onclick="App.navigate('hunt')">去掛機</button></div>`;
     }
+    html += this._worldChatHtml();
     view().innerHTML = html;
     this._lootJson = JSON.stringify((status && status.loot) || {});
     this._wireLoot();
+    this._wireWorldChat();
 
     const stopBtn = document.querySelector("#btn-stop");
     if (stopBtn) stopBtn.onclick = async () => {
@@ -395,6 +400,62 @@ Screens.home = {
         this._layout(null);
       } catch (e) { App.toast(e.detail || "停止失敗", true); stopBtn.disabled = false; }
     };
+  },
+
+  // ---- 世界頻道（狀態頁可收合，預設關）----
+  _worldChatOpen() {
+    try { return localStorage.getItem("rotxt_worldchat_open") === "1"; }
+    catch (_) { return false; }
+  },
+  _worldChatHtml() {
+    const open = this._worldChatOpen();
+    return `<details class="card" id="world-box"${open ? " open" : ""}>` +
+      `<summary style="cursor:pointer;font-weight:600">世界頻道</summary>` +
+      `<div class="log" id="home-world-log"><span class="dim">${
+        open ? "載入中…" : "展開以顯示"}</span></div></details>`;
+  },
+  _wireWorldChat() {
+    const box = document.querySelector("#world-box");
+    if (!box) return;
+    box.ontoggle = () => {
+      try { localStorage.setItem("rotxt_worldchat_open", box.open ? "1" : "0"); } catch (_) {}
+      if (box.open) this._startChat();
+      else this._stopChat();
+    };
+    if (box.open) this._startChat();
+  },
+  _startChat() {
+    this._stopChat();
+    this._worldSeen = 0;
+    const log = document.querySelector("#home-world-log");
+    if (log) { log.innerHTML = "<span class='dim'>載入中…</span>"; log.dataset.empty = "1"; }
+    this._chatTick();
+  },
+  _stopChat() { if (this._chatTimer) { clearTimeout(this._chatTimer); this._chatTimer = null; } },
+  async _chatTick() {
+    this._stopChat();
+    const box = document.querySelector("#world-box");
+    const log = document.querySelector("#home-world-log");
+    if (S.view !== "home" || !box || !box.open || !log) return;
+    try {
+      const first = !this._worldSeen;
+      const msgs = first
+        ? await API.chatRecent("world", 25)
+        : await API.chatSince("world", this._worldSeen);
+      for (const m of msgs) this._worldSeen = Math.max(this._worldSeen || 0, m.id);
+      const row = (m) =>
+        `<div><span class="dim">${esc(m.character_name)}：</span>${esc(m.text)}</div>`;
+      if (first) {
+        log.innerHTML = msgs.length ? msgs.map(row).join("")
+          : "<span class='dim'>還沒有訊息</span>";
+        delete log.dataset.empty;
+      } else if (msgs.length) {
+        log.insertAdjacentHTML("beforeend", msgs.map(row).join(""));
+        while (log.children.length > 80) log.removeChild(log.firstChild);
+      }
+      log.scrollTop = log.scrollHeight;
+    } catch (_) {}
+    this._chatTimer = setTimeout(() => this._chatTick(), 4000);
   },
 
   _logLines(events) {
@@ -475,6 +536,10 @@ Screens.hunt = {
         <div class="kv"><span class="k">補到手上有</span>
           <span><input type="number" id="st-buyupto" min="0" max="999" style="width:72px"
             value="${s.buy_potion_upto || 0}"> 瓶</span></div>
+        <div class="kv"><span class="k">SP 高於</span>
+          <span><input type="number" id="st-skillsp" min="0" max="95" style="width:64px"
+            value="${Math.round((s.skill_min_sp_pct ?? 0) * 100)}"> %　才放主動技能</span></div>
+        <p class="sub">設 0 = 一律放。設高一點會留魔力、少放技能。</p>
         <button class="btn primary block" id="st-save" style="margin-top:10px">儲存掛機設定</button>
       </div>`;
   },
@@ -490,6 +555,7 @@ Screens.hunt = {
         auto_buy_potion: g("#st-autobuy").checked,
         buy_potion_id: g("#st-buyid").value,
         buy_potion_upto: Math.max(0, Math.floor(Number(g("#st-buyupto").value) || 0)),
+        skill_min_sp_pct: Math.min(0.95, Math.max(0, (Number(g("#st-skillsp").value) || 0) / 100)),
       };
       btn.disabled = true;
       try { await API.setHuntStrategy(S.char.id, strat); this._strategy = strat; App.toast("已儲存"); }

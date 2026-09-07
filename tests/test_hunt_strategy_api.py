@@ -7,6 +7,7 @@ def test_hunt_strategy_can_be_saved_and_read(client, auth, db_helpers):
         "potion_item_id": "red_potion", "potion_hp_pct": 0.4,
         "auto_buy_potion": True, "buy_potion_id": "red_potion",
         "buy_potion_upto": 30, "sell_item_ids": ["jellopy"],
+        "skill_min_sp_pct": 0.3,
     }
     response = client.put(f"/api/hunt/strategy/{ch['id']}", headers=headers, json=body)
     assert response.status_code == 200

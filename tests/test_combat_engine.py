@@ -72,6 +72,23 @@ def test_skill_fires_by_trigger_and_costs_sp():
     assert hero.sp < 30   # 有消耗
 
 
+def test_skill_min_sp_frac_holds_skills_until_sp_recovers():
+    def _bash():
+        return ResolvedSkill("bash", "爆裂波動", 1, "active", 12, 0,
+                             [{"type": "physical_hit", "power_pct": [200]}],
+                             "every_turn", 1)
+    # 門檻 0：能放就放
+    h1 = _mk("放招哥", atk=30, max_sp=40, skills=[_bash()])
+    r1 = simulate_fight(h1, _mk("怪", max_hp=800, flee=0), rng=random.Random(4))
+    free = sum(1 for e in r1.events if e.kind == "skill")
+    # 門檻 0.9：SP 一低於 90% 就不放，整場幾乎只普攻
+    h2 = _mk("省魔哥", atk=30, max_sp=40, skills=[_bash()])
+    r2 = simulate_fight(h2, _mk("怪", max_hp=800, flee=0), rng=random.Random(4),
+                        a_skill_min_sp_frac=0.9)
+    gated = sum(1 for e in r2.events if e.kind == "skill")
+    assert free > gated
+
+
 def test_fight_flees_when_first_combatant_low():
     strong_boss = _mk("王", atk=200, max_hp=99999, defense=50)
     hero = _mk("勇者", atk=30, max_hp=1000)

@@ -44,7 +44,10 @@ def send_chat(body: ChatRequest, account_id: CurrentAccount):
 
 
 @router.get("")
-def read_chat(account_id: CurrentAccount, channel: str = "world", after: int = 0):
+def read_chat(account_id: CurrentAccount, channel: str = "world", after: int = 0,
+             recent: int = 0):
     if channel.startswith("guild:"):
         _check_channel(account_id, channel)
+    if recent > 0:
+        return chat_repo.recent(channel, min(recent, 100))
     return chat_repo.since(channel, after)

@@ -37,7 +37,7 @@
         <div class="card">
           <h3>面對面交易</h3>
           <div class="row" style="margin-bottom:8px">
-            <input id="trade-to" placeholder="對方帳號" style="flex:1">
+            <input id="trade-to" placeholder="對方角色名稱" style="flex:1">
             <button class="btn primary" id="trade-offer">發起</button>
           </div>
           <div id="trade-pending"></div>
@@ -134,7 +134,7 @@
         const rows = await API.tradePending();
         pend.innerHTML = rows.length
           ? `<p class="muted">待處理交易</p>` + rows.map((t) =>
-              `<div class="item"><div>交易 #${t.id}</div>
+              `<div class="item"><div>${esc(t.from_name || "？")} 想跟你交易</div>
                 <button class="btn small" data-trade="${t.id}">開啟</button></div>`).join("")
           : "";
         pend.querySelectorAll("[data-trade]").forEach((b) => {
@@ -179,6 +179,8 @@
       box.innerHTML = `
         <div class="card" style="margin-top:10px">
           <div class="kv"><span class="k">交易 #${t.id}</span><span class="pill">${esc(t.status)}</span></div>
+          <div class="kv"><span class="k">對象</span><span>${esc(
+            this._side === "from" ? (t.to_name || "？") : (t.from_name || "？"))}</span></div>
           <div class="kv"><span class="k">我方放上</span><span>${fmt(mine)}</span></div>
           <div class="kv"><span class="k">對方放上</span><span>${fmt(theirs)}</span></div>
           ${done ? "" : `

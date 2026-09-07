@@ -23,7 +23,9 @@ class FightResult:
     potions_used: int = 0   # 戰鬥中喝掉的補品數（只有玩家 a 會喝）
 
 
-def _pick_skill(c):
+def _pick_skill(c, min_sp_frac: float = 0.0):
+    if min_sp_frac > 0 and c.sp < c.max_sp * min_sp_frac:
+        return None            # 留魔力：SP 沒到門檻就不放主動技能，改普攻
     ready = []
     for s in c.skills:
         if s.kind != "active" or s._cd_left > 0 or c.sp < s.sp_cost:
@@ -66,10 +68,10 @@ def _auto_attack(attacker, defender, rng, events):
         events.append(AttackEvent(attacker.name, defender.name, dmg, crit, True))
 
 
-def _take_turn(actor, foe, rng, events):
+def _take_turn(actor, foe, rng, events, min_sp_frac: float = 0.0):
     if actor.stunned:
         return
-    skill = _pick_skill(actor)
+    skill = _pick_skill(actor, min_sp_frac)
     if skill and actor.spend_sp(skill.sp_cost):
         # cast_skill 內部按 effect 型別分流：heal_hp/buff 作用在 actor，其餘作用在 foe
         events += cast_skill(actor, foe, skill, rng)
@@ -80,7 +82,8 @@ def _take_turn(actor, foe, rng, events):
 
 def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAULT,
                    flee_hp_frac: float = 0.0, *, a_potions: int = 0,
-                   a_potion_heal: int = 0, a_potion_hp_frac: float = 0.0) -> FightResult:
+                   a_potion_heal: int = 0, a_potion_hp_frac: float = 0.0,
+                   a_skill_min_sp_frac: float = 0.0) -> FightResult:
     events: list = []
     rounds = 0
     potions_used = 0
@@ -115,10 +118,12 @@ def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAUL
             return FightResult(None, None, "fled", rounds, a.hp, b.hp, events,
                                potions_used)
         _predrink(first)
-        _take_turn(first, second, rng, events)
+        _take_turn(first, second, rng, events,
+                   a_skill_min_sp_frac if first is a else 0.0)
         if second.alive:
             _predrink(second)
-            _take_turn(second, first, rng, events)
+            _take_turn(second, first, rng, events,
+                       a_skill_min_sp_frac if second is a else 0.0)
 
     if a.alive and b.alive:
         return FightResult(None, None, "stalemate", rounds, a.hp, b.hp, events,

@@ -113,8 +113,11 @@ def online_players(_: GMAccount):
         rows = conn.execute("""
             SELECT a.id AS account_id, a.username, a.role, c.id AS character_id, c.name,
                    c.base_level, c.job_level, c.zeny
-            FROM accounts a JOIN sessions s ON s.account_id = a.id
+            FROM accounts a
             LEFT JOIN characters c ON c.account_id = a.id
-            WHERE s.expires_at > datetime('now') ORDER BY a.id, c.id
+            WHERE a.id IN (
+                SELECT account_id FROM sessions WHERE expires_at > datetime('now')
+            )
+            ORDER BY a.id, c.id
         """).fetchall()
     return [dict(row) for row in rows]

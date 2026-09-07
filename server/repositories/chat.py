@@ -22,6 +22,16 @@ def post(channel: str, account_id: int | None, character_name: str, text: str) -
         return dict(row)
 
 
+def recent(channel: str, limit: int = 30) -> list[dict]:
+    """最新的 limit 則（照時間正序回傳），給只想看近況的精簡視圖用。"""
+    with connection.get_connection() as conn:
+        rows = conn.execute(
+            "SELECT * FROM chat_messages WHERE channel = ? ORDER BY id DESC LIMIT ?",
+            (channel, limit),
+        ).fetchall()
+    return [dict(r) for r in reversed(rows)]
+
+
 def since(channel: str, after_id: int, limit: int = 100) -> list[dict]:
     with connection.get_connection() as conn:
         return [

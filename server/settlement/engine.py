@@ -49,7 +49,8 @@ def _rare_drop_events(monster: MonsterDef, drops: dict, cfg: HuntConfig) -> list
 def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
            cfg: HuntConfig, rng: random.Random, *, offline: bool, pity_in: dict,
            potion_item_id: str | None = None, potion_heal: int = 0,
-           potion_count: int = 0, hp_threshold: float | None = None) -> SettlementResult:
+           potion_count: int = 0, hp_threshold: float | None = None,
+           skill_min_sp_pct: float = 0.0) -> SettlementResult:
     if hp_threshold is not None:
         cfg = replace(cfg, potion_hp_threshold=hp_threshold)
 
@@ -84,7 +85,8 @@ def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
     if not offline and potential <= cfg.literal_sim_kill_cap:
         result = _settle_literal(player, monster, elapsed_seconds, effective,
                                time_per_kill, cfg, rng, pity_in,
-                               potion_item_id, potion_heal, potion_count)
+                               potion_item_id, potion_heal, potion_count,
+                               skill_min_sp_pct)
     else:
         result = _settle_statistical(player, monster, elapsed_seconds, effective,
                                time_per_kill, potential, prof, cfg, rng, offline,
@@ -165,7 +167,7 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
 
 def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
                     cfg, rng, pity_in, potion_item_id, potion_heal,
-                    potion_count) -> SettlementResult:
+                    potion_count, skill_min_sp_pct=0.0) -> SettlementResult:
     # 從玩家目前的掛機狀態續算（不重置滿血），這樣連續掛機才會累積掉血
     p = copy.deepcopy(player)
     for s in p.skills:
@@ -198,7 +200,8 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
         # 補品也能在戰鬥中喝：血量掉到門檻以下就補，撐過那些一場就會被打死的怪
         r = simulate_fight(p, foe, rng, a_potions=potions_left,
                            a_potion_heal=potion_heal,
-                           a_potion_hp_frac=cfg.potion_hp_threshold)
+                           a_potion_hp_frac=cfg.potion_hp_threshold,
+                           a_skill_min_sp_frac=skill_min_sp_pct)
         combat_events.extend(r.events)
         potions_left -= r.potions_used
         potions_used += r.potions_used

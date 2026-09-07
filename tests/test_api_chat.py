@@ -23,3 +23,11 @@ def test_chat_rejects_too_long(client, auth):
     client.post("/api/characters", headers=h, json={"name": "n"})
     r = client.post("/api/chat", headers=h, json={"channel": "world", "text": "x" * 500})
     assert r.status_code == 422
+
+def test_chat_recent_returns_tail_in_order(client, auth):
+    _, h, _ = auth
+    client.post("/api/characters", headers=h, json={"name": "刷頻"})
+    for i in range(8):
+        client.post("/api/chat", headers=h, json={"channel": "world", "text": str(i)})
+    recent = client.get("/api/chat?channel=world&recent=3", headers=h).json()
+    assert [m["text"] for m in recent] == ["5", "6", "7"]

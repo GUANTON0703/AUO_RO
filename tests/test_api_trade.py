@@ -18,7 +18,7 @@ def test_full_trade_swaps_items(client, db_helpers):
     db_helpers.give_item(a_char["id"], "jellopy", 10)
     db_helpers.give_item(b_char["id"], "clover", 5)
 
-    tid = client.post("/api/trade/offer", headers=ha, json={"to_username": "bob"}).json()["trade_id"]
+    tid = client.post("/api/trade/offer", headers=ha, json={"to_username": "BOB"}).json()["trade_id"]
     client.post(f"/api/trade/{tid}/put", headers=ha, json={"item_id": "jellopy", "qty": 6})
     client.post(f"/api/trade/{tid}/put", headers=hb, json={"item_id": "clover", "qty": 3})
     client.post(f"/api/trade/{tid}/confirm", headers=ha)
@@ -35,7 +35,7 @@ def test_changing_table_voids_confirm(client, db_helpers):
     ha, hb = _two_accounts(client)
     a_char = client.get("/api/characters", headers=ha).json()[0]
     db_helpers.give_item(a_char["id"], "jellopy", 10)
-    tid = client.post("/api/trade/offer", headers=ha, json={"to_username": "bob"}).json()["trade_id"]
+    tid = client.post("/api/trade/offer", headers=ha, json={"to_username": "BOB"}).json()["trade_id"]
     client.post(f"/api/trade/{tid}/put", headers=ha, json={"item_id": "jellopy", "qty": 5})
     client.post(f"/api/trade/{tid}/confirm", headers=hb)
     client.post(f"/api/trade/{tid}/put", headers=ha, json={"item_id": "jellopy", "qty": 8})
@@ -47,6 +47,23 @@ def test_cannot_put_more_than_owned(client, db_helpers):
     ha, hb = _two_accounts(client)
     a_char = client.get("/api/characters", headers=ha).json()[0]
     db_helpers.give_item(a_char["id"], "jellopy", 2)
-    tid = client.post("/api/trade/offer", headers=ha, json={"to_username": "bob"}).json()["trade_id"]
+    tid = client.post("/api/trade/offer", headers=ha, json={"to_username": "BOB"}).json()["trade_id"]
     r = client.post(f"/api/trade/{tid}/put", headers=ha, json={"item_id": "jellopy", "qty": 99})
     assert r.status_code == 400
+
+
+def test_offer_by_character_name_and_shows_names(client, db_helpers):
+    ha, hb = _two_accounts(client)
+    r = client.post("/api/trade/offer", headers=ha, json={"to_username": "BOB"})
+    assert r.status_code == 200
+    tid = r.json()["trade_id"]
+    table = client.get(f"/api/trade/{tid}", headers=hb).json()
+    assert table["from_name"] == "ALICE" and table["to_name"] == "BOB"
+    pend = client.get("/api/trade/pending", headers=hb).json()
+    assert pend[0]["from_name"] == "ALICE"
+
+
+def test_offer_unknown_character_404(client, db_helpers):
+    ha, _ = _two_accounts(client)
+    r = client.post("/api/trade/offer", headers=ha, json={"to_username": "查無此人"})
+    assert r.status_code == 404

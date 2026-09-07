@@ -62,6 +62,7 @@ class HuntStrategyRequest(BaseModel):
     buy_potion_id: str | None = None
     buy_potion_upto: int = Field(default=0, ge=0, le=999)
     sell_item_ids: list[str] = []
+    skill_min_sp_pct: float = Field(default=0.0, ge=0.0, le=0.95)
 
 
 def _current_character(account_id: int):
@@ -355,6 +356,7 @@ def _settle_current(row, *, force=False) -> dict:
         offline=offline, pity_in=json.loads(row["hunt_pity"]),
         potion_item_id=potion_id, potion_heal=potion_heal, potion_count=potion_count,
         hp_threshold=strategy.potion_hp_pct,
+        skill_min_sp_pct=strategy.skill_min_sp_pct,
     )
 
     # 這次沒湊出任何一場戰鬥（時間還在攢）→ 撤銷剛才的「認領」，什麼都不寫，

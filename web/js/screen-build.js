@@ -127,12 +127,17 @@
       const skills = Object.values(S.catalog.skills || {})
         .filter((sk) => sk.job_id === c.job_id);
       let rows = "";
-      for (const sk of skills) {
+      const sorted = [...skills].sort((a, b) =>
+        (a.kind === b.kind ? 0 : a.kind === "active" ? -1 : 1));
+      for (const sk of sorted) {
         const lv = learned[sk.id] || 0;
         const maxed = lv >= sk.max_level;
+        const tag = sk.kind === "active"
+          ? `<span class="pill good">主動</span>`
+          : `<span class="pill">被動</span>`;
         rows += `
           <div class="item">
-            <div>${esc(sk.name)}<div class="sub">${lv} / ${sk.max_level}</div></div>
+            <div>${tag} ${esc(sk.name)}<div class="sub">${lv} / ${sk.max_level}</div></div>
             <button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}" ${maxed ? "disabled" : ""}>學 +1</button>
           </div>`;
       }

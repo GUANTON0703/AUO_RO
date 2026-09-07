@@ -145,6 +145,7 @@ const App = (() => {
     if (view !== "home") {
       stopHuntPoll();                       // home.mount 自己決定要不要輪詢
       if (Screens.home && Screens.home._stopDrip) Screens.home._stopDrip();
+      if (Screens.home && Screens.home._stopChat) Screens.home._stopChat();
     }
     if (!scr || !scr.mount) {
       $("#view").innerHTML = `<div class="card"><p class="muted">這個畫面還沒做。</p></div>`;

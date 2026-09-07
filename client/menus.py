@@ -461,13 +461,13 @@ def trade_menu(api, character: dict, console: Console | None = None) -> None:
         return
     rows = [("開新交易", ("new", None))]
     for t in pend:
-        rows.append((f"#{t['id']}　來自帳號 {t.get('from_account')}", ("open", t["id"])))
+        rows.append((f"#{t['id']}　來自 {t.get('from_name', '？')}", ("open", t["id"])))
     picked = choose(console, "交易", rows)
     if picked is None:
         return
     kind, tid = picked
     if kind == "new":
-        who = Prompt.ask("對方帳號名")
+        who = Prompt.ask("對方角色名")
         try:
             tid = api.trade_offer(who)["trade_id"]
         except ApiError as exc:

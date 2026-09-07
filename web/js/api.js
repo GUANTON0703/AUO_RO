@@ -92,6 +92,8 @@ const API = (() => {
     leaderboard: (by) => get("/leaderboard?by=" + encodeURIComponent(by || "base_level")),
     chatSince: (channel, after) =>
       get(`/chat?channel=${encodeURIComponent(channel)}&after=${after || 0}`),
+    chatRecent: (channel, n) =>
+      get(`/chat?channel=${encodeURIComponent(channel)}&recent=${n || 30}`),
     chatPost: (channel, text) => post("/chat", { channel, text }),
     guildMine: () => get("/guild/mine"),
     guildList: () => get("/guild"),

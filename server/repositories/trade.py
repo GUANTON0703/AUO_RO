@@ -153,6 +153,8 @@ def table(trade_id: int) -> dict:
         return {
             "id": trade["id"],
             "status": trade["status"],
+            "from_account": trade["from_account"],
+            "to_account": trade["to_account"],
             "from_confirmed": trade["from_confirmed"],
             "to_confirmed": trade["to_confirmed"],
             "items": items,
