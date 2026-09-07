@@ -28,6 +28,54 @@ function bar(cur, max, cls) {
   return `<div class="bar ${cls || ""}"><i style="width:${pct}%"></i></div>`;
 }
 
+// ---- 內容說明（給商店 / 背包 / 交易顯示「這東西幹嘛用」）----
+const SLOT_ZH = { weapon: "武器", armor: "身體", headgear: "頭", garment: "披風",
+  shoes: "鞋", accessory: "飾品", shield: "盾" };
+const STAT_ZH = { str: "力量", agi: "敏捷", vit: "體質", int: "智力", dex: "靈巧",
+  luk: "幸運", atk: "攻擊", matk: "魔攻", def: "防禦", mdef: "魔防", hit: "命中",
+  flee: "迴避", crit: "爆擊", aspd: "攻速", max_hp: "HP上限", max_sp: "SP上限" };
+
+function effectText(e) {
+  if (!e) return "";
+  if (e.type === "heal_hp") return `回復 HP ${e.amount}`;
+  if (e.type === "heal_sp") return `回復 SP ${e.amount}`;
+  if (e.type === "teleport") return "隨機傳送到附近";
+  if (e.type === "flat_stat") return `${STAT_ZH[e.stat] || e.stat} +${e.amount}`;
+  if (e.type === "pct_stat") return `${STAT_ZH[e.stat] || e.stat} +${e.amount}%`;
+  return e.type;
+}
+
+// 道具說明字串
+function itemDesc(id) {
+  const it = S.catalog?.items?.[id];
+  if (!it) return "";
+  const fx = (it.effects || []).map(effectText).filter(Boolean).join("、");
+  return fx || (it.kind === "material" ? "素材（賣錢 / 精煉用）" : "");
+}
+
+// 裝備 / 卡片說明字串
+function gearDesc(id) {
+  const eq = S.catalog?.equipment?.[id];
+  if (eq) {
+    const parts = [];
+    parts.push(SLOT_ZH[eq.slot] || eq.slot);
+    const st = Object.entries(eq.stats || {}).map(([k, v]) =>
+      `${STAT_ZH[k] || k} ${v > 0 ? "+" : ""}${v}`);
+    if (st.length) parts.push(st.join(" "));
+    if (eq.required_level > 1) parts.push(`需 Lv ${eq.required_level}`);
+    const jobs = eq.job_ids || [];
+    parts.push(jobs.length ? "限 " + jobs.map(jobName).join("/") : "全職業");
+    if (eq.card_slots) parts.push(`${eq.card_slots} 卡槽`);
+    return parts.join("・");
+  }
+  const cd = S.catalog?.cards?.[id];
+  if (cd) {
+    const fx = (cd.effects || []).map(effectText).filter(Boolean).join("、");
+    return `卡片・插${SLOT_ZH[cd.slot] || cd.slot}${fx ? "・" + fx : ""}`;
+  }
+  return "";
+}
+
 const Screens = {};
 
 // ---------- 狀態（首頁）----------
@@ -285,3 +333,4 @@ window.esc = esc; window.bar = bar; window.view = view;
 window.Curve = Curve;
 window.jobName = jobName; window.jobTier = jobTier;
 window.monName = monName; window.mapName = mapName; window.itemName = itemName;
+window.itemDesc = itemDesc; window.gearDesc = gearDesc; window.effectText = effectText;

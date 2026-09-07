@@ -53,20 +53,24 @@
       catch (e) { if (this._stale("shop")) return; this._body().innerHTML = `<div class="card">${esc(e.detail || "載入失敗")}</div>`; return; }
       if (this._stale("shop")) return;
 
-      const itemRows = (data.items || []).map((it) => `
+      const itemRows = (data.items || []).map((it) => {
+        const d = itemDesc(it.id);
+        return `
         <div class="item">
-          <div>${esc(it.name)}<div class="sub">${esc(it.kind || "道具")}　賣 ${it.sell_price}</div></div>
+          <div>${esc(it.name)}<div class="sub">${d ? esc(d) + "　" : ""}賣 ${it.sell_price}</div></div>
           <div class="row tight">
             <button class="btn small primary" data-buy="${it.id}" data-name="${esc(it.name)}">買 ${it.price}</button>
             <button class="btn small" data-sell-item="${it.id}" data-name="${esc(it.name)}">賣</button>
           </div>
-        </div>`).join("");
+        </div>`; }).join("");
 
-      const eqRows = (data.equipment || []).map((eq) => `
+      const eqRows = (data.equipment || []).map((eq) => {
+        const d = gearDesc(eq.id);
+        return `
         <div class="item">
-          <div>${esc(eq.name)}<div class="sub">${esc(eq.slot || "裝備")}　賣 ${eq.sell_price}</div></div>
+          <div>${esc(eq.name)}<div class="sub">${d ? esc(d) + "　" : ""}賣 ${eq.sell_price}</div></div>
           <button class="btn small primary" data-buy="${eq.id}" data-name="${esc(eq.name)}">買 ${eq.price}</button>
-        </div>`).join("");
+        </div>`; }).join("");
 
       this._body().innerHTML = `
         <div class="card"><h3>道具</h3>
@@ -110,11 +114,13 @@
       if (this._stale("bag")) return;
 
       const items = inv.items || {};
-      const itemRows = Object.entries(items).map(([id, qty]) => `
+      const itemRows = Object.entries(items).map(([id, qty]) => {
+        const d = itemDesc(id);
+        return `
         <div class="item">
-          <div>${esc(itemName(id))}<div class="sub">×${qty}</div></div>
+          <div>${esc(itemName(id))}<div class="sub">×${qty}${d ? "　" + esc(d) : ""}</div></div>
           <button class="btn small" data-sell="${id}" data-name="${esc(itemName(id))}">賣</button>
-        </div>`).join("");
+        </div>`; }).join("");
 
       const eqRows = (inv.equipment || []).map((inst) => {
         const equipped = inst.equipped_slot != null;
@@ -122,7 +128,7 @@
         return `
         <div class="item" style="align-items:flex-start">
           <div>${esc(eqName(inst.equipment_id))}${inst.refine ? ` <span class="pill good">+${inst.refine}</span>` : ""}
-            <div class="sub">${esc(eqSlot(inst.equipment_id) || "")}${equipped ? "　裝備中" : ""}${cards ? `　卡：${esc(cards)}` : ""}</div>
+            <div class="sub">${esc(gearDesc(inst.equipment_id) || "")}${equipped ? "　裝備中" : ""}${cards ? `　卡：${esc(cards)}` : ""}</div>
             <div class="row tight" style="margin-top:6px">
               ${equipped
                 ? `<button class="btn small" data-unequip="${inst.equipped_slot}">卸下</button>`
