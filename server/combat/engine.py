@@ -97,7 +97,7 @@ def _one_hit(attacker, defender, rng, events):
 
 
 def _auto_attack(attacker, defender, rng, events):
-    for _ in range(attacks_this_round(attacker.aspd, rng)):
+    for _ in range(attacks_this_round(attacker.effective_aspd, rng)):
         if not defender.alive:
             break
         landed = _one_hit(attacker, defender, rng, events)

@@ -100,3 +100,23 @@ def test_envenom_applies_poison_dot():
     hp_before = target.hp
     tick_statuses(target, [])
     assert target.hp < hp_before  # 中毒每回合扣血
+
+
+def test_debuff_lowers_target_stat():
+    rng = random.Random(7)
+    caster, target = _c("刺客"), _c("怪", defense=50)
+    rs = ResolvedSkill("provoke", "挑釁", 3, "active", 8, 0,
+                       [{"type": "debuff", "stat": "defense",
+                         "pct": [-5, -8, -11, -14, -17], "duration_s": 30}],
+                       "every_turn", 1)
+    cast_skill(caster, target, rs, rng)
+    assert target.effective_defense < target.defense
+
+
+def test_aspd_buff_raises_effective_aspd():
+    c = _c("騎士", aspd=120)
+    rs = ResolvedSkill("twohand_quicken", "二刀加速", 3, "active", 10, 0,
+                       [{"type": "buff", "stats": {"aspd": [2, 4, 6, 8, 10]},
+                         "duration_s": 60}], "sp_available", 1)
+    cast_skill(c, c, rs, random.Random(1))
+    assert c.effective_aspd > 120

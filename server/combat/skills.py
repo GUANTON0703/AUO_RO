@@ -27,11 +27,11 @@ def cast_skill(caster, target, skill, rng: random.Random) -> list:
         elif t == "heal_hp":
             events += _heal_skill(caster, skill, eff)
         elif t == "buff":
-            _stat_mod_skill(caster, eff, skill.level, sign=1)
+            _stat_mod_skill(caster, eff, skill.level)
             events.append(SkillEvent(actor=caster.name, target=caster.name,
                                      skill_id=skill.skill_id, skill_name=skill.name))
         elif t == "debuff":
-            _stat_mod_skill(target, eff, skill.level, sign=-1)
+            _stat_mod_skill(target, eff, skill.level)
             events.append(SkillEvent(actor=caster.name, target=target.name,
                                      skill_id=skill.skill_id, skill_name=skill.name))
         elif t == "proc":
@@ -105,10 +105,13 @@ def _heal_skill(caster, skill, eff):
     return [HealEvent(actor=caster.name, target=caster.name, amount=amount)]
 
 
-def _stat_mod_skill(who, eff, level, sign):
+def _stat_mod_skill(who, eff, level):
+    """buff 格式 {stats:{stat:[...]}}；debuff 格式 {stat, pct:[...]}（值本身已帶正負）。"""
     dur = max(1, round(eff.get("duration_s", 60) / 2))
-    stats = eff.get("stats", {})
-    for stat, seq in stats.items():
-        mag = _seq(seq, level) * sign
+    if "stats" in eff:
+        pairs = list(eff["stats"].items())
+    else:
+        pairs = [(eff["stat"], eff.get("pct", eff.get("amount", [0])))]
+    for stat, seq in pairs:
         apply_status(who, Status(kind="stat_mod", name=f"{stat}_mod", duration=dur,
-                                 magnitude=mag, stat=stat))
+                                 magnitude=_seq(seq, level), stat=stat))

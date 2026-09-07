@@ -97,6 +97,10 @@ class Combatant:
         return max(0, self.crit + self._stat_mod("crit"))
 
     @property
+    def effective_aspd(self) -> int:
+        return max(1, min(193, self.aspd + self._stat_mod("aspd")))
+
+    @property
     def stunned(self) -> bool:
         return any(s.kind == "stun" for s in self.statuses)
 
