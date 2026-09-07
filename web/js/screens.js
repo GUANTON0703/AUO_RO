@@ -137,6 +137,12 @@ Screens.home = {
     if (!status.batch_id || status.batch_id === this._lastBatch) return;
     this._lastBatch = status.batch_id;
     const lines = this._logLines(status.events || []);
+    const drops = status.drops || {};
+    const dk = Object.keys(drops);
+    if (dk.length) {
+      lines.push(`<span class="kill">　取得 ${dk.map((k) =>
+        `${esc(itemName(k))} ×${drops[k]}`).join("、")}</span>`);
+    }
     if (status.offline || lines.length > 30) {          // 離線大批次直接倒完
       this._queue.length = 0;
       this._shown.push(...lines);
