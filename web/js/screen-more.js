@@ -1,6 +1,6 @@
 // screen-more — MVP 挑戰 / 面對面交易 / GM 面板 / 登出
 (() => {
-  function fightLog(events) {
+  function fightLogLines(events) {
     const out = [];
     for (const e of events || []) {
       if (e.kind === "attack") {
@@ -21,7 +21,7 @@
         out.push(`<span class="crit">— ${label}（${e.rounds} 回合）—</span>`);
       }
     }
-    return out.slice(-60).join("\n");
+    return out.slice(-60);
   }
 
   Screens.more = {
@@ -54,14 +54,63 @@
         try { await API.logout(); } finally { location.reload(); }
       };
 
+      this._stopFightDrip();
       await this._loadMvp();
       await this._loadTrade();
       if (S.me && S.me.is_gm) await this._loadGm();
     },
 
+    _stopFightDrip() {
+      this._fightGen = (this._fightGen || 0) + 1;   // 作廢在途的挑戰請求
+      if (this._fightEnd) this._fightEnd(false);
+      this._fighting = false;
+    },
+
+    // 把戰鬥訊息一則一則吐進 log；播完（或提前結束）呼叫 done()
+    _playFight(lines, done) {
+      const log = document.querySelector("#mvp-log");
+      if (!log) { this._fighting = false; done(); return; }
+      log.hidden = false;
+      log.innerHTML = "";
+      const step = Math.max(90, Math.min(280, Math.round(7000 / (lines.length || 1))));
+      let i = 0;
+
+      // ended=true → 補完訊息並結算；ended=false → 只清理（畫面已切走）
+      const end = (settle) => {
+        if (!this._fightEnd) return;
+        this._fightEnd = null;
+        this._fighting = false;
+        document.removeEventListener("visibilitychange", onHide);
+        if (this._fightTimer) { clearTimeout(this._fightTimer); this._fightTimer = null; }
+        const el = document.querySelector("#mvp-log");
+        if (settle && el) {
+          el.innerHTML = lines.join("\n");
+          el.scrollTop = el.scrollHeight;
+          done();
+        }
+      };
+      this._fightEnd = end;
+      // 分頁切走時瀏覽器凍結計時器 → 立刻補完
+      const onHide = () => { if (document.hidden) end(true); };
+      document.addEventListener("visibilitychange", onHide);
+
+      const tick = () => {
+        const el = document.querySelector("#mvp-log");
+        if (!el) { end(false); return; }
+        if (document.hidden) { end(true); return; }
+        el.innerHTML = lines.slice(0, i + 1).join("\n");
+        el.scrollTop = el.scrollHeight;
+        i += 1;
+        if (i < lines.length) this._fightTimer = setTimeout(tick, step);
+        else end(true);
+      };
+      tick();
+    },
+
     // ---------- MVP ----------
     async _loadMvp() {
       const box = document.querySelector("#mvp-list");
+      if (!box) return;
       try {
         const list = await API.listMvp();
         box.innerHTML = list.map((m) => {
@@ -79,15 +128,25 @@
     },
 
     async _challenge(id, btn) {
+      if (this._fighting) return;
       if (!confirm("確定挑戰這隻 MVP？戰敗會損失少量經驗。")) return;
-      btn.disabled = true;
-      const log = document.querySelector("#mvp-log");
+      this._fighting = true;
+      const gen = (this._fightGen || 0);
+      document.querySelectorAll("#mvp-list [data-mvp]").forEach((b) => { b.disabled = true; });
       const res = document.querySelector("#mvp-result");
+      res.innerHTML = "";
+      let r;
       try {
-        const r = await API.challengeMvp(id);
-        log.hidden = false;
-        log.innerHTML = fightLog(r.events);
-        log.scrollTop = log.scrollHeight;
+        r = await API.challengeMvp(id);
+      } catch (e) {
+        if (gen !== (this._fightGen || 0)) return;
+        App.toast(e.detail || "挑戰失敗", true);
+        this._fighting = false;
+        await this._loadMvp();
+        return;
+      }
+      if (gen !== (this._fightGen || 0)) return;   // 已離開 More 畫面，丟棄結果
+      this._playFight(fightLogLines(r.events), async () => {
         const label = { win: "勝利", loss: "戰敗", fled: "撤退" }[r.outcome] || r.outcome;
         const cls = r.outcome === "win" ? "good" : r.outcome === "loss" ? "bad" : "warn";
         let line = `<span class="pill ${cls}">${label}</span> `;
@@ -100,10 +159,11 @@
         } else {
           line += `全身而退，無損失`;
         }
-        res.innerHTML = `<p style="margin-top:8px">${line}</p>`;
+        const box = document.querySelector("#mvp-result");
+        if (box) box.innerHTML = `<p style="margin-top:8px">${line}</p>`;
         await App.refreshChar();
-      } catch (e) { App.toast(e.detail || "挑戰失敗", true); }
-      await this._loadMvp();
+        await this._loadMvp();
+      });
     },
 
     // ---------- 交易 ----------
