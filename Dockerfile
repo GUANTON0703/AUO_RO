@@ -1,13 +1,8 @@
-FROM python:3.12-slim AS build
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
-RUN uv pip install --system --no-cache \
-    "fastapi>=0.115" "uvicorn[standard]>=0.32" "pydantic>=2.9" \
-    "pydantic-settings>=2.6" "passlib>=1.7.4" "bcrypt==4.0.1"
-
 FROM python:3.12-slim
 RUN useradd -m -u 1000 rotxt && mkdir /data && chown rotxt:rotxt /data
-COPY --from=build /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=build /usr/local/bin/uvicorn /usr/local/bin/uvicorn
+RUN pip install --no-cache-dir \
+    "fastapi>=0.115" "uvicorn[standard]>=0.32" "pydantic>=2.9" \
+    "pydantic-settings>=2.6" "passlib>=1.7.4" "bcrypt==4.0.1"
 WORKDIR /app
 COPY server ./server
 COPY shared ./shared
