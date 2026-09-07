@@ -1,8 +1,12 @@
 // screen-build — 加點分頁：屬性加點 / 技能 / 轉職
 (() => {
   const STATS = [
-    ["str", "STR"], ["agi", "AGI"], ["vit", "VIT"],
-    ["int", "INT"], ["dex", "DEX"], ["luk", "LUK"],
+    ["str", "STR 力量", "物理攻擊力"],
+    ["agi", "AGI 敏捷", "迴避、攻擊速度"],
+    ["vit", "VIT 體質", "HP 上限、物理防禦"],
+    ["int", "INT 智力", "SP 上限、魔法攻擊、魔法防禦"],
+    ["dex", "DEX 靈巧", "命中率（少量攻擊、攻速）"],
+    ["luk", "LUK 幸運", "爆擊率（少量攻擊）"],
   ];
   const statCost = (v) => Math.floor(v / 10) + 2;
 
@@ -45,20 +49,23 @@
       const spend = this._spend();
       const left = avail - spend;
       let rows = "";
-      for (const [k, label] of STATS) {
+      for (const [k, label, desc] of STATS) {
         const base = c["stat_" + k] || 0;
         const add = this._pending[k];
         const target = base + add;
         const cost = statCost(target);
         const canAdd = target < 99 && cost <= left;
         rows += `
-          <div class="kv">
-            <span class="k">${label}</span>
-            <span>
-              ${target}${add ? ` <span class="pill good">+${add}</span>` : ""}
-              <button class="btn small" data-inc="${k}" ${canAdd ? "" : "disabled"}
-                style="margin-left:8px">+ (${cost})</button>
-            </span>
+          <div style="padding:6px 0;border-bottom:1px solid var(--line)">
+            <div class="kv">
+              <span class="k">${label}</span>
+              <span>
+                ${target}${add ? ` <span class="pill good">+${add}</span>` : ""}
+                <button class="btn small" data-inc="${k}" ${canAdd ? "" : "disabled"}
+                  style="margin-left:8px">+ (${cost})</button>
+              </span>
+            </div>
+            <div class="sub">${desc}</div>
           </div>`;
       }
       document.querySelector("#build-body").innerHTML = `

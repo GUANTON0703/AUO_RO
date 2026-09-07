@@ -205,9 +205,11 @@ class ApiClient:
     def admin_settings(self):
         return self._req("GET", "/api/admin/settings")
 
-    def admin_set_multipliers(self, experience, drop):
-        return self._req("PUT", "/api/admin/settings/multipliers",
-                         json={"experience": experience, "drop": drop})
+    def admin_set_multipliers(self, experience, drop, zeny=None):
+        body = {"experience": experience, "drop": drop}
+        if zeny is not None:
+            body["zeny"] = zeny
+        return self._req("PUT", "/api/admin/settings/multipliers", json=body)
 
     def admin_set_hunt(self, settle_floor_seconds, huntable_win_rate):
         return self._req("PUT", "/api/admin/settings/hunt",

@@ -452,10 +452,11 @@ class _ScreenApi:
 
     def admin_settings(self):
         return {"experience_multiplier": 1.0, "drop_multiplier": 1.0,
-                "settle_floor_seconds": 15.0, "huntable_win_rate": 0.6}
+                "zeny_multiplier": 1.0, "settle_floor_seconds": 15.0,
+                "huntable_win_rate": 0.6}
 
-    def admin_set_multipliers(self, experience, drop):
-        self.mult_calls.append((experience, drop))
+    def admin_set_multipliers(self, experience, drop, zeny=1.0):
+        self.mult_calls.append((experience, drop, zeny))
 
 
 def _state():
@@ -523,11 +524,14 @@ def test_gm_menu_sets_multipliers(monkeypatch):
     api = _ScreenApi()
     actions = iter(["mult", None])  # 選倍率一次，第二圈返回
     monkeypatch.setattr(menus, "choose", lambda *a, **k: next(actions))
-    monkeypatch.setattr(menus.Prompt, "ask",
-                        staticmethod(lambda *a, **k: next(iter(["2"]))
-                                     if "經驗" in a[0] else "3"))
+    def _ask(*a, **k):
+        p = a[0] if a else ""
+        if "經驗" in p: return "2"
+        if "掉寶" in p: return "3"
+        return "4"  # 金錢
+    monkeypatch.setattr(menus.Prompt, "ask", staticmethod(_ask))
     menus.gm_menu(api, {"id": 1}, Console(record=True))
-    assert api.mult_calls == [(2.0, 3.0)]
+    assert api.mult_calls == [(2.0, 3.0, 4.0)]
 
 
 def test_render_screen_survives_markup_in_chat():

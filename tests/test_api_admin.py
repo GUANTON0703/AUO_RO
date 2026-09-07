@@ -66,7 +66,7 @@ def test_gm_can_set_bounded_multipliers(client):
         headers=headers,
     )
     assert response.status_code == 200
-    assert response.json() == {"experience": 2.0, "drop": 1.5}
+    assert response.json() == {"experience": 2.0, "drop": 1.5, "zeny": 1.0}
     assert client.put("/api/admin/settings/multipliers", json={"experience": 0, "drop": 1}, headers=headers).status_code == 422
 
 
@@ -146,11 +146,13 @@ def test_get_server_settings_defaults_then_updates(client):
     assert client.get("/api/admin/settings", headers=headers).json() == {
         "experience_multiplier": 1.0,
         "drop_multiplier": 1.0,
+        "zeny_multiplier": 1.0,
         "settle_floor_seconds": HuntConfig().settle_floor_seconds,
         "huntable_win_rate": HuntConfig().huntable_win_rate,
     }
 
-    client.put("/api/admin/settings/multipliers", json={"experience": 3.0, "drop": 2.0}, headers=headers)
+    client.put("/api/admin/settings/multipliers",
+               json={"experience": 3.0, "drop": 2.0, "zeny": 5.0}, headers=headers)
     client.put(
         "/api/admin/settings/hunt",
         json={"settle_floor_seconds": 45, "huntable_win_rate": 0.55},
@@ -159,6 +161,25 @@ def test_get_server_settings_defaults_then_updates(client):
     assert client.get("/api/admin/settings", headers=headers).json() == {
         "experience_multiplier": 3.0,
         "drop_multiplier": 2.0,
+        "zeny_multiplier": 5.0,
         "settle_floor_seconds": 45.0,
         "huntable_win_rate": 0.55,
     }
+
+
+def test_zeny_multiplier_scales_hunt_income(client, auth, db_helpers):
+    _, h, _ = auth
+    _make_gm("gmzeny")
+    gmh = {"Authorization": f"Bearer {_login(client, 'gmzeny').json()['token']}"}
+    client.put("/api/admin/settings/multipliers",
+               json={"experience": 1.0, "drop": 1.0, "zeny": 10.0}, headers=gmh)
+    ch = client.post("/api/characters", headers=h, json={"name": "金錢王"}).json()
+    db_helpers.set_base_level(ch["id"], 20)
+    db_helpers.set_stats(ch["id"], {"str": 40, "agi": 20, "vit": 25, "int": 5,
+                                    "dex": 25, "luk": 10})
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_south_field"})
+    db_helpers.rewind_hunt(ch["id"], seconds=600)
+    body = client.get("/api/hunt/status", headers=h).json()
+    assert body["kills"] > 0
+    # 10x：每殺一隻 zeny 明顯高於基礎值（基礎約 level*1.5+base_exp*0.3）
+    assert body["zeny"] > body["kills"] * 30

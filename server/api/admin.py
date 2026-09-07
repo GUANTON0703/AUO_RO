@@ -20,6 +20,7 @@ class ExperienceRequest(BaseModel):
 class MultipliersRequest(BaseModel):
     experience: float = Field(gt=0, le=100)
     drop: float = Field(gt=0, le=100)
+    zeny: float | None = Field(default=None, gt=0, le=100)   # 省略 = 不動既有值
 
 
 class HuntSettingsRequest(BaseModel):
@@ -30,6 +31,7 @@ class HuntSettingsRequest(BaseModel):
 _SETTING_DEFAULTS = {
     "experience_multiplier": 1.0,
     "drop_multiplier": 1.0,
+    "zeny_multiplier": 1.0,
     "settle_floor_seconds": HuntConfig().settle_floor_seconds,
     "huntable_win_rate": HuntConfig().huntable_win_rate,
 }
@@ -61,9 +63,20 @@ def set_experience(character_id: int, body: ExperienceRequest, _: GMAccount):
 
 @router.put("/settings/multipliers")
 def set_multipliers(body: MultipliersRequest, _: GMAccount):
+    rows = [("experience_multiplier", str(body.experience)),
+            ("drop_multiplier", str(body.drop))]
+    if body.zeny is not None:
+        rows.append(("zeny_multiplier", str(body.zeny)))
     with connection.transaction() as conn:
-        conn.executemany("INSERT INTO server_settings(key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", [("experience_multiplier", str(body.experience)), ("drop_multiplier", str(body.drop))])
-    return {"experience": body.experience, "drop": body.drop}
+        conn.executemany(
+            "INSERT INTO server_settings(key, value) VALUES (?, ?) "
+            "ON CONFLICT(key) DO UPDATE SET value=excluded.value", rows)
+        got = dict(conn.execute(
+            "SELECT key, value FROM server_settings WHERE key = 'zeny_multiplier'"
+        ).fetchall())
+    zeny = float(got["zeny_multiplier"]) if "zeny_multiplier" in got \
+        else HuntConfig().zeny_multiplier
+    return {"experience": body.experience, "drop": body.drop, "zeny": zeny}
 
 
 @router.put("/settings/hunt")
@@ -84,10 +97,11 @@ def set_hunt_settings(body: HuntSettingsRequest, _: GMAccount):
 
 @router.get("/settings")
 def get_server_settings(_: GMAccount):
+    keys = tuple(_SETTING_DEFAULTS)
     with connection.get_connection() as conn:
         rows = conn.execute(
-            "SELECT key, value FROM server_settings WHERE key IN (?, ?, ?, ?)",
-            tuple(_SETTING_DEFAULTS),
+            f"SELECT key, value FROM server_settings WHERE key IN ({','.join('?' * len(keys))})",
+            keys,
         ).fetchall()
     values = {row["key"]: float(row["value"]) for row in rows}
     return {key: values.get(key, default) for key, default in _SETTING_DEFAULTS.items()}

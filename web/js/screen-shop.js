@@ -48,16 +48,19 @@
 
     // ---------- 商店 ----------
     async _drawShop() {
-      let data;
-      try { data = await API.shop(); }
-      catch (e) { if (this._stale("shop")) return; this._body().innerHTML = `<div class="card">${esc(e.detail || "載入失敗")}</div>`; return; }
+      let data, inv = { items: {} };
+      try {
+        [data, inv] = await Promise.all([API.shop(), API.inventory(S.char.id).catch(() => ({ items: {} }))]);
+      } catch (e) { if (this._stale("shop")) return; this._body().innerHTML = `<div class="card">${esc(e.detail || "載入失敗")}</div>`; return; }
       if (this._stale("shop")) return;
+      const owned = inv.items || {};
 
       const itemRows = (data.items || []).map((it) => {
         const d = itemDesc(it.id);
+        const have = owned[it.id] ? `背包有 ${owned[it.id]}　` : "";
         return `
         <div class="item">
-          <div>${esc(it.name)}<div class="sub">${d ? esc(d) + "　" : ""}賣 ${it.sell_price}</div></div>
+          <div>${esc(it.name)}<div class="sub">${d ? esc(d) + "　" : ""}${have}賣 ${it.sell_price}</div></div>
           <div class="row tight">
             <button class="btn small primary" data-buy="${it.id}" data-name="${esc(it.name)}">買 ${it.price}</button>
             <button class="btn small" data-sell-item="${it.id}" data-name="${esc(it.name)}">賣</button>
@@ -87,6 +90,7 @@
             const r = await API.buy(b.dataset.buy, qty);
             App.toast(`買了 ${b.dataset.name} ×${qty}${r && r.spent != null ? `（-${r.spent}z）` : ""}`);
             await this._reloadHeader();
+            if (this._tab === "shop") this._drawShop();
           } catch (e) { App.toast(e.detail || "購買失敗", true); }
           b.disabled = false;
         };
@@ -100,6 +104,7 @@
             const r = await API.sell({ item_id: b.dataset.sellItem, qty });
             App.toast(`賣了 ${b.dataset.name} ×${qty}${r && r.gained != null ? `（+${r.gained}z）` : ""}`);
             await this._reloadHeader();
+            if (this._tab === "shop") this._drawShop();
           } catch (e) { App.toast(e.detail || "販售失敗", true); }
           b.disabled = false;
         };

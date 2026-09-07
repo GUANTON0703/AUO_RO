@@ -615,9 +615,10 @@ def gm_menu(api, character: dict, console: Console | None = None) -> None:
             if action == "mult":
                 exp = _ask_float(console, "經驗倍率", s["experience_multiplier"])
                 drop = _ask_float(console, "掉寶倍率", s["drop_multiplier"])
-                if exp is None or drop is None:
+                zeny = _ask_float(console, "金錢倍率", s.get("zeny_multiplier", 1.0))
+                if exp is None or drop is None or zeny is None:
                     continue
-                api.admin_set_multipliers(exp, drop)
+                api.admin_set_multipliers(exp, drop, zeny)
                 console.print("[green]已更新倍率[/green]")
             elif action == "hunt":
                 floor = _ask_float(console, "結算地板秒數", s["settle_floor_seconds"])

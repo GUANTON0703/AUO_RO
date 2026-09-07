@@ -115,7 +115,8 @@ const API = (() => {
     // content / admin
     catalog: () => get("/content/catalog"),
     adminSettings: () => get("/admin/settings"),
-    adminSetMultipliers: (experience, drop) => put("/admin/settings/multipliers", { experience, drop }),
+    adminSetMultipliers: (experience, drop, zeny) =>
+      put("/admin/settings/multipliers", { experience, drop, zeny }),
     adminSetHunt: (settle_floor_seconds, huntable_win_rate) =>
       put("/admin/settings/hunt", { settle_floor_seconds, huntable_win_rate }),
     adminMoney: (cid, amount) => post(`/admin/characters/${cid}/money`, { amount }),

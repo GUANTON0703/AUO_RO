@@ -227,9 +227,10 @@
       slot.innerHTML = `<div class="card"><h3>GM 面板</h3>
         <div id="gm-settings"><div class="spinner">載入中…</div></div>
         <div class="section-title" style="margin-top:10px"><span class="k">倍率</span></div>
-        <div class="row">
-          <input id="gm-exp" type="number" step="0.1" placeholder="經驗倍率" style="flex:1">
-          <input id="gm-drop" type="number" step="0.1" placeholder="掉寶倍率" style="flex:1">
+        <div class="row tight">
+          <input id="gm-exp" type="number" step="0.1" placeholder="經驗" style="flex:1">
+          <input id="gm-drop" type="number" step="0.1" placeholder="掉寶" style="flex:1">
+          <input id="gm-zenym" type="number" step="0.1" placeholder="金錢" style="flex:1">
           <button class="btn small" id="gm-mult">套用</button>
         </div>
         <div class="section-title" style="margin-top:10px"><span class="k">掛機</span></div>
@@ -259,10 +260,12 @@
           document.querySelector("#gm-settings").innerHTML = `
             <div class="kv"><span class="k">經驗倍率</span><span>${s.experience_multiplier}</span></div>
             <div class="kv"><span class="k">掉寶倍率</span><span>${s.drop_multiplier}</span></div>
+            <div class="kv"><span class="k">金錢倍率</span><span>${s.zeny_multiplier}</span></div>
             <div class="kv"><span class="k">結算地板秒</span><span>${s.settle_floor_seconds}</span></div>
             <div class="kv"><span class="k">勝率門檻</span><span>${s.huntable_win_rate}</span></div>`;
           document.querySelector("#gm-exp").value = s.experience_multiplier;
           document.querySelector("#gm-drop").value = s.drop_multiplier;
+          document.querySelector("#gm-zenym").value = s.zeny_multiplier;
           document.querySelector("#gm-floor").value = s.settle_floor_seconds;
           document.querySelector("#gm-wr").value = s.huntable_win_rate;
         } catch (e) { document.querySelector("#gm-settings").innerHTML = `<p class="muted">${esc(e.detail || "載入失敗")}</p>`; }
@@ -279,7 +282,10 @@
 
       document.querySelector("#gm-mult").onclick = async () => {
         try {
-          await API.adminSetMultipliers(Number(document.querySelector("#gm-exp").value), Number(document.querySelector("#gm-drop").value));
+          await API.adminSetMultipliers(
+            Number(document.querySelector("#gm-exp").value),
+            Number(document.querySelector("#gm-drop").value),
+            Number(document.querySelector("#gm-zenym").value) || 1);
           App.toast("已套用"); showSettings();
         } catch (e) { App.toast(e.detail || "失敗", true); }
       };

@@ -18,6 +18,7 @@ class HuntConfig:
     boss_retreat_rate: float = 0.01
     experience_multiplier: float = 1.0
     drop_multiplier: float = 1.0
+    zeny_multiplier: float = 1.0
     settle_floor_seconds: float = 3.0    # 結算防抖：距上次結算未達這個秒數就只回累積值
     huntable_win_rate: float = 0.85      # 自動選怪 / 輪替時，勝率低於此值的怪不打
 
@@ -26,16 +27,18 @@ class HuntConfig:
         defaults = cls()
         experience_multiplier = defaults.experience_multiplier
         drop_multiplier = defaults.drop_multiplier
+        zeny_multiplier = defaults.zeny_multiplier
         settle_floor_seconds = defaults.settle_floor_seconds
         huntable_win_rate = defaults.huntable_win_rate
         try:
             from server.db import connection
             with connection.get_connection() as conn:
                 rows = conn.execute(
-                    "SELECT key, value FROM server_settings WHERE key IN (?, ?, ?, ?)",
+                    "SELECT key, value FROM server_settings WHERE key IN (?, ?, ?, ?, ?)",
                     (
                         "experience_multiplier",
                         "drop_multiplier",
+                        "zeny_multiplier",
                         "settle_floor_seconds",
                         "huntable_win_rate",
                     ),
@@ -43,6 +46,7 @@ class HuntConfig:
             values = {row[0]: float(row[1]) for row in rows}
             experience_multiplier = values.get("experience_multiplier", experience_multiplier)
             drop_multiplier = values.get("drop_multiplier", drop_multiplier)
+            zeny_multiplier = values.get("zeny_multiplier", zeny_multiplier)
             settle_floor_seconds = values.get("settle_floor_seconds", settle_floor_seconds)
             huntable_win_rate = values.get("huntable_win_rate", huntable_win_rate)
         except (RuntimeError, OSError):
@@ -52,6 +56,7 @@ class HuntConfig:
             offline_cap_hours=settings.offline_cap_hours,
             experience_multiplier=experience_multiplier,
             drop_multiplier=drop_multiplier,
+            zeny_multiplier=zeny_multiplier,
             settle_floor_seconds=settle_floor_seconds,
             huntable_win_rate=huntable_win_rate,
         )

@@ -135,7 +135,7 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
 
     base_exp = round(kills * monster.base_exp * cfg.experience_multiplier)
     job_exp = round(kills * monster.job_exp * cfg.experience_multiplier)
-    zeny = kills * zeny_per_kill(monster)
+    zeny = round(kills * zeny_per_kill(monster) * cfg.zeny_multiplier)
     drops, pity_out = roll_drops(monster.drops, kills, rng, offline=offline,
                                  pity_in=pity_in, cfg=cfg)
 
@@ -208,7 +208,7 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
 
     base_exp = round(kills * monster.base_exp * cfg.experience_multiplier)
     job_exp = round(kills * monster.job_exp * cfg.experience_multiplier)
-    zeny = kills * zeny_per_kill(monster)
+    zeny = round(kills * zeny_per_kill(monster) * cfg.zeny_multiplier)
     drops, pity_out = roll_drops(monster.drops, kills, rng, offline=False,
                                  pity_in=pity_in, cfg=cfg)
 
