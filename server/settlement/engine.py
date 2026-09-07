@@ -35,6 +35,8 @@ class SettlementResult:
     events: list = field(default_factory=list)
     final_hp: int = 0
     final_sp: int = 0
+    # 結算結束時身上還在的 buff/debuff（給掛機畫面的人物框顯示）
+    active_buffs: list = field(default_factory=list)
 
 
 def _rare_drop_events(monster: MonsterDef, drops: dict, cfg: HuntConfig) -> list:
@@ -96,6 +98,23 @@ def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
     return result
 
 
+def _buffs_from_statuses(statuses, cfg) -> list:
+    return [
+        {"stat": s.stat, "magnitude": s.magnitude,
+         "remaining_s": round(s.duration * cfg.round_seconds)}
+        for s in statuses if s.kind == "stat_mod"
+    ]
+
+
+def _probe_active_buffs(player, monster, rng, cfg) -> list:
+    """統計路徑沒有逐場模擬，跑一場拿身上的 buff 狀態給畫面顯示用。"""
+    probe = copy.deepcopy(player)
+    for s in probe.skills:
+        s._cd_left = 0
+    simulate_fight(probe, Combatant.from_monster(monster), rng)
+    return _buffs_from_statuses(probe.statuses, cfg)
+
+
 def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_kill,
                         potential, prof, cfg, rng, offline, pity_in,
                         potion_item_id, potion_heal, potion_count) -> SettlementResult:
@@ -153,6 +172,9 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
     if retreated:
         events.append(RetreatEvent(reason, used_seconds))
 
+    active_buffs = ([] if retreated or kills <= 0
+                    else _probe_active_buffs(player, monster, rng, cfg))
+
     return SettlementResult(
         kills=kills, base_exp=base_exp, job_exp=job_exp, zeny=zeny, drops=drops,
         potions_used=potions_used, retreated=retreated, retreat_reason=reason,
@@ -162,6 +184,7 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
         consumed_seconds=used_seconds,
         pity_out=pity_out, events=events,
         final_hp=player.hp, final_sp=player.sp,
+        active_buffs=active_buffs,
     )
 
 
@@ -235,6 +258,8 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
     if retreated:
         events.append(RetreatEvent(reason, elapsed))
 
+    active_buffs = [] if retreated else _buffs_from_statuses(p.statuses, cfg)
+
     return SettlementResult(
         kills=kills, base_exp=base_exp, job_exp=job_exp, zeny=zeny, drops=drops,
         potions_used=potions_used, retreated=retreated, retreat_reason=reason,
@@ -243,4 +268,5 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
         consumed_seconds=elapsed,
         pity_out=pity_out, events=events,
         final_hp=p.hp, final_sp=p.sp,
+        active_buffs=active_buffs,
     )

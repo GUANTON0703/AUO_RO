@@ -23,17 +23,35 @@ class FightResult:
     potions_used: int = 0   # 戰鬥中喝掉的補品數（只有玩家 a 會喝）
 
 
+def _buff_already_up(c, skill) -> bool:
+    """技能的所有增益 stat 都還在身上 → 不用重放。"""
+    for eff in skill.effects:
+        if eff.get("type") != "buff":
+            continue
+        for stat in eff.get("stats", {}):
+            if not any(st.kind == "stat_mod" and st.stat == stat for st in c.statuses):
+                return False
+    return True
+
+
 def _pick_skill(c, min_sp_frac: float = 0.0):
     if min_sp_frac > 0 and c.sp < c.max_sp * min_sp_frac:
         return None            # 留魔力：SP 沒到門檻就不放主動技能，改普攻
-    ready = []
+    buffs, others = [], []
     for s in c.skills:
         if s.kind != "active" or s._cd_left > 0 or c.sp < s.sp_cost:
             continue
-        if _trigger_ok(c, s.trigger):
-            ready.append(s)
-    ready.sort(key=lambda s: -s.priority)
-    return ready[0] if ready else None
+        if not _trigger_ok(c, s.trigger):
+            continue
+        if any(e.get("type") == "buff" for e in s.effects):
+            if not _buff_already_up(c, s):     # 已經開著的 buff 不重放，改去攻擊
+                buffs.append(s)
+        else:
+            others.append(s)
+    # 先把缺的 buff 補上，補齊後才輪到攻擊 / 補血技能
+    pool = buffs or others
+    pool.sort(key=lambda s: -s.priority)
+    return pool[0] if pool else None
 
 
 def _trigger_ok(c, trigger: str) -> bool:

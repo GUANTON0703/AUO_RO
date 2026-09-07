@@ -127,6 +127,23 @@ def test_potions_drunk_mid_fight_prevent_one_shot_death():
                for e in wet.events)
 
 
+def test_buff_skill_logs_cast_and_reports_active_buff():
+    c = load_content()
+    bless, bash = c.skills["blessing"], c.skills["bash"]
+    hero = _hero(max_sp=200, skills=[
+        ResolvedSkill("bash", bash.name, 1, "active", 5, 0, bash.effects, "every_turn", 3),
+        ResolvedSkill("blessing", bless.name, 3, "active", 5, 0, bless.effects,
+                      "sp_available", 1),
+    ])
+    r = settle(hero, c.get_monster("poring"), elapsed_seconds=60, cfg=HuntConfig(),
+               rng=random.Random(1), offline=False, pity_in={})
+    assert any(getattr(e, "kind", "") == "skill" and getattr(e, "skill_id", "") == "blessing"
+               for e in r.events)
+    assert r.active_buffs and all(b["remaining_s"] > 0 for b in r.active_buffs)
+    assert {b["stat"] for b in r.active_buffs} >= {"str", "int", "dex"}
+    assert r.kills > 0                       # 補完 buff 還是會去打怪
+
+
 def test_zeny_and_drops_accumulate():
     c = load_content()
     m = c.get_monster("green_cotton_worm")

@@ -120,6 +120,8 @@ Screens.home = {
     this._dripMs = 0;
     this._paceBudget = 0;
     this._curMon = null;
+    this._buffs = [];
+    this._buffsAt = 0;
     this._sheet = await API.sheet(S.char.id).catch(() => null);
     S._sheet = this._sheet;
     this._strategy = await API.huntStrategy(S.char.id).catch(() => null);
@@ -127,6 +129,7 @@ Screens.home = {
     try { status = await API.huntStatus(); } catch (e) { if (e.status !== 409) throw e; }
     // status 這一趟可能撿到裝備，所以裝備清單在它之後才抓
     this._inv = await API.inventory(S.char.id).catch(() => null);
+    if (status && status.buffs) { this._buffs = status.buffs; this._buffsAt = Date.now(); }
     this._layout(status);
     if (status && !status.retreated) {
       this._ingest(status);
@@ -198,6 +201,7 @@ Screens.home = {
     if (status.monster_id) this._curMon = status.monster_id;
     if (!status.batch_id || status.batch_id === this._lastBatch) return;
     this._lastBatch = status.batch_id;
+    if (status.buffs) { this._buffs = status.buffs; this._buffsAt = Date.now(); }
     const lines = this._logLines(status.events || []);
     const drops = status.drops || {};
     const dk = Object.keys(drops);
@@ -252,6 +256,13 @@ Screens.home = {
       const lb = document.querySelector("#loot-box");
       if (lb) { lb.innerHTML = this._lootHtml(status.loot); this._wireLoot(); }
     }
+    const bb = document.querySelector("#buff-box");
+    if (bb) {
+      const wasOpen = bb.querySelector("details")?.open;
+      bb.innerHTML = this._buffHtml();
+      const d = bb.querySelector("details");
+      if (d && wasOpen) d.open = true;
+    }
   },
 
   _lootHtml(loot) {
@@ -296,6 +307,22 @@ Screens.home = {
     });
   },
 
+  _buffHtml() {
+    const buffs = this._buffs || [];
+    if (!this._hunting || !buffs.length) return "";
+    const gone = (Date.now() - (this._buffsAt || Date.now())) / 1000;
+    const live = buffs.map((b) => ({ ...b, left: Math.max(0, Math.round((b.remaining_s || 0) - gone)) }));
+    const rows = live.map((b) => {
+      const zh = STAT_ZH[b.stat] || b.stat;
+      const sign = b.magnitude >= 0 ? "+" : "";
+      const t = b.left > 0 ? `　剩約 ${b.left} 秒` : "　續投中…";
+      return `<div class="kv"><span class="k">${esc(zh)}</span>` +
+        `<span>${sign}${b.magnitude}${t}</span></div>`;
+    }).join("");
+    return `<details style="margin-top:4px">` +
+      `<summary style="cursor:pointer" class="dim">增益中 ×${buffs.length}（點開看效果）</summary>` +
+      rows + `</details>`;
+  },
   _equipHtml(inv) {
     const eqs = (inv && inv.equipment) || [];
     const bySlot = {};
@@ -352,6 +379,7 @@ Screens.home = {
         <div class="bar sp"><i id="hm-spbar" style="width:${Math.min(100,(sp/Math.max(1,sheet.max_sp??1))*100)}%"></i></div>
         <div class="kv"><span class="k">Zeny</span><span id="hm-zeny">${c.zeny}</span></div>
         <div class="kv"><span class="k">地點</span><span>${esc(mapName(c.location_map))}</span></div>
+        <div id="buff-box">${this._buffHtml()}</div>
       </div>
       ${this._equipHtml(this._inv)}`;
 
@@ -466,6 +494,13 @@ Screens.home = {
       if (e.kind === "attack") {
         if (!e.hit) out.push(`<span class="dim">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → MISS</span>`);
         else out.push(`<span class="${e.crit ? "crit" : "hit"}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${e.damage}${e.crit ? " 暴擊!" : ""}</span>`);
+      } else if (e.kind === "skill") {
+        const dmg = e.damage ? ` → ${e.damage}` : "";
+        const tgt = e.target && e.target !== e.actor ? `對 ${esc(e.target)} ` : "";
+        out.push(`<span class="${e.damage ? "crit" : "hit"}">  ${esc(e.actor)} ${tgt}施放【${esc(e.skill_name)}】${dmg}</span>`);
+      } else if (e.kind === "status_expired") {
+        const st = (e.status || "").replace(/_mod$/, "");
+        out.push(`<span class="dim">  ${esc(e.target)} 的 ${esc(STAT_ZH[st] || st)} 加成結束</span>`);
       } else if (e.kind === "kill") {
         out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}</span>`);
       } else if (e.kind === "heal") {

@@ -23,8 +23,12 @@ def cast_skill(caster, target, skill, rng: random.Random) -> list:
             events += _heal_skill(caster, skill, eff)
         elif t == "buff":
             _stat_mod_skill(caster, eff, skill.level, sign=1)
+            events.append(SkillEvent(actor=caster.name, target=caster.name,
+                                     skill_id=skill.skill_id, skill_name=skill.name))
         elif t == "debuff":
             _stat_mod_skill(target, eff, skill.level, sign=-1)
+            events.append(SkillEvent(actor=caster.name, target=target.name,
+                                     skill_id=skill.skill_id, skill_name=skill.name))
         # proc / passive_stat：no-op
     return events
 
