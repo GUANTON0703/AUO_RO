@@ -88,6 +88,7 @@ Screens.home = {
     this._hunting = null;
     this._sheet = await API.sheet(S.char.id).catch(() => null);
     S._sheet = this._sheet;
+    this._strategy = await API.huntStrategy(S.char.id).catch(() => null);
     let status = null;
     try { status = await API.huntStatus(); } catch (e) { if (e.status !== 409) throw e; }
     this._layout(status);
@@ -176,6 +177,54 @@ Screens.home = {
     setT("#hk-exp", `+${status.base_exp} / +${status.job_exp}`);
     setT("#hk-zeny", `+${status.zeny}`);
     setT("#hk-time", Math.floor(App.huntSecsShown()) + " 秒");
+    const lj = JSON.stringify(status.loot || {});
+    if (lj !== this._lootJson) {
+      this._lootJson = lj;
+      const lb = document.querySelector("#loot-box");
+      if (lb) { lb.innerHTML = this._lootHtml(status.loot); this._wireLoot(); }
+    }
+  },
+
+  _lootHtml(loot) {
+    const held = loot || {};
+    const sell = new Set((this._strategy && this._strategy.sell_item_ids) || []);
+    const sellable = (id) => (S.catalog?.items?.[id]?.npc_sell || 0) > 0;
+    // 撿到的 + 已被自動賣掉的（清單裡有但背包已清空）都列出來，才能取消勾選
+    const ids = [...new Set([...Object.keys(held), ...sell])];
+    if (!ids.length) return `<p class="muted" style="margin-top:8px">本場還沒撿到東西</p>`;
+    return `<div style="margin-top:8px"><div class="sub">本場撿到（勾 = 之後自動賣掉）</div>` +
+      ids.map((id) => {
+        const qty = held[id] || 0;
+        const label = qty > 0 ? `${esc(itemName(id))} ×${qty}`
+          : `${esc(itemName(id))}（已自動賣出）`;
+        return `
+        <label class="kv" style="cursor:pointer">
+          <span>${label}</span>
+          ${sellable(id) || sell.has(id)
+            ? `<input type="checkbox" data-sell="${esc(id)}" style="width:auto" ${sell.has(id) ? "checked" : ""}>`
+            : `<span class="dim" style="font-size:.85em">不可賣</span>`}
+        </label>`;
+      }).join("") + `</div>`;
+  },
+  _wireLoot() {
+    document.querySelectorAll("#loot-box [data-sell]").forEach((cb) => {
+      cb.onchange = async () => {
+        const id = cb.dataset.sell;
+        const strat = this._strategy || (this._strategy = {});
+        const prev = strat.sell_item_ids ? [...strat.sell_item_ids] : [];
+        const set = new Set(prev);
+        cb.checked ? set.add(id) : set.delete(id);
+        strat.sell_item_ids = [...set];
+        try {
+          await API.setHuntStrategy(S.char.id, strat);
+          App.toast(cb.checked ? "已設為自動賣" : "取消自動賣");
+        } catch (e) {
+          strat.sell_item_ids = prev;
+          cb.checked = !cb.checked;
+          App.toast(e.detail || "失敗", true);
+        }
+      };
+    });
   },
 
   _layout(status) {
@@ -213,6 +262,7 @@ Screens.home = {
           <div class="kv"><span class="k">本場 Zeny</span><span id="hk-zeny">+${status.zeny}</span></div>
           <div class="kv"><span class="k">掛機時間</span><span id="hk-time">${Math.floor(App.huntSecsShown())} 秒</span></div>
           <div class="log" id="huntlog">${this._shown.join("\n") || "<span class='dim'>搜尋目標中…</span>"}</div>
+          <div id="loot-box">${this._lootHtml(status.loot)}</div>
           <div class="row" style="margin-top:10px">
             <button class="btn block" id="btn-stop">停止掛機並結算</button>
           </div>
@@ -228,6 +278,8 @@ Screens.home = {
         <button class="btn primary block" onclick="App.navigate('hunt')">去掛機</button></div>`;
     }
     view().innerHTML = html;
+    this._lootJson = JSON.stringify((status && status.loot) || {});
+    this._wireLoot();
 
     const stopBtn = document.querySelector("#btn-stop");
     if (stopBtn) stopBtn.onclick = async () => {
@@ -277,6 +329,7 @@ Screens.hunt = {
       .sort((a, b) => (a.unlock_base_level || 1) - (b.unlock_base_level || 1));
     this._picked = new Set();
     this._mapId = null;
+    this._strategy = await API.huntStrategy(S.char.id).catch(() => ({}));
 
     let html = `<div class="card"><h3>選狩獵地圖</h3><div class="list" id="maplist">`;
     for (const m of maps) {
@@ -285,12 +338,60 @@ Screens.hunt = {
         ・${m.monster_ids.map(monName).join("、")}</div></button>`;
     }
     if (!maps.length) html += `<p class="muted">還沒有解鎖的地圖。</p>`;
-    html += `</div></div><div id="monsterpick"></div>`;
+    html += `</div></div><div id="monsterpick"></div>` + this._strategyCard();
     view().innerHTML = html;
 
     view().querySelectorAll("[data-map]").forEach((b) => {
       b.onclick = () => { this._selectMap(b.dataset.map); };
     });
+    this._wireStrategy();
+  },
+
+  _strategyCard() {
+    const s = this._strategy || {};
+    const potions = Object.values(S.catalog.items || {})
+      .filter((it) => (it.effects || []).some((e) => e.type === "heal_hp"));
+    const opt = (list, sel) => list.map((it) =>
+      `<option value="${it.id}"${it.id === sel ? " selected" : ""}>${esc(it.name)}</option>`).join("");
+    return `
+      <div class="card"><h3>掛機設定</h3>
+        <label class="kv" style="cursor:pointer">
+          <span>自動喝水</span>
+          <input type="checkbox" id="st-autopot" style="width:auto" ${s.auto_potion !== false ? "checked" : ""}>
+        </label>
+        <div class="kv"><span class="k">血量低於</span>
+          <span><input type="number" id="st-hppct" min="5" max="95" style="width:64px"
+            value="${Math.round((s.potion_hp_pct ?? 0.5) * 100)}"> %　才喝</span></div>
+        <label class="kv" style="cursor:pointer">
+          <span>自動買水</span>
+          <input type="checkbox" id="st-autobuy" style="width:auto" ${s.auto_buy_potion ? "checked" : ""}>
+        </label>
+        <div class="kv"><span class="k">買哪瓶</span>
+          <select id="st-buyid" style="width:auto">${opt(potions, s.buy_potion_id || "red_potion")}</select></div>
+        <div class="kv"><span class="k">補到手上有</span>
+          <span><input type="number" id="st-buyupto" min="0" max="999" style="width:72px"
+            value="${s.buy_potion_upto || 0}"> 瓶</span></div>
+        <button class="btn primary block" id="st-save" style="margin-top:10px">儲存掛機設定</button>
+      </div>`;
+  },
+  _wireStrategy() {
+    const btn = document.querySelector("#st-save");
+    if (!btn) return;
+    btn.onclick = async () => {
+      const g = (id) => document.querySelector(id);
+      const strat = {
+        ...(this._strategy || {}),
+        auto_potion: g("#st-autopot").checked,
+        potion_hp_pct: Math.min(0.95, Math.max(0.05, (Number(g("#st-hppct").value) || 50) / 100)),
+        auto_buy_potion: g("#st-autobuy").checked,
+        buy_potion_id: g("#st-buyid").value,
+        buy_potion_upto: Math.max(0, Math.floor(Number(g("#st-buyupto").value) || 0)),
+      };
+      btn.disabled = true;
+      try { await API.setHuntStrategy(S.char.id, strat); this._strategy = strat; App.toast("已儲存"); }
+      catch (e) { App.toast(e.detail || "儲存失敗", true); }
+      btn.disabled = false;
+    };
   },
   _selectMap(mid) {
     this._mapId = mid;

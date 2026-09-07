@@ -88,7 +88,7 @@ def set_hunt_state(character_id: int, *, map_id, monster_id, started_at,
                 hunting_map_id = ?, hunting_monster_id = ?, hunt_started_at = ?,
                 hunt_last_settled_at = ?, hunt_hp = ?, hunt_sp = ?,
                 hunt_kills = 0, hunt_base_exp = 0, hunt_job_exp = 0, hunt_zeny = 0,
-                hunt_seconds = 0
+                hunt_seconds = 0, hunt_loot = '{}'
             WHERE id = ?
             """,
             (map_id, monster_id, started_at, last_settled_at, hp, sp, character_id),
@@ -127,6 +127,30 @@ def update_hunt_target(character_id: int, monster_id: str) -> None:
                      (monster_id, character_id))
 
 
+def adjust_zeny(character_id: int, delta: int) -> int:
+    """加減 Zeny，回傳結果。不會低於 0。"""
+    with connection.get_connection() as conn:
+        conn.execute(
+            "UPDATE characters SET zeny = MAX(0, zeny + ?) WHERE id = ?",
+            (delta, character_id),
+        )
+        return conn.execute(
+            "SELECT zeny FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()["zeny"]
+
+
+def spend_zeny(character_id: int, amount: int) -> bool:
+    """原子扣款：餘額不足回傳 False，不會扣成負數。"""
+    if amount <= 0:
+        return True
+    with connection.get_connection() as conn:
+        cur = conn.execute(
+            "UPDATE characters SET zeny = zeny - ? WHERE id = ? AND zeny >= ?",
+            (amount, character_id, amount),
+        )
+        return cur.rowcount > 0
+
+
 def apply_progression(character_id: int, *, base_level: int, base_exp: int,
                       job_level: int, job_exp: int, zeny_delta: int) -> None:
     with connection.get_connection() as conn:
@@ -152,6 +176,25 @@ def merge_hunt_loot(character_id: int, loot_delta: dict, pity_replace: dict) -> 
         conn.execute(
             "UPDATE characters SET hunt_loot = ?, hunt_pity = ? WHERE id = ?",
             (json.dumps(loot), json.dumps(pity_replace or {}), character_id),
+        )
+
+
+def reduce_hunt_loot(character_id: int, sold: dict) -> None:
+    """自動賣掉的道具從本場撿到清單扣掉（顯示的是「留下的」）。"""
+    with connection.get_connection() as conn:
+        row = conn.execute(
+            "SELECT hunt_loot FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()
+        loot = json.loads(row["hunt_loot"]) if row and row["hunt_loot"] else {}
+        for k, v in (sold or {}).items():
+            left = loot.get(k, 0) - v
+            if left > 0:
+                loot[k] = left
+            else:
+                loot.pop(k, None)
+        conn.execute(
+            "UPDATE characters SET hunt_loot = ? WHERE id = ?",
+            (json.dumps(loot), character_id),
         )
 
 

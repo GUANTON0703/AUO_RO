@@ -11,12 +11,17 @@ def test_strategy_accepts_target_filters_and_item_policies():
         flee_on_boss=True,
         auto_potion=True,
         potion_item_id="red_potion",
-        buy_potions=True,
-        sell_items=True,
+        potion_hp_pct=0.4,
+        auto_buy_potion=True,
+        buy_potion_id="red_potion",
+        buy_potion_upto=50,
+        sell_item_ids=["jellopy", "fluff"],
     )
     assert strategy.include_monsters == ["poring", "lunatic"]
     assert strategy.flee_on_boss is True
-    assert strategy.buy_potions is True
+    assert strategy.auto_buy_potion is True
+    assert strategy.buy_potion_upto == 50
+    assert strategy.sell_item_ids == ["jellopy", "fluff"]
 
 
 def test_random_event_rolls_are_deterministic_and_testable():

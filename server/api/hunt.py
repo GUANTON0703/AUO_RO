@@ -4,7 +4,7 @@ from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from server.auth.dependencies import CurrentAccount
 from server.config import get_settings
@@ -51,8 +51,11 @@ class HuntStrategyRequest(BaseModel):
     flee_on_boss: bool = True
     auto_potion: bool = True
     potion_item_id: str | None = None
-    buy_potions: bool = False
-    sell_items: bool = False
+    potion_hp_pct: float = Field(default=0.5, ge=0.05, le=0.95)
+    auto_buy_potion: bool = False
+    buy_potion_id: str | None = None
+    buy_potion_upto: int = Field(default=0, ge=0, le=999)
+    sell_item_ids: list[str] = []
 
 
 def _current_character(account_id: int):
@@ -101,21 +104,71 @@ def _snapshot(row, *, hp=None, sp=None) -> CharacterSnapshot:
     )
 
 
-def _pick_potion(character_id: int):
-    """回傳 (item_id, heal, qty)；沒有可用補品回 (None, 0, 0)。"""
+def _heal_amount(item) -> int:
+    if item is None:
+        return 0
+    return max((e.get("amount", 0) for e in item.effects
+               if e.get("type") == "heal_hp"), default=0)
+
+
+def _pick_potion(character_id: int, preferred_id: str | None = None):
+    """回傳 (item_id, heal, qty)；沒有可用補品回 (None, 0, 0)。
+    指定 preferred_id 且背包有、又能回血 → 用它；否則自動挑回血最多的。"""
+    qty_of = inventory.item_qty(character_id, preferred_id) if preferred_id else 0
+    if preferred_id and qty_of > 0:
+        heal = _heal_amount(_content.items.get(preferred_id))
+        if heal > 0:
+            return (preferred_id, heal, qty_of)
     inv = inventory.list_inventory(character_id)
     best = (None, 0, 0)
     for item_id, qty in inv["items"].items():
         item = _content.items.get(item_id)
         if item is None or item.kind != "consumable" or qty <= 0:
             continue
-        heal = max(
-            (e.get("amount", 0) for e in item.effects if e.get("type") == "heal_hp"),
-            default=0,
-        )
+        heal = _heal_amount(item)
         if heal > best[1]:
             best = (item_id, heal, qty)
     return best
+
+
+def _auto_buy_potions(character_id: int, strategy) -> None:
+    """掛機自動補水：買到手上有 buy_potion_upto 瓶，錢不夠就買能買的。"""
+    if not strategy.auto_buy_potion or strategy.buy_potion_upto <= 0:
+        return
+    pid = strategy.buy_potion_id or "red_potion"
+    item = _content.items.get(pid)
+    if item is None or not item.npc_buy or item.npc_buy <= 0:
+        return
+    if item.kind != "consumable" or _heal_amount(item) <= 0:
+        return
+    have = inventory.item_qty(character_id, pid)
+    want = strategy.buy_potion_upto - have
+    if want <= 0:
+        return
+    current_zeny = characters_repo.get_character(character_id)["zeny"]
+    buy_n = min(want, current_zeny // item.npc_buy)
+    if buy_n <= 0:
+        return
+    if characters_repo.spend_zeny(character_id, buy_n * item.npc_buy):
+        inventory.add_item(character_id, pid, buy_n)
+
+
+def _auto_sell(character_id: int, strategy) -> int:
+    """每次結算把 sell_item_ids 裡的道具整批賣掉，回傳賣得的 Zeny。"""
+    gained = 0
+    sold: dict = {}
+    for iid in strategy.sell_item_ids or []:
+        item = _content.items.get(iid)
+        if item is None or item.npc_sell <= 0:
+            continue
+        qty = inventory.item_qty(character_id, iid)
+        if qty > 0 and inventory.consume_item(character_id, iid, qty):
+            gained += item.npc_sell * qty
+            sold[iid] = qty
+    if gained:
+        characters_repo.adjust_zeny(character_id, gained)
+        characters_repo.reduce_hunt_loot(character_id, sold)
+    return gained
 
 
 @router.post("/start")
@@ -178,6 +231,14 @@ def _character_block(row) -> dict:
     }
 
 
+def _loot(row) -> dict:
+    """本場累積撿到的道具 {item_id: qty}。"""
+    try:
+        return json.loads(row["hunt_loot"]) if row["hunt_loot"] else {}
+    except (KeyError, TypeError, ValueError):
+        return {}
+
+
 def _no_op_settlement(fresh) -> dict:
     """別的並發請求已結算過時回這個：目前角色狀態、無增量。"""
     batch = _last_batch.get(fresh["id"], {})
@@ -187,6 +248,7 @@ def _no_op_settlement(fresh) -> dict:
         "batch_id": batch.get("batch_id"),
         "kills": fresh["hunt_kills"], "base_exp": fresh["hunt_base_exp"],
         "job_exp": fresh["hunt_job_exp"], "zeny": fresh["hunt_zeny"], "drops": {},
+        "loot": _loot(fresh),
         "offline": False, "effective_seconds": fresh["hunt_seconds"],
         "retreated": False, "retreat_reason": None, "events": [],
         "character": _character_block(fresh),
@@ -202,6 +264,7 @@ def _accumulated_snapshot(row) -> dict:
         "batch_id": batch.get("batch_id"),
         "kills": row["hunt_kills"], "base_exp": row["hunt_base_exp"],
         "job_exp": row["hunt_job_exp"], "zeny": row["hunt_zeny"], "drops": {},
+        "loot": _loot(row),
         "offline": False, "effective_seconds": row["hunt_seconds"],
         "retreated": False, "retreat_reason": None,
         "events": batch.get("events", []),
@@ -249,13 +312,20 @@ def _settle_current(row, *, force=False) -> dict:
             (now.isoformat(), row["id"]),
         )
 
-    potion_id, potion_heal, potion_count = _pick_potion(row["id"])
+    strategy = _strategies.get(row["id"], HuntStrategy())
+    _auto_buy_potions(row["id"], strategy)
+
+    if strategy.auto_potion:
+        potion_id, potion_heal, potion_count = _pick_potion(row["id"], strategy.potion_item_id)
+    else:
+        potion_id, potion_heal, potion_count = (None, 0, 0)
 
     rng = random.Random(hash(row["hunt_last_settled_at"]) & 0xFFFFFFFF)
     result = settle(
         player, monster, elapsed, cfg, rng,
         offline=offline, pity_in=json.loads(row["hunt_pity"]),
         potion_item_id=potion_id, potion_heal=potion_heal, potion_count=potion_count,
+        hp_threshold=strategy.potion_hp_pct,
     )
 
     # 這次沒湊出任何一場戰鬥（時間還在攢）→ 撤銷剛才的「認領」，什麼都不寫，
@@ -280,6 +350,7 @@ def _settle_current(row, *, force=False) -> dict:
     inventory.apply_drops(row["id"], result.drops)
     if potion_id and result.potions_used:
         inventory.consume_item(row["id"], potion_id, result.potions_used)
+    sell_gain = _auto_sell(row["id"], strategy)
 
     # 線上結算只「用掉」湊完整場戰鬥的時間，剩下的留給下次 → 玩家一直輪詢
     # 也不會把零碎時間燒光。離線批次結算則整段吃掉。
@@ -294,7 +365,7 @@ def _settle_current(row, *, force=False) -> dict:
         row["id"], hp=result.final_hp, sp=result.final_sp,
         last_settled_at=settled_until.isoformat(),
         kills=result.kills, base_exp=result.base_exp,
-        job_exp=result.job_exp, zeny=result.zeny,
+        job_exp=result.job_exp, zeny=result.zeny + sell_gain,
         seconds=hunt_secs_delta,
     )
 
@@ -306,7 +377,6 @@ def _settle_current(row, *, force=False) -> dict:
     else:
         after = characters_repo.get_character(row["id"])
         map_def = _content.maps[row["hunting_map_id"]]
-        strategy = _strategies.get(row["id"], HuntStrategy())
         pick_player = build_player_combatant(
             _snapshot(after, hp=after["hunt_hp"], sp=after["hunt_sp"]), _content
         )
@@ -362,6 +432,8 @@ def _settle_current(row, *, force=False) -> dict:
         "job_exp": fresh["hunt_job_exp"],
         "zeny": fresh["hunt_zeny"],
         "drops": result.drops,
+        "loot": _loot(fresh),
+        "sold": sell_gain,
         "offline": offline,
         "effective_seconds": fresh["hunt_seconds"],
         "retreated": retreated,

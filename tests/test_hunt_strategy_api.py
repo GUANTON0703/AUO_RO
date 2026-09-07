@@ -4,8 +4,9 @@ def test_hunt_strategy_can_be_saved_and_read(client, auth, db_helpers):
     body = {
         "include_monsters": ["poring"], "exclude_monsters": ["boss"],
         "flee_on_boss": True, "auto_potion": True,
-        "potion_item_id": "red_potion", "buy_potions": True,
-        "sell_items": True,
+        "potion_item_id": "red_potion", "potion_hp_pct": 0.4,
+        "auto_buy_potion": True, "buy_potion_id": "red_potion",
+        "buy_potion_upto": 30, "sell_item_ids": ["jellopy"],
     }
     response = client.put(f"/api/hunt/strategy/{ch['id']}", headers=headers, json=body)
     assert response.status_code == 200
@@ -26,8 +27,7 @@ def test_auto_mode_respects_exclude_list(client, auth, db_helpers):
     ch = _strong_char(client, headers, db_helpers)
     client.put(f"/api/hunt/strategy/{ch['id']}", headers=headers,
                json={"include_monsters": [], "exclude_monsters": ["green_cotton_worm"],
-                     "flee_on_boss": True, "auto_potion": True,
-                     "potion_item_id": None, "buy_potions": False, "sell_items": False})
+                     "flee_on_boss": True, "auto_potion": True, "potion_item_id": None})
     client.post("/api/hunt/start", headers=headers,
                 json={"map_id": "prontera_east_gate"})
     db_helpers.rewind_hunt(ch["id"], seconds=20)
@@ -44,3 +44,45 @@ def _strong_char(client, headers, db_helpers):
     db_helpers.set_stats(ch["id"], {"str": 40, "agi": 20, "vit": 25, "int": 5,
                                     "dex": 25, "luk": 10})
     return ch
+
+
+def test_auto_sell_converts_drops_to_zeny(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = client.post("/api/characters", headers=h, json={"name": "自動賣"}).json()
+    db_helpers.set_base_level(ch["id"], 20)
+    db_helpers.set_stats(ch["id"], {"str": 40, "agi": 20, "vit": 25, "int": 5,
+                                    "dex": 25, "luk": 10})
+    client.put(f"/api/hunt/strategy/{ch['id']}", headers=h,
+               json={"sell_item_ids": ["jellopy", "sticky_mucus", "fluff",
+                                       "feather", "clover"]})
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_east_gate"})
+    z0 = client.get("/api/characters", headers=h).json()[0]["zeny"]
+    db_helpers.rewind_hunt(ch["id"], seconds=600)
+    body = client.get("/api/hunt/status", headers=h).json()
+    z1 = client.get("/api/characters", headers=h).json()[0]["zeny"]
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert body["kills"] > 0
+    assert body.get("sold", 0) > 0          # 有賣出
+    assert z1 - z0 > body["zeny"] - body.get("sold", 0)  # 總 zeny 含賣出所得
+    # 被列入自動賣的道具背包不會留
+    for iid in ("jellopy", "fluff"):
+        assert inv["items"].get(iid, 0) == 0
+
+
+def test_potion_hp_pct_and_auto_buy(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = client.post("/api/characters", headers=h, json={"name": "自動買水"}).json()
+    db_helpers.set_base_level(ch["id"], 12)
+    db_helpers.set_stats(ch["id"], {"str": 20, "agi": 8, "vit": 16, "int": 1,
+                                    "dex": 12, "luk": 1})
+    db_helpers.set_zeny(ch["id"], 100000)
+    client.put(f"/api/hunt/strategy/{ch['id']}", headers=h,
+               json={"auto_potion": True, "potion_hp_pct": 0.6,
+                     "auto_buy_potion": True, "buy_potion_id": "red_potion",
+                     "buy_potion_upto": 200})
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_east_gate"})
+    db_helpers.rewind_hunt(ch["id"], seconds=1800)
+    client.get("/api/hunt/status", headers=h)
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    # 自動買水補過貨（起始 10 瓶，掛機途中會補到接近 200）
+    assert inv["items"].get("red_potion", 0) > 50

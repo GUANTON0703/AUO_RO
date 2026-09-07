@@ -1,7 +1,7 @@
 import copy
 import math
 import random
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from server.combat.combatant import Combatant
 from server.combat.engine import simulate_fight
@@ -49,7 +49,9 @@ def _rare_drop_events(monster: MonsterDef, drops: dict, cfg: HuntConfig) -> list
 def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
            cfg: HuntConfig, rng: random.Random, *, offline: bool, pity_in: dict,
            potion_item_id: str | None = None, potion_heal: int = 0,
-           potion_count: int = 0) -> SettlementResult:
+           potion_count: int = 0, hp_threshold: float | None = None) -> SettlementResult:
+    if hp_threshold is not None:
+        cfg = replace(cfg, potion_hp_threshold=hp_threshold)
 
     random_event = choose_hunt_event(monster.role == "boss", rng, cfg)
     if random_event and random_event.kind == "boss_retreat":

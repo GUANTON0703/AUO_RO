@@ -8,9 +8,12 @@ class HuntStrategy:
     exclude_monsters: list[str] = field(default_factory=list)
     flee_on_boss: bool = True
     auto_potion: bool = True
-    potion_item_id: str | None = None
-    buy_potions: bool = False
-    sell_items: bool = False
+    potion_item_id: str | None = None          # 指定喝哪瓶，None = 自動挑回血最多的
+    potion_hp_pct: float = 0.5                  # 血量低於此比例才喝（0~1）
+    auto_buy_potion: bool = False               # 掛機時自動補水
+    buy_potion_id: str | None = None            # 買哪瓶，None = red_potion
+    buy_potion_upto: int = 0                    # 補到手上有這麼多瓶
+    sell_item_ids: list[str] = field(default_factory=list)   # 每次結算自動賣掉這些道具
 
     def allows(self, monster_id: str) -> bool:
         return monster_id not in self.exclude_monsters and (
