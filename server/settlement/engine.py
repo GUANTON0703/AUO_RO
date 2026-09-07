@@ -158,7 +158,13 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
 
     base_exp = round(kills * monster.base_exp * cfg.experience_multiplier)
     job_exp = round(kills * monster.job_exp * cfg.experience_multiplier)
-    zeny = round(kills * zeny_per_kill(monster) * cfg.zeny_multiplier)
+    # 偷竊：以每場成功機率估算額外 Zeny（統計路徑沒逐場模擬）。偷竊掛在普攻上，
+    # 施法職多半不普攻 → 只算物理職，且再打折當作沒每場都摸到。
+    steal_pct = min(100, getattr(player, "procs", {}).get("steal_loot", 0))
+    steal_zeny = 0 if player.is_caster else round(
+        kills * steal_pct / 100 * 0.6 * zeny_per_kill(monster) * 0.5
+        * cfg.zeny_multiplier)
+    zeny = round(kills * zeny_per_kill(monster) * cfg.zeny_multiplier) + steal_zeny
     drops, pity_out = roll_drops(monster.drops, kills, rng, offline=offline,
                                  pity_in=pity_in, cfg=cfg)
 

@@ -141,8 +141,8 @@ def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAUL
         if healed > 0:
             events.append(HealEvent(a.name, a.name, healed, source="potion"))
 
-    # 先手：aspd 高者先，平手 a 先
-    first, second = (a, b) if a.aspd >= b.aspd else (b, a)
+    # 先手：aspd 高者先，平手 a 先（吃得到場間留存的加速 buff）
+    first, second = (a, b) if a.effective_aspd >= b.effective_aspd else (b, a)
     while a.alive and b.alive and rounds < max_rounds:
         rounds += 1
         for c in (first, second):
