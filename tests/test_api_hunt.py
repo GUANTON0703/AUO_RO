@@ -33,6 +33,17 @@ def test_hunt_consumes_potions_from_inventory(client, auth, db_helpers):
     assert inv["items"].get("red_potion", 200) < 200
 
 
+def test_hunt_warm_start_yields_kills_on_first_status(client, auth, db_helpers):
+    # 暖啟動：按下掛機後不 rewind，第一次 status 就該結算出一場戰鬥
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=h,
+                json={"map_id": "prontera_south_field"})
+    body = client.get("/api/hunt/status", headers=h).json()
+    assert body["kills"] >= 1
+    assert not body["offline"]
+
+
 def test_start_hunt_validates_unlock_level(client, auth, db_helpers):
     _, headers, _ = auth
     _ready_char(client, headers, db_helpers, base_level=1)

@@ -81,3 +81,8 @@ def init_db() -> None:
         ):
             if name not in character_columns:
                 conn.execute(f"ALTER TABLE characters ADD COLUMN {name} {definition}")
+        # 飾品從單格改成左右兩格：舊資料的 'accessory' 併到左格
+        conn.execute(
+            "UPDATE character_equipment SET equipped_slot = 'accessory1' "
+            "WHERE equipped_slot = 'accessory'"
+        )

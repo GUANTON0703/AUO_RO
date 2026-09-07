@@ -67,14 +67,32 @@ def equip(character_id: int, body: EquipRequest, account_id: CurrentAccount):
             status_code=400, detail=f"Base Level 未達裝備需求（{eq.required_level}）"
         )
     with connection.transaction() as conn:
+        if eq.slot == "accessory":
+            # 飾品有左右兩格：先塞空的那格，兩格都滿就換掉左格（accessory1）
+            if inst["equipped_slot"] in ("accessory1", "accessory2"):
+                return inventory.list_inventory(character_id)
+            used = {
+                r["equipped_slot"]
+                for r in conn.execute(
+                    "SELECT equipped_slot FROM character_equipment "
+                    "WHERE character_id = ? AND equipped_slot IN "
+                    "('accessory1', 'accessory2')",
+                    (character_id,),
+                ).fetchall()
+            }
+            target = "accessory1" if "accessory1" not in used else (
+                "accessory2" if "accessory2" not in used else "accessory1"
+            )
+        else:
+            target = eq.slot
         conn.execute(
             "UPDATE character_equipment SET equipped_slot = NULL "
             "WHERE character_id = ? AND equipped_slot = ?",
-            (character_id, eq.slot),
+            (character_id, target),
         )
         conn.execute(
             "UPDATE character_equipment SET equipped_slot = ? WHERE id = ?",
-            (eq.slot, inst["id"]),
+            (target, inst["id"]),
         )
     return inventory.list_inventory(character_id)
 

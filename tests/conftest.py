@@ -16,10 +16,14 @@ def _reset_hunt_memory():
     hunt._strategies.clear()
     hunt._last_batch.clear()
     hunt._hunt_meta.clear()
+    hunt._warm_start_at.clear()
+    hunt._warm_start_pending.clear()
     yield
     hunt._strategies.clear()
     hunt._last_batch.clear()
     hunt._hunt_meta.clear()
+    hunt._warm_start_at.clear()
+    hunt._warm_start_pending.clear()
 
 
 @pytest.fixture

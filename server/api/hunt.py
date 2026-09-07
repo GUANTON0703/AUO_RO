@@ -16,6 +16,7 @@ from server.repositories import characters as characters_repo
 from server.repositories import inventory
 from server.settlement import HuntConfig, settle
 from server.settlement.huntable import huntable_monsters, pick_start_monster
+from server.settlement.profile import estimate_fight_profile
 from server.settlement.strategy import HuntStrategy
 
 router = APIRouter(prefix="/api/hunt", tags=["hunt"])
@@ -28,6 +29,11 @@ _strategies: dict[int, HuntStrategy] = {}
 _last_batch: dict[int, dict] = {}
 # character_id -> (快取鍵, 可打怪清單)；避免每次結算都重跑勝率模擬
 _hunt_meta: dict[int, tuple] = {}
+# character_id -> 上次拿到暖啟動加成的時間；擋 start/stop 連點刷進度
+_warm_start_at: dict[int, "datetime"] = {}
+# 已標記、還沒被第一次 /status 消化的暖啟動
+_warm_start_pending: set[int] = set()
+_WARM_START_COOLDOWN = 90.0
 
 
 def _forget_hunt(cid: int) -> None:
@@ -211,7 +217,16 @@ def start_hunt(body: StartRequest, account_id: CurrentAccount):
             detail="這張地圖的怪你現在都打不贏，先加點或換更弱的地圖。",
         )
 
-    now = _now_iso()
+    now_dt = datetime.now(timezone.utc)
+    # 暖啟動：標記這個角色，第一次 /status 直接送一場戰鬥的量，玩家按下掛機
+    # 幾秒內就看到打鬥、不用乾等二十幾秒。連點 start/stop 有冷卻擋著。
+    last_warm = _warm_start_at.get(row["id"])
+    if last_warm is None or (now_dt - last_warm).total_seconds() > _WARM_START_COOLDOWN:
+        _warm_start_pending.add(row["id"])
+        _warm_start_at[row["id"]] = now_dt
+    else:
+        _warm_start_pending.discard(row["id"])
+    now = now_dt.isoformat()
     characters_repo.set_hunt_state(
         row["id"], map_id=body.map_id, monster_id=monster_id,
         started_at=now, last_settled_at=now,
@@ -288,17 +303,29 @@ def _settle_current(row, *, force=False) -> dict:
         last = last.replace(tzinfo=timezone.utc)
     elapsed = max(0.0, (now - last).total_seconds())
     offline = elapsed > settings.online_grace_seconds
+    warm_start = row["id"] in _warm_start_pending
 
     # 結算防抖：距上次結算太近就只回累積值，不重算（省 CPU/寫入）。
-    # 這個門檻很小（預設幾秒），不影響「感覺有在跑」。真正的防浪費靠下面的
-    # 「只用掉湊完整場的時間、剩下留給下次」。
-    if not force and not offline and elapsed < cfg.settle_floor_seconds:
+    # 暖啟動要跳過防抖，讓玩家按下掛機的第一次 /status 就結算得出東西。
+    if not force and not offline and not warm_start \
+            and elapsed < cfg.settle_floor_seconds:
         return _accumulated_snapshot(row)
 
     snap = _snapshot(row, hp=row["hunt_hp"], sp=row["hunt_sp"])
     player = build_player_combatant(snap, _content)
     monster = _content.get_monster(row["hunting_monster_id"])
     job = _content.get_job(row["job_id"])
+
+    # 暖啟動：消掉標記。只有在真實 elapsed 還很小（玩家剛按下掛機、還沒離開）時
+    # 才把結算時間拉高到剛好一場戰鬥的量，讓第一次 /status 就打得出東西。
+    # 真的離開一段時間才回來（elapsed 大）就照常結算，不要硬轉成線上。
+    if warm_start and not force:
+        _warm_start_pending.discard(row["id"])
+        if elapsed < settings.online_grace_seconds:
+            offline = False
+            prof = estimate_fight_profile(player, monster, random.Random(), samples=6)
+            one_fight = prof.avg_rounds * cfg.round_seconds + cfg.rest_seconds
+            elapsed = max(elapsed, one_fight + cfg.round_seconds * 2)
 
     # 併發防護：BEGIN IMMEDIATE 序列化競爭的 status 請求。交易內重讀時間戳，
     # 若已被別的請求結算過就直接回目前狀態；否則立刻「認領」（寫回 now），
@@ -457,6 +484,7 @@ def hunt_status(account_id: CurrentAccount):
 @router.post("/stop")
 def stop_hunt(account_id: CurrentAccount):
     row = _current_character(account_id)
+    _warm_start_pending.discard(row["id"])   # 沒消化到的暖啟動作廢，不留到下次
     out = _settle_current(row, force=True)
     characters_repo.clear_hunt_state(row["id"])
     _forget_hunt(row["id"])

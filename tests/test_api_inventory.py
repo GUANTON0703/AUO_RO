@@ -75,6 +75,47 @@ def test_unequip(client, auth, db_helpers):
     assert _equip_list(client, ch, h)[0]["equipped_slot"] is None
 
 
+def test_accessory_fills_two_slots(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.give_equipment(ch["id"], "clip")
+    db_helpers.give_equipment(ch["id"], "clip")
+    a, b = _equip_list(client, ch, h)
+    for inst in (a, b):
+        client.post(f"/api/characters/{ch['id']}/inventory/equip", headers=h,
+                    json={"equipment_instance_id": inst["id"]})
+    slots = sorted(e["equipped_slot"] for e in _equip_list(client, ch, h))
+    assert slots == ["accessory1", "accessory2"]
+
+
+def test_third_accessory_replaces_left(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    for _ in range(3):
+        db_helpers.give_equipment(ch["id"], "clip")
+    a, b, c = _equip_list(client, ch, h)
+    for inst in (a, b, c):
+        client.post(f"/api/characters/{ch['id']}/inventory/equip", headers=h,
+                    json={"equipment_instance_id": inst["id"]})
+    equipped = {e["id"]: e["equipped_slot"] for e in _equip_list(client, ch, h)
+               if e["equipped_slot"]}
+    assert set(equipped.values()) == {"accessory1", "accessory2"}
+    assert equipped[c["id"]] == "accessory1"       # 第三個換掉左格
+    assert a["id"] not in equipped                 # 原左格被卸下
+
+
+def test_unequip_accessory_by_slot(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.give_equipment(ch["id"], "clip")
+    inst = _equip_list(client, ch, h)[0]
+    client.post(f"/api/characters/{ch['id']}/inventory/equip", headers=h,
+                json={"equipment_instance_id": inst["id"]})
+    client.post(f"/api/characters/{ch['id']}/inventory/unequip", headers=h,
+                json={"slot": "accessory1"})
+    assert _equip_list(client, ch, h)[0]["equipped_slot"] is None
+
+
 def test_socket_card(client, auth, db_helpers):
     _, h, _ = auth
     ch = _char(client, h, db_helpers)

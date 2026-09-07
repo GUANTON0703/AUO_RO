@@ -29,11 +29,28 @@ function bar(cur, max, cls) {
 }
 
 // ---- 內容說明（給商店 / 背包 / 交易顯示「這東西幹嘛用」）----
-const SLOT_ZH = { weapon: "武器", armor: "身體", headgear: "頭", garment: "披風",
-  shoes: "鞋", accessory: "飾品", shield: "盾" };
+const SLOT_ZH = { weapon: "武器", offhand: "副手", head: "頭部", armor: "鎧甲",
+  garment: "披肩", shoes: "鞋子", accessory: "飾品",
+  accessory1: "飾品（左）", accessory2: "飾品（右）", shield: "盾" };
+// 狀態頁裝備欄顯示順序
+const SLOT_ORDER = [
+  ["weapon", "武器"], ["offhand", "副手"], ["head", "頭部"], ["armor", "鎧甲"],
+  ["garment", "披肩"], ["shoes", "鞋子"],
+  ["accessory1", "飾品（左）"], ["accessory2", "飾品（右）"],
+];
 const STAT_ZH = { str: "力量", agi: "敏捷", vit: "體質", int: "智力", dex: "靈巧",
   luk: "幸運", atk: "攻擊", matk: "魔攻", def: "防禦", mdef: "魔防", hit: "命中",
-  flee: "迴避", crit: "爆擊", aspd: "攻速", max_hp: "HP上限", max_sp: "SP上限" };
+  flee: "迴避", crit: "爆擊", aspd: "攻速", max_hp: "HP上限", max_sp: "SP上限",
+  defense: "防禦", magic_defense: "魔防", attack: "攻擊", magic_attack: "魔攻",
+  hp: "HP上限", sp: "SP上限", accuracy: "命中", evasion: "迴避", critical: "爆擊" };
+
+const ELEM_ZH = { neutral: "無", water: "水", earth: "地", fire: "火", wind: "風",
+  poison: "毒", holy: "聖", shadow: "暗", ghost: "念", undead: "不死" };
+const RACE_ZH = { formless: "無形", undead: "不死", animal: "動物", plant: "植物",
+  insect: "昆蟲", fish: "魚貝", demon: "惡魔", demihuman: "人形", angel: "天使",
+  dragon: "龍" };
+const PROC_ZH = { stun: "暈眩", poison: "中毒", blind: "致盲", silence: "沉默",
+  freeze: "冰凍", sleep: "睡眠", curse: "詛咒", bleed: "流血" };
 
 function effectText(e) {
   if (!e) return "";
@@ -42,6 +59,10 @@ function effectText(e) {
   if (e.type === "teleport") return "隨機傳送到附近";
   if (e.type === "flat_stat") return `${STAT_ZH[e.stat] || e.stat} +${e.amount}`;
   if (e.type === "pct_stat") return `${STAT_ZH[e.stat] || e.stat} +${e.amount}%`;
+  if (e.type === "percent_stat") return `${STAT_ZH[e.stat] || e.stat} +${e.pct}%`;
+  if (e.type === "element_resist") return `${ELEM_ZH[e.element] || e.element}屬性抗性 +${e.pct}%`;
+  if (e.type === "race_damage") return `對${RACE_ZH[e.race] || e.race}傷害 +${e.pct}%`;
+  if (e.type === "on_hit_proc") return `攻擊 ${e.chance_pct}% 機率${PROC_ZH[e.effect] || e.effect}`;
   return e.type;
 }
 
@@ -76,6 +97,14 @@ function gearDesc(id) {
   return "";
 }
 
+// 卡片說明：效果 + 可鑲部位（背包卡片區用）
+function cardDesc(id) {
+  const cd = S.catalog?.cards?.[id];
+  if (!cd) return "";
+  const fx = (cd.effects || []).map(effectText).filter(Boolean).join("、");
+  return `${fx || "特殊效果"}　可鑲：${SLOT_ZH[cd.slot] || cd.slot}`;
+}
+
 const Screens = {};
 
 // ---------- 狀態（首頁）----------
@@ -94,6 +123,8 @@ Screens.home = {
     this._strategy = await API.huntStrategy(S.char.id).catch(() => null);
     let status = null;
     try { status = await API.huntStatus(); } catch (e) { if (e.status !== 409) throw e; }
+    // status 這一趟可能撿到裝備，所以裝備清單在它之後才抓
+    this._inv = await API.inventory(S.char.id).catch(() => null);
     this._layout(status);
     if (status && !status.retreated) {
       this._ingest(status);
@@ -171,6 +202,8 @@ Screens.home = {
     if (dk.length) {
       lines.push(`<span class="kill">　取得 ${dk.map((k) =>
         `${esc(itemName(k))} ×${drops[k]}`).join("、")}</span>`);
+      // 撿到裝備 → 更新狀態頁的裝備欄
+      if (dk.some((k) => S.catalog?.equipment?.[k])) this._refreshEquip();
     }
     if (status.offline || lines.length > 30) {          // 離線大批次直接倒完
       this._queue.length = 0;
@@ -261,6 +294,38 @@ Screens.home = {
     });
   },
 
+  _equipHtml(inv) {
+    const eqs = (inv && inv.equipment) || [];
+    const bySlot = {};
+    for (const e of eqs) if (e.equipped_slot) bySlot[e.equipped_slot] = e;
+    const rows = SLOT_ORDER.map(([slot, zh]) => {
+      const e = bySlot[slot];
+      if (!e) {
+        return `<div class="kv"><span class="k">${zh}</span>` +
+          `<span class="dim">未裝備</span></div>`;
+      }
+      const rf = e.refine ? ` <span class="pill good">+${e.refine}</span>` : "";
+      const def = S.catalog?.equipment?.[e.equipment_id];
+      const n = def?.card_slots || 0;
+      const cards = (e.card_ids || []).map((c) => esc(itemName(c)));
+      let cardTxt = "";
+      if (n) {
+        const filled = cards.join("、");
+        const empty = n - cards.length;
+        cardTxt = `<div class="sub">卡：${filled || "－"}` +
+          `${empty > 0 ? `（空 ${empty} 孔）` : ""}</div>`;
+      }
+      return `<div class="kv" style="align-items:flex-start"><span class="k">${zh}</span>` +
+        `<span style="text-align:right">${esc(itemName(e.equipment_id))}${rf}${cardTxt}</span></div>`;
+    }).join("");
+    return `<div class="card" id="equip-box"><h3>裝備</h3>${rows}</div>`;
+  },
+  async _refreshEquip() {
+    this._inv = await API.inventory(S.char.id).catch(() => this._inv);
+    const box = document.querySelector("#equip-box");
+    if (box && S.view === "home") box.outerHTML = this._equipHtml(this._inv);
+  },
+
   _layout(status) {
     this._hunting = !!(status && !status.retreated);
     const c = S.char, sheet = this._sheet || {};
@@ -284,7 +349,8 @@ Screens.home = {
         <div class="bar sp"><i id="hm-spbar" style="width:${Math.min(100,(sp/Math.max(1,sheet.max_sp??1))*100)}%"></i></div>
         <div class="kv"><span class="k">Zeny</span><span id="hm-zeny">${c.zeny}</span></div>
         <div class="kv"><span class="k">地點</span><span>${esc(mapName(c.location_map))}</span></div>
-      </div>`;
+      </div>
+      ${this._equipHtml(this._inv)}`;
 
     if (this._hunting) {
       html += `
@@ -325,6 +391,7 @@ Screens.home = {
         App.toast(`結算：擊殺 ${r.kills}，經驗 +${r.base_exp}/${r.job_exp}`);
         await App.refreshChar();
         this._sheet = await API.sheet(S.char.id).catch(() => this._sheet);
+        this._inv = await API.inventory(S.char.id).catch(() => this._inv);
         this._layout(null);
       } catch (e) { App.toast(e.detail || "停止失敗", true); stopBtn.disabled = false; }
     };
@@ -475,3 +542,4 @@ window.Curve = Curve;
 window.jobName = jobName; window.jobTier = jobTier;
 window.monName = monName; window.mapName = mapName; window.itemName = itemName;
 window.itemDesc = itemDesc; window.gearDesc = gearDesc; window.effectText = effectText;
+window.cardDesc = cardDesc; window.SLOT_ZH = SLOT_ZH;

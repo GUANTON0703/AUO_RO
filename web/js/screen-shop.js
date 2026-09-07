@@ -119,7 +119,18 @@
       if (this._stale("bag")) return;
 
       const items = inv.items || {};
-      const itemRows = Object.entries(items).map(([id, qty]) => {
+      const isCard = (id) => !!S.catalog?.cards?.[id];
+
+      // 每張已鑲嵌的卡片鑲在哪些裝備上
+      const socketedIn = {};
+      for (const inst of inv.equipment || []) {
+        for (const cid of inst.card_ids || []) {
+          const tag = `${eqName(inst.equipment_id)}${inst.refine ? ` +${inst.refine}` : ""}`;
+          (socketedIn[cid] = socketedIn[cid] || []).push(tag);
+        }
+      }
+
+      const itemRows = Object.entries(items).filter(([id]) => !isCard(id)).map(([id, qty]) => {
         const d = itemDesc(id);
         return `
         <div class="item">
@@ -127,13 +138,33 @@
           <button class="btn small" data-sell="${id}" data-name="${esc(itemName(id))}">賣</button>
         </div>`; }).join("");
 
+      // 卡片：背包持有的 + 已鑲在裝備上的，都列出來
+      const cardIds = [...new Set([
+        ...Object.keys(items).filter(isCard),
+        ...Object.keys(socketedIn),
+      ])];
+      const cardRows = cardIds.map((id) => {
+        const held = items[id] || 0;
+        const where = socketedIn[id] || [];
+        const status = where.length
+          ? `<span class="pill good">已鑲：${esc(where.join("、"))}</span>`
+          : (held ? `<span class="pill">未鑲嵌</span>` : "");
+        return `
+        <div class="item" style="align-items:flex-start">
+          <div>${esc(itemName(id))}
+            <div class="sub">${esc(cardDesc(id))}　持有 ${held}</div>
+            <div style="margin-top:4px">${status}</div>
+          </div>
+        </div>`; }).join("");
+
       const eqRows = (inv.equipment || []).map((inst) => {
         const equipped = inst.equipped_slot != null;
         const cards = (inst.card_ids || []).map((c) => itemName(c)).join("、");
+        const slotZh = equipped ? `　裝備中（${SLOT_ZH[inst.equipped_slot] || inst.equipped_slot}）` : "";
         return `
         <div class="item" style="align-items:flex-start">
           <div>${esc(eqName(inst.equipment_id))}${inst.refine ? ` <span class="pill good">+${inst.refine}</span>` : ""}
-            <div class="sub">${esc(gearDesc(inst.equipment_id) || "")}${equipped ? "　裝備中" : ""}${cards ? `　卡：${esc(cards)}` : ""}</div>
+            <div class="sub">${esc(gearDesc(inst.equipment_id) || "")}${slotZh}${cards ? `　卡：${esc(cards)}` : ""}</div>
             <div class="row tight" style="margin-top:6px">
               ${equipped
                 ? `<button class="btn small" data-unequip="${inst.equipped_slot}">卸下</button>`
@@ -148,6 +179,7 @@
       this._body().innerHTML = `
         <div class="card"><h3>道具</h3>
           <div class="list">${itemRows || `<p class="muted">背包沒有道具。</p>`}</div></div>
+        ${cardRows ? `<div class="card"><h3>卡片</h3><div class="list">${cardRows}</div></div>` : ""}
         <div class="card"><h3>裝備</h3>
           <div class="list">${eqRows || `<p class="muted">背包沒有裝備。</p>`}</div></div>`;
 
