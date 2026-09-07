@@ -440,7 +440,11 @@ Screens.home = {
     return `<details class="card" id="world-box"${open ? " open" : ""}>` +
       `<summary style="cursor:pointer;font-weight:600">世界頻道</summary>` +
       `<div class="log" id="home-world-log"><span class="dim">${
-        open ? "載入中…" : "展開以顯示"}</span></div></details>`;
+        open ? "載入中…" : "展開以顯示"}</span></div>` +
+      `<div class="row" style="margin-top:8px">` +
+      `<input id="home-world-input" placeholder="說點什麼…" maxlength="200" style="flex:1">` +
+      `<button class="btn primary" id="home-world-send">送出</button></div>` +
+      `</details>`;
   },
   _wireWorldChat() {
     const box = document.querySelector("#world-box");
@@ -450,40 +454,69 @@ Screens.home = {
       if (box.open) this._startChat();
       else this._stopChat();
     };
+    const inp = document.querySelector("#home-world-input");
+    const btn = document.querySelector("#home-world-send");
+    if (inp && btn) {
+      const send = async () => {
+        if (this._wsending) return;            // 擋 Enter 連按重送
+        const t = inp.value.trim();
+        if (!t) return;
+        this._wsending = true; btn.disabled = true;
+        try {
+          await API.chatPost("world", t);
+          inp.value = "";
+          await this._chatTick();
+        } catch (e) { App.toast(e.detail || "送出失敗", true); }
+        this._wsending = false; btn.disabled = false;
+      };
+      btn.onclick = send;
+      inp.onkeydown = (e) => { if (e.key === "Enter") send(); };
+    }
     if (box.open) this._startChat();
   },
   _startChat() {
     this._stopChat();
+    this._chatGen = (this._chatGen || 0) + 1;
     this._worldSeen = 0;
     const log = document.querySelector("#home-world-log");
     if (log) { log.innerHTML = "<span class='dim'>載入中…</span>"; log.dataset.empty = "1"; }
     this._chatTick();
+    this._chatTimer = setInterval(() => this._chatTick(), 4000);
   },
-  _stopChat() { if (this._chatTimer) { clearTimeout(this._chatTimer); this._chatTimer = null; } },
+  _stopChat() {
+    this._chatGen = (this._chatGen || 0) + 1;   // 作廢進行中的請求
+    if (this._chatTimer) { clearInterval(this._chatTimer); this._chatTimer = null; }
+    this._chatBusy = false;
+  },
   async _chatTick() {
-    this._stopChat();
+    if (this._chatBusy) return;                 // 上一輪還沒回來就跳過，不重疊
+    const gen = this._chatGen;
     const box = document.querySelector("#world-box");
     const log = document.querySelector("#home-world-log");
     if (S.view !== "home" || !box || !box.open || !log) return;
+    this._chatBusy = true;
     try {
       const first = !this._worldSeen;
       const msgs = first
         ? await API.chatRecent("world", 25)
         : await API.chatSince("world", this._worldSeen);
-      for (const m of msgs) this._worldSeen = Math.max(this._worldSeen || 0, m.id);
-      const row = (m) =>
-        `<div><span class="dim">${esc(m.character_name)}：</span>${esc(m.text)}</div>`;
-      if (first) {
-        log.innerHTML = msgs.length ? msgs.map(row).join("")
-          : "<span class='dim'>還沒有訊息</span>";
-        delete log.dataset.empty;
-      } else if (msgs.length) {
-        log.insertAdjacentHTML("beforeend", msgs.map(row).join(""));
-        while (log.children.length > 80) log.removeChild(log.firstChild);
+      // 請求回來時若這輪已被作廢（切頁 / 重開），整批丟掉，不動畫面也不動 _worldSeen
+      if (gen === this._chatGen && S.view === "home" && box.open) {
+        for (const m of msgs) this._worldSeen = Math.max(this._worldSeen || 0, m.id);
+        const row = (m) =>
+          `<div><span class="dim">${esc(m.character_name)}：</span>${esc(m.text)}</div>`;
+        if (first) {
+          log.innerHTML = msgs.length ? msgs.map(row).join("")
+            : "<span class='dim'>還沒有訊息</span>";
+          delete log.dataset.empty;
+        } else if (msgs.length) {
+          log.insertAdjacentHTML("beforeend", msgs.map(row).join(""));
+          while (log.children.length > 80) log.removeChild(log.firstChild);
+        }
+        log.scrollTop = log.scrollHeight;
       }
-      log.scrollTop = log.scrollHeight;
     } catch (_) {}
-    this._chatTimer = setTimeout(() => this._chatTick(), 4000);
+    if (gen === this._chatGen) this._chatBusy = false;   // 只有當前這輪能放開鎖
   },
 
   _logLines(events) {
