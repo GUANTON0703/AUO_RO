@@ -31,5 +31,6 @@
   {"id": "flame_endow_card", "name": "火焰附魔卡片", "monster_id": "red_bat", "slot": "weapon", "drop_rate": 0.004, "effects": [{"type": "weapon_element", "element": "fire"}]},
   {"id": "frost_endow_card", "name": "冰霜附魔卡片", "monster_id": "blue_rat", "slot": "weapon", "drop_rate": 0.004, "effects": [{"type": "weapon_element", "element": "water"}]},
   {"id": "gale_endow_card", "name": "疾風附魔卡片", "monster_id": "bee_soldier", "slot": "weapon", "drop_rate": 0.004, "effects": [{"type": "weapon_element", "element": "wind"}]},
-  {"id": "seismic_endow_card", "name": "大地附魔卡片", "monster_id": "miner_foreman", "slot": "weapon", "drop_rate": 0.004, "effects": [{"type": "weapon_element", "element": "earth"}]}
+  {"id": "seismic_endow_card", "name": "大地附魔卡片", "monster_id": "miner_foreman", "slot": "weapon", "drop_rate": 0.004, "effects": [{"type": "weapon_element", "element": "earth"}]},
+  {"id": "pupa_card", "name": "蟲蛹卡片", "monster_id": "pupa", "slot": "armor", "drop_rate": 0.003, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 150}]}
 ]

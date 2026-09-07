@@ -39,6 +39,25 @@
     "lore": ""
   },
   {
+    "id": "pupa",
+    "name": "蟲蛹",
+    "level": 2,
+    "element": "earth",
+    "race": "insect",
+    "size": "small",
+    "role": "tank",
+    "base_exp": 3,
+    "job_exp": 2,
+    "stats": {"max_hp": 150, "max_sp": 0, "atk": 0, "matk": 0, "defense": 22, "mdef": 1, "hit": 0, "flee": 0, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fluff", "rate": 0.55},
+      {"item_id": "jellopy", "rate": 0.3},
+      {"item_id": "pupa_card", "rate": 0.003}
+    ],
+    "is_mvp": false,
+    "lore": "一動也不動的硬殼蟲蛹。打不還手，就是殼特別厚，新手練耐心用。"
+  },
+  {
     "id": "little_boar",
     "name": "小野豬",
     "level": 4,
