@@ -142,7 +142,10 @@ const App = (() => {
       b.classList.toggle("active", b.dataset.nav === view));
     const scr = Screens[view];
     $("#view").innerHTML = `<div class="spinner">載入中…</div>`;
-    if (view !== "home") stopHuntPoll();   // home.mount 自己決定要不要輪詢
+    if (view !== "home") {
+      stopHuntPoll();                       // home.mount 自己決定要不要輪詢
+      if (Screens.home && Screens.home._stopDrip) Screens.home._stopDrip();
+    }
     if (!scr || !scr.mount) {
       $("#view").innerHTML = `<div class="card"><p class="muted">這個畫面還沒做。</p></div>`;
       return;

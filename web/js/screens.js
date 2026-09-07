@@ -33,54 +33,137 @@ const Screens = {};
 // ---------- 狀態（首頁）----------
 Screens.home = {
   async mount() {
-    const sheet = await API.sheet(S.char.id).catch(() => null);
-    S._sheet = sheet;
+    this._stopDrip();
+    this._queue = [];
+    this._shown = [];
+    this._lastBatch = null;
+    this._hunting = null;
+    this._sheet = await API.sheet(S.char.id).catch(() => null);
+    S._sheet = this._sheet;
     let status = null;
     try { status = await API.huntStatus(); } catch (e) { if (e.status !== 409) throw e; }
-    this.render(status);
-    if (status && !status.retreated) App.startHuntPoll();  // 有在掛機才輪詢
+    this._layout(status);
+    if (status && !status.retreated) {
+      this._ingest(status);
+      this._drip();
+      App.startHuntPoll();
+    }
   },
+
+  // 每 poll 呼叫：掛機狀態沒切換就只更新數字、不碰戰鬥紀錄；切換才整個重畫
   render(status) {
     if (S.view !== "home") return;
-    const c = S.char, sheet = S._sheet || {};
+    const hunting = !!(status && !status.retreated);
+    if (hunting !== this._hunting || (status && status.retreated)) {
+      this._layout(status);
+      if (hunting) { this._ingest(status); this._drip(); }
+      else this._stopDrip();
+      return;
+    }
+    if (hunting) { this._ingest(status); this._updateKV(status); }
+  },
+
+  _dripInterval() {
+    const aspd = (this._sheet && this._sheet.aspd) || 100;
+    // aspd ~100 → 約 1 秒一行；越高越快，夾在 0.15~1.4 秒
+    return Math.min(1400, Math.max(150, Math.round(100000 / Math.max(aspd, 50))));
+  },
+  _stopDrip() { if (this._dripTimer) { clearTimeout(this._dripTimer); this._dripTimer = null; } },
+  _drip() {
+    this._stopDrip();
+    const box = document.querySelector("#huntlog");
+    if (!box || S.view !== "home") return;
+    if (this._queue.length) {
+      this._shown.push(this._queue.shift());
+      while (this._shown.length > 60) this._shown.shift();
+      box.innerHTML = this._shown.join("\n");
+      box.scrollTop = box.scrollHeight;
+    } else if (!this._shown.length) {
+      box.innerHTML = "<span class='dim'>搜尋目標中…</span>";
+    }
+    const wait = this._queue.length > 40 ? 50 : this._dripInterval();
+    this._dripTimer = setTimeout(() => this._drip(), wait);
+  },
+  _ingest(status) {
+    if (!status || status.retreated) return;
+    if (!status.batch_id || status.batch_id === this._lastBatch) return;
+    this._lastBatch = status.batch_id;
+    const lines = this._logLines(status.events || []);
+    if (status.offline || lines.length > 30) {          // 離線大批次直接倒完
+      this._queue.length = 0;
+      this._shown.push(...lines);
+      while (this._shown.length > 60) this._shown.shift();
+      const box = document.querySelector("#huntlog");
+      if (box) { box.innerHTML = this._shown.join("\n"); box.scrollTop = box.scrollHeight; }
+    } else {
+      this._queue.push(...lines);
+    }
+  },
+
+  _updateKV(status) {
+    const c = S.char, sheet = this._sheet || {};
     const tier = jobTier(c.job_id);
     const hp = status?.character?.hunt_hp ?? sheet.hunt_hp ?? sheet.max_hp ?? 0;
     const sp = status?.character?.hunt_sp ?? sheet.hunt_sp ?? sheet.max_sp ?? 0;
-    const hunting = status && !status.retreated;
+    const setT = (id, v) => { const el = document.querySelector(id); if (el) el.textContent = v; };
+    const setW = (id, cur, max) => { const el = document.querySelector(id);
+      if (el) el.style.width = Math.max(0, Math.min(100, (cur / Math.max(1, max)) * 100)) + "%"; };
+    setT("#hm-btext", `${c.base_exp} / ${Curve.baseNext(c.base_level)}`);
+    setW("#hm-bbar", c.base_exp, Curve.baseNext(c.base_level));
+    setT("#hm-jtext", `${c.job_exp} / ${Curve.jobNext(c.job_level, tier)}`);
+    setW("#hm-jbar", c.job_exp, Curve.jobNext(c.job_level, tier));
+    setT("#hm-hptext", `${hp} / ${sheet.max_hp ?? "?"}`);
+    setW("#hm-hpbar", hp, sheet.max_hp ?? 1);
+    setT("#hm-sptext", `${sp} / ${sheet.max_sp ?? "?"}`);
+    setW("#hm-spbar", sp, sheet.max_sp ?? 1);
+    setT("#hm-zeny", c.zeny);
+    setT("#hk-mon", monName(status.monster_id));
+    setT("#hk-kills", status.kills);
+    setT("#hk-exp", `+${status.base_exp} / +${status.job_exp}`);
+    setT("#hk-zeny", `+${status.zeny}`);
+    setT("#hk-time", Math.floor(App.huntSecsShown()) + " 秒");
+  },
+
+  _layout(status) {
+    this._hunting = !!(status && !status.retreated);
+    const c = S.char, sheet = this._sheet || {};
+    const tier = jobTier(c.job_id);
+    const hp = status?.character?.hunt_hp ?? sheet.hunt_hp ?? sheet.max_hp ?? 0;
+    const sp = status?.character?.hunt_sp ?? sheet.hunt_sp ?? sheet.max_sp ?? 0;
 
     let html = `
       <div class="card">
         <div class="section-title"><h2>${esc(c.name)}</h2>
           <span class="pill">${esc(jobName(c.job_id))}</span></div>
         <div class="kv"><span class="k">Base Lv ${c.base_level}</span>
-          <span>${c.base_exp} / ${Curve.baseNext(c.base_level)}</span></div>
-        ${bar(c.base_exp, Curve.baseNext(c.base_level), "exp")}
+          <span id="hm-btext">${c.base_exp} / ${Curve.baseNext(c.base_level)}</span></div>
+        <div class="bar exp"><i id="hm-bbar" style="width:${Math.min(100,(c.base_exp/Math.max(1,Curve.baseNext(c.base_level)))*100)}%"></i></div>
         <div class="kv"><span class="k">Job Lv ${c.job_level}</span>
-          <span>${c.job_exp} / ${Curve.jobNext(c.job_level, tier)}</span></div>
-        ${bar(c.job_exp, Curve.jobNext(c.job_level, tier), "exp")}
-        <div class="kv"><span class="k">HP</span><span>${hp} / ${sheet.max_hp ?? "?"}</span></div>
-        ${bar(hp, sheet.max_hp ?? 1, "hp")}
-        <div class="kv"><span class="k">SP</span><span>${sp} / ${sheet.max_sp ?? "?"}</span></div>
-        ${bar(sp, sheet.max_sp ?? 1, "sp")}
-        <div class="kv"><span class="k">Zeny</span><span>${c.zeny}</span></div>
+          <span id="hm-jtext">${c.job_exp} / ${Curve.jobNext(c.job_level, tier)}</span></div>
+        <div class="bar exp"><i id="hm-jbar" style="width:${Math.min(100,(c.job_exp/Math.max(1,Curve.jobNext(c.job_level,tier)))*100)}%"></i></div>
+        <div class="kv"><span class="k">HP</span><span id="hm-hptext">${hp} / ${sheet.max_hp ?? "?"}</span></div>
+        <div class="bar hp"><i id="hm-hpbar" style="width:${Math.min(100,(hp/Math.max(1,sheet.max_hp??1))*100)}%"></i></div>
+        <div class="kv"><span class="k">SP</span><span id="hm-sptext">${sp} / ${sheet.max_sp ?? "?"}</span></div>
+        <div class="bar sp"><i id="hm-spbar" style="width:${Math.min(100,(sp/Math.max(1,sheet.max_sp??1))*100)}%"></i></div>
+        <div class="kv"><span class="k">Zeny</span><span id="hm-zeny">${c.zeny}</span></div>
         <div class="kv"><span class="k">地點</span><span>${esc(mapName(c.location_map))}</span></div>
       </div>`;
 
-    if (hunting) {
+    if (this._hunting) {
       html += `
         <div class="card">
           <div class="section-title"><h3>掛機中</h3>
-            <span class="pill good">${esc(monName(status.monster_id))}</span></div>
-          <div class="kv"><span class="k">擊殺</span><span>${status.kills}</span></div>
-          <div class="kv"><span class="k">本場經驗</span><span>+${status.base_exp} / +${status.job_exp}</span></div>
-          <div class="kv"><span class="k">本場 Zeny</span><span>+${status.zeny}</span></div>
-          <div class="kv"><span class="k">掛機時間</span><span>${Math.floor(App.huntSecsShown())} 秒</span></div>
-          <div class="log" id="huntlog">${(this._logLines(status.events) || []).join("\n") || "<span class='dim'>搜尋目標中…</span>"}</div>
+            <span class="pill good" id="hk-mon">${esc(monName(status.monster_id))}</span></div>
+          <div class="kv"><span class="k">擊殺</span><span id="hk-kills">${status.kills}</span></div>
+          <div class="kv"><span class="k">本場經驗</span><span id="hk-exp">+${status.base_exp} / +${status.job_exp}</span></div>
+          <div class="kv"><span class="k">本場 Zeny</span><span id="hk-zeny">+${status.zeny}</span></div>
+          <div class="kv"><span class="k">掛機時間</span><span id="hk-time">${Math.floor(App.huntSecsShown())} 秒</span></div>
+          <div class="log" id="huntlog">${this._shown.join("\n") || "<span class='dim'>搜尋目標中…</span>"}</div>
           <div class="row" style="margin-top:10px">
             <button class="btn block" id="btn-stop">停止掛機並結算</button>
           </div>
         </div>`;
-    } else if (status?.retreated) {
+    } else if (status && status.retreated) {
       html += `<div class="card"><h3>掛機結束</h3>
         <p>擊殺 ${status.kills}　經驗 +${status.base_exp}/${status.job_exp}　Zeny +${status.zeny}</p>
         <p class="pill bad">${esc(status.retreat_reason || "已撤退")}</p>
@@ -98,12 +181,15 @@ Screens.home = {
       try {
         const r = await API.huntStop();
         App.stopHuntPoll();
+        this._stopDrip();
         App.toast(`結算：擊殺 ${r.kills}，經驗 +${r.base_exp}/${r.job_exp}`);
         await App.refreshChar();
-        this.render(null);
+        this._sheet = await API.sheet(S.char.id).catch(() => this._sheet);
+        this._layout(null);
       } catch (e) { App.toast(e.detail || "停止失敗", true); stopBtn.disabled = false; }
     };
   },
+
   _logLines(events) {
     if (!events) return [];
     const out = [];
