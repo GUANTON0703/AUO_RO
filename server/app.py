@@ -79,4 +79,17 @@ def create_app() -> FastAPI:
     def health() -> dict:
         return {"status": "ok"}
 
+    _mount_web(app)
     return app
+
+
+def _mount_web(app: FastAPI) -> None:
+    """有 web/ 目錄就把網頁前端掛在根路徑（同源、免 CORS）。"""
+    from pathlib import Path
+
+    web_dir = Path(__file__).resolve().parent.parent / "web"
+    if not (web_dir / "index.html").exists():
+        return
+    from fastapi.staticfiles import StaticFiles
+
+    app.mount("/", StaticFiles(directory=str(web_dir), html=True), name="web")

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<title>ROtxt · 文字版仙境傳說</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div id="toast" class="toast" hidden></div>
+
+<!-- 登入 -->
+<section id="screen-auth" class="screen">
+  <div class="auth-box">
+    <h1>ROtxt</h1>
+    <p class="muted">文字版仙境傳說</p>
+    <div class="tabs">
+      <button class="tab active" data-authtab="login">登入</button>
+      <button class="tab" data-authtab="register">註冊</button>
+    </div>
+    <form id="form-login" class="authform">
+      <input name="username" placeholder="帳號" autocomplete="username" required>
+      <input name="password" type="password" placeholder="密碼" autocomplete="current-password" required>
+      <button class="btn primary" type="submit">登入</button>
+    </form>
+    <form id="form-register" class="authform" hidden>
+      <input name="invite_code" placeholder="邀請碼" required>
+      <input name="username" placeholder="帳號（3-20 字，英數底線）" pattern="[A-Za-z0-9_]{3,20}" required>
+      <input name="password" type="password" placeholder="密碼（至少 8 字）" minlength="8" required>
+      <button class="btn primary" type="submit">註冊並登入</button>
+    </form>
+  </div>
+</section>
+
+<!-- 建立角色 -->
+<section id="screen-newchar" class="screen">
+  <div class="auth-box">
+    <h2>建立角色</h2>
+    <form id="form-newchar" class="authform">
+      <input name="name" placeholder="角色名稱" maxlength="24" required>
+      <button class="btn primary" type="submit">建立</button>
+    </form>
+  </div>
+</section>
+
+<!-- 主畫面 -->
+<div id="app" hidden>
+  <main id="view"></main>
+  <nav id="nav">
+    <button data-nav="home">狀態</button>
+    <button data-nav="hunt">掛機</button>
+    <button data-nav="build">加點</button>
+    <button data-nav="shop">商店</button>
+    <button data-nav="social">社群</button>
+    <button data-nav="more">更多</button>
+  </nav>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/screens.js"></script>
+<script src="/js/screen-build.js"></script>
+<script src="/js/screen-shop.js"></script>
+<script src="/js/screen-social.js"></script>
+<script src="/js/screen-more.js"></script>
+</body>
+</html>

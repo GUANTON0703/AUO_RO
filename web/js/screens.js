@@ -1,0 +1,200 @@
+// ROtxt web — screen render modules.
+// Each screen: { mount() }  — builds #view. Some also expose render(data) for live updates.
+// Scaffold provides: home, hunt.  TODO (agents): build, shop, social, more, inv, gm...
+
+const S = App.state;
+const view = () => document.querySelector("#view");
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// exp curve — mirrors server/progression/levels.py
+const Curve = {
+  baseNext: (lvl) => Math.round(30 * Math.pow(lvl, 2.4) + 40 * lvl + 30),
+  jobNext: (jl, tier) => {
+    const m = { novice: 0.6, first: 1.0, second: 1.8 }[tier] ?? 1.0;
+    return Math.round((20 * Math.pow(jl, 2.2) + 30 * jl + 20) * m);
+  },
+};
+const jobName = (id) => S.catalog?.jobs?.[id]?.name || id;
+const jobTier = (id) => S.catalog?.jobs?.[id]?.tier || "first";
+const monName = (id) => S.catalog?.monsters?.[id]?.name || S.catalog?.mvps?.[id]?.name || id;
+const mapName = (id) => S.catalog?.maps?.[id]?.name || id;
+const itemName = (id) =>
+  S.catalog?.items?.[id]?.name || S.catalog?.equipment?.[id]?.name ||
+  S.catalog?.cards?.[id]?.name || id;
+
+function bar(cur, max, cls) {
+  const pct = Math.max(0, Math.min(100, (cur / Math.max(1, max)) * 100));
+  return `<div class="bar ${cls || ""}"><i style="width:${pct}%"></i></div>`;
+}
+
+const Screens = {};
+
+// ---------- 狀態（首頁）----------
+Screens.home = {
+  async mount() {
+    const sheet = await API.sheet(S.char.id).catch(() => null);
+    S._sheet = sheet;
+    let status = null;
+    try { status = await API.huntStatus(); } catch (e) { if (e.status !== 409) throw e; }
+    this.render(status);
+  },
+  render(status) {
+    if (S.view !== "home") return;
+    const c = S.char, sheet = S._sheet || {};
+    const tier = jobTier(c.job_id);
+    const hp = status?.character?.hunt_hp ?? sheet.hunt_hp ?? sheet.max_hp ?? 0;
+    const sp = status?.character?.hunt_sp ?? sheet.hunt_sp ?? sheet.max_sp ?? 0;
+    const hunting = status && !status.retreated;
+
+    let html = `
+      <div class="card">
+        <div class="section-title"><h2>${esc(c.name)}</h2>
+          <span class="pill">${esc(jobName(c.job_id))}</span></div>
+        <div class="kv"><span class="k">Base Lv ${c.base_level}</span>
+          <span>${c.base_exp} / ${Curve.baseNext(c.base_level)}</span></div>
+        ${bar(c.base_exp, Curve.baseNext(c.base_level), "exp")}
+        <div class="kv"><span class="k">Job Lv ${c.job_level}</span>
+          <span>${c.job_exp} / ${Curve.jobNext(c.job_level, tier)}</span></div>
+        ${bar(c.job_exp, Curve.jobNext(c.job_level, tier), "exp")}
+        <div class="kv"><span class="k">HP</span><span>${hp} / ${sheet.max_hp ?? "?"}</span></div>
+        ${bar(hp, sheet.max_hp ?? 1, "hp")}
+        <div class="kv"><span class="k">SP</span><span>${sp} / ${sheet.max_sp ?? "?"}</span></div>
+        ${bar(sp, sheet.max_sp ?? 1, "sp")}
+        <div class="kv"><span class="k">Zeny</span><span>${c.zeny}</span></div>
+        <div class="kv"><span class="k">地點</span><span>${esc(mapName(c.location_map))}</span></div>
+      </div>`;
+
+    if (hunting) {
+      html += `
+        <div class="card">
+          <div class="section-title"><h3>掛機中</h3>
+            <span class="pill good">${esc(monName(status.monster_id))}</span></div>
+          <div class="kv"><span class="k">擊殺</span><span>${status.kills}</span></div>
+          <div class="kv"><span class="k">本場經驗</span><span>+${status.base_exp} / +${status.job_exp}</span></div>
+          <div class="kv"><span class="k">本場 Zeny</span><span>+${status.zeny}</span></div>
+          <div class="kv"><span class="k">掛機時間</span><span>${Math.floor(App.huntSecsShown())} 秒</span></div>
+          <div class="log" id="huntlog">${(this._logLines(status.events) || []).join("\n") || "<span class='dim'>搜尋目標中…</span>"}</div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn block" id="btn-stop">停止掛機並結算</button>
+          </div>
+        </div>`;
+    } else if (status?.retreated) {
+      html += `<div class="card"><h3>掛機結束</h3>
+        <p>擊殺 ${status.kills}　經驗 +${status.base_exp}/${status.job_exp}　Zeny +${status.zeny}</p>
+        <p class="pill bad">${esc(status.retreat_reason || "已撤退")}</p>
+        <button class="btn primary block" onclick="App.navigate('hunt')" style="margin-top:8px">重新掛機</button>
+        </div>`;
+    } else {
+      html += `<div class="card"><h3>沒有在掛機</h3>
+        <button class="btn primary block" onclick="App.navigate('hunt')">去掛機</button></div>`;
+    }
+    view().innerHTML = html;
+
+    const stopBtn = document.querySelector("#btn-stop");
+    if (stopBtn) stopBtn.onclick = async () => {
+      stopBtn.disabled = true;
+      try {
+        const r = await API.huntStop();
+        App.stopHuntPoll();
+        App.toast(`結算：擊殺 ${r.kills}，經驗 +${r.base_exp}/${r.job_exp}`);
+        await App.refreshChar();
+        this.render(null);
+      } catch (e) { App.toast(e.detail || "停止失敗", true); stopBtn.disabled = false; }
+    };
+  },
+  _logLines(events) {
+    if (!events) return [];
+    const out = [];
+    const bbb = events.some((e) => ["attack", "skill", "kill"].includes(e.kind));
+    for (const e of events) {
+      if (e.kind === "attack") {
+        if (!e.hit) out.push(`<span class="dim">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → MISS</span>`);
+        else out.push(`<span class="${e.crit ? "crit" : "hit"}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${e.damage}${e.crit ? " 暴擊!" : ""}</span>`);
+      } else if (e.kind === "kill") {
+        out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}</span>`);
+      } else if (e.kind === "kill_batch" && !bbb) {
+        out.push(`<span class="kill">擊殺 ${esc(e.monster_name)} ×${e.count}　+經驗 ${e.base_exp}/${e.job_exp}　+Zeny ${e.zeny}</span>`);
+      } else if (e.kind === "potion_used") {
+        out.push(`<span class="dim">  使用 ${esc(itemName(e.item_id))} ×${e.count}（剩 ${e.remaining}）</span>`);
+      } else if (e.kind === "find_monster") {
+        out.push(`<span class="dim">正在尋找怪物…</span>`);
+      } else if (e.kind === "retreat") {
+        out.push(`<span class="dim">撤退：${esc(e.reason || "")}</span>`);
+      }
+    }
+    return out.slice(-40);
+  },
+};
+
+// ---------- 掛機設定 ----------
+Screens.hunt = {
+  async mount() {
+    const bl = S.char.base_level;
+    const maps = Object.values(S.catalog.maps)
+      .filter((m) => bl >= (m.unlock_base_level || 1))
+      .sort((a, b) => (a.unlock_base_level || 1) - (b.unlock_base_level || 1));
+    this._picked = new Set();
+    this._mapId = null;
+
+    let html = `<div class="card"><h3>選狩獵地圖</h3><div class="list" id="maplist">`;
+    for (const m of maps) {
+      html += `<button class="btn choice" data-map="${m.id}">
+        ${esc(m.name)}<div class="sub">解鎖 Lv ${m.unlock_base_level || 1}
+        ・${m.monster_ids.map(monName).join("、")}</div></button>`;
+    }
+    if (!maps.length) html += `<p class="muted">還沒有解鎖的地圖。</p>`;
+    html += `</div></div><div id="monsterpick"></div>`;
+    view().innerHTML = html;
+
+    view().querySelectorAll("[data-map]").forEach((b) => {
+      b.onclick = () => { this._selectMap(b.dataset.map); };
+    });
+  },
+  _selectMap(mid) {
+    this._mapId = mid;
+    this._picked.clear();
+    view().querySelectorAll("[data-map]").forEach((b) =>
+      b.classList.toggle("sel", b.dataset.map === mid));
+    const m = S.catalog.maps[mid];
+    let html = `<div class="card"><h3>要打哪幾隻？</h3>
+      <p class="muted">留空 = 自動選好打的。指定的話就照你選的打（要拚自己扛）。</p>
+      <div class="list" id="monlist">`;
+    for (const id of m.monster_ids) {
+      const mon = S.catalog.monsters[id] || {};
+      html += `<button class="btn choice" data-mon="${id}">
+        ${esc(mon.name || id)}<div class="sub">Lv ${mon.level ?? "?"}</div></button>`;
+    }
+    html += `</div>
+      <button class="btn primary block" id="btn-go" style="margin-top:12px">開始掛機</button>
+      </div>`;
+    document.querySelector("#monsterpick").innerHTML = html;
+
+    view().querySelectorAll("[data-mon]").forEach((b) => {
+      b.onclick = () => {
+        const id = b.dataset.mon;
+        if (this._picked.has(id)) this._picked.delete(id); else this._picked.add(id);
+        b.classList.toggle("sel", this._picked.has(id));
+      };
+    });
+    document.querySelector("#btn-go").onclick = () => this._go();
+  },
+  async _go() {
+    const btn = document.querySelector("#btn-go");
+    btn.disabled = true;
+    try {
+      await API.huntStart(this._mapId, [...this._picked]);
+      App.navigate("home");
+    } catch (e) { App.toast(e.detail || "開始失敗", true); btn.disabled = false; }
+  },
+};
+
+// 其他分頁（build / shop / social / more / inv / gm …）由 web/js/screen-*.js
+// 各自補上 Screens.xxx（在 index.html 於本檔之後載入）。
+
+window.Screens = Screens;
+window.S = S;
+window.esc = esc; window.bar = bar; window.view = view;
+window.Curve = Curve;
+window.jobName = jobName; window.jobTier = jobTier;
+window.monName = monName; window.mapName = mapName; window.itemName = itemName;
