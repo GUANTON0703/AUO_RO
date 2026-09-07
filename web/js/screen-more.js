@@ -1,1 +1,310 @@
-// screen-more — 待子代理實作。在此 assign Screens.xxx = { async mount(){...} }
+// screen-more — MVP 挑戰 / 面對面交易 / GM 面板 / 登出
+(() => {
+  function fightLog(events) {
+    const out = [];
+    for (const e of events || []) {
+      if (e.kind === "attack") {
+        if (!e.hit) out.push(`<span class="dim">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → MISS</span>`);
+        else out.push(`<span class="${e.crit ? "crit" : "hit"}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${e.damage}${e.crit ? " 暴擊!" : ""}</span>`);
+      } else if (e.kind === "skill") {
+        out.push(`<span class="hit">  ${esc(e.actor)} 使出 ${esc(e.skill_name)}${e.damage ? " → " + e.damage : ""}</span>`);
+      } else if (e.kind === "heal") {
+        out.push(`<span class="dim">  ${esc(e.actor)} 回復 ${e.amount}</span>`);
+      } else if (e.kind === "kill") {
+        out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}</span>`);
+      } else if (e.kind === "fled") {
+        out.push(`<span class="dim">${esc(e.actor)} 撤退了（HP ${e.hp}）</span>`);
+      } else if (e.kind === "status_applied") {
+        out.push(`<span class="dim">  ${esc(e.target)} 陷入 ${esc(e.status)}</span>`);
+      } else if (e.kind === "challenge_result") {
+        const label = { win: "勝利", loss: "戰敗", fled: "撤退" }[e.outcome] || e.outcome;
+        out.push(`<span class="crit">— ${label}（${e.rounds} 回合）—</span>`);
+      }
+    }
+    return out.slice(-60).join("\n");
+  }
+
+  Screens.more = {
+    async mount() {
+      view().innerHTML = `
+        <div class="card">
+          <h3>MVP 挑戰</h3>
+          <div class="list" id="mvp-list"><div class="spinner">載入中…</div></div>
+          <div class="log" id="mvp-log" hidden></div>
+          <div id="mvp-result"></div>
+        </div>
+
+        <div class="card">
+          <h3>面對面交易</h3>
+          <div class="row" style="margin-bottom:8px">
+            <input id="trade-to" placeholder="對方帳號" style="flex:1">
+            <button class="btn primary" id="trade-offer">發起</button>
+          </div>
+          <div id="trade-pending"></div>
+          <div id="trade-box"></div>
+        </div>
+
+        <div id="gm-slot"></div>
+
+        <div class="card">
+          <button class="btn block" id="btn-logout">登出</button>
+        </div>`;
+
+      document.querySelector("#btn-logout").onclick = async () => {
+        try { await API.logout(); } finally { location.reload(); }
+      };
+
+      await this._loadMvp();
+      await this._loadTrade();
+      if (S.me && S.me.is_gm) await this._loadGm();
+    },
+
+    // ---------- MVP ----------
+    async _loadMvp() {
+      const box = document.querySelector("#mvp-list");
+      try {
+        const list = await API.listMvp();
+        box.innerHTML = list.map((m) => {
+          const cd = !m.available;
+          const secs = m.seconds_remaining || 0;
+          const wait = cd ? `冷卻中 ${Math.ceil(secs / 60)} 分` : "可挑戰";
+          return `<div class="item"><div>${esc(m.name)}
+            <div class="sub">Lv ${m.level ?? "?"}・${esc(m.home_map_name || "")}・${wait}</div></div>
+            <button class="btn small" data-mvp="${esc(m.id)}"${cd ? " disabled" : ""}>挑戰</button></div>`;
+        }).join("") || "<p class='muted'>沒有 MVP</p>";
+        box.querySelectorAll("[data-mvp]").forEach((b) => {
+          b.onclick = () => this._challenge(b.dataset.mvp, b);
+        });
+      } catch (e) { box.innerHTML = `<p class="muted">${esc(e.detail || "載入失敗")}</p>`; }
+    },
+
+    async _challenge(id, btn) {
+      if (!confirm("確定挑戰這隻 MVP？戰敗會損失少量經驗。")) return;
+      btn.disabled = true;
+      const log = document.querySelector("#mvp-log");
+      const res = document.querySelector("#mvp-result");
+      try {
+        const r = await API.challengeMvp(id);
+        log.hidden = false;
+        log.innerHTML = fightLog(r.events);
+        log.scrollTop = log.scrollHeight;
+        const label = { win: "勝利", loss: "戰敗", fled: "撤退" }[r.outcome] || r.outcome;
+        const cls = r.outcome === "win" ? "good" : r.outcome === "loss" ? "bad" : "warn";
+        let line = `<span class="pill ${cls}">${label}</span> `;
+        if (r.outcome === "win") {
+          line += `經驗 +${r.base_exp}/${r.job_exp}　Zeny +${r.zeny}`;
+          const d = Object.entries(r.drops || {});
+          if (d.length) line += `<br>掉落：${d.map(([k, v]) => `${esc(itemName(k))}×${v}`).join("、")}`;
+        } else if (r.outcome === "loss") {
+          line += `損失經驗 -${r.exp_penalty}`;
+        } else {
+          line += `全身而退，無損失`;
+        }
+        res.innerHTML = `<p style="margin-top:8px">${line}</p>`;
+        await App.refreshChar();
+      } catch (e) { App.toast(e.detail || "挑戰失敗", true); }
+      await this._loadMvp();
+    },
+
+    // ---------- 交易 ----------
+    async _loadTrade() {
+      document.querySelector("#trade-offer").onclick = async () => {
+        const to = document.querySelector("#trade-to").value.trim();
+        if (!to) return;
+        try {
+          const r = await API.tradeOffer(to);
+          this._openTrade(r.trade_id ?? r.id, "from");
+        } catch (e) { App.toast(e.detail || "發起失敗", true); }
+      };
+
+      // 之前開著的交易（換分頁 / reload 後還能回去確認或取消）
+      if (!this._tid) {
+        const saved = (localStorage.getItem("rotxt_trade") || "").split(":");
+        if (saved[0]) {
+          try {
+            const t = await API.tradeGet(Number(saved[0]));
+            if (t && t.status === "open") { this._openTrade(Number(saved[0]), saved[1] || "from"); return; }
+          } catch (_) {}
+          localStorage.removeItem("rotxt_trade");
+        }
+      }
+
+      const pend = document.querySelector("#trade-pending");
+      try {
+        const rows = await API.tradePending();
+        pend.innerHTML = rows.length
+          ? `<p class="muted">待處理交易</p>` + rows.map((t) =>
+              `<div class="item"><div>交易 #${t.id}</div>
+                <button class="btn small" data-trade="${t.id}">開啟</button></div>`).join("")
+          : "";
+        pend.querySelectorAll("[data-trade]").forEach((b) => {
+          b.onclick = () => this._openTrade(Number(b.dataset.trade), "to");
+        });
+      } catch (_) { pend.innerHTML = ""; }
+    },
+
+    async _openTrade(tid, side) {
+      this._tid = tid;
+      this._side = side;
+      localStorage.setItem("rotxt_trade", tid + ":" + side);
+      await this._renderTrade();
+    },
+
+    _closeTrade() {
+      this._tid = null;
+      localStorage.removeItem("rotxt_trade");
+    },
+
+    async _renderTrade() {
+      const box = document.querySelector("#trade-box");
+      if (!this._tid) { box.innerHTML = ""; return; }
+      let t;
+      try { t = await API.tradeGet(this._tid); }
+      catch (e) { box.innerHTML = `<p class="muted">${esc(e.detail || "交易不存在")}</p>`; return; }
+      const mine = (t.items || []).filter((i) => i.side === this._side);
+      const theirs = (t.items || []).filter((i) => i.side !== this._side);
+      const fmt = (arr) => arr.length
+        ? arr.map((i) => i.item_id
+            ? `${esc(itemName(i.item_id))} ×${i.qty}`
+            : `裝備 #${i.equipment_id}`).join("、")
+        : "（空）";
+      const done = t.status !== "open";
+      let inv = { items: {}, equipment: [] };
+      if (!done) { try { inv = await API.inventory(S.char.id); } catch (_) {} }
+      const itemBtns = Object.entries(inv.items || {}).map(([id, qty]) =>
+        `<button class="btn small" data-put-item="${esc(id)}">${esc(itemName(id))} ×${qty}</button>`).join("");
+      const eqBtns = (inv.equipment || []).filter((e) => !e.equipped_slot).map((e) =>
+        `<button class="btn small" data-put-eq="${e.id}">${esc(itemName(e.equipment_id))} +${e.refine || 0}</button>`).join("");
+
+      box.innerHTML = `
+        <div class="card" style="margin-top:10px">
+          <div class="kv"><span class="k">交易 #${t.id}</span><span class="pill">${esc(t.status)}</span></div>
+          <div class="kv"><span class="k">我方放上</span><span>${fmt(mine)}</span></div>
+          <div class="kv"><span class="k">對方放上</span><span>${fmt(theirs)}</span></div>
+          ${done ? "" : `
+          <p class="muted" style="margin-top:8px">點道具 / 裝備放入（道具會問數量）</p>
+          <div class="row tight">${itemBtns || "<span class='muted'>沒有道具</span>"}</div>
+          <div class="row tight" style="margin-top:4px">${eqBtns || "<span class='muted'>沒有可交易裝備</span>"}</div>`}
+          <div class="row" style="margin-top:10px">
+            <button class="btn primary" id="trade-confirm"${done ? " disabled" : ""}>確認</button>
+            <button class="btn" id="trade-cancel"${done ? " disabled" : ""}>取消</button>
+            <button class="btn ghost" id="trade-refresh">重新整理</button>
+          </div>
+        </div>`;
+
+      box.querySelectorAll("[data-put-item]").forEach((b) => {
+        b.onclick = async () => {
+          const qty = Number(prompt("放入數量", "1")) || 0;
+          if (qty < 1) return;
+          try { await API.tradePut(this._tid, { item_id: b.dataset.putItem, qty }); await this._renderTrade(); }
+          catch (e) { App.toast(e.detail || "放入失敗", true); }
+        };
+      });
+      box.querySelectorAll("[data-put-eq]").forEach((b) => {
+        b.onclick = async () => {
+          try { await API.tradePut(this._tid, { equipment_instance_id: Number(b.dataset.putEq) }); await this._renderTrade(); }
+          catch (e) { App.toast(e.detail || "放入失敗", true); }
+        };
+      });
+      document.querySelector("#trade-confirm").onclick = async () => {
+        try {
+          const r = await API.tradeConfirm(this._tid);
+          App.toast(r.status === "done" ? "交易完成" : "已確認，等待對方");
+          if (r.status === "done") { this._closeTrade(); await App.refreshChar(); await this._loadTrade(); }
+          await this._renderTrade();
+        } catch (e) { App.toast(e.detail || "確認失敗", true); }
+      };
+      document.querySelector("#trade-cancel").onclick = async () => {
+        try { await API.tradeCancel(this._tid); App.toast("已取消"); this._closeTrade(); box.innerHTML = ""; await this._loadTrade(); }
+        catch (e) { App.toast(e.detail || "取消失敗", true); }
+      };
+      document.querySelector("#trade-refresh").onclick = () => this._renderTrade();
+    },
+
+    // ---------- GM ----------
+    async _loadGm() {
+      const slot = document.querySelector("#gm-slot");
+      slot.innerHTML = `<div class="card"><h3>GM 面板</h3>
+        <div id="gm-settings"><div class="spinner">載入中…</div></div>
+        <div class="section-title" style="margin-top:10px"><span class="k">倍率</span></div>
+        <div class="row">
+          <input id="gm-exp" type="number" step="0.1" placeholder="經驗倍率" style="flex:1">
+          <input id="gm-drop" type="number" step="0.1" placeholder="掉寶倍率" style="flex:1">
+          <button class="btn small" id="gm-mult">套用</button>
+        </div>
+        <div class="section-title" style="margin-top:10px"><span class="k">掛機</span></div>
+        <div class="row">
+          <input id="gm-floor" type="number" step="1" placeholder="結算地板秒" style="flex:1">
+          <input id="gm-wr" type="number" step="0.05" placeholder="勝率門檻" style="flex:1">
+          <button class="btn small" id="gm-hunt">套用</button>
+        </div>
+        <div class="section-title" style="margin-top:10px"><span class="k">我的角色</span></div>
+        <div class="row">
+          <input id="gm-zeny" type="number" placeholder="給 Zeny（可負）" style="flex:1">
+          <button class="btn small" id="gm-money">給錢</button>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <input id="gm-be" type="number" placeholder="base_exp" style="flex:1">
+          <input id="gm-je" type="number" placeholder="job_exp" style="flex:1">
+          <button class="btn small" id="gm-xp">設經驗</button>
+        </div>
+        <div class="section-title" style="margin-top:10px"><span class="k">線上玩家</span>
+          <button class="btn small ghost" id="gm-online-refresh">刷新</button></div>
+        <div class="list" id="gm-online"></div>
+      </div>`;
+
+      const showSettings = async () => {
+        try {
+          const s = await API.adminSettings();
+          document.querySelector("#gm-settings").innerHTML = `
+            <div class="kv"><span class="k">經驗倍率</span><span>${s.experience_multiplier}</span></div>
+            <div class="kv"><span class="k">掉寶倍率</span><span>${s.drop_multiplier}</span></div>
+            <div class="kv"><span class="k">結算地板秒</span><span>${s.settle_floor_seconds}</span></div>
+            <div class="kv"><span class="k">勝率門檻</span><span>${s.huntable_win_rate}</span></div>`;
+          document.querySelector("#gm-exp").value = s.experience_multiplier;
+          document.querySelector("#gm-drop").value = s.drop_multiplier;
+          document.querySelector("#gm-floor").value = s.settle_floor_seconds;
+          document.querySelector("#gm-wr").value = s.huntable_win_rate;
+        } catch (e) { document.querySelector("#gm-settings").innerHTML = `<p class="muted">${esc(e.detail || "載入失敗")}</p>`; }
+      };
+      const showOnline = async () => {
+        try {
+          const rows = await API.adminOnlinePlayers();
+          document.querySelector("#gm-online").innerHTML = rows.map((p) =>
+            `<div class="item"><div>${esc(p.name || p.username)}
+              <div class="sub">${esc(p.username)}・B${p.base_level ?? "?"}/J${p.job_level ?? "?"}</div></div>
+              <span>${p.zeny ?? 0}z</span></div>`).join("") || "<p class='muted'>沒有線上玩家</p>";
+        } catch (_) {}
+      };
+
+      document.querySelector("#gm-mult").onclick = async () => {
+        try {
+          await API.adminSetMultipliers(Number(document.querySelector("#gm-exp").value), Number(document.querySelector("#gm-drop").value));
+          App.toast("已套用"); showSettings();
+        } catch (e) { App.toast(e.detail || "失敗", true); }
+      };
+      document.querySelector("#gm-hunt").onclick = async () => {
+        try {
+          await API.adminSetHunt(Number(document.querySelector("#gm-floor").value), Number(document.querySelector("#gm-wr").value));
+          App.toast("已套用"); showSettings();
+        } catch (e) { App.toast(e.detail || "失敗", true); }
+      };
+      document.querySelector("#gm-money").onclick = async () => {
+        try {
+          await API.adminMoney(S.char.id, Number(document.querySelector("#gm-zeny").value) || 0);
+          App.toast("已給錢"); await App.refreshChar();
+        } catch (e) { App.toast(e.detail || "失敗", true); }
+      };
+      document.querySelector("#gm-xp").onclick = async () => {
+        try {
+          await API.adminExperience(S.char.id, Number(document.querySelector("#gm-be").value) || 0, Number(document.querySelector("#gm-je").value) || 0);
+          App.toast("已設經驗"); await App.refreshChar();
+        } catch (e) { App.toast(e.detail || "失敗", true); }
+      };
+      document.querySelector("#gm-online-refresh").onclick = showOnline;
+
+      await showSettings();
+      await showOnline();
+    },
+  };
+})();

@@ -38,6 +38,7 @@ Screens.home = {
     let status = null;
     try { status = await API.huntStatus(); } catch (e) { if (e.status !== 409) throw e; }
     this.render(status);
+    if (status && !status.retreated) App.startHuntPoll();  // 有在掛機才輪詢
   },
   render(status) {
     if (S.view !== "home") return;

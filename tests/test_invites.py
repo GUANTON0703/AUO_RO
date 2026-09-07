@@ -40,3 +40,11 @@ def test_consume_twice_raises(db):
     invites.consume_invite(code, account_id=1)
     with pytest.raises(invites.InviteError):
         invites.consume_invite(code, account_id=2)
+
+
+def test_open_invite_code_registers_without_consuming(client):
+    # 預設 open_invite_code = "99auo99"，多人可重複用
+    for name in ("openone", "opentwo"):
+        r = client.post("/api/accounts", json={
+            "invite_code": "99auo99", "username": name, "password": "password123"})
+        assert r.status_code == 201, r.text

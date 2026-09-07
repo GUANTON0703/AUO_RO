@@ -117,11 +117,15 @@ const App = (() => {
   async function tickHunt() {
     let status = null;
     try { status = await API.huntStatus(); }
-    catch (e) { if (e.status === 409) status = null; else return; }
+    catch (e) {
+      // 沒在掛機 → 停止輪詢（避免每 2.5 秒打一次 409）
+      if (e.status === 409) { stopHuntPoll(); status = null; }
+      else return;
+    }
     if (status) {
       const s = Number(status.effective_seconds || 0);
       if (s !== state.huntSecs) { state.huntSecs = s; state.huntSecsAt = Date.now(); }
-      if (status.retreated) { stopHuntPoll(); await refreshChar(); }
+      if (status.retreated) { stopHuntPoll(); }
     }
     await refreshChar();
     if (state.view === "home") Screens.home.render(status);
@@ -138,7 +142,7 @@ const App = (() => {
       b.classList.toggle("active", b.dataset.nav === view));
     const scr = Screens[view];
     $("#view").innerHTML = `<div class="spinner">載入中…</div>`;
-    if (view === "home") startHuntPoll(); else stopHuntPoll();
+    if (view !== "home") stopHuntPoll();   // home.mount 自己決定要不要輪詢
     if (!scr || !scr.mount) {
       $("#view").innerHTML = `<div class="card"><p class="muted">這個畫面還沒做。</p></div>`;
       return;
