@@ -157,31 +157,64 @@
           </div>
         </div>`; }).join("");
 
-      const eqRows = (inv.equipment || []).map((inst) => {
-        const equipped = inst.equipped_slot != null;
-        const cards = (inst.card_ids || []).map((c) => itemName(c)).join("、");
-        const slotZh = equipped ? `　裝備中（${SLOT_ZH[inst.equipped_slot] || inst.equipped_slot}）` : "";
-        return `
+      const baseSlot = (s) => (s === "accessory1" || s === "accessory2" ? "accessory" : s);
+      const slotOf = (eqId) => S.catalog?.equipment?.[eqId]?.slot || "";
+
+      // 目前每個部位穿著什麼（給沒穿的同部位裝備當比較基準）
+      const wornBySlot = {};
+      for (const inst of inv.equipment || []) {
+        if (inst.equipped_slot == null) continue;
+        const tag = `${eqName(inst.equipment_id)}${inst.refine ? ` +${inst.refine}` : ""}`;
+        (wornBySlot[baseSlot(inst.equipped_slot)] = wornBySlot[baseSlot(inst.equipped_slot)] || []).push(tag);
+      }
+
+      // 部位篩選下拉：只列出背包裡實際有的部位
+      const slotsPresent = [...new Set((inv.equipment || []).map((i) => slotOf(i.equipment_id)).filter(Boolean))];
+      if (this._bagSlot && !slotsPresent.includes(this._bagSlot)) this._bagSlot = "";
+      const slotOptions = [`<option value="">全部部位</option>`].concat(
+        slotsPresent.map((s) => `<option value="${s}"${this._bagSlot === s ? " selected" : ""}>${SLOT_ZH[s] || s}</option>`),
+      ).join("");
+
+      const eqRows = (inv.equipment || [])
+        .filter((inst) => !this._bagSlot || slotOf(inst.equipment_id) === this._bagSlot)
+        .map((inst) => {
+          const equipped = inst.equipped_slot != null;
+          const cards = (inst.card_ids || []).map((c) => itemName(c)).join("、");
+          const slotZh = equipped ? `　裝備中（${SLOT_ZH[inst.equipped_slot] || inst.equipped_slot}）` : "";
+          const worn = !equipped ? (wornBySlot[slotOf(inst.equipment_id)] || []) : [];
+          const wornLine = worn.length
+            ? `<div class="sub" style="color:var(--muted)">目前穿：${esc(worn.join("、"))}</div>`
+            : (!equipped && slotOf(inst.equipment_id)
+              ? `<div class="sub" style="color:var(--muted)">目前這個部位沒穿東西</div>` : "");
+          return `
         <div class="item" style="align-items:flex-start">
           <div>${esc(eqName(inst.equipment_id))}${inst.refine ? ` <span class="pill good">+${inst.refine}</span>` : ""}
             <div class="sub">${esc(gearDesc(inst.equipment_id) || "")}${slotZh}${cards ? `　卡：${esc(cards)}` : ""}</div>
+            ${wornLine}
             <div class="row tight" style="margin-top:6px">
               ${equipped
                 ? `<button class="btn small" data-unequip="${inst.equipped_slot}">卸下</button>`
                 : `<button class="btn small primary" data-equip="${inst.id}">裝備</button>`}
               <button class="btn small" data-refine="${inst.id}">精煉</button>
               <button class="btn small" data-socket="${inst.id}">鑲卡</button>
+              ${equipped ? "" : `<button class="btn small" data-sell-eq="${inst.id}" data-name="${esc(eqName(inst.equipment_id))}">賣出</button>`}
             </div>
           </div>
         </div>`;
-      }).join("");
+        }).join("");
 
       this._body().innerHTML = `
         <div class="card"><h3>道具</h3>
           <div class="list">${itemRows || `<p class="muted">背包沒有道具。</p>`}</div></div>
         ${cardRows ? `<div class="card"><h3>卡片</h3><div class="list">${cardRows}</div></div>` : ""}
         <div class="card"><h3>裝備</h3>
-          <div class="list">${eqRows || `<p class="muted">背包沒有裝備。</p>`}</div></div>`;
+          <div class="row" style="margin-bottom:8px">
+            <select id="bag-slot" style="flex:1">${slotOptions}</select>
+          </div>
+          <div class="list">${eqRows || `<p class="muted">${this._bagSlot ? "這個部位沒有裝備。" : "背包沒有裝備。"}</p>`}</div></div>`;
+
+      const slotSel = this._body().querySelector("#bag-slot");
+      if (slotSel) slotSel.onchange = () => { this._bagSlot = slotSel.value; this._drawBag(); };
 
       const reload = () => this._drawBag();
 
@@ -193,6 +226,18 @@
           try {
             const r = await API.sell({ item_id: b.dataset.sell, qty });
             App.toast(`賣了 ${b.dataset.name} ×${qty}${r && r.gained != null ? `（+${r.gained}z）` : ""}`);
+            await this._reloadHeader();
+            reload();
+          } catch (e) { App.toast(e.detail || "販售失敗", true); b.disabled = false; }
+        };
+      });
+      this._body().querySelectorAll("[data-sell-eq]").forEach((b) => {
+        b.onclick = async () => {
+          if (!confirm(`確定賣出「${b.dataset.name}」？賣掉就拿不回來了。`)) return;
+          b.disabled = true;
+          try {
+            const r = await API.sell({ equipment_instance_id: Number(b.dataset.sellEq) });
+            App.toast(`賣了 ${b.dataset.name}${r && r.gained != null ? `（+${r.gained}z）` : ""}`);
             await this._reloadHeader();
             reload();
           } catch (e) { App.toast(e.detail || "販售失敗", true); b.disabled = false; }
