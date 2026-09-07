@@ -143,3 +143,28 @@ uv run pytest --disable-warnings -q
 ```
 
 若要修改程式：先補回歸測試，再分段實作；每個段落完成後集中自我審核一次。完成一段程式修改後，明確檔案加入 git、檢查 staged 清單沒有 token/secret/.env，再 commit 並附上 `Co-Authored-By: Codex <noreply@openai.com>`。
+
+## 2026-09-07 第四批：網頁前端 + 上線（master）
+
+**已上線：`https://rotxt.guanton07.com`**（手機可玩）。朋友用這網址 + 註冊碼 `99auo99` 即可。
+
+- 網頁前端 `web/`：vanilla JS SPA，FastAPI 同源 serve（`server/app.py` 的 `_mount_web`）。六大分頁：狀態 / 掛機 / 加點（屬性技能轉職）/ 商店（買賣背包倉庫）/ 社群（排行榜世界公會聊天）/ 更多（MVP交易GM登出）。
+- `GET /api/content/catalog` 給前端一次抓齊靜態內容。
+- `open_invite_code`（`server/config.py`，預設 `99auo99`）：不限次數、不消耗。
+- 靜態資源 `Cache-Control: no-cache`。
+
+### J1900 部署現況
+
+- container `rotxt`，image `rotxt:latest`，compose 在 `/srv/rotxt/compose.yaml`，port 綁 `172.17.0.1:8010`。
+- app 檔案在 `/srv/rotxt/app`（`git archive | tar` 推上去，非 git repo）。DB `/srv/rotxt/data/rotxt.db`（uid 1000）。
+- env `/srv/rotxt/rotxt.env`（洗點收費、open_invite_code）。
+- NPM proxy host id 16 → `172.17.0.1:8010`，Let's Encrypt cert id 41（到期 2026-12-06，NPM 自動續）。
+- 每日 04:30 `crontab` 跑 `/srv/rotxt/backup.sh`（保留 14 天）。
+- **Dockerfile 改用 pip**（J1900 連不上 ghcr.io，拿不到 astral-sh/uv image）。
+- **更新版本**：本機 `sh deploy/push.sh`（git archive 推 J1900 → rebuild → compose up → health check）。
+- 備用邀請碼 5 組已產（見 vault `帳號與服務.md` 或 `docker exec rotxt python -m server.admin invite`）。
+- prod DB 有測試帳號 `livecheck1` / `外網測試員`，可忽略或砍。
+
+### 已知後續
+- schema 用 `CREATE TABLE IF NOT EXISTS`，加欄位要手動 ALTER / migration（正式上線後不能砍 DB 重建）。
+- 交易 / 聊天等進階功能是 v1 陽春版。
