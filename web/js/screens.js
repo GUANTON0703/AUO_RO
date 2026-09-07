@@ -86,6 +86,9 @@ Screens.home = {
     this._shown = [];
     this._lastBatch = null;
     this._hunting = null;
+    this._dripMs = 0;
+    this._paceBudget = 0;
+    this._curMon = null;
     this._sheet = await API.sheet(S.char.id).catch(() => null);
     S._sheet = this._sheet;
     this._strategy = await API.huntStrategy(S.char.id).catch(() => null);
@@ -113,11 +116,26 @@ Screens.home = {
   },
 
   _dripInterval() {
+    // 每批事件攤開填滿它代表的遊戲內時間，這樣兩批之間不會有一段空白。
+    // 沒有 pace 資訊時退回用攻擊速度估。
+    if (this._dripMs) return this._dripMs;
     const aspd = (this._sheet && this._sheet.aspd) || 100;
-    // aspd ~100 → 約 1 秒一行；越高越快，夾在 0.15~1.4 秒
     return Math.min(1400, Math.max(150, Math.round(100000 / Math.max(aspd, 50))));
   },
   _stopDrip() { if (this._dripTimer) { clearTimeout(this._dripTimer); this._dripTimer = null; } },
+  _recalcDrip() {
+    const n = this._queue.length;
+    if (!n) { this._dripMs = 0; this._paceBudget = 0; return; }
+    this._dripMs = this._paceBudget > 0
+      ? Math.min(1600, Math.max(300, Math.round((this._paceBudget * 1000) / n)))
+      : 0;
+  },
+  _heartbeat() {
+    const f = ["⡿", "⣟", "⣯", "⣷", "⣾", "⣽", "⣻", "⢿"];
+    this._pulse = ((this._pulse || 0) + 1) % f.length;
+    const mon = this._curMon ? esc(monName(this._curMon)) : "怪物";
+    return `<span class="dim">${f[this._pulse]} 與 ${mon} 交戰中…</span>`;
+  },
   _drip() {
     this._stopDrip();
     const box = document.querySelector("#huntlog");
@@ -127,14 +145,24 @@ Screens.home = {
       while (this._shown.length > 60) this._shown.shift();
       box.innerHTML = this._shown.join("\n");
       box.scrollTop = box.scrollHeight;
+      this._paceBudget = Math.max(0, (this._paceBudget || 0) - this._dripMs / 1000);
+      this._recalcDrip();
     } else if (!this._shown.length) {
       box.innerHTML = "<span class='dim'>搜尋目標中…</span>";
+    } else if (this._hunting) {
+      // 佇列清空、還在掛機 → 顯示一個跳動的「交戰中」，畫面才不會像卡住
+      box.innerHTML = this._shown.join("\n") + "\n" + this._heartbeat();
+      box.scrollTop = box.scrollHeight;
     }
-    const wait = this._queue.length > 40 ? 50 : this._dripInterval();
+    let wait;
+    if (this._queue.length > 40) wait = 50;
+    else if (this._queue.length) wait = this._dripInterval();
+    else wait = 900;                        // 心跳更新節奏
     this._dripTimer = setTimeout(() => this._drip(), wait);
   },
   _ingest(status) {
     if (!status || status.retreated) return;
+    if (status.monster_id) this._curMon = status.monster_id;
     if (!status.batch_id || status.batch_id === this._lastBatch) return;
     this._lastBatch = status.batch_id;
     const lines = this._logLines(status.events || []);
@@ -146,12 +174,18 @@ Screens.home = {
     }
     if (status.offline || lines.length > 30) {          // 離線大批次直接倒完
       this._queue.length = 0;
+      this._dripMs = 0;
+      this._paceBudget = 0;
       this._shown.push(...lines);
       while (this._shown.length > 60) this._shown.shift();
       const box = document.querySelector("#huntlog");
       if (box) { box.innerHTML = this._shown.join("\n"); box.scrollTop = box.scrollHeight; }
     } else {
       this._queue.push(...lines);
+      // 每批帶來的遊戲內時間累加進「攤開預算」，再平均分給佇列裡所有還沒跳出的行，
+      // 這樣就算新批在舊批還沒跳完時進來，整體節奏也不會忽快忽慢。
+      this._paceBudget = (this._paceBudget || 0) + (Number(status.pace_seconds) || 0);
+      this._recalcDrip();
     }
   },
 

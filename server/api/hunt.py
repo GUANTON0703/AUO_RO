@@ -246,6 +246,7 @@ def _no_op_settlement(fresh) -> dict:
         "monster_id": fresh["hunting_monster_id"],
         "monster_name": _content.get_monster(fresh["hunting_monster_id"]).name,
         "batch_id": batch.get("batch_id"),
+        "pace_seconds": batch.get("pace_seconds", 0.0),
         "kills": fresh["hunt_kills"], "base_exp": fresh["hunt_base_exp"],
         "job_exp": fresh["hunt_job_exp"], "zeny": fresh["hunt_zeny"], "drops": {},
         "loot": _loot(fresh),
@@ -262,6 +263,7 @@ def _accumulated_snapshot(row) -> dict:
         "monster_id": row["hunting_monster_id"],
         "monster_name": _content.get_monster(row["hunting_monster_id"]).name,
         "batch_id": batch.get("batch_id"),
+        "pace_seconds": batch.get("pace_seconds", 0.0),
         "kills": row["hunt_kills"], "base_exp": row["hunt_base_exp"],
         "job_exp": row["hunt_job_exp"], "zeny": row["hunt_zeny"], "drops": {},
         "loot": _loot(row),
@@ -418,7 +420,10 @@ def _settle_current(row, *, force=False) -> dict:
 
     batch_id = now.isoformat()
     events = [asdict(e) for e in result.events]
-    _last_batch[row["id"]] = {"batch_id": batch_id, "events": events}
+    # 這批事件代表的遊戲內時間：客戶端用它把逐擊訊息平均攤開，填滿到下一批之間
+    pace_seconds = max(result.consumed_seconds, result.effective_seconds if offline else 0.0)
+    _last_batch[row["id"]] = {"batch_id": batch_id, "events": events,
+                              "pace_seconds": pace_seconds}
 
     fresh = characters_repo.get_character(row["id"])
     # 輪替後目標可能已換，回傳新的（撤退清空後 fall back 到這次打的那隻）
@@ -427,6 +432,7 @@ def _settle_current(row, *, force=False) -> dict:
         "monster_id": cur_mid,
         "monster_name": _content.get_monster(cur_mid).name,
         "batch_id": batch_id,
+        "pace_seconds": pace_seconds,
         "kills": fresh["hunt_kills"],
         "base_exp": fresh["hunt_base_exp"],
         "job_exp": fresh["hunt_job_exp"],
