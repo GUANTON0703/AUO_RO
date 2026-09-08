@@ -8,3 +8,5 @@ __pycache__/
 .env
 uv.lock
 .worktrees/
+backups/
+graphify-out/
