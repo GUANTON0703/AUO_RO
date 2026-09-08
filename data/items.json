@@ -8,5 +8,12 @@
   {"id": "blue_potion", "name": "藍色藥水", "kind": "consumable", "effects": [{"type": "heal_sp", "amount": 40}], "npc_buy": 600, "npc_sell": 300},
   {"id": "elunium", "name": "艾魯凡", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 0},
   {"id": "oridecon", "name": "歐里德鋼", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 0},
-  {"id": "fly_wing", "name": "蒼蠅之翼", "kind": "consumable", "effects": [{"type": "teleport"}], "npc_buy": 60, "npc_sell": 30}
+  {"id": "fly_wing", "name": "蒼蠅之翼", "kind": "consumable", "effects": [{"type": "teleport"}], "npc_buy": 60, "npc_sell": 30},
+  {"id": "decayed_nail", "name": "腐爛的指甲", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 15},
+  {"id": "skel_bone", "name": "骷髏的骨頭", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 20},
+  {"id": "ant_jaw", "name": "螞蟻的大顎", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 12},
+  {"id": "honey", "name": "蜂蜜", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 30},
+  {"id": "talon", "name": "鷹爪", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 18},
+  {"id": "iron_ore", "name": "鐵礦", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 25},
+  {"id": "cursed_ruby", "name": "詛咒的紅寶石", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 120}
 ]

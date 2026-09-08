@@ -70,5 +70,50 @@
     "monster_ids": ["thunder_hedgehog", "queen_scarab", "dragonfly"],
     "mvp_id": "raging_bigfoot",
     "unlock_base_level": 40
+  },
+  {
+    "id": "morroc_field",
+    "name": "夢羅克野外-沙漠",
+    "town": "morroc",
+    "level_range": [15, 35],
+    "monster_ids": ["desert_condor", "peco_peco", "metaller", "sand_man"],
+    "mvp_id": null,
+    "unlock_base_level": 14
+  },
+  {
+    "id": "ant_hell_1f",
+    "name": "螞蟻洞穴 1F",
+    "town": "morroc",
+    "level_range": [16, 28],
+    "monster_ids": ["piere", "deniro", "vitata", "andre"],
+    "mvp_id": null,
+    "unlock_base_level": 16
+  },
+  {
+    "id": "ant_hell_2f",
+    "name": "螞蟻洞穴 2F",
+    "town": "morroc",
+    "level_range": [20, 36],
+    "monster_ids": ["andre", "piere", "deniro", "sand_man"],
+    "mvp_id": null,
+    "unlock_base_level": 22
+  },
+  {
+    "id": "pyramid_1f",
+    "name": "金字塔 1F",
+    "town": "morroc",
+    "level_range": [16, 30],
+    "monster_ids": ["bat_familiar", "zombie", "skeleton", "matyr"],
+    "mvp_id": null,
+    "unlock_base_level": 16
+  },
+  {
+    "id": "pyramid_2f",
+    "name": "金字塔 2F",
+    "town": "morroc",
+    "level_range": [30, 50],
+    "monster_ids": ["verit", "mummy", "isis", "matyr"],
+    "mvp_id": null,
+    "unlock_base_level": 33
   }
 ]

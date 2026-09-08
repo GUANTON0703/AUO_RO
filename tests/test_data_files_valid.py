@@ -4,7 +4,7 @@ from server import content
 def test_all_data_files_load_and_validate():
     c = content.load_content()
     assert len(c.monsters) >= 12
-    assert len(c.maps) == 8
+    assert len(c.maps) >= 13
     assert len(c.items) >= 10
 
 

@@ -820,5 +820,95 @@
     ],
     "is_mvp": false,
     "lore": ""
+  },
+  {
+    "id": "bat_familiar", "name": "蝙蝠", "level": 16,
+    "element": "shadow", "race": "animal", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "fluff", "rate": 0.4}, {"item_id": "talon", "rate": 0.2}],
+    "lore": "金字塔裡成群亂飛的小蝙蝠。"
+  },
+  {
+    "id": "desert_condor", "name": "沙漠禿鷹", "level": 17,
+    "element": "wind", "race": "animal", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "feather", "rate": 0.5}, {"item_id": "talon", "rate": 0.3}, {"item_id": "clover", "rate": 0.05}],
+    "lore": "在摩洛克沙漠上空盤旋的禿鷹。"
+  },
+  {
+    "id": "vitata", "name": "綠蟻花", "level": 18,
+    "element": "poison", "race": "plant", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "honey", "rate": 0.4}, {"item_id": "clover", "rate": 0.25}],
+    "lore": "會分泌蜂蜜的蟻穴植物，靠近會麻。"
+  },
+  {
+    "id": "piere", "name": "紅蟻", "level": 20,
+    "element": "fire", "race": "insect", "size": "small", "role": "normal", "gen": true,
+    "drops": [{"item_id": "ant_jaw", "rate": 0.4}, {"item_id": "jellopy", "rate": 0.3}],
+    "lore": "螞蟻洞穴的紅色工蟻，成群結隊。"
+  },
+  {
+    "id": "zombie", "name": "殭屍", "level": 20,
+    "element": "undead", "race": "undead", "size": "medium", "role": "tank", "gen": true,
+    "drops": [{"item_id": "decayed_nail", "rate": 0.5}, {"item_id": "sticky_mucus", "rate": 0.3}, {"item_id": "zombie_card", "rate": 0.002}],
+    "lore": "金字塔裡拖著腳步的腐屍，動作慢但耐打。"
+  },
+  {
+    "id": "skeleton", "name": "骷髏", "level": 21,
+    "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "skel_bone", "rate": 0.5}, {"item_id": "jellopy", "rate": 0.3}, {"item_id": "skeleton_card", "rate": 0.002}],
+    "lore": "拿著生鏽武器的骷髏兵。"
+  },
+  {
+    "id": "deniro", "name": "黑蟻", "level": 22,
+    "element": "earth", "race": "insect", "size": "small", "role": "normal", "gen": true,
+    "drops": [{"item_id": "ant_jaw", "rate": 0.4}, {"item_id": "clover", "rate": 0.2}],
+    "lore": "螞蟻洞穴的黑色兵蟻，比紅蟻兇。"
+  },
+  {
+    "id": "andre", "name": "黃蟻", "level": 23,
+    "element": "fire", "race": "insect", "size": "small", "role": "normal", "gen": true,
+    "drops": [{"item_id": "ant_jaw", "rate": 0.4}, {"item_id": "sticky_mucus", "rate": 0.25}],
+    "lore": "螞蟻洞穴的黃色工蟻，搬運隊主力。"
+  },
+  {
+    "id": "metaller", "name": "鋼鐵蟲", "level": 27,
+    "element": "wind", "race": "insect", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "iron_ore", "rate": 0.35}, {"item_id": "sticky_mucus", "rate": 0.3}, {"item_id": "oridecon", "rate": 0.05}],
+    "lore": "外殼硬如金屬的沙漠大蟲，會發出刺耳嘶鳴。"
+  },
+  {
+    "id": "peco_peco", "name": "沛可沛可", "level": 20,
+    "element": "fire", "race": "animal", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "feather", "rate": 0.4}, {"item_id": "jellopy", "rate": 0.3}, {"item_id": "peco_peco_card", "rate": 0.002}],
+    "lore": "騎士的坐騎，野生的會亂衝亂踢。"
+  },
+  {
+    "id": "matyr", "name": "惡魔犬", "level": 30,
+    "element": "shadow", "race": "demon", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "fluff", "rate": 0.35}, {"item_id": "clover", "rate": 0.2}],
+    "lore": "金字塔深處疾奔的黑犬，速度極快。"
+  },
+  {
+    "id": "sand_man", "name": "沙人", "level": 31,
+    "element": "earth", "race": "formless", "size": "large", "role": "tank", "gen": true,
+    "drops": [{"item_id": "iron_ore", "rate": 0.4}, {"item_id": "jellopy", "rate": 0.3}, {"item_id": "elunium", "rate": 0.05}],
+    "lore": "沙子聚成人形的怪物，打散了又會重組。"
+  },
+  {
+    "id": "verit", "name": "威利特", "level": 36,
+    "element": "undead", "race": "demon", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "decayed_nail", "rate": 0.4}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "cursed_ruby", "rate": 0.05}],
+    "lore": "守在金字塔二層的掘墓怪，喜歡收集寶石。"
+  },
+  {
+    "id": "mummy", "name": "木乃伊", "level": 39,
+    "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "decayed_nail", "rate": 0.45}, {"item_id": "cursed_ruby", "rate": 0.1}, {"item_id": "elunium", "rate": 0.08}],
+    "lore": "裹著繃帶的古代亡者，命中極高，閃不掉。"
+  },
+  {
+    "id": "isis", "name": "伊西斯", "level": 42,
+    "element": "shadow", "race": "demon", "size": "large", "role": "tank", "gen": true,
+    "drops": [{"item_id": "cursed_ruby", "rate": 0.15}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "isis_card", "rate": 0.0015}],
+    "lore": "上半身女人、下半身蛇的金字塔守護者。"
   }
 ]
