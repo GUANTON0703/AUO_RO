@@ -2604,5 +2604,158 @@
     ],
     "is_mvp": false,
     "lore": "獸人地城最深處復甦的腐屍，還保留著殘暴的戰意。"
+  },
+  {
+    "id": "cookie",
+    "name": "聖誕餅乾",
+    "level": 27,
+    "element": "neutral",
+    "race": "demihuman",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 381,
+    "job_exp": 190,
+    "stats": {"max_hp": 1236, "max_sp": 0, "atk": 48, "matk": 35, "defense": 8, "mdef": 8, "hit": 28, "flee": 32, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "jellopy", "rate": 0.5},
+      {"item_id": "gingerbread", "rate": 0.35},
+      {"item_id": "cookie_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "玩具工廠裡跑來跑去的薑餅人，被施了魔法就開始搗蛋。"
+  },
+  {
+    "id": "cruiser",
+    "name": "巡邏兵",
+    "level": 30,
+    "element": "neutral",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 450,
+    "job_exp": 225,
+    "stats": {"max_hp": 1450, "max_sp": 0, "atk": 53, "matk": 39, "defense": 9, "mdef": 9, "hit": 31, "flee": 35, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "tin_toy_part", "rate": 0.4},
+      {"item_id": "gear_wheel", "rate": 0.25},
+      {"item_id": "cruiser_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "上了發條就會端槍巡邏的錫製玩具兵，槍口是真的會打人。"
+  },
+  {
+    "id": "myst_case",
+    "name": "禮物盒",
+    "level": 33,
+    "element": "neutral",
+    "race": "formless",
+    "size": "small",
+    "role": "tank",
+    "base_exp": 666,
+    "job_exp": 333,
+    "stats": {"max_hp": 3024, "max_sp": 0, "atk": 46, "matk": 43, "defense": 30, "mdef": 10, "hit": 34, "flee": 27, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "gingerbread", "rate": 0.4},
+      {"item_id": "gear_wheel", "rate": 0.3},
+      {"item_id": "elunium", "rate": 0.05},
+      {"item_id": "myst_case_card", "rate": 0.0016}
+    ],
+    "is_mvp": false,
+    "lore": "包裝精美的聖誕禮物，打開前誰也不知道裡面會咬人。"
+  },
+  {
+    "id": "christmas_cookie",
+    "name": "聖誕小惡魔",
+    "level": 36,
+    "element": "shadow",
+    "race": "demon",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 605,
+    "job_exp": 302,
+    "stats": {"max_hp": 1348, "max_sp": 0, "atk": 81, "matk": 46, "defense": 0, "mdef": 11, "hit": 37, "flee": 49, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.35},
+      {"item_id": "will_o_wisp", "rate": 0.2},
+      {"item_id": "christmas_cookie_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "混進玩具工廠的小惡魔，專門在聖誕夜搞破壞。"
+  },
+  {
+    "id": "kobold_archer",
+    "name": "弓箭狗頭人",
+    "level": 31,
+    "element": "neutral",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 474,
+    "job_exp": 237,
+    "stats": {"max_hp": 1067, "max_sp": 0, "atk": 71, "matk": 40, "defense": 0, "mdef": 9, "hit": 32, "flee": 43, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "kobold_hair", "rate": 0.4},
+      {"item_id": "talon", "rate": 0.25},
+      {"item_id": "kobold_archer_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "躲在樹後放冷箭的狗頭人，準頭比看起來好得多。"
+  },
+  {
+    "id": "kobold_axe",
+    "name": "斧頭狗頭人",
+    "level": 33,
+    "element": "neutral",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 525,
+    "job_exp": 262,
+    "stats": {"max_hp": 1680, "max_sp": 0, "atk": 58, "matk": 43, "defense": 10, "mdef": 10, "hit": 34, "flee": 38, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "kobold_hair", "rate": 0.45},
+      {"item_id": "oridecon", "rate": 0.06},
+      {"item_id": "kobold_axe_card", "rate": 0.0016}
+    ],
+    "is_mvp": false,
+    "lore": "扛著大斧橫衝直撞的狗頭人，是森林裡最常見的一種。"
+  },
+  {
+    "id": "kobold_hammer",
+    "name": "槌子狗頭人",
+    "level": 35,
+    "element": "neutral",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 578,
+    "job_exp": 289,
+    "stats": {"max_hp": 1842, "max_sp": 0, "atk": 61, "matk": 45, "defense": 10, "mdef": 10, "hit": 36, "flee": 40, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "kobold_hair", "rate": 0.45},
+      {"item_id": "iron_ore", "rate": 0.25},
+      {"item_id": "kobold_hammer_card", "rate": 0.0016}
+    ],
+    "is_mvp": false,
+    "lore": "揮著鐵槌把地面砸出坑的狗頭人，一擊能震得人腳麻。"
+  },
+  {
+    "id": "vagabond_wolf",
+    "name": "流浪之狼",
+    "level": 37,
+    "element": "neutral",
+    "race": "animal",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 633,
+    "job_exp": 316,
+    "stats": {"max_hp": 2012, "max_sp": 0, "atk": 64, "matk": 47, "defense": 11, "mdef": 11, "hit": 38, "flee": 42, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "mane", "rate": 0.45},
+      {"item_id": "talon", "rate": 0.2},
+      {"item_id": "vagabond_wolf_card", "rate": 0.0016}
+    ],
+    "is_mvp": false,
+    "lore": "離群獨行的老狼，在狗頭人森林邊緣徘徊獵食。"
   }
 ]

@@ -342,6 +342,24 @@
     "unlock_base_level": 40
   },
   {
+    "id": "toy_factory_1f",
+    "name": "玩具工廠 1F",
+    "town": "aldebaran",
+    "level_range": [25, 40],
+    "monster_ids": ["cookie", "cruiser", "myst_case", "christmas_cookie"],
+    "mvp_id": null,
+    "unlock_base_level": 24
+  },
+  {
+    "id": "kobold_forest",
+    "name": "狗頭人森林",
+    "town": "geffen",
+    "level_range": [30, 42],
+    "monster_ids": ["kobold_archer", "kobold_axe", "kobold_hammer", "vagabond_wolf"],
+    "mvp_id": null,
+    "unlock_base_level": 30
+  },
+  {
     "id": "orc_dungeon_2f",
     "name": "獸人地城 2F",
     "town": "geffen",

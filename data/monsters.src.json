@@ -1390,5 +1390,53 @@
     "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
     "drops": [{"item_id": "orc_tooth", "rate": 0.45}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "zenorc_card", "rate": 0.0012}],
     "lore": "獸人地城最深處復甦的腐屍，還保留著殘暴的戰意。"
+  },
+  {
+    "id": "cookie", "name": "聖誕餅乾", "level": 27,
+    "element": "neutral", "race": "demihuman", "size": "small", "role": "normal", "gen": true,
+    "drops": [{"item_id": "jellopy", "rate": 0.5}, {"item_id": "gingerbread", "rate": 0.35}, {"item_id": "cookie_card", "rate": 0.002}],
+    "lore": "玩具工廠裡跑來跑去的薑餅人，被施了魔法就開始搗蛋。"
+  },
+  {
+    "id": "cruiser", "name": "巡邏兵", "level": 30,
+    "element": "neutral", "race": "demihuman", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "tin_toy_part", "rate": 0.4}, {"item_id": "gear_wheel", "rate": 0.25}, {"item_id": "cruiser_card", "rate": 0.0018}],
+    "lore": "上了發條就會端槍巡邏的錫製玩具兵，槍口是真的會打人。"
+  },
+  {
+    "id": "myst_case", "name": "禮物盒", "level": 33,
+    "element": "neutral", "race": "formless", "size": "small", "role": "tank", "gen": true,
+    "drops": [{"item_id": "gingerbread", "rate": 0.4}, {"item_id": "gear_wheel", "rate": 0.3}, {"item_id": "elunium", "rate": 0.05}, {"item_id": "myst_case_card", "rate": 0.0016}],
+    "lore": "包裝精美的聖誕禮物，打開前誰也不知道裡面會咬人。"
+  },
+  {
+    "id": "christmas_cookie", "name": "聖誕小惡魔", "level": 36,
+    "element": "shadow", "race": "demon", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "sticky_mucus", "rate": 0.35}, {"item_id": "will_o_wisp", "rate": 0.2}, {"item_id": "christmas_cookie_card", "rate": 0.0015}],
+    "lore": "混進玩具工廠的小惡魔，專門在聖誕夜搞破壞。"
+  },
+  {
+    "id": "kobold_archer", "name": "弓箭狗頭人", "level": 31,
+    "element": "neutral", "race": "demihuman", "size": "medium", "role": "glass", "gen": true,
+    "drops": [{"item_id": "kobold_hair", "rate": 0.4}, {"item_id": "talon", "rate": 0.25}, {"item_id": "kobold_archer_card", "rate": 0.0018}],
+    "lore": "躲在樹後放冷箭的狗頭人，準頭比看起來好得多。"
+  },
+  {
+    "id": "kobold_axe", "name": "斧頭狗頭人", "level": 33,
+    "element": "neutral", "race": "demihuman", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "kobold_hair", "rate": 0.45}, {"item_id": "oridecon", "rate": 0.06}, {"item_id": "kobold_axe_card", "rate": 0.0016}],
+    "lore": "扛著大斧橫衝直撞的狗頭人，是森林裡最常見的一種。"
+  },
+  {
+    "id": "kobold_hammer", "name": "槌子狗頭人", "level": 35,
+    "element": "neutral", "race": "demihuman", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "kobold_hair", "rate": 0.45}, {"item_id": "iron_ore", "rate": 0.25}, {"item_id": "kobold_hammer_card", "rate": 0.0016}],
+    "lore": "揮著鐵槌把地面砸出坑的狗頭人，一擊能震得人腳麻。"
+  },
+  {
+    "id": "vagabond_wolf", "name": "流浪之狼", "level": 37,
+    "element": "neutral", "race": "animal", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "mane", "rate": 0.45}, {"item_id": "talon", "rate": 0.2}, {"item_id": "vagabond_wolf_card", "rate": 0.0016}],
+    "lore": "離群獨行的老狼，在狗頭人森林邊緣徘徊獵食。"
   }
 ]

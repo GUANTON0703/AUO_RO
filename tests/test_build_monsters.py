@@ -41,3 +41,12 @@ def test_generated_classic_batch_one_monsters_keep_required_drops():
     for monster_id in ("pirate_skeleton", "pasana", "orc_skeleton"):
         assert entries[monster_id]["gen"] is True
         assert entries[monster_id]["drops"]
+
+
+def test_generated_lv21_40_prejob_monsters_keep_required_drops():
+    source = json.loads((build_monsters.DATA / "monsters.src.json").read_text(encoding="utf-8"))
+    entries = {entry["id"]: entry for entry in source}
+    for monster_id in ("cookie", "myst_case", "cruiser", "christmas_cookie",
+                       "kobold_axe", "kobold_hammer", "kobold_archer", "vagabond_wolf"):
+        assert entries[monster_id]["gen"] is True
+        assert entries[monster_id]["drops"]

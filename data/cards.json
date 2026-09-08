@@ -92,5 +92,14 @@
   {"id": "ghostring_card", "name": "幽靈波利卡片", "monster_id": "ghostring", "slot": "garment", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "ghost", "pct": 15}]},
   {"id": "deviace_card", "name": "深海魔物卡片", "monster_id": "deviace", "slot": "garment", "drop_rate": 0.0012, "effects": [{"type": "element_resist", "element": "water", "pct": 20}]},
   {"id": "zenorc_card", "name": "獸人腐屍卡片", "monster_id": "zenorc", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "race_damage", "race": "undead", "pct": 15}]},
-  {"id": "orc_skeleton_card", "name": "獸人骷髏卡片", "monster_id": "orc_skeleton", "slot": "armor", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 4}, {"type": "flat_stat", "stat": "max_hp", "amount": 80}]}
+  {"id": "orc_skeleton_card", "name": "獸人骷髏卡片", "monster_id": "orc_skeleton", "slot": "armor", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 4}, {"type": "flat_stat", "stat": "max_hp", "amount": 80}]},
+
+  {"id": "cookie_card", "name": "聖誕餅乾卡片", "monster_id": "cookie", "slot": "accessory", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 5}, {"type": "flat_stat", "stat": "crit", "amount": 2}]},
+  {"id": "cruiser_card", "name": "巡邏兵卡片", "monster_id": "cruiser", "slot": "weapon", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "hit", "amount": 8}, {"type": "flat_stat", "stat": "atk", "amount": 5}]},
+  {"id": "myst_case_card", "name": "禮物盒卡片", "monster_id": "myst_case", "slot": "head", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "max_sp", "amount": 20}, {"type": "flat_stat", "stat": "mdef", "amount": 3}]},
+  {"id": "christmas_cookie_card", "name": "聖誕小惡魔卡片", "monster_id": "christmas_cookie", "slot": "garment", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "shadow", "pct": 10}, {"type": "flat_stat", "stat": "flee", "amount": 5}]},
+  {"id": "kobold_archer_card", "name": "弓箭狗頭人卡片", "monster_id": "kobold_archer", "slot": "weapon", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "hit", "amount": 10}]},
+  {"id": "kobold_axe_card", "name": "斧頭狗頭人卡片", "monster_id": "kobold_axe", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 14}, {"type": "flat_stat", "stat": "crit", "amount": 2}]},
+  {"id": "kobold_hammer_card", "name": "槌子狗頭人卡片", "monster_id": "kobold_hammer", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 16}]},
+  {"id": "vagabond_wolf_card", "name": "流浪之狼卡片", "monster_id": "vagabond_wolf", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "race_damage", "race": "animal", "pct": 15}]}
 ]
