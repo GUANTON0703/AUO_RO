@@ -3349,7 +3349,7 @@
       }
     ],
     "idle_default": {
-      "enabled": true,
+      "enabled": false,
       "trigger": "sp_available",
       "priority": 1
     },
@@ -3611,7 +3611,7 @@
       }
     ],
     "idle_default": {
-      "enabled": true,
+      "enabled": false,
       "trigger": "sp_available",
       "priority": 1
     },
@@ -3751,7 +3751,7 @@
       }
     ],
     "idle_default": {
-      "enabled": true,
+      "enabled": false,
       "trigger": "sp_available",
       "priority": 1
     },
@@ -4645,7 +4645,7 @@
       }
     ],
     "idle_default": {
-      "enabled": true,
+      "enabled": false,
       "trigger": "sp_available",
       "priority": 1
     },
@@ -4751,7 +4751,7 @@
       }
     ],
     "idle_default": {
-      "enabled": true,
+      "enabled": false,
       "trigger": "hp_below_50",
       "priority": 2
     },
