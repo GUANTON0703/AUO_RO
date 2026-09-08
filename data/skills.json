@@ -4614,5 +4614,373 @@
       "priority": 0
     },
     "requires": {}
+  },
+  {
+    "id": "holy_wall",
+    "name": "聖十字結界",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "defense": [
+            8,
+            12,
+            16,
+            20,
+            24
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {
+      "kyrie_eleison": 1
+    }
+  },
+  {
+    "id": "sanctuary",
+    "name": "大聖堂",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      18,
+      22,
+      26,
+      30,
+      34
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "heal_hp",
+        "flat": [
+          120,
+          180,
+          240,
+          300,
+          360
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_50",
+      "priority": 2
+    },
+    "requires": {
+      "heal": 5
+    }
+  },
+  {
+    "id": "resurrection",
+    "name": "復活術",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 4,
+    "sp_cost": [
+      30,
+      40,
+      50,
+      60
+    ],
+    "cooldown_s": 10,
+    "effects": [
+      {
+        "type": "heal_hp",
+        "flat": [
+          250,
+          350,
+          450,
+          550
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_30",
+      "priority": 3
+    },
+    "requires": {
+      "turn_undead": 1
+    }
+  },
+  {
+    "id": "pneuma",
+    "name": "神聖之風",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "defense": [
+            10,
+            15,
+            20,
+            25,
+            30
+          ]
+        },
+        "duration_s": 30
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_50",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "impositio_manus",
+    "name": "神聖之手",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "atk": [
+            5,
+            10,
+            15,
+            20,
+            25
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {
+      "aspersio": 1
+    }
+  },
+  {
+    "id": "suffragium",
+    "name": "急速聖歌",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 3,
+    "sp_cost": [
+      8,
+      12,
+      16
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "aspd": [
+            8,
+            16,
+            24
+          ]
+        },
+        "duration_s": 30
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {
+      "angelus": 2
+    }
+  },
+  {
+    "id": "lex_aeterna",
+    "name": "破滅聖言",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 1,
+    "sp_cost": [
+      10
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "defense",
+        "pct": [
+          -20
+        ],
+        "duration_s": 15
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "lex_divina": 1
+    }
+  },
+  {
+    "id": "status_recovery",
+    "name": "狀態恢復",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 1,
+    "sp_cost": [
+      10
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "heal_hp",
+        "flat": [
+          40
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_50",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "redemptio",
+    "name": "犧牲",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 1,
+    "sp_cost": [
+      50
+    ],
+    "cooldown_s": 10,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "holy",
+        "power_pct": [
+          280
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "resurrection": 1
+    }
+  },
+  {
+    "id": "mace_mastery",
+    "name": "錘矛精通",
+    "job_id": "priest",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "bs_sacramenti",
+    "name": "聖光洗禮",
+    "job_id": "priest",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      16,
+      19,
+      22,
+      25,
+      28
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "atk": [
+            4,
+            8,
+            12,
+            16,
+            20
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {
+      "aspersio": 3
+    }
   }
 ]
