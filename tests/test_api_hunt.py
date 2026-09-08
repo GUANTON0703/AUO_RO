@@ -236,3 +236,18 @@ def test_online_time_accumulates_across_short_polls(client, auth, db_helpers):
         body = client.get("/api/hunt/status", headers=headers).json()
     assert body["kills"] > 0
     assert body["base_exp"] > 0
+
+
+def test_underlevel_potion_not_auto_used(client, auth, db_helpers):
+    """等級不足的補品：掛機引擎不會拿來喝（跟裝備一樣買得到、用不了）。"""
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=10)  # white_potion 需 Lv30
+    db_helpers.set_stats(ch["id"], {"str": 55, "agi": 1, "vit": 1, "int": 1,
+                                    "dex": 30, "luk": 1})
+    db_helpers.give_item(ch["id"], "white_potion", 400)
+    client.post("/api/hunt/start", headers=h,
+                json={"map_id": "prontera_south_field", "monster_id": "bee_soldier"})
+    db_helpers.rewind_hunt(ch["id"], seconds=8 * 3600)
+    client.get("/api/hunt/status", headers=h)
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert inv["items"].get("white_potion", 0) == 400   # 一瓶都沒喝

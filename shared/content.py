@@ -152,6 +152,7 @@ class ItemDef(BaseModel):
     name: str
     kind: Literal["consumable", "material", "misc"]
     effects: list[dict] = Field(default_factory=list)
+    required_level: int = Field(default=1, ge=1)   # 消耗品的使用/購買等級門檻
     npc_buy: int | None = None    # NPC 售價（None = NPC 不賣）
     npc_sell: int = Field(default=0, ge=0)
 

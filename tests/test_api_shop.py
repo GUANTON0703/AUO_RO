@@ -62,3 +62,18 @@ def test_sell_equipped_item_rejected(client, auth, db_helpers):
                 json={"equipment_instance_id": inst["id"]})
     r = client.post("/api/shop/sell", headers=h, json={"equipment_instance_id": inst["id"]})
     assert r.status_code == 400
+
+
+def test_shop_has_varied_heal_potions(client, auth, db_helpers):
+    _, h, _ = auth
+    _char(client, h, db_helpers)
+    items = client.get("/api/shop", headers=h).json()["items"]
+    heal_ids = {i["id"] for i in items if i["id"].endswith("_potion")}
+    assert {"orange_potion", "white_potion"} <= heal_ids
+    # 白藥水回血比紅藥水多
+    from server.content import load_content
+    c = load_content()
+    red = next(e["amount"] for e in c.items["red_potion"].effects if e["type"] == "heal_hp")
+    white = next(e["amount"] for e in c.items["white_potion"].effects if e["type"] == "heal_hp")
+    assert white > red
+    assert c.items["white_potion"].required_level > 1

@@ -118,11 +118,18 @@ def _heal_amount(item) -> int:
                if e.get("type") == "heal_hp"), default=0)
 
 
-def _pick_potion(character_id: int, preferred_id: str | None = None):
+def _usable(item, base_level: int) -> bool:
+    return item is not None and item.kind == "consumable" \
+        and base_level >= item.required_level
+
+
+def _pick_potion(character_id: int, preferred_id: str | None = None,
+                 base_level: int = 1):
     """回傳 (item_id, heal, qty)；沒有可用補品回 (None, 0, 0)。
-    指定 preferred_id 且背包有、又能回血 → 用它；否則自動挑回血最多的。"""
+    指定 preferred_id 且背包有、能回血、等級也夠 → 用它；否則自動挑回血最多的。
+    等級不足的補品直接跳過（跟裝備一樣，買得到但用不了）。"""
     qty_of = inventory.item_qty(character_id, preferred_id) if preferred_id else 0
-    if preferred_id and qty_of > 0:
+    if preferred_id and qty_of > 0 and _usable(_content.items.get(preferred_id), base_level):
         heal = _heal_amount(_content.items.get(preferred_id))
         if heal > 0:
             return (preferred_id, heal, qty_of)
@@ -130,7 +137,7 @@ def _pick_potion(character_id: int, preferred_id: str | None = None):
     best = (None, 0, 0)
     for item_id, qty in inv["items"].items():
         item = _content.items.get(item_id)
-        if item is None or item.kind != "consumable" or qty <= 0:
+        if qty <= 0 or not _usable(item, base_level):
             continue
         heal = _heal_amount(item)
         if heal > best[1]:
@@ -138,7 +145,7 @@ def _pick_potion(character_id: int, preferred_id: str | None = None):
     return best
 
 
-def _auto_buy_potions(character_id: int, strategy) -> None:
+def _auto_buy_potions(character_id: int, strategy, base_level: int = 1) -> None:
     """掛機自動補水：買到手上有 buy_potion_upto 瓶，錢不夠就買能買的。"""
     if not strategy.auto_buy_potion or strategy.buy_potion_upto <= 0:
         return
@@ -146,7 +153,7 @@ def _auto_buy_potions(character_id: int, strategy) -> None:
     item = _content.items.get(pid)
     if item is None or not item.npc_buy or item.npc_buy <= 0:
         return
-    if item.kind != "consumable" or _heal_amount(item) <= 0:
+    if not _usable(item, base_level) or _heal_amount(item) <= 0:
         return
     have = inventory.item_qty(character_id, pid)
     want = strategy.buy_potion_upto - have
@@ -345,10 +352,11 @@ def _settle_current(row, *, force=False) -> dict:
         )
 
     strategy = _strategies.get(row["id"], HuntStrategy())
-    _auto_buy_potions(row["id"], strategy)
+    _auto_buy_potions(row["id"], strategy, row["base_level"])
 
     if strategy.auto_potion:
-        potion_id, potion_heal, potion_count = _pick_potion(row["id"], strategy.potion_item_id)
+        potion_id, potion_heal, potion_count = _pick_potion(
+            row["id"], strategy.potion_item_id, row["base_level"])
     else:
         potion_id, potion_heal, potion_count = (None, 0, 0)
 
