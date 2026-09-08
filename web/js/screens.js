@@ -793,10 +793,12 @@ Screens.hunt = {
     const box = document.querySelector("#maplist");
     if (!box) return;
     const q = (this._search || "").trim().toLowerCase();
+    const monMatchesDrop = (id) => (S.catalog.monsters[id]?.drops || [])
+      .some((d) => itemName(d.item_id).toLowerCase().includes(q));
     let maps = this._maps.filter((m) => !this._region || m.town === this._region);
     if (q) maps = maps.filter((m) =>
       m.name.toLowerCase().includes(q)
-      || m.monster_ids.some((id) => monName(id).toLowerCase().includes(q)));
+      || m.monster_ids.some((id) => monName(id).toLowerCase().includes(q) || monMatchesDrop(id)));
     box.innerHTML = maps.map((m) => `<button class="btn choice" data-map="${m.id}">
         ${esc(m.name)}<div class="sub">解鎖 Lv ${m.unlock_base_level || 1}
         ・${m.monster_ids.map(monName).join("、")}</div></button>`).join("")
