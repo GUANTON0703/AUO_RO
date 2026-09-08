@@ -44,6 +44,15 @@ class Content:
     def monsters_on_map(self, map_id: str) -> list[MonsterDef]:
         return [self.get_monster(m) for m in self.maps[map_id].monster_ids]
 
+    def job_ancestry(self, job_id: str) -> set[str]:
+        """回傳這個職業自己 + 所有前職的 id 集合（防環）。"""
+        seen: set[str] = set()
+        j = self.jobs.get(job_id)
+        while j and j.id not in seen:
+            seen.add(j.id)
+            j = self.jobs.get(j.parent_id) if j.parent_id else None
+        return seen
+
 
 def _index(models, kind: str, key="id") -> dict:
     out: dict = {}

@@ -62,6 +62,31 @@ def test_equip_rejects_low_level(client, auth, db_helpers):
     assert r.status_code == 400
 
 
+def test_equip_allows_parent_job_gear(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.set_job(ch["id"], "knight")
+    db_helpers.set_base_level(ch["id"], 30)
+    db_helpers.give_equipment(ch["id"], "guardian_greatsword")
+    inst = _equip_list(client, ch, h)[0]
+    r = client.post(f"/api/characters/{ch['id']}/inventory/equip", headers=h,
+                    json={"equipment_instance_id": inst["id"]})
+    assert r.status_code == 200
+    assert _equip_list(client, ch, h)[0]["equipped_slot"] == "weapon"
+
+
+def test_equip_still_rejects_unrelated_job(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.set_job(ch["id"], "mage")
+    db_helpers.set_base_level(ch["id"], 30)
+    db_helpers.give_equipment(ch["id"], "guardian_greatsword")
+    inst = _equip_list(client, ch, h)[0]
+    r = client.post(f"/api/characters/{ch['id']}/inventory/equip", headers=h,
+                    json={"equipment_instance_id": inst["id"]})
+    assert r.status_code == 400
+
+
 def test_unequip(client, auth, db_helpers):
     _, h, _ = auth
     ch = _char(client, h, db_helpers)

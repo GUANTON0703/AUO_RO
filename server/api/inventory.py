@@ -60,7 +60,7 @@ def equip(character_id: int, body: EquipRequest, account_id: CurrentAccount):
     eq = _content.equipment.get(inst["equipment_id"])
     if eq is None:
         raise HTTPException(status_code=400, detail="裝備定義不存在")
-    if eq.job_ids and row["job_id"] not in eq.job_ids:
+    if eq.job_ids and not (set(eq.job_ids) & _content.job_ancestry(row["job_id"])):
         raise HTTPException(status_code=400, detail="此職業無法裝備")
     if row["base_level"] < eq.required_level:
         raise HTTPException(

@@ -124,30 +124,40 @@
     _drawSkills() {
       const c = S.char;
       const learned = c.learned_skills || {};
+      const jobs = S.catalog.jobs || {};
+      const chain = [];
+      for (let jid = c.job_id; jid; jid = (jobs[jid] || {}).parent_id) chain.push(jid);
+      const rank = (jid) => (jid === c.job_id ? 0 : 1);
       const skills = Object.values(S.catalog.skills || {})
-        .filter((sk) => sk.job_id === c.job_id);
+        .filter((sk) => chain.includes(sk.job_id));
       let rows = "";
       const sorted = [...skills].sort((a, b) =>
-        (a.kind === b.kind ? 0 : a.kind === "active" ? -1 : 1));
+        (rank(a.job_id) - rank(b.job_id))
+        || (a.kind === b.kind ? 0 : a.kind === "active" ? -1 : 1));
       for (const sk of sorted) {
         const lv = learned[sk.id] || 0;
         const maxed = lv >= sk.max_level;
+        const inherited = sk.job_id !== c.job_id;
         const tag = sk.kind === "active"
           ? `<span class="pill good">主動</span>`
           : `<span class="pill">被動</span>`;
+        const inheritTag = inherited ? `<span class="pill">前職</span>` : "";
         const explain = skillExplain(sk, lv);
         const req = Object.entries(sk.requires || {})
           .map(([rid, rlv]) => `${skillName(rid)} Lv${rlv}`).join("、");
         const cost = sk.kind === "active" && (sk.sp_cost || []).length
           ? `　SP ${sk.sp_cost[Math.min(Math.max(1, lv), sk.sp_cost.length) - 1]}` : "";
+        const btn = inherited
+          ? ""
+          : `<button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}" ${maxed ? "disabled" : ""}>學 +1</button>`;
         rows += `
           <div class="item" style="align-items:flex-start">
-            <div>${tag} ${esc(sk.name)}
+            <div>${tag} ${inheritTag} ${esc(sk.name)}
               <div class="sub">Lv ${lv} / ${sk.max_level}${cost}</div>
               ${explain ? `<div class="sub">${esc(explain)}</div>` : ""}
               ${req ? `<div class="sub" style="color:var(--warn)">前置：${esc(req)}</div>` : ""}
             </div>
-            <button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}" ${maxed ? "disabled" : ""}>學 +1</button>
+            ${btn}
           </div>`;
       }
       if (!skills.length) rows = `<p class="muted">這個職業沒有可學的技能。</p>`;

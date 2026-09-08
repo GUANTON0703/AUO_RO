@@ -65,7 +65,7 @@ def _detail(kind: str, item_id: str, account_id: int):
         reasons = []
         if char:
             job = _content.jobs.get(char["job_id"])
-            if item.job_ids and char["job_id"] not in item.job_ids:
+            if item.job_ids and not (set(item.job_ids) & _content.job_ancestry(char["job_id"])):
                 reasons.append("職業不符")
             if char["base_level"] < item.required_level:
                 reasons.append(f"Base Level 不足（需要 {item.required_level}）")
