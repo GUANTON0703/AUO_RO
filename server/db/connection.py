@@ -98,10 +98,26 @@ def _migration_2(conn: sqlite3.Connection) -> None:
     )
 
 
+def _migration_3(conn: sqlite3.Connection) -> None:
+    """技能改名（B4）：把角色已學技能裡的舊 id 換成新 id，保留等級。"""
+    import json as _json
+    renames = {"shield_charge": "counter_attack"}
+    for cid, raw in conn.execute("SELECT id, learned_skills FROM characters").fetchall():
+        learned = _json.loads(raw or "{}")
+        if not any(old in learned for old in renames):
+            continue
+        for old, new in renames.items():
+            if old in learned:
+                learned[new] = learned.pop(old)
+        conn.execute("UPDATE characters SET learned_skills = ? WHERE id = ?",
+                     (_json.dumps(learned), cid))
+
+
 # (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
 _MIGRATIONS: list[tuple[int, "callable"]] = [
     (1, _migration_1),
     (2, _migration_2),
+    (3, _migration_3),
 ]
 
 

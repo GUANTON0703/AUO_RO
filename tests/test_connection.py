@@ -81,3 +81,31 @@ def test_migration_2_backfills_carried_points_for_second_jobbers(tmp_path):
     assert got["老刺客"] == 39   # 二轉角色補上 carried
     assert got["新賊"] == 0      # 一轉角色不動
     assert got["菜"] == 0
+
+
+def test_migration_3_renames_learned_skill_ids(tmp_path):
+    import json
+    connection.configure(str(tmp_path / "t.db"))
+    connection.init_db()
+    with connection.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO accounts (username, password_hash, created_at) VALUES (?,?,?)",
+            ("a", "h", "t"),
+        )
+        aid = conn.execute("SELECT id FROM accounts").fetchone()["id"]
+        conn.execute(
+            "INSERT INTO characters (account_id, name, job_id, location_map, created_at, "
+            "learned_skills) VALUES (?,?,?,?,?,?)",
+            (aid, "騎士", "knight", "prontera_east_gate", "t",
+             json.dumps({"shield_charge": 3, "bash": 5})),
+        )
+        conn.execute(
+            "INSERT INTO characters (account_id, name, job_id, location_map, created_at, "
+            "learned_skills) VALUES (?,?,?,?,?,?)",
+            (aid, "沒學的", "knight", "prontera_east_gate", "t", json.dumps({"bash": 1})),
+        )
+        connection._migration_3(conn)
+        got = {r["name"]: json.loads(r["learned_skills"])
+               for r in conn.execute("SELECT name, learned_skills FROM characters")}
+    assert got["騎士"] == {"counter_attack": 3, "bash": 5}
+    assert got["沒學的"] == {"bash": 1}

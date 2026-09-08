@@ -1294,35 +1294,37 @@
     "requires": {}
   },
   {
-    "id": "shield_charge",
-    "name": "盾牌衝撞",
+    "id": "counter_attack",
+    "name": "反擊",
     "job_id": "knight",
-    "kind": "active",
+    "kind": "passive",
     "max_level": 5,
     "sp_cost": [
-      12,
-      14,
-      16,
-      18,
-      20
+      0,
+      0,
+      0,
+      0,
+      0
     ],
-    "cooldown_s": 3,
+    "cooldown_s": 0,
     "effects": [
       {
-        "type": "physical_hit",
-        "power_pct": [
-          130,
-          150,
-          170,
-          190,
-          210
-        ]
+        "type": "proc",
+        "event": "on_attack",
+        "chance_pct": [
+          8,
+          12,
+          16,
+          20,
+          24
+        ],
+        "effect": "extra_hit"
       }
     ],
     "idle_default": {
       "enabled": true,
-      "trigger": "cooldown_ready",
-      "priority": 2
+      "trigger": "passive",
+      "priority": 0
     },
     "requires": {}
   },
@@ -2557,7 +2559,7 @@
   },
   {
     "id": "katar_mastery",
-    "name": "匕首精通",
+    "name": "拳刃精通",
     "job_id": "assassin",
     "kind": "passive",
     "max_level": 5,
@@ -3832,6 +3834,274 @@
     },
     "requires": {
       "demon_bane": 3
+    }
+  },
+  {
+    "id": "pierce",
+    "name": "穿刺",
+    "job_id": "knight",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "neutral",
+        "power_pct": [
+          100,
+          115,
+          130,
+          145,
+          160
+        ],
+        "hits": [
+          2,
+          2,
+          3,
+          3,
+          3
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "spear_stab",
+    "name": "標槍刺",
+    "job_id": "knight",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      15,
+      18,
+      21,
+      24,
+      27
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "neutral",
+        "power_pct": [
+          180,
+          215,
+          250,
+          285,
+          320
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "pierce": 3
+    }
+  },
+  {
+    "id": "cavalier_mastery",
+    "name": "騎兵掌握",
+    "job_id": "knight",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "aspd",
+        "amount": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "riding_mastery": 1
+    }
+  },
+  {
+    "id": "charge_attack",
+    "name": "衝鋒突擊",
+    "job_id": "knight",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "neutral",
+        "power_pct": [
+          150,
+          190,
+          230,
+          270,
+          310
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "riding_mastery": 1
+    }
+  },
+  {
+    "id": "poison_react",
+    "name": "毒素反應",
+    "job_id": "assassin",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "proc",
+        "event": "on_attack",
+        "chance_pct": [
+          10,
+          14,
+          18,
+          22,
+          26
+        ],
+        "effect": "extra_hit"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "envenom": 1
+    }
+  },
+  {
+    "id": "sonic_acceleration",
+    "name": "音速加速",
+    "job_id": "assassin",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      14,
+      16,
+      18,
+      20,
+      22
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "aspd": [
+            10,
+            15,
+            20,
+            25,
+            30
+          ],
+          "hit": [
+            5,
+            8,
+            11,
+            14,
+            17
+          ]
+        },
+        "duration_s": 90
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {
+      "sonic_blow": 1
+    }
+  },
+  {
+    "id": "venom_knife",
+    "name": "擲毒匕首",
+    "job_id": "assassin",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "poison",
+        "power_pct": [
+          110,
+          130,
+          150,
+          170,
+          190
+        ],
+        "debuff": "poison"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    },
+    "requires": {
+      "enchant_poison": 1
     }
   }
 ]
