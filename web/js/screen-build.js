@@ -130,9 +130,36 @@
       const rank = (jid) => (jid === c.job_id ? 0 : 1);
       const skills = Object.values(S.catalog.skills || {})
         .filter((sk) => chain.includes(sk.job_id));
+      const skillMap = {};
+      for (const sk of skills) skillMap[sk.id] = sk;
+      const tierCache = {};
+      const tierOf = (sk, stack) => {
+        if (tierCache[sk.id] != null) return tierCache[sk.id];
+        const reqIds = Object.keys(sk.requires || {});
+        if (!reqIds.length) return (tierCache[sk.id] = 0);
+        if (stack.has(sk.id)) return 0;
+        stack.add(sk.id);
+        let max = 0;
+        for (const rid of reqIds) {
+          const parent = skillMap[rid];
+          const t = parent ? tierOf(parent, stack) + 1 : 0;
+          if (t > max) max = t;
+        }
+        stack.delete(sk.id);
+        return (tierCache[sk.id] = max);
+      };
+      for (const sk of skills) tierOf(sk, new Set());
+      const unlocks = {};
+      for (const sk of skills) {
+        for (const rid of Object.keys(sk.requires || {})) {
+          if (!skillMap[rid]) continue;
+          (unlocks[rid] = unlocks[rid] || []).push(sk.id);
+        }
+      }
       let rows = "";
       const sorted = [...skills].sort((a, b) =>
         (rank(a.job_id) - rank(b.job_id))
+        || ((tierCache[a.id] || 0) - (tierCache[b.id] || 0))
         || (a.kind === b.kind ? 0 : a.kind === "active" ? -1 : 1));
       for (const sk of sorted) {
         const lv = learned[sk.id] || 0;
@@ -142,6 +169,9 @@
           ? `<span class="pill good">主動</span>`
           : `<span class="pill">被動</span>`;
         const inheritTag = inherited ? `<span class="pill">前職</span>` : "";
+        const tier = tierCache[sk.id] || 0;
+        const tierTag = `<span class="pill">T${tier + 1}</span>`;
+        const unlockNames = (unlocks[sk.id] || []).map((id) => skillName(id)).join("、");
         const explain = skillExplain(sk, lv);
         const req = Object.entries(sk.requires || {})
           .map(([rid, rlv]) => `${skillName(rid)} Lv${rlv}`).join("、");
@@ -152,10 +182,11 @@
           : `<button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}" ${maxed ? "disabled" : ""}>學 +1</button>`;
         rows += `
           <div class="item" style="align-items:flex-start">
-            <div>${tag} ${inheritTag} ${esc(sk.name)}
+            <div>${tag} ${inheritTag} ${tierTag} ${esc(sk.name)}
               <div class="sub">Lv ${lv} / ${sk.max_level}${cost}</div>
               ${explain ? `<div class="sub">${esc(explain)}</div>` : ""}
               ${req ? `<div class="sub" style="color:var(--warn)">前置：${esc(req)}</div>` : ""}
+              ${unlockNames ? `<div class="sub" style="color:var(--muted)">解鎖：${esc(unlockNames)}</div>` : ""}
             </div>
             ${btn}
           </div>`;
