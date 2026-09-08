@@ -707,10 +707,23 @@ Screens.home = {
     if (!events) return [];
     const out = [];
     const bbb = events.some((e) => ["attack", "skill", "kill"].includes(e.kind));
-    for (const e of events) {
+    for (let i = 0; i < events.length; i++) {
+      const e = events[i];
       if (e.kind === "attack") {
-        if (!e.hit) out.push(`<span class="dim">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → MISS</span>`);
-        else out.push(`<span class="${e.crit ? "crit" : "hit"}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${e.damage}${e.crit ? " 暴擊!" : ""}</span>`);
+        // 同一 actor→target 連續的普攻併成一行，攻速快就會看到多筆數字
+        const nums = [];
+        let anyCrit = false;
+        let j = i;
+        while (j < events.length && events[j].kind === "attack"
+               && events[j].actor === e.actor && events[j].target === e.target) {
+          const a = events[j];
+          if (!a.hit) nums.push(`<span class="dim">MISS</span>`);
+          else if (a.crit) { nums.push(`${a.damage}爆`); anyCrit = true; }
+          else nums.push(`${a.damage}`);
+          j++;
+        }
+        i = j - 1;
+        out.push(`<span class="${anyCrit ? "crit" : "hit"}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${nums.join(" ")}</span>`);
       } else if (e.kind === "skill") {
         const dmg = e.damage ? ` → ${e.damage}` : "";
         const tgt = e.target && e.target !== e.actor ? `對 ${esc(e.target)} ` : "";
