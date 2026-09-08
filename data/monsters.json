@@ -224,6 +224,7 @@
       {"item_id": "clover", "rate": 0.5},
       {"item_id": "elunium", "rate": 0.08},
       {"item_id": "oridecon", "rate": 0.06},
+      {"item_id": "main_gauche_4", "rate": 0.01},
       {"item_id": "tree_sprite_card", "rate": 0.002}
     ],
     "is_mvp": false,
@@ -375,7 +376,7 @@
     "role": "normal",
     "base_exp": 222,
     "job_exp": 111,
-    "stats": {"max_hp": 745, "max_sp": 0, "atk": 35, "matk": 26, "defense": 6, "mdef": 6, "hit": 20, "flee": 24, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 930, "max_sp": 0, "atk": 35, "matk": 26, "defense": 6, "mdef": 6, "hit": 20, "flee": 24, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "jellopy", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.05},
@@ -394,11 +395,12 @@
     "role": "tank",
     "base_exp": 313,
     "job_exp": 156,
-    "stats": {"max_hp": 1440, "max_sp": 0, "atk": 30, "matk": 27, "defense": 18, "mdef": 6, "hit": 21, "flee": 18, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1800, "max_sp": 0, "atk": 30, "matk": 27, "defense": 18, "mdef": 6, "hit": 21, "flee": 18, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "oridecon", "rate": 0.08},
       {"item_id": "elunium", "rate": 0.05},
       {"item_id": "ring", "rate": 0.04},
+      {"item_id": "waghnak_3", "rate": 0.02},
       {"item_id": "seismic_endow_card", "rate": 0.004}
     ],
     "is_mvp": false,
@@ -1010,7 +1012,7 @@
   },
   {
     "id": "matyr",
-    "name": "惡魔犬",
+    "name": "黑狐",
     "level": 30,
     "element": "shadow",
     "race": "demon",
@@ -1021,10 +1023,11 @@
     "stats": {"max_hp": 1015, "max_sp": 0, "atk": 69, "matk": 39, "defense": 0, "mdef": 9, "hit": 31, "flee": 42, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fluff", "rate": 0.35},
-      {"item_id": "clover", "rate": 0.2}
+      {"item_id": "clover", "rate": 0.2},
+      {"item_id": "matyr_card", "rate": 0.002}
     ],
     "is_mvp": false,
-    "lore": "金字塔深處疾奔的黑犬，速度極快。"
+    "lore": "金字塔深處疾奔的黑毛獸，速度極快，一眨眼就竄進暗處。"
   },
   {
     "id": "sand_man",

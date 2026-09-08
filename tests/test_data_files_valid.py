@@ -148,3 +148,35 @@ def test_lv21_40_prejob_routes_and_cards_exist():
         assert map_id in c.maps
     for card_id in ("cookie_card", "myst_case_card", "kobold_axe_card", "vagabond_wolf_card"):
         assert card_id in c.cards
+
+
+def test_p1_prontera_gear_and_matyr_card():
+    c = content.load_content()
+    # 黑狐卡（Matyr Card）：鞋、MHP +10%
+    card = c.cards["matyr_card"]
+    assert card.slot == "shoes"
+    assert any(e.get("type") == "percent_stat" and e.get("stat") == "max_hp"
+               and e.get("pct") == 10 for e in card.effects)
+    assert c.monsters["matyr"].name == "黑狐"
+    assert "matyr_card" in {d.item_id for d in c.monsters["matyr"].drops}
+    # 帶洞武器只從指定怪掉
+    assert c.equipment["waghnak_3"].card_slots == 3
+    assert c.equipment["main_gauche_4"].card_slots == 4
+    assert "waghnak_3" in {d.item_id for d in c.monsters["miner_foreman"].drops}
+
+
+def test_matyr_card_hp_bonus_in_combat():
+    import random
+    from server.combat import simulate_fight
+    from server.combat.combatant import Combatant
+    from server.progression import (
+        CharacterSnapshot, EquippedPiece, build_player_combatant,
+    )
+    c = content.load_content()
+    snap = lambda cards: CharacterSnapshot(
+        name="P", job_id="thief", base_level=40, job_level=40,
+        stats={"str": 30, "agi": 20, "vit": 30, "int": 5, "dex": 20, "luk": 10},
+        learned_skills={}, equipped=[EquippedPiece("boots", 0, cards)])
+    plain = build_player_combatant(snap([]), c)
+    carded = build_player_combatant(snap(["matyr_card"]), c)
+    assert carded.max_hp > plain.max_hp * 1.05
