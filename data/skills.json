@@ -839,6 +839,9 @@
       "enabled": true,
       "trigger": "cooldown_ready",
       "priority": 2
+    },
+    "requires": {
+      "pushcart": 5
     }
   },
   {
@@ -1362,7 +1365,7 @@
   {
     "id": "auto_berserk",
     "name": "自動狂暴",
-    "job_id": "knight",
+    "job_id": "swordman",
     "kind": "active",
     "max_level": 5,
     "sp_cost": [
@@ -1831,7 +1834,7 @@
   {
     "id": "charge_arrow",
     "name": "蓄力箭",
-    "job_id": "hunter",
+    "job_id": "archer",
     "kind": "active",
     "max_level": 5,
     "sp_cost": [
@@ -2845,5 +2848,427 @@
     "requires": {
       "envenom": 3
     }
+  },
+  {
+    "id": "play_dead",
+    "name": "裝死",
+    "job_id": "novice",
+    "kind": "active",
+    "max_level": 1,
+    "sp_cost": [
+      5
+    ],
+    "cooldown_s": 20,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "flee": [
+            50
+          ]
+        },
+        "duration_s": 8
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_30",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "two_hand_sword_mastery",
+    "name": "雙手劍精通",
+    "job_id": "swordman",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "hp_recovery",
+    "name": "體力回復",
+    "job_id": "swordman",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "max_hp",
+        "amount": [
+          30,
+          60,
+          90,
+          120,
+          150
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "fatal_blow",
+    "name": "致命一擊",
+    "job_id": "swordman",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "proc",
+        "event": "on_attack",
+        "chance_pct": [
+          10,
+          15,
+          20,
+          25,
+          30
+        ],
+        "effect": "extra_hit"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "bash": 5
+    }
+  },
+  {
+    "id": "arrow_crafting",
+    "name": "製箭",
+    "job_id": "archer",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "pushcart",
+    "name": "手推車",
+    "job_id": "merchant",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "enlarge_weight": 1
+    }
+  },
+  {
+    "id": "overcharge",
+    "name": "加倍索價",
+    "job_id": "merchant",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "luk",
+        "amount": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "discount": 3
+    }
+  },
+  {
+    "id": "crazy_uproar",
+    "name": "吶喊",
+    "job_id": "merchant",
+    "kind": "active",
+    "max_level": 1,
+    "sp_cost": [
+      10
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "atk": [
+            10
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "detoxify",
+    "name": "解毒",
+    "job_id": "thief",
+    "kind": "active",
+    "max_level": 1,
+    "sp_cost": [
+      10
+    ],
+    "cooldown_s": 5,
+    "effects": [
+      {
+        "type": "heal_hp",
+        "flat": [
+          40
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_50",
+      "priority": 1
+    },
+    "requires": {
+      "envenom": 1
+    }
+  },
+  {
+    "id": "find_stone",
+    "name": "找石頭",
+    "job_id": "thief",
+    "kind": "passive",
+    "max_level": 1,
+    "sp_cost": [
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          0
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "stone_fling",
+    "name": "投石",
+    "job_id": "thief",
+    "kind": "active",
+    "max_level": 1,
+    "sp_cost": [
+      3
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "earth",
+        "power_pct": [
+          120
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": false,
+      "trigger": "every_turn",
+      "priority": 1
+    },
+    "requires": {
+      "find_stone": 1
+    }
+  },
+  {
+    "id": "sand_attack",
+    "name": "潑沙",
+    "job_id": "thief",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "element": "earth",
+        "power_pct": [
+          120,
+          140,
+          160,
+          180,
+          200
+        ]
+      },
+      {
+        "type": "debuff",
+        "stat": "hit",
+        "pct": [
+          -6,
+          -9,
+          -12,
+          -15,
+          -18
+        ],
+        "duration_s": 15
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "back_slide",
+    "name": "後翻",
+    "job_id": "thief",
+    "kind": "active",
+    "max_level": 1,
+    "sp_cost": [
+      5
+    ],
+    "cooldown_s": 8,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "flee": [
+            15
+          ]
+        },
+        "duration_s": 10
+      }
+    ],
+    "idle_default": {
+      "enabled": false,
+      "trigger": "hp_below_50",
+      "priority": 1
+    },
+    "requires": {}
   }
 ]

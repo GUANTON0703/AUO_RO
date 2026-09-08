@@ -66,12 +66,13 @@ def test_all_seven_starting_jobs_plus_second_tier():
         assert c.get_job(j).tier == "second"
 
 
-def test_each_first_job_has_five_skills():
+def test_first_job_skill_ids_match_skills_json():
     c = content.load_content()
     for j in ["swordman", "mage", "archer", "acolyte", "merchant", "thief"]:
-        assert len(c.get_job(j).skill_ids) == 5
-        for sid in c.get_job(j).skill_ids:
-            assert c.skills[sid].job_id == j
+        declared = set(c.get_job(j).skill_ids)
+        actual = {s.id for s in c.skills.values() if s.job_id == j}
+        assert declared == actual, j
+        assert len(declared) >= 5
 
 
 def test_every_mvp_card_exists():

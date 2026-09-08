@@ -120,3 +120,37 @@ def test_aspd_buff_raises_effective_aspd():
                          "duration_s": 60}], "sp_available", 1)
     cast_skill(c, c, rs, random.Random(1))
     assert c.effective_aspd > 120
+
+
+def test_every_active_skill_in_data_casts_without_error():
+    """所有 skills.json 的 active 技能都能被引擎解析並施放，不丟例外。"""
+    from server.content import load_content
+
+    c = load_content()
+    rng = random.Random(0)
+    for sk in c.skills.values():
+        if sk.kind != "active":
+            continue
+        for lv in range(1, sk.max_level + 1):
+            rs = ResolvedSkill(sk.id, sk.name, lv, "active",
+                               (sk.sp_cost or [0])[min(lv, len(sk.sp_cost or [0])) - 1],
+                               0, sk.effects, "every_turn", 1)
+            caster = _c("P", max_sp=999)
+            target = _c("怪", max_hp=99999, flee=0)
+            cast_skill(caster, target, rs, rng)
+
+
+def test_every_skill_loads_into_player_combatant():
+    """每個技能都能被 build_player_combatant 吃進去（含新增的一轉技能）。"""
+    from server.content import load_content
+    from server.progression import CharacterSnapshot, build_player_combatant
+
+    c = load_content()
+    for job_id in ("swordman", "archer", "merchant", "thief", "novice"):
+        learned = {s.id: s.max_level for s in c.skills.values() if s.job_id == job_id}
+        combatant = build_player_combatant(CharacterSnapshot(
+            name="P", job_id=job_id, base_level=40, job_level=40,
+            stats={"str": 30, "agi": 20, "vit": 20, "int": 10, "dex": 20, "luk": 10},
+            learned_skills=learned,
+        ), c)
+        assert combatant.max_hp > 0
