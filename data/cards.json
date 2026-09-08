@@ -36,5 +36,10 @@
   {"id": "zombie_card", "name": "殭屍卡片", "monster_id": "zombie", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "undead", "pct": 20}]},
   {"id": "skeleton_card", "name": "骷髏卡片", "monster_id": "skeleton", "slot": "weapon", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 12}]},
   {"id": "peco_peco_card", "name": "沛可沛可卡片", "monster_id": "peco_peco", "slot": "shoes", "drop_rate": 0.002, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 10}]},
-  {"id": "isis_card", "name": "伊西斯卡片", "monster_id": "isis", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "max_sp", "amount": 40}]}
+  {"id": "isis_card", "name": "伊西斯卡片", "monster_id": "isis", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "max_sp", "amount": 40}]},
+  {"id": "poporing_card", "name": "波波利卡片", "monster_id": "poporing", "slot": "accessory", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "poison", "pct": 15}]},
+  {"id": "munak_card", "name": "木乃伊乾屍卡片", "monster_id": "munak", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 120}]},
+  {"id": "dokebi_card", "name": "桃給比卡片", "monster_id": "dokebi", "slot": "weapon", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "matk", "amount": 15}]},
+  {"id": "sohee_card", "name": "蘇喜卡片", "monster_id": "sohee", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "percent_stat", "stat": "max_sp", "pct": 15}]},
+  {"id": "nine_tail_card", "name": "九尾狐卡片", "monster_id": "nine_tail", "slot": "head", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "hit", "amount": 10}]}
 ]

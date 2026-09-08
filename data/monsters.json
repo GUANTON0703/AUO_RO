@@ -1101,5 +1101,248 @@
     ],
     "is_mvp": false,
     "lore": "上半身女人、下半身蛇的金字塔守護者。"
+  },
+  {
+    "id": "wormtail",
+    "name": "芋頭蟲",
+    "level": 12,
+    "element": "earth",
+    "race": "plant",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 115,
+    "job_exp": 58,
+    "stats": {"max_hp": 287, "max_sp": 0, "atk": 31, "matk": 17, "defense": 0, "mdef": 4, "hit": 13, "flee": 20, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fluff", "rate": 0.45},
+      {"item_id": "clover", "rate": 0.3}
+    ],
+    "is_mvp": false,
+    "lore": "斐揚森林裡拖著長尾巴的植物蟲。"
+  },
+  {
+    "id": "spore",
+    "name": "孢子",
+    "level": 16,
+    "element": "earth",
+    "race": "plant",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 173,
+    "job_exp": 86,
+    "stats": {"max_hp": 590, "max_sp": 0, "atk": 31, "matk": 22, "defense": 5, "mdef": 5, "hit": 17, "flee": 21, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "mushroom_spore", "rate": 0.5},
+      {"item_id": "sticky_mucus", "rate": 0.25}
+    ],
+    "is_mvp": false,
+    "lore": "會噴孢子的蘑菇怪，成群出現在森林邊緣。"
+  },
+  {
+    "id": "boa",
+    "name": "蟒蛇",
+    "level": 18,
+    "element": "poison",
+    "race": "animal",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 205,
+    "job_exp": 102,
+    "stats": {"max_hp": 692, "max_sp": 0, "atk": 34, "matk": 25, "defense": 5, "mdef": 5, "hit": 19, "flee": 23, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "snake_skin", "rate": 0.45},
+      {"item_id": "jellopy", "rate": 0.3}
+    ],
+    "is_mvp": false,
+    "lore": "盤在樹上的綠色大蛇，咬一口會中毒。"
+  },
+  {
+    "id": "poporing",
+    "name": "波波利",
+    "level": 22,
+    "element": "poison",
+    "race": "plant",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 277,
+    "job_exp": 138,
+    "stats": {"max_hp": 641, "max_sp": 0, "atk": 52, "matk": 29, "defense": 0, "mdef": 7, "hit": 23, "flee": 32, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.4},
+      {"item_id": "jellopy", "rate": 0.3},
+      {"item_id": "poporing_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "波利的毒屬性親戚，彈跳力更好。"
+  },
+  {
+    "id": "elder_willow",
+    "name": "古柳樹",
+    "level": 28,
+    "element": "fire",
+    "race": "plant",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 403,
+    "job_exp": 202,
+    "stats": {"max_hp": 1306, "max_sp": 0, "atk": 50, "matk": 37, "defense": 8, "mdef": 8, "hit": 29, "flee": 33, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "trunk", "rate": 0.45},
+      {"item_id": "clover", "rate": 0.25},
+      {"item_id": "oridecon", "rate": 0.04}
+    ],
+    "is_mvp": false,
+    "lore": "活了很久的柳樹精，樹枝像鞭子一樣抽人。"
+  },
+  {
+    "id": "munak",
+    "name": "木乃伊乾屍",
+    "level": 30,
+    "element": "undead",
+    "race": "undead",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 450,
+    "job_exp": 225,
+    "stats": {"max_hp": 1450, "max_sp": 0, "atk": 53, "matk": 39, "defense": 9, "mdef": 9, "hit": 31, "flee": 35, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "decayed_nail", "rate": 0.45},
+      {"item_id": "rosary", "rate": 0.15},
+      {"item_id": "munak_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "斐揚洞窟裡飄浮的清朝殭屍，蹦蹦跳跳。"
+  },
+  {
+    "id": "soldier_skeleton",
+    "name": "士兵骷髏",
+    "level": 32,
+    "element": "undead",
+    "race": "undead",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 499,
+    "job_exp": 250,
+    "stats": {"max_hp": 1602, "max_sp": 0, "atk": 56, "matk": 41, "defense": 10, "mdef": 10, "hit": 33, "flee": 37, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "skel_bone", "rate": 0.5},
+      {"item_id": "oridecon", "rate": 0.06}
+    ],
+    "is_mvp": false,
+    "lore": "穿著破爛盔甲的骷髏士兵，比一般骷髏能打。"
+  },
+  {
+    "id": "dokebi",
+    "name": "桃給比",
+    "level": 35,
+    "element": "wind",
+    "race": "demon",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 578,
+    "job_exp": 289,
+    "stats": {"max_hp": 1842, "max_sp": 0, "atk": 61, "matk": 45, "defense": 10, "mdef": 10, "hit": 36, "flee": 40, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "rosary", "rate": 0.2},
+      {"item_id": "oridecon", "rate": 0.08},
+      {"item_id": "dokebi_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "拿著大槌的獨角鬼，會放電。"
+  },
+  {
+    "id": "archer_skeleton",
+    "name": "弓箭手骷髏",
+    "level": 38,
+    "element": "undead",
+    "race": "undead",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 661,
+    "job_exp": 330,
+    "stats": {"max_hp": 1470, "max_sp": 0, "atk": 86, "matk": 49, "defense": 0, "mdef": 11, "hit": 39, "flee": 52, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "skel_bone", "rate": 0.45},
+      {"item_id": "feather", "rate": 0.3},
+      {"item_id": "elunium", "rate": 0.05}
+    ],
+    "is_mvp": false,
+    "lore": "躲在洞窟深處放冷箭的骷髏，命中很高。"
+  },
+  {
+    "id": "ghoul",
+    "name": "食屍鬼",
+    "level": 40,
+    "element": "undead",
+    "race": "undead",
+    "size": "medium",
+    "role": "tank",
+    "base_exp": 914,
+    "job_exp": 457,
+    "stats": {"max_hp": 4104, "max_sp": 0, "atk": 55, "matk": 51, "defense": 36, "mdef": 12, "hit": 41, "flee": 31, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "horrendous_mouth", "rate": 0.35},
+      {"item_id": "decayed_nail", "rate": 0.4},
+      {"item_id": "cursed_ruby", "rate": 0.06}
+    ],
+    "is_mvp": false,
+    "lore": "腐爛發臭的食屍鬼，皮厚肉粗，慢慢磨。"
+  },
+  {
+    "id": "bon_gun",
+    "name": "冤魂",
+    "level": 43,
+    "element": "undead",
+    "race": "undead",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 813,
+    "job_exp": 406,
+    "stats": {"max_hp": 2564, "max_sp": 0, "atk": 74, "matk": 55, "defense": 13, "mdef": 13, "hit": 44, "flee": 48, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "rosary", "rate": 0.25},
+      {"item_id": "horrendous_mouth", "rate": 0.2},
+      {"item_id": "elunium", "rate": 0.06}
+    ],
+    "is_mvp": false,
+    "lore": "含恨而死的怨靈，會突然暴怒衝過來。"
+  },
+  {
+    "id": "sohee",
+    "name": "蘇喜",
+    "level": 45,
+    "element": "shadow",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 878,
+    "job_exp": 439,
+    "stats": {"max_hp": 1934, "max_sp": 0, "atk": 100, "matk": 57, "defense": 0, "mdef": 14, "hit": 46, "flee": 60, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "rosary", "rate": 0.3},
+      {"item_id": "oridecon", "rate": 0.12},
+      {"item_id": "sohee_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "被困在洞窟裡的少女亡魂，身法飄忽難打中。"
+  },
+  {
+    "id": "nine_tail",
+    "name": "九尾狐",
+    "level": 50,
+    "element": "wind",
+    "race": "demon",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 1050,
+    "job_exp": 525,
+    "stats": {"max_hp": 3290, "max_sp": 0, "atk": 85, "matk": 63, "defense": 15, "mdef": 15, "hit": 51, "flee": 55, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fox_tail", "rate": 0.4},
+      {"item_id": "oridecon", "rate": 0.12},
+      {"item_id": "nine_tail_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "斐揚洞窟最深處的九尾妖狐，速度快、攻擊猛。"
   }
 ]

@@ -115,5 +115,41 @@
     "monster_ids": ["verit", "mummy", "isis", "matyr"],
     "mvp_id": null,
     "unlock_base_level": 33
+  },
+  {
+    "id": "payon_field",
+    "name": "斐揚野外-森林",
+    "town": "payon",
+    "level_range": [10, 30],
+    "monster_ids": ["wormtail", "spore", "boa", "elder_willow"],
+    "mvp_id": null,
+    "unlock_base_level": 10
+  },
+  {
+    "id": "payon_cave_1f",
+    "name": "斐揚洞窟 1F",
+    "town": "payon",
+    "level_range": [15, 32],
+    "monster_ids": ["bat_familiar", "poporing", "munak", "spore"],
+    "mvp_id": null,
+    "unlock_base_level": 14
+  },
+  {
+    "id": "payon_cave_2f",
+    "name": "斐揚洞窟 2F",
+    "town": "payon",
+    "level_range": [28, 42],
+    "monster_ids": ["soldier_skeleton", "dokebi", "archer_skeleton", "munak"],
+    "mvp_id": null,
+    "unlock_base_level": 28
+  },
+  {
+    "id": "payon_cave_3f",
+    "name": "斐揚洞窟 3F",
+    "town": "payon",
+    "level_range": [38, 55],
+    "monster_ids": ["ghoul", "bon_gun", "sohee", "nine_tail"],
+    "mvp_id": null,
+    "unlock_base_level": 36
   }
 ]

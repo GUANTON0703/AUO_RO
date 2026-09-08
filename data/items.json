@@ -15,5 +15,11 @@
   {"id": "honey", "name": "蜂蜜", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 30},
   {"id": "talon", "name": "鷹爪", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 18},
   {"id": "iron_ore", "name": "鐵礦", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 25},
-  {"id": "cursed_ruby", "name": "詛咒的紅寶石", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 120}
+  {"id": "cursed_ruby", "name": "詛咒的紅寶石", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 120},
+  {"id": "mushroom_spore", "name": "蘑菇孢子", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 10},
+  {"id": "snake_skin", "name": "蛇皮", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 16},
+  {"id": "trunk", "name": "樹幹", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 14},
+  {"id": "rosary", "name": "十字念珠", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 40},
+  {"id": "horrendous_mouth", "name": "恐怖之口", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 55},
+  {"id": "fox_tail", "name": "狐狸尾巴", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 70}
 ]
