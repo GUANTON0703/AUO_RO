@@ -151,5 +151,50 @@
     "monster_ids": ["ghoul", "bon_gun", "sohee", "nine_tail"],
     "mvp_id": null,
     "unlock_base_level": 36
+  },
+  {
+    "id": "geffen_field",
+    "name": "吉芬野外-草原",
+    "town": "geffen",
+    "level_range": [8, 28],
+    "monster_ids": ["chonchon", "hornet", "rocker", "ambernite"],
+    "mvp_id": null,
+    "unlock_base_level": 8
+  },
+  {
+    "id": "orc_village",
+    "name": "獸人村",
+    "town": "geffen",
+    "level_range": [24, 38],
+    "monster_ids": ["orc_lady", "orc_warrior", "orc_archer", "goblin"],
+    "mvp_id": null,
+    "unlock_base_level": 24
+  },
+  {
+    "id": "goblin_forest",
+    "name": "哥布林森林",
+    "town": "geffen",
+    "level_range": [28, 44],
+    "monster_ids": ["goblin", "goblin_archer", "hound", "savage"],
+    "mvp_id": null,
+    "unlock_base_level": 28
+  },
+  {
+    "id": "orc_dungeon",
+    "name": "獸人地城",
+    "town": "geffen",
+    "level_range": [32, 50],
+    "monster_ids": ["orc_zombie", "orc_skeleton", "high_orc", "orc_warrior"],
+    "mvp_id": null,
+    "unlock_base_level": 32
+  },
+  {
+    "id": "geffen_dungeon_1f",
+    "name": "吉芬地城 1F",
+    "town": "geffen",
+    "level_range": [30, 48],
+    "monster_ids": ["whisper", "deviruchi", "savage", "orc_zombie"],
+    "mvp_id": null,
+    "unlock_base_level": 30
   }
 ]

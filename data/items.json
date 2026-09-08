@@ -21,5 +21,11 @@
   {"id": "trunk", "name": "樹幹", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 14},
   {"id": "rosary", "name": "十字念珠", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 40},
   {"id": "horrendous_mouth", "name": "恐怖之口", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 55},
-  {"id": "fox_tail", "name": "狐狸尾巴", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 70}
+  {"id": "fox_tail", "name": "狐狸尾巴", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 70},
+  {"id": "insect_leg", "name": "蟲腳", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 8},
+  {"id": "amber", "name": "琥珀", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 45},
+  {"id": "mane", "name": "鬃毛", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 22},
+  {"id": "orc_tooth", "name": "獸人的獠牙", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 30},
+  {"id": "goblin_mask", "name": "哥布林面具", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 35},
+  {"id": "voodoo_doll", "name": "巫毒娃娃", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 60}
 ]

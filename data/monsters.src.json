@@ -988,5 +988,101 @@
     "element": "wind", "race": "demon", "size": "large", "role": "normal", "gen": true,
     "drops": [{"item_id": "fox_tail", "rate": 0.4}, {"item_id": "oridecon", "rate": 0.12}, {"item_id": "nine_tail_card", "rate": 0.0015}],
     "lore": "斐揚洞窟最深處的九尾妖狐，速度快、攻擊猛。"
+  },
+  {
+    "id": "chonchon", "name": "蒼蠅", "level": 10,
+    "element": "wind", "race": "insect", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "fluff", "rate": 0.4}, {"item_id": "insect_leg", "rate": 0.3}, {"item_id": "chonchon_card", "rate": 0.002}],
+    "lore": "吉芬草原上嗡嗡亂飛的綠色小飛蟲。"
+  },
+  {
+    "id": "hornet", "name": "大黃蜂", "level": 14,
+    "element": "wind", "race": "insect", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "honey", "rate": 0.35}, {"item_id": "insect_leg", "rate": 0.3}],
+    "lore": "被驚動就會整群追著螫人的黃蜂。"
+  },
+  {
+    "id": "rocker", "name": "蟋蟀", "level": 16,
+    "element": "earth", "race": "insect", "size": "small", "role": "normal", "gen": true,
+    "drops": [{"item_id": "insect_leg", "rate": 0.45}, {"item_id": "clover", "rate": 0.25}],
+    "lore": "草叢裡拉小提琴的蟋蟀，其實在磨牙。"
+  },
+  {
+    "id": "ambernite", "name": "琥珀蟲", "level": 20,
+    "element": "earth", "race": "insect", "size": "small", "role": "tank", "gen": true,
+    "drops": [{"item_id": "amber", "rate": 0.4}, {"item_id": "jellopy", "rate": 0.3}, {"item_id": "ambernite_card", "rate": 0.002}],
+    "lore": "背著琥珀硬殼的蝸牛蟲，殼硬得很。"
+  },
+  {
+    "id": "orc_lady", "name": "獸人淑女", "level": 26,
+    "element": "earth", "race": "demihuman", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "orc_tooth", "rate": 0.4}, {"item_id": "clover", "rate": 0.25}],
+    "lore": "獸人村裡負責採集的女獸人，脾氣不好。"
+  },
+  {
+    "id": "orc_warrior", "name": "獸人戰士", "level": 28,
+    "element": "earth", "race": "demihuman", "size": "large", "role": "normal", "gen": true,
+    "drops": [{"item_id": "orc_tooth", "rate": 0.45}, {"item_id": "oridecon", "rate": 0.06}],
+    "lore": "拿著粗製斧頭的獸人打手。"
+  },
+  {
+    "id": "goblin", "name": "哥布林", "level": 28,
+    "element": "wind", "race": "demihuman", "size": "small", "role": "normal", "gen": true,
+    "drops": [{"item_id": "goblin_mask", "rate": 0.3}, {"item_id": "jellopy", "rate": 0.3}, {"item_id": "goblin_card", "rate": 0.002}],
+    "lore": "戴著怪面具、拿著小刀的哥布林，成群結隊很煩。"
+  },
+  {
+    "id": "orc_archer", "name": "獸人弓箭手", "level": 30,
+    "element": "earth", "race": "demihuman", "size": "medium", "role": "glass", "gen": true,
+    "drops": [{"item_id": "orc_tooth", "rate": 0.4}, {"item_id": "feather", "rate": 0.3}],
+    "lore": "站在後排放冷箭的獸人。"
+  },
+  {
+    "id": "savage", "name": "野豬", "level": 30,
+    "element": "earth", "race": "animal", "size": "large", "role": "tank", "gen": true,
+    "drops": [{"item_id": "mane", "rate": 0.4}, {"item_id": "jellopy", "rate": 0.3}, {"item_id": "savage_card", "rate": 0.002}],
+    "lore": "體型巨大的野豬，衝起來很難擋。"
+  },
+  {
+    "id": "goblin_archer", "name": "哥布林弓兵", "level": 33,
+    "element": "wind", "race": "demihuman", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "goblin_mask", "rate": 0.3}, {"item_id": "feather", "rate": 0.3}],
+    "lore": "哥布林森林裡的遠程小隊。"
+  },
+  {
+    "id": "orc_zombie", "name": "獸人殭屍", "level": 33,
+    "element": "undead", "race": "undead", "size": "large", "role": "tank", "gen": true,
+    "drops": [{"item_id": "decayed_nail", "rate": 0.45}, {"item_id": "orc_tooth", "rate": 0.3}, {"item_id": "orc_zombie_card", "rate": 0.002}],
+    "lore": "死在戰場又爬起來的獸人，臭氣沖天。"
+  },
+  {
+    "id": "orc_skeleton", "name": "獸人骷髏", "level": 36,
+    "element": "undead", "race": "undead", "size": "large", "role": "normal", "gen": true,
+    "drops": [{"item_id": "skel_bone", "rate": 0.5}, {"item_id": "orc_tooth", "rate": 0.3}, {"item_id": "oridecon", "rate": 0.06}],
+    "lore": "獸人地城深處的骨戰士，還握著生鏽的鈍器。"
+  },
+  {
+    "id": "hound", "name": "獵犬", "level": 38,
+    "element": "fire", "race": "animal", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "mane", "rate": 0.4}, {"item_id": "clover", "rate": 0.2}],
+    "lore": "哥布林養的火屬性獵犬，一逮到人就死咬。"
+  },
+  {
+    "id": "whisper", "name": "嗚咽鬼", "level": 38,
+    "element": "shadow", "race": "demon", "size": "medium", "role": "glass", "gen": true,
+    "drops": [{"item_id": "voodoo_doll", "rate": 0.35}, {"item_id": "sticky_mucus", "rate": 0.3}, {"item_id": "whisper_card", "rate": 0.0015}],
+    "lore": "半透明、飄來飄去的怨鬼，物理很難打中。"
+  },
+  {
+    "id": "high_orc", "name": "高等獸人", "level": 40,
+    "element": "earth", "race": "demihuman", "size": "large", "role": "normal", "gen": true,
+    "drops": [{"item_id": "orc_tooth", "rate": 0.5}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "high_orc_card", "rate": 0.0015}],
+    "lore": "獸人部隊的精銳，力氣大、盔甲厚。"
+  },
+  {
+    "id": "deviruchi", "name": "小惡魔", "level": 45,
+    "element": "shadow", "race": "demon", "size": "small", "role": "normal", "gen": true,
+    "drops": [{"item_id": "voodoo_doll", "rate": 0.3}, {"item_id": "cursed_ruby", "rate": 0.1}, {"item_id": "deviruchi_card", "rate": 0.0015}],
+    "lore": "戴兜帽、拿三叉戟的小惡魔，欠揍但難纏。"
   }
 ]

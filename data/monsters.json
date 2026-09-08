@@ -1344,5 +1344,302 @@
     ],
     "is_mvp": false,
     "lore": "斐揚洞窟最深處的九尾妖狐，速度快、攻擊猛。"
+  },
+  {
+    "id": "chonchon",
+    "name": "蒼蠅",
+    "level": 10,
+    "element": "wind",
+    "race": "insect",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 90,
+    "job_exp": 45,
+    "stats": {"max_hp": 231, "max_sp": 0, "atk": 27, "matk": 15, "defense": 0, "mdef": 3, "hit": 11, "flee": 18, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fluff", "rate": 0.4},
+      {"item_id": "insect_leg", "rate": 0.3},
+      {"item_id": "chonchon_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "吉芬草原上嗡嗡亂飛的綠色小飛蟲。"
+  },
+  {
+    "id": "hornet",
+    "name": "大黃蜂",
+    "level": 14,
+    "element": "wind",
+    "race": "insect",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 143,
+    "job_exp": 72,
+    "stats": {"max_hp": 347, "max_sp": 0, "atk": 36, "matk": 20, "defense": 0, "mdef": 4, "hit": 15, "flee": 23, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "honey", "rate": 0.35},
+      {"item_id": "insect_leg", "rate": 0.3}
+    ],
+    "is_mvp": false,
+    "lore": "被驚動就會整群追著螫人的黃蜂。"
+  },
+  {
+    "id": "rocker",
+    "name": "蟋蟀",
+    "level": 16,
+    "element": "earth",
+    "race": "insect",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 173,
+    "job_exp": 86,
+    "stats": {"max_hp": 590, "max_sp": 0, "atk": 31, "matk": 22, "defense": 5, "mdef": 5, "hit": 17, "flee": 21, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "insect_leg", "rate": 0.45},
+      {"item_id": "clover", "rate": 0.25}
+    ],
+    "is_mvp": false,
+    "lore": "草叢裡拉小提琴的蟋蟀，其實在磨牙。"
+  },
+  {
+    "id": "ambernite",
+    "name": "琥珀蟲",
+    "level": 20,
+    "element": "earth",
+    "race": "insect",
+    "size": "small",
+    "role": "tank",
+    "base_exp": 305,
+    "job_exp": 152,
+    "stats": {"max_hp": 1440, "max_sp": 0, "atk": 30, "matk": 27, "defense": 18, "mdef": 6, "hit": 21, "flee": 18, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "amber", "rate": 0.4},
+      {"item_id": "jellopy", "rate": 0.3},
+      {"item_id": "ambernite_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "背著琥珀硬殼的蝸牛蟲，殼硬得很。"
+  },
+  {
+    "id": "orc_lady",
+    "name": "獸人淑女",
+    "level": 26,
+    "element": "earth",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 359,
+    "job_exp": 180,
+    "stats": {"max_hp": 1168, "max_sp": 0, "atk": 47, "matk": 34, "defense": 8, "mdef": 8, "hit": 27, "flee": 31, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "orc_tooth", "rate": 0.4},
+      {"item_id": "clover", "rate": 0.25}
+    ],
+    "is_mvp": false,
+    "lore": "獸人村裡負責採集的女獸人，脾氣不好。"
+  },
+  {
+    "id": "orc_warrior",
+    "name": "獸人戰士",
+    "level": 28,
+    "element": "earth",
+    "race": "demihuman",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 403,
+    "job_exp": 202,
+    "stats": {"max_hp": 1306, "max_sp": 0, "atk": 50, "matk": 37, "defense": 8, "mdef": 8, "hit": 29, "flee": 33, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "orc_tooth", "rate": 0.45},
+      {"item_id": "oridecon", "rate": 0.06}
+    ],
+    "is_mvp": false,
+    "lore": "拿著粗製斧頭的獸人打手。"
+  },
+  {
+    "id": "goblin",
+    "name": "哥布林",
+    "level": 28,
+    "element": "wind",
+    "race": "demihuman",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 403,
+    "job_exp": 202,
+    "stats": {"max_hp": 1306, "max_sp": 0, "atk": 50, "matk": 37, "defense": 8, "mdef": 8, "hit": 29, "flee": 33, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "goblin_mask", "rate": 0.3},
+      {"item_id": "jellopy", "rate": 0.3},
+      {"item_id": "goblin_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "戴著怪面具、拿著小刀的哥布林，成群結隊很煩。"
+  },
+  {
+    "id": "orc_archer",
+    "name": "獸人弓箭手",
+    "level": 30,
+    "element": "earth",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 450,
+    "job_exp": 225,
+    "stats": {"max_hp": 1015, "max_sp": 0, "atk": 69, "matk": 39, "defense": 0, "mdef": 9, "hit": 31, "flee": 42, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "orc_tooth", "rate": 0.4},
+      {"item_id": "feather", "rate": 0.3}
+    ],
+    "is_mvp": false,
+    "lore": "站在後排放冷箭的獸人。"
+  },
+  {
+    "id": "savage",
+    "name": "野豬",
+    "level": 30,
+    "element": "earth",
+    "race": "animal",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 572,
+    "job_exp": 286,
+    "stats": {"max_hp": 2610, "max_sp": 0, "atk": 42, "matk": 39, "defense": 27, "mdef": 9, "hit": 31, "flee": 24, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "mane", "rate": 0.4},
+      {"item_id": "jellopy", "rate": 0.3},
+      {"item_id": "savage_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "體型巨大的野豬，衝起來很難擋。"
+  },
+  {
+    "id": "goblin_archer",
+    "name": "哥布林弓兵",
+    "level": 33,
+    "element": "wind",
+    "race": "demihuman",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 525,
+    "job_exp": 262,
+    "stats": {"max_hp": 1176, "max_sp": 0, "atk": 75, "matk": 43, "defense": 0, "mdef": 10, "hit": 34, "flee": 46, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "goblin_mask", "rate": 0.3},
+      {"item_id": "feather", "rate": 0.3}
+    ],
+    "is_mvp": false,
+    "lore": "哥布林森林裡的遠程小隊。"
+  },
+  {
+    "id": "orc_zombie",
+    "name": "獸人殭屍",
+    "level": 33,
+    "element": "undead",
+    "race": "undead",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 666,
+    "job_exp": 333,
+    "stats": {"max_hp": 3024, "max_sp": 0, "atk": 46, "matk": 43, "defense": 30, "mdef": 10, "hit": 34, "flee": 27, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "decayed_nail", "rate": 0.45},
+      {"item_id": "orc_tooth", "rate": 0.3},
+      {"item_id": "orc_zombie_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "死在戰場又爬起來的獸人，臭氣沖天。"
+  },
+  {
+    "id": "orc_skeleton",
+    "name": "獸人骷髏",
+    "level": 36,
+    "element": "undead",
+    "race": "undead",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 605,
+    "job_exp": 302,
+    "stats": {"max_hp": 1926, "max_sp": 0, "atk": 63, "matk": 46, "defense": 11, "mdef": 11, "hit": 37, "flee": 41, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "skel_bone", "rate": 0.5},
+      {"item_id": "orc_tooth", "rate": 0.3},
+      {"item_id": "oridecon", "rate": 0.06}
+    ],
+    "is_mvp": false,
+    "lore": "獸人地城深處的骨戰士，還握著生鏽的鈍器。"
+  },
+  {
+    "id": "hound",
+    "name": "獵犬",
+    "level": 38,
+    "element": "fire",
+    "race": "animal",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 661,
+    "job_exp": 330,
+    "stats": {"max_hp": 2100, "max_sp": 0, "atk": 66, "matk": 49, "defense": 11, "mdef": 11, "hit": 39, "flee": 43, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "mane", "rate": 0.4},
+      {"item_id": "clover", "rate": 0.2}
+    ],
+    "is_mvp": false,
+    "lore": "哥布林養的火屬性獵犬，一逮到人就死咬。"
+  },
+  {
+    "id": "whisper",
+    "name": "嗚咽鬼",
+    "level": 38,
+    "element": "shadow",
+    "race": "demon",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 661,
+    "job_exp": 330,
+    "stats": {"max_hp": 1470, "max_sp": 0, "atk": 86, "matk": 49, "defense": 0, "mdef": 11, "hit": 39, "flee": 52, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "voodoo_doll", "rate": 0.35},
+      {"item_id": "sticky_mucus", "rate": 0.3},
+      {"item_id": "whisper_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "半透明、飄來飄去的怨鬼，物理很難打中。"
+  },
+  {
+    "id": "high_orc",
+    "name": "高等獸人",
+    "level": 40,
+    "element": "earth",
+    "race": "demihuman",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 720,
+    "job_exp": 360,
+    "stats": {"max_hp": 2280, "max_sp": 0, "atk": 69, "matk": 51, "defense": 12, "mdef": 12, "hit": 41, "flee": 45, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "orc_tooth", "rate": 0.5},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "high_orc_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "獸人部隊的精銳，力氣大、盔甲厚。"
+  },
+  {
+    "id": "deviruchi",
+    "name": "小惡魔",
+    "level": 45,
+    "element": "shadow",
+    "race": "demon",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 878,
+    "job_exp": 439,
+    "stats": {"max_hp": 2762, "max_sp": 0, "atk": 77, "matk": 57, "defense": 14, "mdef": 14, "hit": 46, "flee": 50, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "voodoo_doll", "rate": 0.3},
+      {"item_id": "cursed_ruby", "rate": 0.1},
+      {"item_id": "deviruchi_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "戴兜帽、拿三叉戟的小惡魔，欠揍但難纏。"
   }
 ]
