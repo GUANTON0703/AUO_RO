@@ -863,13 +863,23 @@ Screens.hunt = {
     view().querySelectorAll("[data-map]").forEach((b) =>
       b.classList.toggle("sel", b.dataset.map === mid));
     const m = S.catalog.maps[mid];
+    const pct = (r) => (r >= 0.1 ? Math.round(r * 100) + "%"
+      : r >= 0.001 ? (r * 100).toFixed(1) + "%" : (r * 100).toFixed(2) + "%");
     let html = `<div class="card"><h3>要打哪幾隻？</h3>
-      <p class="muted">留空 = 自動選好打的。指定的話就照你選的打（要拚自己扛）。</p>
+      <p class="muted">留空 = 自動選好打的。指定的話就照你選的打（要拚自己扛）。點掉落物看細節。</p>
       <div class="list" id="monlist">`;
     for (const id of m.monster_ids) {
       const mon = S.catalog.monsters[id] || {};
-      html += `<button class="btn choice" data-mon="${id}">
-        ${esc(mon.name || id)}<div class="sub">Lv ${mon.level ?? "?"}</div></button>`;
+      const drops = (mon.drops || []).map((d) =>
+        `<span class="droplink" data-drop="${esc(d.item_id)}" data-owner="${id}"
+          style="color:var(--accent);cursor:pointer;text-decoration:underline">${
+          esc(itemName(d.item_id))} ${pct(d.rate)}</span>`).join("　");
+      html += `<div class="monrow" style="margin-bottom:6px">
+        <button class="btn choice" data-mon="${id}" style="width:100%">
+          ${esc(mon.name || id)}<div class="sub">Lv ${mon.level ?? "?"}</div></button>
+        ${drops ? `<div class="sub" style="padding:4px 6px">掉落：${drops}</div>` : ""}
+        <div class="sub" id="dd-${id}" hidden style="padding:4px 6px;color:var(--muted)"></div>
+      </div>`;
     }
     html += `</div>
       <button class="btn primary block" id="btn-go" style="margin-top:12px">開始掛機</button>
@@ -881,6 +891,21 @@ Screens.hunt = {
         const id = b.dataset.mon;
         if (this._picked.has(id)) this._picked.delete(id); else this._picked.add(id);
         b.classList.toggle("sel", this._picked.has(id));
+      };
+    });
+    view().querySelectorAll(".droplink").forEach((el) => {
+      el.onclick = () => {
+        const box = document.querySelector("#dd-" + el.dataset.owner);
+        if (!box) return;
+        const txt = `${itemName(el.dataset.drop)}：${
+          gearDesc(el.dataset.drop) || itemDesc(el.dataset.drop) || "（無額外資料）"}`;
+        if (!box.hidden && box.dataset.showing === el.dataset.drop) {
+          box.hidden = true;
+        } else {
+          box.textContent = txt;
+          box.dataset.showing = el.dataset.drop;
+          box.hidden = false;
+        }
       };
     });
     document.querySelector("#btn-go").onclick = () => this._go();
