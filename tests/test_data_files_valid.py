@@ -117,3 +117,13 @@ def test_lv60_classic_batch_one_maps_and_cards_exist():
         assert map_id in c.maps
     for card_id in ("pirate_skeleton_card", "pasana_card", "orc_skeleton_card", "zenorc_card"):
         assert card_id in c.cards
+
+
+def test_toy_factory_route_maps_and_cards_exist():
+    c = content.load_content()
+    for map_id in ("toy_factory_1f", "toy_factory_2f"):
+        assert map_id in c.maps
+    for card_id in ("myst_case_card", "cruiser_card", "cookie_card",
+                    "chepet_card", "christmas_cookie_card"):
+        assert card_id in c.cards
+        assert c.cards[card_id].monster_id in c.monsters

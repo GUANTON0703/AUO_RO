@@ -56,5 +56,8 @@
   {"id": "rusty_shackle", "name": "生鏽的枷鎖", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 20},
   {"id": "old_page", "name": "古老書頁", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 35},
   {"id": "coal", "name": "煤炭", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 22},
-  {"id": "ore_fragment", "name": "礦石碎片", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 28}
+  {"id": "ore_fragment", "name": "礦石碎片", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 28},
+  {"id": "ribbon", "name": "緞帶", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 16},
+  {"id": "needle_pack", "name": "縫衣針", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 14},
+  {"id": "stuffing", "name": "填充棉", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 12}
 ]

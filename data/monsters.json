@@ -2604,5 +2604,101 @@
     ],
     "is_mvp": false,
     "lore": "獸人地城最深處復甦的腐屍，還保留著殘暴的戰意。"
+  },
+  {
+    "id": "myst_case",
+    "name": "神秘禮盒",
+    "level": 43,
+    "element": "neutral",
+    "race": "formless",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 813,
+    "job_exp": 406,
+    "stats": {"max_hp": 2564, "max_sp": 0, "atk": 74, "matk": 55, "defense": 13, "mdef": 13, "hit": 44, "flee": 48, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "ribbon", "rate": 0.45},
+      {"item_id": "elunium", "rate": 0.05},
+      {"item_id": "myst_case_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "包裝精美的禮盒，掀開蓋子卻是一張咬人的嘴。"
+  },
+  {
+    "id": "cruiser",
+    "name": "十字弓魔偶",
+    "level": 46,
+    "element": "wind",
+    "race": "formless",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 911,
+    "job_exp": 456,
+    "stats": {"max_hp": 2005, "max_sp": 0, "atk": 102, "matk": 58, "defense": 0, "mdef": 14, "hit": 47, "flee": 61, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "gear_wheel", "rate": 0.35},
+      {"item_id": "needle_pack", "rate": 0.25},
+      {"item_id": "cruiser_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "會自己上弦的玩具十字弓，專打靠近的小動物。"
+  },
+  {
+    "id": "cookie",
+    "name": "餅乾魔物",
+    "level": 44,
+    "element": "earth",
+    "race": "formless",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 845,
+    "job_exp": 422,
+    "stats": {"max_hp": 2662, "max_sp": 0, "atk": 75, "matk": 56, "defense": 13, "mdef": 13, "hit": 45, "flee": 49, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "needle_pack", "rate": 0.4},
+      {"item_id": "honey", "rate": 0.15},
+      {"item_id": "cookie_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "薑餅烤過頭後活了過來，身上還沾著糖霜。"
+  },
+  {
+    "id": "chepet",
+    "name": "醫護娃娃",
+    "level": 50,
+    "element": "holy",
+    "race": "formless",
+    "size": "medium",
+    "role": "tank",
+    "base_exp": 1334,
+    "job_exp": 667,
+    "stats": {"max_hp": 5922, "max_sp": 0, "atk": 68, "matk": 63, "defense": 45, "mdef": 15, "hit": 51, "flee": 38, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "stuffing", "rate": 0.45},
+      {"item_id": "royal_jelly", "rate": 0.04},
+      {"item_id": "chepet_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "抱著急救箱的護士娃娃，會替其他玩具補血。"
+  },
+  {
+    "id": "christmas_cookie",
+    "name": "聖誕餅乾",
+    "level": 54,
+    "element": "shadow",
+    "race": "demon",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 1199,
+    "job_exp": 600,
+    "stats": {"max_hp": 3744, "max_sp": 0, "atk": 91, "matk": 68, "defense": 16, "mdef": 16, "hit": 55, "flee": 59, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "stuffing", "rate": 0.35},
+      {"item_id": "ribbon", "rate": 0.3},
+      {"item_id": "oridecon", "rate": 0.07},
+      {"item_id": "christmas_cookie_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "節慶結束後被丟棄的餅乾人，怨氣讓它染上暗色。"
   }
 ]
