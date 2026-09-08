@@ -13,6 +13,12 @@ class HuntStrategy:
     auto_buy_potion: bool = False               # 掛機時自動補水
     buy_potion_id: str | None = None            # 買哪瓶，None = red_potion
     buy_potion_upto: int = 0                    # 補到手上有這麼多瓶
+    auto_sp_potion: bool = False               # 掛機自動喝 SP 回復藥水
+    sp_potion_item_id: str | None = None       # 指定喝哪瓶 SP 藥水，None = 自動挑回 SP 最多的
+    sp_potion_pct: float = 0.3                  # SP 低於此比例才喝
+    auto_buy_sp_potion: bool = False           # 掛機自動補 SP 藥水
+    buy_sp_potion_id: str | None = None        # 買哪瓶 SP 藥水，None = blue_potion
+    buy_sp_potion_upto: int = 0                # 補到手上有這麼多瓶
     sell_item_ids: list[str] = field(default_factory=list)   # 每次結算自動賣掉這些道具
     skill_min_sp_pct: float = 0.0              # SP 高於此比例才放主動技能（0 = 一律放）
     primary_skill_id: str | None = None        # 指定主攻技能（None = 引擎自動挑）

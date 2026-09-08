@@ -110,6 +110,9 @@ class Combatant:
     def heal(self, amount: int) -> None:
         self.hp = min(self.max_hp, self.hp + max(0, amount))
 
+    def restore_sp(self, amount: int) -> None:
+        self.sp = min(self.max_sp, self.sp + max(0, amount))
+
     def spend_sp(self, amount: int) -> bool:
         if self.sp < amount:
             return False

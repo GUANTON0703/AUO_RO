@@ -22,6 +22,7 @@ class FightResult:
     loser_hp: int
     events: list = field(default_factory=list)
     potions_used: int = 0   # 戰鬥中喝掉的補品數（只有玩家 a 會喝）
+    sp_potions_used: int = 0  # 戰鬥中喝掉的 SP 藥水數（只有玩家 a 會喝）
     stole: bool = False      # 這場有偷竊成功
 
 
@@ -122,10 +123,12 @@ def _take_turn(actor, foe, rng, events, min_sp_frac: float = 0.0):
 def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAULT,
                    flee_hp_frac: float = 0.0, *, a_potions: int = 0,
                    a_potion_heal: int = 0, a_potion_hp_frac: float = 0.0,
-                   a_skill_min_sp_frac: float = 0.0) -> FightResult:
+                   a_skill_min_sp_frac: float = 0.0, a_sp_potions: int = 0,
+                   a_sp_potion_restore: int = 0, a_sp_potion_frac: float = 0.0) -> FightResult:
     events: list = []
     rounds = 0
     potions_used = 0
+    sp_potions_used = 0
 
     def _predrink(actor):
         """輪到玩家行動前，血量低於門檻就連喝補品到門檻以上或喝完。"""
@@ -141,6 +144,20 @@ def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAUL
         if healed > 0:
             events.append(HealEvent(a.name, a.name, healed, source="potion"))
 
+    def _predrink_sp(actor):
+        """輪到玩家行動前，SP 低於門檻就連喝 SP 藥水到門檻以上或喝完。"""
+        nonlocal sp_potions_used
+        if actor is not a or a_sp_potion_restore <= 0 or not a.alive:
+            return
+        restored = 0
+        while sp_potions_used < a_sp_potions and a.sp < a.max_sp * a_sp_potion_frac:
+            before = a.sp
+            a.restore_sp(a_sp_potion_restore)
+            restored += a.sp - before
+            sp_potions_used += 1
+        if restored > 0:
+            events.append(HealEvent(a.name, a.name, restored, source="sp_potion"))
+
     # 先手：aspd 高者先，平手 a 先（吃得到場間留存的加速 buff）
     first, second = (a, b) if a.effective_aspd >= b.effective_aspd else (b, a)
     while a.alive and b.alive and rounds < max_rounds:
@@ -155,22 +172,24 @@ def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAUL
         if flee_hp_frac > 0 and a.alive and a.hp < a.max_hp * flee_hp_frac:
             events.append(FledEvent(actor=a.name, hp=a.hp))
             return FightResult(None, None, "fled", rounds, a.hp, b.hp, events,
-                               potions_used, _stole(events))
+                               potions_used, sp_potions_used, _stole(events))
         _predrink(first)
+        _predrink_sp(first)
         _take_turn(first, second, rng, events,
                    a_skill_min_sp_frac if first is a else 0.0)
         if second.alive:
             _predrink(second)
+            _predrink_sp(second)
             _take_turn(second, first, rng, events,
                        a_skill_min_sp_frac if second is a else 0.0)
 
     if a.alive and b.alive:
         return FightResult(None, None, "stalemate", rounds, a.hp, b.hp, events,
-                           potions_used, _stole(events))
+                           potions_used, sp_potions_used, _stole(events))
     winner, loser = (a, b) if a.alive else (b, a)
     events.append(KillEvent(actor=winner.name, target=loser.name))
     return FightResult(winner.name, loser.name, "win", rounds, winner.hp,
-                       loser.hp, events, potions_used, _stole(events))
+                       loser.hp, events, potions_used, sp_potions_used, _stole(events))
 
 
 def _stole(events) -> bool:

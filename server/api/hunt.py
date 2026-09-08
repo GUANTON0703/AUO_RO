@@ -61,6 +61,12 @@ class HuntStrategyRequest(BaseModel):
     auto_buy_potion: bool = False
     buy_potion_id: str | None = None
     buy_potion_upto: int = Field(default=0, ge=0, le=999)
+    auto_sp_potion: bool = False
+    sp_potion_item_id: str | None = None
+    sp_potion_pct: float = Field(default=0.3, ge=0.05, le=0.95)
+    auto_buy_sp_potion: bool = False
+    buy_sp_potion_id: str | None = None
+    buy_sp_potion_upto: int = Field(default=0, ge=0, le=999)
     sell_item_ids: list[str] = []
     skill_min_sp_pct: float = Field(default=0.0, ge=0.0, le=0.95)
     primary_skill_id: str | None = None
@@ -132,6 +138,13 @@ def _heal_amount(item) -> int:
                if e.get("type") == "heal_hp"), default=0)
 
 
+def _sp_restore_amount(item) -> int:
+    if item is None:
+        return 0
+    return max((e.get("amount", 0) for e in item.effects
+               if e.get("type") == "heal_sp"), default=0)
+
+
 def _usable(item, base_level: int) -> bool:
     return item is not None and item.kind == "consumable" \
         and base_level >= item.required_level
@@ -159,6 +172,27 @@ def _pick_potion(character_id: int, preferred_id: str | None = None,
     return best
 
 
+def _pick_sp_potion(character_id: int, preferred_id: str | None = None,
+                    base_level: int = 1):
+    """回傳 (item_id, restore, qty)；沒有可用 SP 藥水回 (None, 0, 0)。
+    指定 preferred_id 且背包有、能回 SP、等級也夠 → 用它；否則自動挑回 SP 最多的。"""
+    qty_of = inventory.item_qty(character_id, preferred_id) if preferred_id else 0
+    if preferred_id and qty_of > 0 and _usable(_content.items.get(preferred_id), base_level):
+        restore = _sp_restore_amount(_content.items.get(preferred_id))
+        if restore > 0:
+            return (preferred_id, restore, qty_of)
+    inv = inventory.list_inventory(character_id)
+    best = (None, 0, 0)
+    for item_id, qty in inv["items"].items():
+        item = _content.items.get(item_id)
+        if qty <= 0 or not _usable(item, base_level):
+            continue
+        restore = _sp_restore_amount(item)
+        if restore > best[1]:
+            best = (item_id, restore, qty)
+    return best
+
+
 def _auto_buy_potions(character_id: int, strategy, base_level: int = 1) -> None:
     """掛機自動補水：買到手上有 buy_potion_upto 瓶，錢不夠就買能買的。"""
     if not strategy.auto_buy_potion or strategy.buy_potion_upto <= 0:
@@ -171,6 +205,28 @@ def _auto_buy_potions(character_id: int, strategy, base_level: int = 1) -> None:
         return
     have = inventory.item_qty(character_id, pid)
     want = strategy.buy_potion_upto - have
+    if want <= 0:
+        return
+    current_zeny = characters_repo.get_character(character_id)["zeny"]
+    buy_n = min(want, current_zeny // item.npc_buy)
+    if buy_n <= 0:
+        return
+    if characters_repo.spend_zeny(character_id, buy_n * item.npc_buy):
+        inventory.add_item(character_id, pid, buy_n)
+
+
+def _auto_buy_sp_potions(character_id: int, strategy, base_level: int = 1) -> None:
+    """掛機自動補 SP 藥水：買到手上有 buy_sp_potion_upto 瓶，錢不夠就買能買的。"""
+    if not strategy.auto_buy_sp_potion or strategy.buy_sp_potion_upto <= 0:
+        return
+    pid = strategy.buy_sp_potion_id or "blue_potion"
+    item = _content.items.get(pid)
+    if item is None or not item.npc_buy or item.npc_buy <= 0:
+        return
+    if not _usable(item, base_level) or _sp_restore_amount(item) <= 0:
+        return
+    have = inventory.item_qty(character_id, pid)
+    want = strategy.buy_sp_potion_upto - have
     if want <= 0:
         return
     current_zeny = characters_repo.get_character(character_id)["zeny"]
@@ -386,12 +442,26 @@ def _settle_current(row, *, force=False) -> dict:
 
     strategy = _load_strategy(row["id"])
     _auto_buy_potions(row["id"], strategy, row["base_level"])
+    _auto_buy_sp_potions(row["id"], strategy, row["base_level"])
 
     if strategy.auto_potion:
         potion_id, potion_heal, potion_count = _pick_potion(
             row["id"], strategy.potion_item_id, row["base_level"])
     else:
         potion_id, potion_heal, potion_count = (None, 0, 0)
+
+    if strategy.auto_sp_potion:
+        sp_potion_id, sp_potion_restore, sp_potion_count = _pick_sp_potion(
+            row["id"], strategy.sp_potion_item_id, row["base_level"])
+    else:
+        sp_potion_id, sp_potion_restore, sp_potion_count = (None, 0, 0)
+
+    # HP / SP 藥水是同一道具（例：蜂王乳）→ 拆分數量，模擬時不會重複算同一批。
+    # 取捨：這種設定下每個用途只拿一半，不追求最優配置（罕見設定，重寫成共享池
+    # 不值得動戰鬥引擎）。偏向 SP（無條件進位），qty=1 時 SP 至少有 1 瓶。
+    if potion_id and potion_id == sp_potion_id:
+        sp_share = (potion_count + 1) // 2
+        potion_count, sp_potion_count = potion_count - sp_share, sp_share
 
     rng = random.Random(hash(row["hunt_last_settled_at"]) & 0xFFFFFFFF)
     result = settle(
@@ -400,6 +470,8 @@ def _settle_current(row, *, force=False) -> dict:
         potion_item_id=potion_id, potion_heal=potion_heal, potion_count=potion_count,
         hp_threshold=strategy.potion_hp_pct,
         skill_min_sp_pct=strategy.skill_min_sp_pct,
+        sp_potion_item_id=sp_potion_id, sp_potion_restore=sp_potion_restore,
+        sp_potion_count=sp_potion_count, sp_potion_frac=strategy.sp_potion_pct,
     )
 
     # 這次沒湊出任何一場戰鬥（時間還在攢）→ 撤銷剛才的「認領」，什麼都不寫，
@@ -422,8 +494,14 @@ def _settle_current(row, *, force=False) -> dict:
     )
     characters_repo.merge_hunt_loot(row["id"], result.drops, result.pity_out)
     inventory.apply_drops(row["id"], result.drops)
+    # HP / SP 藥水若是同一個道具（例：蜂王乳），合併扣一次
+    _spent: dict[str, int] = {}
     if potion_id and result.potions_used:
-        inventory.consume_item(row["id"], potion_id, result.potions_used)
+        _spent[potion_id] = _spent.get(potion_id, 0) + result.potions_used
+    if sp_potion_id and result.sp_potions_used:
+        _spent[sp_potion_id] = _spent.get(sp_potion_id, 0) + result.sp_potions_used
+    for _pid, _n in _spent.items():
+        inventory.consume_item(row["id"], _pid, _n)
     sell_gain = _auto_sell(row["id"], strategy)
 
     # 線上結算只「用掉」湊完整場戰鬥的時間，剩下的留給下次 → 玩家一直輪詢

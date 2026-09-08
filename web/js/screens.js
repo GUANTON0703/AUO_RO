@@ -734,7 +734,8 @@ Screens.home = {
       } else if (e.kind === "kill") {
         out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}</span>`);
       } else if (e.kind === "heal") {
-        const how = e.source === "potion" ? "喝藥水" : "施放治療";
+        const how = e.source === "potion" ? "喝藥水"
+          : e.source === "sp_potion" ? "喝 SP 藥水" : "施放治療";
         out.push(`<span class="dim">  ${esc(e.actor)} ${how} 回復 ${e.amount}</span>`);
       } else if (e.kind === "kill_batch" && !bbb) {
         out.push(`<span class="kill">擊殺 ${esc(e.monster_name)} ×${e.count}　+經驗 ${e.base_exp}/${e.job_exp}　+Zeny ${e.zeny}</span>`);
@@ -826,6 +827,8 @@ Screens.hunt = {
     const s = this._strategy || {};
     const potions = Object.values(S.catalog.items || {})
       .filter((it) => (it.effects || []).some((e) => e.type === "heal_hp"));
+    const spPotions = Object.values(S.catalog.items || {})
+      .filter((it) => (it.effects || []).some((e) => e.type === "heal_sp"));
     const opt = (list, sel) => list.map((it) =>
       `<option value="${it.id}"${it.id === sel ? " selected" : ""}>${esc(it.name)}</option>`).join("");
     return `
@@ -846,6 +849,22 @@ Screens.hunt = {
         <div class="kv"><span class="k">補到手上有</span>
           <span><input type="number" id="st-buyupto" min="0" max="999" style="width:72px"
             value="${s.buy_potion_upto || 0}"> 瓶</span></div>
+        <label class="kv" style="cursor:pointer">
+          <span>自動喝 SP 水</span>
+          <input type="checkbox" id="st-autosp" style="width:auto" ${s.auto_sp_potion ? "checked" : ""}>
+        </label>
+        <div class="kv"><span class="k">SP 低於</span>
+          <span><input type="number" id="st-sppct" min="5" max="95" style="width:64px"
+            value="${Math.round((s.sp_potion_pct ?? 0.3) * 100)}"> %　才喝</span></div>
+        <label class="kv" style="cursor:pointer">
+          <span>自動買 SP 水</span>
+          <input type="checkbox" id="st-autobuysp" style="width:auto" ${s.auto_buy_sp_potion ? "checked" : ""}>
+        </label>
+        <div class="kv"><span class="k">買哪瓶</span>
+          <select id="st-buyspid" style="width:auto">${opt(spPotions, s.buy_sp_potion_id || "blue_potion")}</select></div>
+        <div class="kv"><span class="k">補到手上有</span>
+          <span><input type="number" id="st-buyspupto" min="0" max="999" style="width:72px"
+            value="${s.buy_sp_potion_upto || 0}"> 瓶</span></div>
         <div class="kv"><span class="k">SP 高於</span>
           <span><input type="number" id="st-skillsp" min="0" max="95" style="width:64px"
             value="${Math.round((s.skill_min_sp_pct ?? 0) * 100)}"> %　才放主動技能</span></div>
@@ -865,6 +884,11 @@ Screens.hunt = {
         auto_buy_potion: g("#st-autobuy").checked,
         buy_potion_id: g("#st-buyid").value,
         buy_potion_upto: Math.max(0, Math.floor(Number(g("#st-buyupto").value) || 0)),
+        auto_sp_potion: g("#st-autosp").checked,
+        sp_potion_pct: Math.min(0.95, Math.max(0.05, (Number(g("#st-sppct").value) || 30) / 100)),
+        auto_buy_sp_potion: g("#st-autobuysp").checked,
+        buy_sp_potion_id: g("#st-buyspid").value,
+        buy_sp_potion_upto: Math.max(0, Math.floor(Number(g("#st-buyspupto").value) || 0)),
         skill_min_sp_pct: Math.min(0.95, Math.max(0, (Number(g("#st-skillsp").value) || 0) / 100)),
       };
       btn.disabled = true;

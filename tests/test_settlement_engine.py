@@ -127,6 +127,34 @@ def test_potions_drunk_mid_fight_prevent_one_shot_death():
                for e in wet.events)
 
 
+def test_sp_potion_consumed_in_literal_path():
+    c = load_content()
+    bash = c.skills["bash"]
+    hero = _hero(max_sp=30, skills=[
+        ResolvedSkill("bash", bash.name, 1, "active", 15, 0, bash.effects,
+                      "every_turn", 3),
+    ])
+    r = settle(hero, c.get_monster("poring"), elapsed_seconds=120, cfg=HuntConfig(),
+               rng=random.Random(1), offline=False, pity_in={},
+               sp_potion_item_id="blue_potion", sp_potion_restore=40,
+               sp_potion_count=50, sp_potion_frac=0.5)
+    assert r.sp_potions_used > 0
+    assert any(getattr(e, "kind", "") == "heal" and getattr(e, "source", "") == "sp_potion"
+               for e in r.events)
+
+
+def test_sp_potion_not_used_when_unset():
+    c = load_content()
+    bash = c.skills["bash"]
+    hero = _hero(max_sp=30, skills=[
+        ResolvedSkill("bash", bash.name, 1, "active", 15, 0, bash.effects,
+                      "every_turn", 3),
+    ])
+    r = settle(hero, c.get_monster("poring"), elapsed_seconds=120, cfg=HuntConfig(),
+               rng=random.Random(1), offline=False, pity_in={})
+    assert r.sp_potions_used == 0
+
+
 def test_buff_skill_logs_cast_and_reports_active_buff():
     c = load_content()
     bless, bash = c.skills["blessing"], c.skills["bash"]

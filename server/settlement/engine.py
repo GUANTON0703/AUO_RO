@@ -24,6 +24,7 @@ class SettlementResult:
     zeny: int
     drops: dict = field(default_factory=dict)
     potions_used: int = 0
+    sp_potions_used: int = 0
     retreated: bool = False
     retreat_reason: str = ""
     real_elapsed_seconds: float = 0.0
@@ -52,7 +53,9 @@ def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
            cfg: HuntConfig, rng: random.Random, *, offline: bool, pity_in: dict,
            potion_item_id: str | None = None, potion_heal: int = 0,
            potion_count: int = 0, hp_threshold: float | None = None,
-           skill_min_sp_pct: float = 0.0) -> SettlementResult:
+           skill_min_sp_pct: float = 0.0,
+           sp_potion_item_id: str | None = None, sp_potion_restore: int = 0,
+           sp_potion_count: int = 0, sp_potion_frac: float = 0.0) -> SettlementResult:
     if hp_threshold is not None:
         cfg = replace(cfg, potion_hp_threshold=hp_threshold)
 
@@ -88,8 +91,13 @@ def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
         result = _settle_literal(player, monster, elapsed_seconds, effective,
                                time_per_kill, cfg, rng, pity_in,
                                potion_item_id, potion_heal, potion_count,
-                               skill_min_sp_pct)
+                               skill_min_sp_pct,
+                               sp_potion_item_id, sp_potion_restore,
+                               sp_potion_count, sp_potion_frac)
     else:
+        # 統計路徑（離線 / 超過逐場模擬上限）不逐場模擬，SP 藥水在這裡不生效：
+        # result.sp_potions_used 恆為 0，SP 消耗只做粗估。自動買的 SP 藥水會留在
+        # 背包，下次線上逐場結算才會用到，不會憑空消失。
         result = _settle_statistical(player, monster, elapsed_seconds, effective,
                                time_per_kill, potential, prof, cfg, rng, offline,
                                pity_in, potion_item_id, potion_heal, potion_count,
@@ -200,7 +208,9 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
 
 def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
                     cfg, rng, pity_in, potion_item_id, potion_heal,
-                    potion_count, skill_min_sp_pct=0.0) -> SettlementResult:
+                    potion_count, skill_min_sp_pct=0.0,
+                    sp_potion_item_id=None, sp_potion_restore=0,
+                    sp_potion_count=0, sp_potion_frac=0.0) -> SettlementResult:
     # 從玩家目前的掛機狀態續算（不重置滿血），這樣連續掛機才會累積掉血
     p = copy.deepcopy(player)
     for s in p.skills:
@@ -208,6 +218,8 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
 
     potions_left = potion_count
     potions_used = 0
+    sp_potions_left = sp_potion_count
+    sp_potions_used = 0
     kills = 0
     steal_hits = 0
     combat_events: list = []
@@ -215,6 +227,7 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
     reason = ""
     elapsed = 0.0
     threshold_hp = p.max_hp * cfg.potion_hp_threshold
+    threshold_sp = p.max_sp * sp_potion_frac
 
     while elapsed + time_per_kill <= effective + 1e-9:
         # 場間補血：血量低於門檻且有補品才補，補到門檻以上或用完
@@ -227,6 +240,13 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
             retreated, reason = True, "補品用盡，血量見底"
             break
 
+        # 場間補 SP：SP 低於門檻且有 SP 藥水才補。SP 見底不致命，不撤退。
+        if p.sp < threshold_sp and sp_potion_restore > 0:
+            while sp_potions_left > 0 and p.sp < threshold_sp:
+                p.restore_sp(sp_potion_restore)
+                sp_potions_left -= 1
+                sp_potions_used += 1
+
         foe = Combatant.from_monster(monster)
         p.statuses = [s for s in p.statuses if s.kind != "dot"]
         for s in p.skills:
@@ -235,10 +255,15 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
         r = simulate_fight(p, foe, rng, a_potions=potions_left,
                            a_potion_heal=potion_heal,
                            a_potion_hp_frac=cfg.potion_hp_threshold,
-                           a_skill_min_sp_frac=skill_min_sp_pct)
+                           a_skill_min_sp_frac=skill_min_sp_pct,
+                           a_sp_potions=sp_potions_left,
+                           a_sp_potion_restore=sp_potion_restore,
+                           a_sp_potion_frac=sp_potion_frac)
         combat_events.extend(r.events)
         potions_left -= r.potions_used
         potions_used += r.potions_used
+        sp_potions_left -= r.sp_potions_used
+        sp_potions_used += r.sp_potions_used
         elapsed += time_per_kill
         if r.winner == p.name:
             kills += 1
@@ -270,6 +295,9 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
     if potions_used:
         events.append(PotionUsedEvent(potion_item_id or "", potion_item_id or "",
                                       potions_used, max(0, potions_left)))
+    if sp_potions_used:
+        events.append(PotionUsedEvent(sp_potion_item_id or "", sp_potion_item_id or "",
+                                      sp_potions_used, max(0, sp_potions_left)))
     if retreated:
         events.append(RetreatEvent(reason, elapsed))
 
@@ -283,7 +311,8 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
 
     return SettlementResult(
         kills=kills, base_exp=base_exp, job_exp=job_exp, zeny=zeny, drops=drops,
-        potions_used=potions_used, retreated=retreated, retreat_reason=reason,
+        potions_used=potions_used, sp_potions_used=sp_potions_used,
+        retreated=retreated, retreat_reason=reason,
         real_elapsed_seconds=float(elapsed_seconds),
         effective_seconds=elapsed,
         consumed_seconds=elapsed,

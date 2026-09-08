@@ -123,6 +123,29 @@ def test_double_attack_proc_adds_hits():
     assert (99999 - mob2.hp) > (99999 - mob1.hp) * 1.5
 
 
+def test_sp_potion_drunk_when_sp_below_threshold():
+    bash = ResolvedSkill("bash", "爆裂波動", 1, "active", 15, 0,
+                         [{"type": "physical_hit", "power_pct": [200]}],
+                         "every_turn", 1)
+    hero = _mk("英雄", atk=30, max_hp=600, max_sp=30, skills=[bash])
+    foe = _mk("怪", max_hp=1200, flee=0, atk=10)
+    r = simulate_fight(hero, foe, rng=random.Random(4),
+                       a_sp_potions=5, a_sp_potion_restore=20, a_sp_potion_frac=0.5)
+    assert r.sp_potions_used > 0
+    assert any(e.kind == "heal" and getattr(e, "source", "") == "sp_potion"
+               for e in r.events)
+
+
+def test_no_sp_potion_without_config():
+    bash = ResolvedSkill("bash", "爆裂波動", 1, "active", 15, 0,
+                         [{"type": "physical_hit", "power_pct": [200]}],
+                         "every_turn", 1)
+    hero = _mk("英雄", atk=30, max_hp=600, max_sp=30, skills=[bash])
+    r = simulate_fight(hero, _mk("怪", max_hp=1200, flee=0, atk=10),
+                       rng=random.Random(4))
+    assert r.sp_potions_used == 0
+
+
 def test_race_bonus_increases_damage():
     plain = _mk("普通", atk=50, aspd=100)
     slayer = _mk("剋星", atk=50, aspd=100)

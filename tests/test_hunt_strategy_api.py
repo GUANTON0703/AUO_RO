@@ -6,7 +6,11 @@ def test_hunt_strategy_can_be_saved_and_read(client, auth, db_helpers):
         "flee_on_boss": True, "auto_potion": True,
         "potion_item_id": "red_potion", "potion_hp_pct": 0.4,
         "auto_buy_potion": True, "buy_potion_id": "red_potion",
-        "buy_potion_upto": 30, "sell_item_ids": ["jellopy"],
+        "buy_potion_upto": 30,
+        "auto_sp_potion": True, "sp_potion_item_id": "blue_potion",
+        "sp_potion_pct": 0.25, "auto_buy_sp_potion": True,
+        "buy_sp_potion_id": "blue_potion", "buy_sp_potion_upto": 40,
+        "sell_item_ids": ["jellopy"],
         "skill_min_sp_pct": 0.3,
         "primary_skill_id": "bash", "skill_toggles": {"magnum_break": False},
     }
@@ -25,7 +29,11 @@ def test_hunt_strategy_survives_restart(client, auth, db_helpers):
         "flee_on_boss": False, "auto_potion": True,
         "potion_item_id": "red_potion", "potion_hp_pct": 0.35,
         "auto_buy_potion": True, "buy_potion_id": "red_potion",
-        "buy_potion_upto": 50, "sell_item_ids": ["jellopy"],
+        "buy_potion_upto": 50,
+        "auto_sp_potion": False, "sp_potion_item_id": None,
+        "sp_potion_pct": 0.3, "auto_buy_sp_potion": False,
+        "buy_sp_potion_id": None, "buy_sp_potion_upto": 0,
+        "sell_item_ids": ["jellopy"],
         "skill_min_sp_pct": 0.2,
         "primary_skill_id": None, "skill_toggles": {},
     }
@@ -120,3 +128,37 @@ def test_potion_hp_pct_and_auto_buy(client, auth, db_helpers):
     inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
     # 自動買水補過貨（起始 10 瓶，掛機途中會補到接近 200）
     assert inv["items"].get("red_potion", 0) > 50
+
+
+def test_auto_buy_sp_potion(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = client.post("/api/characters", headers=h, json={"name": "自動買SP水"}).json()
+    db_helpers.set_base_level(ch["id"], 20)
+    db_helpers.set_stats(ch["id"], {"str": 40, "agi": 20, "vit": 25, "int": 5,
+                                    "dex": 25, "luk": 10})
+    db_helpers.set_zeny(ch["id"], 500000)
+    client.put(f"/api/hunt/strategy/{ch['id']}", headers=h,
+               json={"auto_sp_potion": True, "sp_potion_pct": 0.9,
+                     "auto_buy_sp_potion": True, "buy_sp_potion_id": "blue_potion",
+                     "buy_sp_potion_upto": 100})
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_east_gate"})
+    db_helpers.rewind_hunt(ch["id"], seconds=600)
+    client.get("/api/hunt/status", headers=h)
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert inv["items"].get("blue_potion", 0) > 50
+
+
+def test_sp_potion_not_bought_when_disabled(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = client.post("/api/characters", headers=h, json={"name": "沒開SP水"}).json()
+    db_helpers.set_base_level(ch["id"], 20)
+    db_helpers.set_stats(ch["id"], {"str": 40, "agi": 20, "vit": 25, "int": 5,
+                                    "dex": 25, "luk": 10})
+    db_helpers.set_zeny(ch["id"], 500000)
+    client.put(f"/api/hunt/strategy/{ch['id']}", headers=h,
+               json={"auto_sp_potion": False, "auto_buy_sp_potion": False})
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_east_gate"})
+    db_helpers.rewind_hunt(ch["id"], seconds=600)
+    client.get("/api/hunt/status", headers=h)
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert inv["items"].get("blue_potion", 0) == 0

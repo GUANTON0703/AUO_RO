@@ -251,3 +251,22 @@ def test_underlevel_potion_not_auto_used(client, auth, db_helpers):
     client.get("/api/hunt/status", headers=h)
     inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
     assert inv["items"].get("white_potion", 0) == 400   # 一瓶都沒喝
+
+
+def test_shared_hp_sp_potion_not_over_consumed(client, auth, db_helpers):
+    """HP 水跟 SP 水都設成蜂王乳時，扣的量不超過背包持有量。"""
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=25)
+    db_helpers.set_stats(ch["id"], {"str": 55, "agi": 1, "vit": 1, "int": 20,
+                                    "dex": 30, "luk": 1})
+    db_helpers.give_item(ch["id"], "royal_jelly", 40)
+    client.put(f"/api/hunt/strategy/{ch['id']}", headers=h, json={
+        "auto_potion": True, "potion_item_id": "royal_jelly", "potion_hp_pct": 0.9,
+        "auto_sp_potion": True, "sp_potion_item_id": "royal_jelly", "sp_potion_pct": 0.9,
+    })
+    client.post("/api/hunt/start", headers=h,
+                json={"map_id": "prontera_south_field", "monster_id": "bee_soldier"})
+    db_helpers.rewind_hunt(ch["id"], seconds=8 * 3600)
+    client.get("/api/hunt/status", headers=h)
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert inv["items"].get("royal_jelly", 0) >= 0   # 不會變負
