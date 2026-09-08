@@ -349,5 +349,14 @@
     "monster_ids": ["orc_skeleton", "high_orc", "orc_archer", "zenorc"],
     "mvp_id": null,
     "unlock_base_level": 44
+  },
+  {
+    "id": "prontera_culvert_1f",
+    "name": "普隆德拉下水道 1F",
+    "town": "prontera",
+    "level_range": [3, 20],
+    "monster_ids": ["thief_bug_egg", "thief_bug", "tarou", "thief_bug_female"],
+    "mvp_id": null,
+    "unlock_base_level": 3
   }
 ]

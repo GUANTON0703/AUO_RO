@@ -117,3 +117,17 @@ def test_lv60_classic_batch_one_maps_and_cards_exist():
         assert map_id in c.maps
     for card_id in ("pirate_skeleton_card", "pasana_card", "orc_skeleton_card", "zenorc_card"):
         assert card_id in c.cards
+
+
+def test_lv1_20_culvert_route_content_exists():
+    c = content.load_content()
+    assert "prontera_culvert_1f" in c.maps
+    route = c.maps["prontera_culvert_1f"]
+    assert route.level_range[0] >= 1 and route.level_range[1] <= 20
+    for monster_id in ("thief_bug_egg", "thief_bug", "tarou", "thief_bug_female"):
+        assert monster_id in c.monsters
+        assert monster_id in route.monster_ids
+        assert c.monsters[monster_id].drops
+    for card_id in ("thief_bug_egg_card", "thief_bug_card", "tarou_card", "thief_bug_female_card"):
+        assert card_id in c.cards
+        assert c.cards[card_id].monster_id in c.monsters
