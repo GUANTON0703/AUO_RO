@@ -1,5 +1,6 @@
 """data/monsters.json 必須是 scripts/build_monsters.py 從 monsters.src.json 產出的結果。"""
 import importlib.util
+import json
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
@@ -32,3 +33,11 @@ def test_overrides_win_over_formula():
     })
     assert entry["stats"]["flee"] == 1 and entry["stats"]["atk"] == 0
     assert entry["base_exp"] == 2 and entry["job_exp"] == 1
+
+
+def test_generated_classic_batch_one_monsters_keep_required_drops():
+    source = json.loads((build_monsters.DATA / "monsters.src.json").read_text(encoding="utf-8"))
+    entries = {entry["id"]: entry for entry in source}
+    for monster_id in ("pirate_skeleton", "pasana", "orc_skeleton"):
+        assert entries[monster_id]["gen"] is True
+        assert entries[monster_id]["drops"]

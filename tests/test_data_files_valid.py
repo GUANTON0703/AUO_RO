@@ -109,3 +109,11 @@ def test_starter_weapon_per_job_buyable():
     c = content.load_content()
     weapons = [e for e in c.equipment.values() if e.slot == "weapon"]
     assert len(weapons) >= 6
+
+
+def test_lv60_classic_batch_one_maps_and_cards_exist():
+    c = content.load_content()
+    for map_id in ("sunken_ship_1f", "sphinx_1f", "orc_dungeon_2f"):
+        assert map_id in c.maps
+    for card_id in ("pirate_skeleton_card", "pasana_card", "orc_skeleton_card"):
+        assert card_id in c.cards
