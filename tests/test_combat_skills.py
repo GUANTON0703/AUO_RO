@@ -146,7 +146,7 @@ def test_every_skill_loads_into_player_combatant():
     from server.progression import CharacterSnapshot, build_player_combatant
 
     c = load_content()
-    for job_id in ("swordman", "archer", "merchant", "thief", "novice"):
+    for job_id in c.jobs:
         learned = {s.id: s.max_level for s in c.skills.values() if s.job_id == job_id}
         combatant = build_player_combatant(CharacterSnapshot(
             name="P", job_id=job_id, base_level=40, job_level=40,
