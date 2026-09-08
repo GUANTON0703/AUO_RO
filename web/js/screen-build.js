@@ -135,9 +135,18 @@
         const tag = sk.kind === "active"
           ? `<span class="pill good">主動</span>`
           : `<span class="pill">被動</span>`;
+        const explain = skillExplain(sk, lv);
+        const req = Object.entries(sk.requires || {})
+          .map(([rid, rlv]) => `${skillName(rid)} Lv${rlv}`).join("、");
+        const cost = sk.kind === "active" && (sk.sp_cost || []).length
+          ? `　SP ${sk.sp_cost[Math.min(Math.max(1, lv), sk.sp_cost.length) - 1]}` : "";
         rows += `
-          <div class="item">
-            <div>${tag} ${esc(sk.name)}<div class="sub">${lv} / ${sk.max_level}</div></div>
+          <div class="item" style="align-items:flex-start">
+            <div>${tag} ${esc(sk.name)}
+              <div class="sub">Lv ${lv} / ${sk.max_level}${cost}</div>
+              ${explain ? `<div class="sub">${esc(explain)}</div>` : ""}
+              ${req ? `<div class="sub" style="color:var(--warn)">前置：${esc(req)}</div>` : ""}
+            </div>
             <button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}" ${maxed ? "disabled" : ""}>學 +1</button>
           </div>`;
       }

@@ -19,6 +19,7 @@ const jobName = (id) => S.catalog?.jobs?.[id]?.name || id;
 const jobTier = (id) => S.catalog?.jobs?.[id]?.tier || "first";
 const monName = (id) => S.catalog?.monsters?.[id]?.name || S.catalog?.mvps?.[id]?.name || id;
 const mapName = (id) => S.catalog?.maps?.[id]?.name || id;
+const skillName = (id) => S.catalog?.skills?.[id]?.name || id;
 const TOWN_ZH = { prontera: "普隆德拉", morroc: "摩洛克", payon: "斐揚", geffen: "吉芬" };
 const itemName = (id) =>
   S.catalog?.items?.[id]?.name || S.catalog?.equipment?.[id]?.name ||
@@ -51,7 +52,46 @@ const RACE_ZH = { formless: "無形", undead: "不死", animal: "動物", plant:
   insect: "昆蟲", fish: "魚貝", demon: "惡魔", demihuman: "人形", angel: "天使",
   dragon: "龍" };
 const PROC_ZH = { stun: "暈眩", poison: "中毒", blind: "致盲", silence: "沉默",
-  freeze: "冰凍", sleep: "睡眠", curse: "詛咒", bleed: "流血" };
+  freeze: "冰凍", sleep: "睡眠", curse: "詛咒", bleed: "流血",
+  extra_hit: "追加一擊", steal_loot: "偷取額外道具" };
+const CASTER_JOBS = ["mage", "wizard", "acolyte", "priest"];
+
+// 把一個技能的效果講成白話：做什麼、吃什麼屬性。lv 給了就用該等級的數值。
+function skillExplain(sk, lv) {
+  lv = Math.max(1, lv || 1);
+  const at = (v) => (Array.isArray(v) ? v[Math.min(lv, v.length) - 1] : v);
+  const caster = CASTER_JOBS.includes(sk.job_id);
+  const elem = (e) => (e.element && e.element !== "neutral" ? `（${ELEM_ZH[e.element] || e.element}屬性）` : "");
+  const out = [];
+  for (const e of sk.effects || []) {
+    const t = e.type;
+    if (t === "physical_hit" || (t === "aoe" && !caster)) {
+      const hits = at(e.hits ?? 1);
+      out.push(`${t === "aoe" ? "範圍" : ""}物理傷害 ${at(e.power_pct ?? 100)}%${
+        hits > 1 ? ` ×${hits} 連擊` : ""}${elem(e)}，隨攻擊力（力量 STR）提升`);
+      if (e.debuff === "poison") out.push("命中後使目標中毒");
+    } else if (t === "magic_hit" || (t === "aoe" && caster)) {
+      const hits = at(e.hits ?? 1);
+      out.push(`${t === "aoe" ? "範圍" : ""}魔法傷害 ${at(e.power_pct ?? 100)}%${
+        hits > 1 ? ` ×${hits}` : ""}${elem(e)}，隨魔攻（智力 INT）提升`);
+    } else if (t === "heal_hp") {
+      out.push(e.flat != null
+        ? `回復固定 HP ${at(e.flat)}`
+        : `回復 HP（魔攻的 ${at(e.matk_pct)}%，隨智力 INT 提升）`);
+    } else if (t === "buff") {
+      const s = Object.entries(e.stats || {})
+        .map(([k, v]) => `${STAT_ZH[k] || k} +${at(v)}`).join("、");
+      out.push(`增益：自身 ${s}，持續 ${e.duration_s || 0} 秒`);
+    } else if (t === "debuff") {
+      out.push(`減益：目標 ${STAT_ZH[e.stat] || e.stat} ${at(e.pct ?? e.amount)}%，持續 ${e.duration_s || 0} 秒`);
+    } else if (t === "passive_stat") {
+      out.push(`被動：${STAT_ZH[e.stat] || e.stat} +${at(e.amount)}`);
+    } else if (t === "proc") {
+      out.push(`被動：攻擊時 ${at(e.chance_pct)}% 機率${PROC_ZH[e.effect] || e.effect}`);
+    }
+  }
+  return out.join("；");
+}
 
 function effectText(e) {
   if (!e) return "";
@@ -845,5 +885,7 @@ window.esc = esc; window.bar = bar; window.view = view;
 window.Curve = Curve;
 window.jobName = jobName; window.jobTier = jobTier;
 window.monName = monName; window.mapName = mapName; window.itemName = itemName;
+window.skillName = skillName;
 window.itemDesc = itemDesc; window.gearDesc = gearDesc; window.effectText = effectText;
+window.skillExplain = skillExplain;
 window.cardDesc = cardDesc; window.SLOT_ZH = SLOT_ZH;
