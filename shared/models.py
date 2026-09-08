@@ -1,16 +1,4 @@
-from enum import Enum
-
 from pydantic import BaseModel
-
-
-class JobId(str, Enum):
-    NOVICE = "novice"
-    SWORDMAN = "swordman"
-    MAGE = "mage"
-    ARCHER = "archer"
-    ACOLYTE = "acolyte"
-    MERCHANT = "merchant"
-    THIEF = "thief"
 
 
 class AccountPublic(BaseModel):
@@ -21,7 +9,7 @@ class AccountPublic(BaseModel):
 class CharacterPublic(BaseModel):
     id: int
     name: str
-    job_id: JobId
+    job_id: str
     base_level: int
     job_level: int
     base_exp: int

@@ -115,3 +115,12 @@ def test_stat_points_reflect_earned_minus_spent(client, auth, db_helpers):
     listed = client.get("/api/characters", headers=headers).json()[0]
     starting = {k: 1 for k in ("str", "agi", "vit", "int", "dex", "luk")}
     assert listed["stat_points"] == total_earned_stat_points(20) - points_spent(starting)
+
+
+def test_list_characters_works_for_second_job(client, auth, db_helpers):
+    _, headers, _ = auth
+    ch = client.post("/api/characters", headers=headers, json={"name": "刺客大人"}).json()
+    db_helpers.set_job(ch["id"], "assassin", 20, 0)
+    r = client.get("/api/characters", headers=headers)
+    assert r.status_code == 200, r.text
+    assert r.json()[0]["job_id"] == "assassin"
