@@ -57,5 +57,14 @@
   {"id": "marc_card", "name": "海豹卡片", "monster_id": "marc", "slot": "armor", "drop_rate": 0.0018, "effects": [{"type": "element_resist", "element": "water", "pct": 20}]},
   {"id": "obeaune_card", "name": "歐貝奴卡片", "monster_id": "obeaune", "slot": "garment", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 10}]},
   {"id": "sword_fish_card", "name": "劍魚卡片", "monster_id": "sword_fish", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "weapon_element", "element": "water"}]},
-  {"id": "strouf_card", "name": "海龍卡片", "monster_id": "strouf", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "matk", "amount": 15}]}
+  {"id": "strouf_card", "name": "海龍卡片", "monster_id": "strouf", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "matk", "amount": 15}]},
+  {"id": "jakk_card", "name": "南瓜人卡片", "monster_id": "jakk", "slot": "garment", "drop_rate": 0.0018, "effects": [{"type": "element_resist", "element": "fire", "pct": 20}]},
+  {"id": "horong_card", "name": "火靈卡片", "monster_id": "horong", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "weapon_element", "element": "fire"}]},
+  {"id": "nightmare_card", "name": "夢魘卡片", "monster_id": "nightmare", "slot": "accessory", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "agi", "amount": 2}]},
+  {"id": "wind_ghost_card", "name": "風之精靈卡片", "monster_id": "wind_ghost", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "percent_stat", "stat": "matk", "pct": 5}]},
+  {"id": "mimic_card", "name": "寶箱怪卡片", "monster_id": "mimic", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "luk", "amount": 3}]},
+  {"id": "marduk_card", "name": "馬爾杜克卡片", "monster_id": "marduk", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "int", "amount": 2}]},
+  {"id": "marionette_card", "name": "魁儡娃娃卡片", "monster_id": "marionette", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "crit", "amount": 5}]},
+  {"id": "bloody_murderer_card", "name": "血腥殺手卡片", "monster_id": "bloody_murderer", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "aspd", "amount": 3}]},
+  {"id": "dark_priest_card", "name": "邪惡祭司卡片", "monster_id": "dark_priest", "slot": "accessory", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "max_sp", "amount": 50}]}
 ]

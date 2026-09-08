@@ -232,5 +232,23 @@
     "monster_ids": ["obeaune", "sword_fish", "kapha", "merman", "strouf"],
     "mvp_id": null,
     "unlock_base_level": 40
+  },
+  {
+    "id": "geffen_tower_2f",
+    "name": "吉芬塔 2F",
+    "town": "geffen",
+    "level_range": [38, 50],
+    "monster_ids": ["jakk", "horong", "nightmare", "wind_ghost"],
+    "mvp_id": null,
+    "unlock_base_level": 38
+  },
+  {
+    "id": "geffen_tower_3f",
+    "name": "吉芬塔 3F",
+    "town": "geffen",
+    "level_range": [46, 58],
+    "monster_ids": ["mimic", "marduk", "marionette", "bloody_murderer", "dark_priest"],
+    "mvp_id": null,
+    "unlock_base_level": 46
   }
 ]

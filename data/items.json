@@ -40,5 +40,10 @@
   {"id": "gill", "name": "魚鰓", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 20},
   {"id": "fish_tail", "name": "魚尾", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 22},
   {"id": "tendon", "name": "肌腱", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 26},
-  {"id": "coral_reef", "name": "珊瑚礁", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 55}
+  {"id": "coral_reef", "name": "珊瑚礁", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 55},
+  {"id": "jack_o_lantern", "name": "南瓜燈", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 30},
+  {"id": "will_o_wisp", "name": "鬼火", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 28},
+  {"id": "nightmare_horn", "name": "夢魘之角", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 48},
+  {"id": "old_manteau", "name": "舊斗篷", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 40},
+  {"id": "dark_crystal", "name": "暗黑結晶", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 90}
 ]

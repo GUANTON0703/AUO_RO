@@ -1866,5 +1866,176 @@
     ],
     "is_mvp": false,
     "lore": "玄武岩洞窟最深處的墮落人魚，會放水魔法。"
+  },
+  {
+    "id": "jakk",
+    "name": "南瓜人",
+    "level": 38,
+    "element": "fire",
+    "race": "demon",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 661,
+    "job_exp": 330,
+    "stats": {"max_hp": 2100, "max_sp": 0, "atk": 66, "matk": 49, "defense": 11, "mdef": 11, "hit": 39, "flee": 43, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "jack_o_lantern", "rate": 0.4},
+      {"item_id": "sticky_mucus", "rate": 0.25},
+      {"item_id": "jakk_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "頂著南瓜燈、飄在吉芬塔裡的火系惡靈。"
+  },
+  {
+    "id": "horong",
+    "name": "火靈",
+    "level": 40,
+    "element": "fire",
+    "race": "formless",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 720,
+    "job_exp": 360,
+    "stats": {"max_hp": 1596, "max_sp": 0, "atk": 90, "matk": 51, "defense": 0, "mdef": 12, "hit": 41, "flee": 54, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "will_o_wisp", "rate": 0.45},
+      {"item_id": "oridecon", "rate": 0.05},
+      {"item_id": "horong_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "一團會亂竄的鬼火，靠近就燒。"
+  },
+  {
+    "id": "nightmare",
+    "name": "夢魘",
+    "level": 43,
+    "element": "shadow",
+    "race": "demon",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 813,
+    "job_exp": 406,
+    "stats": {"max_hp": 2564, "max_sp": 0, "atk": 74, "matk": 55, "defense": 13, "mdef": 13, "hit": 44, "flee": 48, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "nightmare_horn", "rate": 0.4},
+      {"item_id": "old_manteau", "rate": 0.2},
+      {"item_id": "nightmare_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "黑色的獨眼飛馬，會讓人陷入沉睡。"
+  },
+  {
+    "id": "wind_ghost",
+    "name": "風之精靈",
+    "level": 45,
+    "element": "wind",
+    "race": "formless",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 878,
+    "job_exp": 439,
+    "stats": {"max_hp": 1934, "max_sp": 0, "atk": 100, "matk": 57, "defense": 0, "mdef": 14, "hit": 46, "flee": 60, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "will_o_wisp", "rate": 0.4},
+      {"item_id": "feather", "rate": 0.3},
+      {"item_id": "wind_ghost_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "半透明的風系幽靈，飄忽不定、閃電很痛。"
+  },
+  {
+    "id": "mimic",
+    "name": "寶箱怪",
+    "level": 48,
+    "element": "shadow",
+    "race": "formless",
+    "size": "small",
+    "role": "tank",
+    "base_exp": 1244,
+    "job_exp": 622,
+    "stats": {"max_hp": 5532, "max_sp": 0, "atk": 65, "matk": 61, "defense": 43, "mdef": 14, "hit": 49, "flee": 37, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "dark_crystal", "rate": 0.3},
+      {"item_id": "elunium", "rate": 0.08},
+      {"item_id": "mimic_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "偽裝成寶箱的怪物，打開就咬手。"
+  },
+  {
+    "id": "marduk",
+    "name": "馬爾杜克",
+    "level": 48,
+    "element": "fire",
+    "race": "demon",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 979,
+    "job_exp": 490,
+    "stats": {"max_hp": 2152, "max_sp": 0, "atk": 106, "matk": 61, "defense": 0, "mdef": 14, "hit": 49, "flee": 64, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "old_manteau", "rate": 0.3},
+      {"item_id": "dark_crystal", "rate": 0.2},
+      {"item_id": "marduk_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "頭戴斗笠、盤腿浮空的火系妖僧。"
+  },
+  {
+    "id": "marionette",
+    "name": "魁儡娃娃",
+    "level": 50,
+    "element": "shadow",
+    "race": "demon",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 1050,
+    "job_exp": 525,
+    "stats": {"max_hp": 2303, "max_sp": 0, "atk": 110, "matk": 63, "defense": 0, "mdef": 15, "hit": 51, "flee": 66, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "voodoo_doll", "rate": 0.35},
+      {"item_id": "dark_crystal", "rate": 0.2},
+      {"item_id": "marionette_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "被詛咒的提線木偶，自己會動。"
+  },
+  {
+    "id": "bloody_murderer",
+    "name": "血腥殺手",
+    "level": 52,
+    "element": "shadow",
+    "race": "demon",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 1123,
+    "job_exp": 562,
+    "stats": {"max_hp": 3514, "max_sp": 0, "atk": 88, "matk": 65, "defense": 16, "mdef": 16, "hit": 53, "flee": 57, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "dark_crystal", "rate": 0.35},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "bloody_murderer_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "披著血斗篷的幽靈刺客，攻擊又快又狠。"
+  },
+  {
+    "id": "dark_priest",
+    "name": "邪惡祭司",
+    "level": 55,
+    "element": "shadow",
+    "race": "demon",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 1238,
+    "job_exp": 619,
+    "stats": {"max_hp": 3862, "max_sp": 0, "atk": 93, "matk": 69, "defense": 16, "mdef": 16, "hit": 56, "flee": 60, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "dark_crystal", "rate": 0.4},
+      {"item_id": "rosary", "rate": 0.2},
+      {"item_id": "dark_priest_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "墮落的神職者，會吸取生命與魔力。"
   }
 ]
