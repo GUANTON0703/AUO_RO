@@ -196,5 +196,41 @@
     "monster_ids": ["whisper", "deviruchi", "savage", "orc_zombie"],
     "mvp_id": null,
     "unlock_base_level": 30
+  },
+  {
+    "id": "byalan_1f",
+    "name": "玄武岩洞窟 1F",
+    "town": "prontera",
+    "level_range": [12, 24],
+    "monster_ids": ["marina", "cornutus", "kukre", "hydra"],
+    "mvp_id": null,
+    "unlock_base_level": 12
+  },
+  {
+    "id": "byalan_2f",
+    "name": "玄武岩洞窟 2F",
+    "town": "prontera",
+    "level_range": [15, 30],
+    "monster_ids": ["vadon", "hydra", "marc", "kukre"],
+    "mvp_id": null,
+    "unlock_base_level": 15
+  },
+  {
+    "id": "byalan_3f",
+    "name": "玄武岩洞窟 3F",
+    "town": "prontera",
+    "level_range": [28, 44],
+    "monster_ids": ["marc", "marse", "obeaune", "sword_fish"],
+    "mvp_id": null,
+    "unlock_base_level": 28
+  },
+  {
+    "id": "byalan_4f",
+    "name": "玄武岩洞窟 4F",
+    "town": "prontera",
+    "level_range": [40, 58],
+    "monster_ids": ["obeaune", "sword_fish", "kapha", "merman", "strouf"],
+    "mvp_id": null,
+    "unlock_base_level": 40
   }
 ]

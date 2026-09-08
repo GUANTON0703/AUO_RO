@@ -49,5 +49,13 @@
   {"id": "orc_zombie_card", "name": "獸人殭屍卡片", "monster_id": "orc_zombie", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "undead", "pct": 15}]},
   {"id": "whisper_card", "name": "嗚咽鬼卡片", "monster_id": "whisper", "slot": "garment", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 20}]},
   {"id": "high_orc_card", "name": "高等獸人卡片", "monster_id": "high_orc", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "str", "amount": 3}]},
-  {"id": "deviruchi_card", "name": "小惡魔卡片", "monster_id": "deviruchi", "slot": "head", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "str", "amount": 1}]}
+  {"id": "deviruchi_card", "name": "小惡魔卡片", "monster_id": "deviruchi", "slot": "head", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "str", "amount": 1}]},
+  {"id": "marina_card", "name": "水母卡片", "monster_id": "marina", "slot": "accessory", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "water", "pct": 15}]},
+  {"id": "cornutus_card", "name": "貝殼卡片", "monster_id": "cornutus", "slot": "shoes", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 2}]},
+  {"id": "hydra_card", "name": "水蛭卡片", "monster_id": "hydra", "slot": "weapon", "drop_rate": 0.002, "effects": [{"type": "race_damage", "race": "demihuman", "pct": 20}]},
+  {"id": "vadon_card", "name": "蝦兵卡片", "monster_id": "vadon", "slot": "garment", "drop_rate": 0.002, "effects": [{"type": "element_resist", "element": "fire", "pct": 20}]},
+  {"id": "marc_card", "name": "海豹卡片", "monster_id": "marc", "slot": "armor", "drop_rate": 0.0018, "effects": [{"type": "element_resist", "element": "water", "pct": 20}]},
+  {"id": "obeaune_card", "name": "歐貝奴卡片", "monster_id": "obeaune", "slot": "garment", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 10}]},
+  {"id": "sword_fish_card", "name": "劍魚卡片", "monster_id": "sword_fish", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "weapon_element", "element": "water"}]},
+  {"id": "strouf_card", "name": "海龍卡片", "monster_id": "strouf", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "matk", "amount": 15}]}
 ]

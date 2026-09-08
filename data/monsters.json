@@ -1641,5 +1641,230 @@
     ],
     "is_mvp": false,
     "lore": "戴兜帽、拿三叉戟的小惡魔，欠揍但難纏。"
+  },
+  {
+    "id": "marina",
+    "name": "水母",
+    "level": 13,
+    "element": "water",
+    "race": "fish",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 129,
+    "job_exp": 64,
+    "stats": {"max_hp": 316, "max_sp": 0, "atk": 34, "matk": 19, "defense": 0, "mdef": 4, "hit": 14, "flee": 22, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.4},
+      {"item_id": "gill", "rate": 0.25},
+      {"item_id": "marina_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "玄武岩洞窟淺層漂浮的水母，碰到會麻。"
+  },
+  {
+    "id": "cornutus",
+    "name": "貝殼",
+    "level": 15,
+    "element": "water",
+    "race": "fish",
+    "size": "small",
+    "role": "tank",
+    "base_exp": 200,
+    "job_exp": 100,
+    "stats": {"max_hp": 976, "max_sp": 0, "atk": 23, "matk": 21, "defense": 14, "mdef": 4, "hit": 16, "flee": 14, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "shell", "rate": 0.5},
+      {"item_id": "jellopy", "rate": 0.3},
+      {"item_id": "cornutus_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "縮在硬殼裡的貝類，殼特別厚。"
+  },
+  {
+    "id": "kukre",
+    "name": "螃蟹",
+    "level": 15,
+    "element": "earth",
+    "race": "fish",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 158,
+    "job_exp": 79,
+    "stats": {"max_hp": 542, "max_sp": 0, "atk": 29, "matk": 21, "defense": 4, "mdef": 4, "hit": 16, "flee": 20, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "nipper", "rate": 0.45},
+      {"item_id": "shell", "rate": 0.25}
+    ],
+    "is_mvp": false,
+    "lore": "橫著走、大螯亂夾的紅螃蟹。"
+  },
+  {
+    "id": "hydra",
+    "name": "水蛭",
+    "level": 15,
+    "element": "poison",
+    "race": "plant",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 158,
+    "job_exp": 79,
+    "stats": {"max_hp": 380, "max_sp": 0, "atk": 38, "matk": 21, "defense": 0, "mdef": 4, "hit": 16, "flee": 24, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.4},
+      {"item_id": "gill", "rate": 0.2},
+      {"item_id": "hydra_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "吸附在洞壁上的水蛭群，成串出現。"
+  },
+  {
+    "id": "vadon",
+    "name": "蝦兵",
+    "level": 18,
+    "element": "water",
+    "race": "fish",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 205,
+    "job_exp": 102,
+    "stats": {"max_hp": 692, "max_sp": 0, "atk": 34, "matk": 25, "defense": 5, "mdef": 5, "hit": 19, "flee": 23, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "nipper", "rate": 0.4},
+      {"item_id": "shell", "rate": 0.3},
+      {"item_id": "vadon_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "披著紅殼、揮舞大螯的蝦兵。"
+  },
+  {
+    "id": "marc",
+    "name": "海豹",
+    "level": 30,
+    "element": "water",
+    "race": "fish",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 450,
+    "job_exp": 225,
+    "stats": {"max_hp": 1450, "max_sp": 0, "atk": 53, "matk": 39, "defense": 9, "mdef": 9, "hit": 31, "flee": 35, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "tendon", "rate": 0.4},
+      {"item_id": "fish_tail", "rate": 0.3},
+      {"item_id": "marc_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "玄武岩洞窟中層的水藍色海豹，游得飛快。"
+  },
+  {
+    "id": "marse",
+    "name": "海馬",
+    "level": 38,
+    "element": "water",
+    "race": "fish",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 661,
+    "job_exp": 330,
+    "stats": {"max_hp": 1470, "max_sp": 0, "atk": 86, "matk": 49, "defense": 0, "mdef": 11, "hit": 39, "flee": 52, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fish_tail", "rate": 0.4},
+      {"item_id": "gill", "rate": 0.3}
+    ],
+    "is_mvp": false,
+    "lore": "隨海流漂動的小海馬，難打中。"
+  },
+  {
+    "id": "obeaune",
+    "name": "歐貝奴",
+    "level": 40,
+    "element": "water",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 720,
+    "job_exp": 360,
+    "stats": {"max_hp": 2280, "max_sp": 0, "atk": 69, "matk": 51, "defense": 12, "mdef": 12, "hit": 41, "flee": 45, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "coral_reef", "rate": 0.35},
+      {"item_id": "fish_tail", "rate": 0.3},
+      {"item_id": "obeaune_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "拿著三叉戟的人魚戰士，守著洞窟深處。"
+  },
+  {
+    "id": "sword_fish",
+    "name": "劍魚",
+    "level": 43,
+    "element": "water",
+    "race": "fish",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 813,
+    "job_exp": 406,
+    "stats": {"max_hp": 2564, "max_sp": 0, "atk": 74, "matk": 55, "defense": 13, "mdef": 13, "hit": 44, "flee": 48, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fish_tail", "rate": 0.4},
+      {"item_id": "oridecon", "rate": 0.08},
+      {"item_id": "sword_fish_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "頭上長劍、直線衝刺的大魚。"
+  },
+  {
+    "id": "kapha",
+    "name": "卡帕",
+    "level": 46,
+    "element": "water",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 911,
+    "job_exp": 456,
+    "stats": {"max_hp": 2005, "max_sp": 0, "atk": 102, "matk": 58, "defense": 0, "mdef": 14, "hit": 47, "flee": 61, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "coral_reef", "rate": 0.35},
+      {"item_id": "gill", "rate": 0.3}
+    ],
+    "is_mvp": false,
+    "lore": "背著龜殼、頭頂盛水的水妖，動作靈活。"
+  },
+  {
+    "id": "merman",
+    "name": "人魚",
+    "level": 48,
+    "element": "water",
+    "race": "demihuman",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 1244,
+    "job_exp": 622,
+    "stats": {"max_hp": 5532, "max_sp": 0, "atk": 65, "matk": 61, "defense": 43, "mdef": 14, "hit": 49, "flee": 37, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "coral_reef", "rate": 0.4},
+      {"item_id": "tendon", "rate": 0.3},
+      {"item_id": "elunium", "rate": 0.06}
+    ],
+    "is_mvp": false,
+    "lore": "上半身魚、下半身人的深海守衛，皮糙肉厚。"
+  },
+  {
+    "id": "strouf",
+    "name": "海龍",
+    "level": 55,
+    "element": "water",
+    "race": "demon",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 1238,
+    "job_exp": 619,
+    "stats": {"max_hp": 3862, "max_sp": 0, "atk": 93, "matk": 69, "defense": 16, "mdef": 16, "hit": 56, "flee": 60, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "coral_reef", "rate": 0.4},
+      {"item_id": "oridecon", "rate": 0.12},
+      {"item_id": "strouf_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "玄武岩洞窟最深處的墮落人魚，會放水魔法。"
   }
 ]

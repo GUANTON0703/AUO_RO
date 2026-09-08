@@ -34,5 +34,11 @@
   {"id": "mane", "name": "鬃毛", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 22},
   {"id": "orc_tooth", "name": "獸人的獠牙", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 30},
   {"id": "goblin_mask", "name": "哥布林面具", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 35},
-  {"id": "voodoo_doll", "name": "巫毒娃娃", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 60}
+  {"id": "voodoo_doll", "name": "巫毒娃娃", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 60},
+  {"id": "shell", "name": "貝殼碎片", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 12},
+  {"id": "nipper", "name": "蟹鉗", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 14},
+  {"id": "gill", "name": "魚鰓", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 20},
+  {"id": "fish_tail", "name": "魚尾", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 22},
+  {"id": "tendon", "name": "肌腱", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 26},
+  {"id": "coral_reef", "name": "珊瑚礁", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 55}
 ]
