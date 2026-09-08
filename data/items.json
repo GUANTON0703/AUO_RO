@@ -59,5 +59,8 @@
   {"id": "ore_fragment", "name": "礦石碎片", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 28},
   {"id": "ribbon", "name": "緞帶", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 16},
   {"id": "needle_pack", "name": "縫衣針", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 14},
-  {"id": "stuffing", "name": "填充棉", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 12}
+  {"id": "stuffing", "name": "填充棉", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 12},
+  {"id": "gingerbread", "name": "薑餅", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 20},
+  {"id": "tin_toy_part", "name": "錫玩具零件", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 24},
+  {"id": "kobold_hair", "name": "狗頭人的毛", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 22}
 ]

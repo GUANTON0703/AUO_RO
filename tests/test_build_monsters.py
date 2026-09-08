@@ -60,3 +60,10 @@ def test_generated_toy_factory_monsters_keep_required_drops():
         drop_ids = {d["item_id"] for d in entries[monster_id]["drops"]}
         assert drop_ids, monster_id
         assert f"{monster_id}_card" in drop_ids
+def test_generated_lv21_40_prejob_monsters_keep_required_drops():
+    source = json.loads((build_monsters.DATA / "monsters.src.json").read_text(encoding="utf-8"))
+    entries = {entry["id"]: entry for entry in source}
+    for monster_id in ("cookie", "myst_case", "cruiser", "christmas_cookie",
+                       "kobold_axe", "kobold_hammer", "kobold_archer", "vagabond_wolf"):
+        assert entries[monster_id]["gen"] is True
+        assert entries[monster_id]["drops"]

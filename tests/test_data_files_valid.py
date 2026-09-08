@@ -141,3 +141,9 @@ def test_toy_factory_route_maps_and_cards_exist():
                     "chepet_card", "christmas_cookie_card"):
         assert card_id in c.cards
         assert c.cards[card_id].monster_id in c.monsters
+def test_lv21_40_prejob_routes_and_cards_exist():
+    c = content.load_content()
+    for map_id in ("toy_factory_1f", "kobold_forest"):
+        assert map_id in c.maps
+    for card_id in ("cookie_card", "myst_case_card", "kobold_axe_card", "vagabond_wolf_card"):
+        assert card_id in c.cards

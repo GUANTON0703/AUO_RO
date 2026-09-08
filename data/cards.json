@@ -101,5 +101,9 @@
   {"id": "thief_bug_egg_card", "name": "飯匙蟲卵卡片", "monster_id": "thief_bug_egg", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 80}]},
   {"id": "thief_bug_card", "name": "飯匙客卡片", "monster_id": "thief_bug", "slot": "accessory", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "agi", "amount": 2}]},
   {"id": "tarou_card", "name": "塔羅鼠卡片", "monster_id": "tarou", "slot": "weapon", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "str", "amount": 2}]},
-  {"id": "thief_bug_female_card", "name": "母飯匙客卡片", "monster_id": "thief_bug_female", "slot": "garment", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 8}]}
+  {"id": "thief_bug_female_card", "name": "母飯匙客卡片", "monster_id": "thief_bug_female", "slot": "garment", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 8}]},
+  {"id": "kobold_archer_card", "name": "弓箭狗頭人卡片", "monster_id": "kobold_archer", "slot": "weapon", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "hit", "amount": 10}]},
+  {"id": "kobold_axe_card", "name": "斧頭狗頭人卡片", "monster_id": "kobold_axe", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 14}, {"type": "flat_stat", "stat": "crit", "amount": 2}]},
+  {"id": "kobold_hammer_card", "name": "槌子狗頭人卡片", "monster_id": "kobold_hammer", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 16}]},
+  {"id": "vagabond_wolf_card", "name": "流浪之狼卡片", "monster_id": "vagabond_wolf", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "race_damage", "race": "animal", "pct": 15}]}
 ]

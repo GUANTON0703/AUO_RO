@@ -2776,5 +2776,81 @@
     ],
     "is_mvp": false,
     "lore": "節慶結束後被丟棄的餅乾人，怨氣讓它染上暗色。"
+  },
+  {
+    "id": "kobold_archer",
+    "name": "弓箭狗頭人",
+    "level": 31,
+    "element": "neutral",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 474,
+    "job_exp": 237,
+    "stats": {"max_hp": 1067, "max_sp": 0, "atk": 71, "matk": 40, "defense": 0, "mdef": 9, "hit": 32, "flee": 43, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "kobold_hair", "rate": 0.4},
+      {"item_id": "talon", "rate": 0.25},
+      {"item_id": "kobold_archer_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "躲在樹後放冷箭的狗頭人，準頭比看起來好得多。"
+  },
+  {
+    "id": "kobold_axe",
+    "name": "斧頭狗頭人",
+    "level": 33,
+    "element": "neutral",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 525,
+    "job_exp": 262,
+    "stats": {"max_hp": 1680, "max_sp": 0, "atk": 58, "matk": 43, "defense": 10, "mdef": 10, "hit": 34, "flee": 38, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "kobold_hair", "rate": 0.45},
+      {"item_id": "oridecon", "rate": 0.06},
+      {"item_id": "kobold_axe_card", "rate": 0.0016}
+    ],
+    "is_mvp": false,
+    "lore": "扛著大斧橫衝直撞的狗頭人，是森林裡最常見的一種。"
+  },
+  {
+    "id": "kobold_hammer",
+    "name": "槌子狗頭人",
+    "level": 35,
+    "element": "neutral",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 578,
+    "job_exp": 289,
+    "stats": {"max_hp": 1842, "max_sp": 0, "atk": 61, "matk": 45, "defense": 10, "mdef": 10, "hit": 36, "flee": 40, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "kobold_hair", "rate": 0.45},
+      {"item_id": "iron_ore", "rate": 0.25},
+      {"item_id": "kobold_hammer_card", "rate": 0.0016}
+    ],
+    "is_mvp": false,
+    "lore": "揮著鐵槌把地面砸出坑的狗頭人，一擊能震得人腳麻。"
+  },
+  {
+    "id": "vagabond_wolf",
+    "name": "流浪之狼",
+    "level": 37,
+    "element": "neutral",
+    "race": "animal",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 633,
+    "job_exp": 316,
+    "stats": {"max_hp": 2012, "max_sp": 0, "atk": 64, "matk": 47, "defense": 11, "mdef": 11, "hit": 38, "flee": 42, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "mane", "rate": 0.45},
+      {"item_id": "talon", "rate": 0.2},
+      {"item_id": "vagabond_wolf_card", "rate": 0.0016}
+    ],
+    "is_mvp": false,
+    "lore": "離群獨行的老狼，在狗頭人森林邊緣徘徊獵食。"
   }
 ]
