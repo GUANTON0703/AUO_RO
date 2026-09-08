@@ -222,3 +222,19 @@ def test_p3_payon_gear_and_cards():
         assert eid in c.equipment
     assert "gladius_3" in {d.item_id for d in c.monsters["soldier_skeleton"].drops}
     assert "saints_robe_1" in {d.item_id for d in c.monsters["munak"].drops}
+
+
+def test_p4_geffen_gear_and_drops():
+    from server.content.monster_stats import baseline
+    c = content.load_content()
+    for eid, slots in (("orcish_axe_4", 4), ("jur_3", 3), ("full_plate_1", 1),
+                       ("stone_buckler_1", 1)):
+        assert eid in c.equipment and c.equipment[eid].card_slots == slots
+    assert "orcish_axe_4" in {d.item_id for d in c.monsters["orc_warrior"].drops}
+    high_orc_drops = {d.item_id for d in c.monsters["high_orc"].drops}
+    assert {"jur_3", "stone_buckler_1"} <= high_orc_drops
+    assert "full_plate_1" in {d.item_id for d in c.monsters["orc_skeleton"].drops}
+    # hp_mult 生效
+    assert c.monsters["high_orc"].stats.max_hp == round(baseline(40, "normal").max_hp * 1.3)
+    assert c.monsters["orc_skeleton"].stats.max_hp == round(baseline(42, "normal").max_hp * 1.3)
+    assert c.monsters["nightmare"].stats.max_hp == round(baseline(43, "normal").max_hp * 1.2)
