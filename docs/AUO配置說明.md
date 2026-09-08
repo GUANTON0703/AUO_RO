@@ -1,6 +1,6 @@
-# ROtxt（E:\AUO）配置與啟動說明
+# ROtxt Windows 配置與啟動說明
 
-本文件針對把 ROtxt 複製到 Windows `E:\AUO` 後的執行方式：
+本文件說明如何在另一台 Windows 電腦安裝目前 GitHub 版本。以下以 `C:\ROtxt` 為例；若使用其他路徑，請將指令與 `.env` 內的路徑一起替換。
 
 - Python FastAPI 作為後端
 - CMD 終端客戶端與瀏覽器共用同一個後端
@@ -18,11 +18,11 @@
 
 ### Python 套件
 
-在 `E:\AUO` 建立虛擬環境後安裝：
+在專案資料夾建立虛擬環境後安裝：
 
 ```cmd
-cd /d E:\AUO
-py -3.12 -m venv .venv
+cd /d C:\ROtxt
+py -3.13 -m venv .venv
 .venv\Scripts\activate
 python -m pip install --upgrade pip
 python -m pip install "fastapi>=0.115" "uvicorn[standard]>=0.32" "pydantic>=2.9" "pydantic-settings>=2.6" "passlib>=1.7.4" "bcrypt==4.0.1" "httpx>=0.27" "rich>=13"
@@ -31,14 +31,25 @@ python -m pip install "pytest>=8.3"
 
 若電腦只有其他 Python 版本，可把 `py -3.12` 改成該版本；專案要求 Python `>=3.12`。
 
-也可以使用 `uv` 管理環境：
+也可以使用 `uv` 管理環境（兩種方式擇一）：
 
 ```cmd
-cd /d E:\AUO
+cd /d C:\ROtxt
 uv sync
 ```
 
-兩種方式擇一即可，不需要同時使用。
+### 從 GitHub 取得程式
+
+有 Git 時：
+
+```cmd
+git clone https://github.com/GUANTON0703/ROtxt.git C:\ROtxt
+cd /d C:\ROtxt
+```
+
+沒有 Git 時，可在 GitHub 選擇 `Code` → `Download ZIP`，解壓縮後將資料夾命名為 `ROtxt`。
+
+GitHub 只包含程式碼與遊戲資料，不包含 `.venv`、`.env`、SQLite 資料庫；這些會依本文件在本機重新建立。
 
 ## 二、初始化全新資料庫
 
@@ -54,12 +65,12 @@ rotxt.db-shm
 
 ## 三、建立設定檔
 
-在 `E:\AUO` 建立 `.env`：
+在專案根目錄建立 `.env`：
 
 ```env
 ROTXT_SERVER_HOST=0.0.0.0
 ROTXT_SERVER_PORT=8000
-ROTXT_DB_PATH=E:/AUO/rotxt.db
+ROTXT_DB_PATH=C:/ROtxt/rotxt.db
 ROTXT_TOKEN_TTL_HOURS=720
 ROTXT_STAT_RESET_FREE=false
 ROTXT_SKILL_RESET_FREE=false
@@ -80,7 +91,7 @@ ROTXT_OPEN_INVITE_CODE=請改成自己的邀請碼
 開啟 CMD：
 
 ```cmd
-cd /d E:\AUO
+cd /d C:\ROtxt
 .venv\Scripts\activate
 python -m server
 ```
@@ -88,7 +99,7 @@ python -m server
 若使用 `uv`：
 
 ```cmd
-cd /d E:\AUO
+cd /d C:\ROtxt
 uv run python -m server
 ```
 
@@ -167,7 +178,7 @@ netsh advfirewall firewall add rule name="ROtxt LAN 8000" dir=in action=allow pr
 後端先在 CMD 視窗啟動後，再開第二個 CMD：
 
 ```cmd
-cd /d E:\AUO
+cd /d C:\ROtxt
 .venv\Scripts\activate
 python -m client --server http://127.0.0.1:8000
 ```
@@ -198,7 +209,7 @@ python -m client
 在第三個 CMD 執行：
 
 ```cmd
-cd /d E:\AUO
+cd /d C:\ROtxt
 .venv\Scripts\activate
 python -m server.admin invite --count 10
 ```
@@ -214,7 +225,7 @@ python -m server.admin content check
 ## 九、測試安裝是否完整
 
 ```cmd
-cd /d E:\AUO
+cd /d C:\ROtxt
 .venv\Scripts\activate
 python -m pytest -q
 ```

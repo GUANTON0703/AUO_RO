@@ -1,5 +1,9 @@
 # ROtxt — 文字版 RO 仙境傳說
 
+## Windows 安裝與區網啟動
+
+完整的 Python 安裝、`.env` 設定、瀏覽器與 CMD 客戶端連線、防火牆及邀請碼說明，請參考 [`docs/AUO配置說明.md`](docs/AUO配置說明.md)。
+
 ## 開發
 
     uv sync
