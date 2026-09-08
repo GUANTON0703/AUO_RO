@@ -37,7 +37,9 @@ CRIT_MULTIPLIER = 1.4
 
 
 def attacks_this_round(aspd: int, rng: random.Random) -> int:
-    whole = aspd // 100
-    frac = (aspd % 100) / 100
-    extra = 1 if rng.random() < frac else 0
+    """每回合普攻次數。基準 aspd 100 = 1 擊，攻速上限 193 = 3 擊，中間線性內插，
+    小數部分用機率決定要不要多一擊。"""
+    expected = 1.0 + max(0, aspd - 100) / 46.5
+    whole = int(expected)
+    extra = 1 if rng.random() < (expected - whole) else 0
     return max(1, whole + extra)

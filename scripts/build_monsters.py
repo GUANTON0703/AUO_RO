@@ -42,6 +42,9 @@ def _expand(entry: dict) -> dict:
             f"{entry['id']}: gen 條目的 role 只能是 glass/normal/tank，"
             f"boss/MVP 請寫 data/mvps.json")
     stats = baseline(level, role).model_dump()
+    hp_mult = entry.get("hp_mult", 1.0)
+    if hp_mult != 1.0:
+        stats["max_hp"] = round(stats["max_hp"] * hp_mult)
     stats.update(entry.get("overrides", {}).get("stats", {}))
     base_exp = entry.get("overrides", {}).get("base_exp", _base_exp(level, role))
     out = {

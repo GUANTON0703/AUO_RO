@@ -41,7 +41,7 @@ def _sum_equipment_stats(content, pieces: list) -> dict:
 def _apply_card_effects(content, pieces: list, derived: dict) -> dict:
     """把卡片效果套進 derived（數值），並回傳戰鬥用的 {resist, race, atk_element}。
     附魔卡（weapon_element）只有鑲在武器上才算。"""
-    combat = {"resist": {}, "race": {}, "atk_element": None}
+    combat = {"resist": {}, "race": {}, "size": {}, "atk_element": None}
     for piece in pieces:
         eq = content.equipment.get(piece.equipment_id)
         slot = eq.slot if eq else None
@@ -62,6 +62,9 @@ def _apply_card_effects(content, pieces: list, derived: dict) -> dict:
                 elif t == "race_damage":
                     combat["race"][eff["race"]] = (
                         combat["race"].get(eff["race"], 0) + eff["pct"])
+                elif t == "size_damage":
+                    combat["size"][eff["size"]] = (
+                        combat["size"].get(eff["size"], 0) + eff["pct"])
                 elif t == "weapon_element" and slot == "weapon":
                     combat["atk_element"] = eff["element"]
                 # on_hit_proc：走技能路線的 proc，卡片 proc 暫不支援
@@ -168,6 +171,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         attack_element=attack_element,
         element_resist=combat_mods["resist"],
         race_bonus=combat_mods["race"],
+        size_bonus=combat_mods["size"],
         procs=_passive_procs(content, snap.learned_skills),
         hp=snap.hp if snap.hp is not None else 0,
         sp=snap.sp if snap.sp is not None else 0,

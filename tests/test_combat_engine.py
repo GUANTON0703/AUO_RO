@@ -157,3 +157,16 @@ def test_race_bonus_increases_damage():
     simulate_fight(plain, bug1, rng=random.Random(4), max_rounds=3)
     simulate_fight(slayer, bug2, rng=random.Random(4), max_rounds=3)
     assert (99999 - bug2.hp) > (99999 - bug1.hp) * 1.5
+
+
+def test_size_bonus_increases_damage():
+    plain = _mk("普通", atk=50, aspd=100)
+    hunter = _mk("大型剋星", atk=50, aspd=100)
+    hunter.size_bonus = {"large": 100}     # 對大型 +100%
+    big1 = _mk("大怪A", max_hp=99999, flee=0, aspd=1)
+    big1.size = "large"
+    big2 = _mk("大怪B", max_hp=99999, flee=0, aspd=1)
+    big2.size = "large"
+    simulate_fight(plain, big1, rng=random.Random(4), max_rounds=3)
+    simulate_fight(hunter, big2, rng=random.Random(4), max_rounds=3)
+    assert (99999 - big2.hp) > (99999 - big1.hp) * 1.5

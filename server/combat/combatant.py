@@ -49,9 +49,11 @@ class Combatant:
     sp: int = field(default=0)
     element: str = "neutral"                       # 受擊方屬性判定
     race: str = "formless"                         # 受擊方種族判定
+    size: str = "medium"                           # 受擊方尺寸判定（玩家一律中型）
     attack_element: str = "neutral"               # 物理攻擊帶的屬性（武器/附魔卡）
     element_resist: dict = field(default_factory=dict)  # {element: 減傷%}
     race_bonus: dict = field(default_factory=dict)      # {race: 加傷%}
+    size_bonus: dict = field(default_factory=dict)      # {size: 加傷%}
     procs: dict = field(default_factory=dict)           # 被動觸發 {effect: 機率%}
 
     def __post_init__(self):
@@ -129,4 +131,5 @@ class Combatant:
             soft_def=m.level // 4, soft_mdef=m.level // 6,
             element=getattr(m.element, "value", m.element),
             race=getattr(m.race, "value", m.race),
+            size=getattr(m.size, "value", m.size),
         )

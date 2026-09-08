@@ -38,9 +38,9 @@ def test_attacks_this_round_from_aspd():
     rng = random.Random(0)
     # aspd 100 → 每回合剛好 1 次
     assert all(f.attacks_this_round(100, rng) == 1 for _ in range(20))
-    # aspd 200 → 剛好 2 次
-    assert all(f.attacks_this_round(200, rng) == 2 for _ in range(20))
-    # aspd 150 → 1 或 2，平均接近 1.5
-    xs = [f.attacks_this_round(150, rng) for _ in range(2000)]
-    assert set(xs) == {1, 2}
-    assert 1.4 < sum(xs) / len(xs) < 1.6
+    # 攻速上限 193 → 剛好 3 次
+    assert all(f.attacks_this_round(193, rng) == 3 for _ in range(20))
+    # aspd 147（約 2 擊點）→ 平均接近 2
+    xs = [f.attacks_this_round(147, rng) for _ in range(3000)]
+    assert set(xs) <= {1, 2, 3}
+    assert 1.9 < sum(xs) / len(xs) < 2.1

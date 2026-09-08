@@ -23,4 +23,6 @@ def damage_mods(attacker, defender, attack_element: str | None) -> tuple[float, 
     resist = getattr(defender, "element_resist", {}).get(elem, 0)
     race = getattr(attacker, "race_bonus", {}).get(
         getattr(defender, "race", "formless"), 0)
+    race += getattr(attacker, "size_bonus", {}).get(
+        getattr(defender, "size", "medium"), 0)
     return mult, resist, race

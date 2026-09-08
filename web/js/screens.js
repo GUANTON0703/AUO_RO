@@ -52,6 +52,7 @@ const ELEM_ZH = { neutral: "無", water: "水", earth: "地", fire: "火", wind:
 const RACE_ZH = { formless: "無形", undead: "不死", animal: "動物", plant: "植物",
   insect: "昆蟲", fish: "魚貝", demon: "惡魔", demihuman: "人形", angel: "天使",
   dragon: "龍" };
+const SIZE_ZH = { small: "小型", medium: "中型", large: "大型" };
 const PROC_ZH = { stun: "暈眩", poison: "中毒", blind: "致盲", silence: "沉默",
   freeze: "冰凍", sleep: "睡眠", curse: "詛咒", bleed: "流血",
   extra_hit: "追加一擊", steal_loot: "偷取額外道具" };
@@ -104,6 +105,7 @@ function effectText(e) {
   if (e.type === "percent_stat") return `${STAT_ZH[e.stat] || e.stat} +${e.pct}%`;
   if (e.type === "element_resist") return `${ELEM_ZH[e.element] || e.element}屬性抗性 +${e.pct}%`;
   if (e.type === "race_damage") return `對${RACE_ZH[e.race] || e.race}傷害 +${e.pct}%`;
+  if (e.type === "size_damage") return `對${SIZE_ZH[e.size] || e.size}傷害 +${e.pct}%`;
   if (e.type === "on_hit_proc") return `攻擊 ${e.chance_pct}% 機率${PROC_ZH[e.effect] || e.effect}`;
   return e.type;
 }
