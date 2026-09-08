@@ -104,8 +104,16 @@ def test_migration_3_renames_learned_skill_ids(tmp_path):
             "learned_skills) VALUES (?,?,?,?,?,?)",
             (aid, "沒學的", "knight", "prontera_east_gate", "t", json.dumps({"bash": 1})),
         )
+        conn.execute(
+            "INSERT INTO characters (account_id, name, job_id, location_map, created_at, "
+            "learned_skills) VALUES (?,?,?,?,?,?)",
+            (aid, "巫師", "wizard", "prontera_east_gate", "t",
+             json.dumps({"frost_armor": 2})),
+        )
         connection._migration_3(conn)
+        connection._migration_4(conn)
         got = {r["name"]: json.loads(r["learned_skills"])
                for r in conn.execute("SELECT name, learned_skills FROM characters")}
     assert got["騎士"] == {"counter_attack": 3, "bash": 5}
     assert got["沒學的"] == {"bash": 1}
+    assert got["巫師"] == {"frost_nova": 2}

@@ -1401,40 +1401,52 @@
     "requires": {}
   },
   {
-    "id": "frost_armor",
-    "name": "寒冰盾",
+    "id": "frost_nova",
+    "name": "新星冰結",
     "job_id": "wizard",
     "kind": "active",
     "max_level": 5,
     "sp_cost": [
-      20,
-      23,
-      26,
-      29,
-      32
+      16,
+      19,
+      22,
+      25,
+      28
     ],
-    "cooldown_s": 0,
+    "cooldown_s": 2,
     "effects": [
       {
-        "type": "buff",
-        "stats": {
-          "mdef": [
-            3,
-            5,
-            7,
-            9,
-            11
-          ]
-        },
-        "duration_s": 90
+        "type": "aoe",
+        "element": "water",
+        "power_pct": [
+          110,
+          135,
+          160,
+          185,
+          210
+        ]
+      },
+      {
+        "type": "debuff",
+        "stat": "aspd",
+        "pct": [
+          -10,
+          -15,
+          -20,
+          -25,
+          -30
+        ],
+        "duration_s": 8
       }
     ],
     "idle_default": {
       "enabled": true,
-      "trigger": "sp_available",
-      "priority": 1
+      "trigger": "cooldown_ready",
+      "priority": 2
     },
-    "requires": {}
+    "requires": {
+      "frost_diver": 1
+    }
   },
   {
     "id": "amplify_magic",
@@ -4103,5 +4115,504 @@
     "requires": {
       "enchant_poison": 1
     }
+  },
+  {
+    "id": "fire_pillar",
+    "name": "火柱",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      16,
+      20,
+      24,
+      28,
+      32
+    ],
+    "cooldown_s": 4,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "fire",
+        "power_pct": [
+          120,
+          150,
+          180,
+          210,
+          240
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "fire_wall": 1
+    }
+  },
+  {
+    "id": "sightrasher",
+    "name": "刺眼術",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      18,
+      22,
+      26,
+      30,
+      34
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "fire",
+        "power_pct": [
+          130,
+          160,
+          190,
+          220,
+          250
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "sight": 1
+    }
+  },
+  {
+    "id": "lord_of_vermilion",
+    "name": "紅蓮之火",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      28,
+      34,
+      40,
+      46,
+      52
+    ],
+    "cooldown_s": 5,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "wind",
+        "power_pct": [
+          150,
+          190,
+          230,
+          270,
+          310
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "jupitel_thunder": 5
+    }
+  },
+  {
+    "id": "ice_wall",
+    "name": "冰牆",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "aspd",
+        "pct": [
+          -8,
+          -12,
+          -16,
+          -20,
+          -24
+        ],
+        "duration_s": 15
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {
+      "stone_curse": 1
+    }
+  },
+  {
+    "id": "earth_spike",
+    "name": "地刺",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "element": "earth",
+        "power_pct": [
+          110,
+          120,
+          130,
+          140,
+          150
+        ],
+        "hits": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    },
+    "requires": {}
+  },
+  {
+    "id": "sight_blaster",
+    "name": "探測之炎",
+    "job_id": "wizard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      13,
+      16,
+      19,
+      22
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "fire",
+        "power_pct": [
+          70,
+          85,
+          100,
+          115,
+          130
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {
+      "sight": 1
+    }
+  },
+  {
+    "id": "iron_tempering",
+    "name": "鋼鐵鍛煉",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "steel_tempering",
+    "name": "真鋼鍛煉",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "iron_tempering": 1
+    }
+  },
+  {
+    "id": "weaponry_research",
+    "name": "武器研究",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "hit",
+        "amount": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ]
+      },
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "hilt_binding",
+    "name": "護手強化",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 1,
+    "sp_cost": [
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          3
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "enchantedstone_craft",
+    "name": "附魔武器",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "ore_discovery",
+    "name": "礦石發現",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "luk",
+        "amount": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "greed",
+    "name": "貪婪",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "luk",
+        "amount": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "unfair_trick",
+    "name": "欺瞞",
+    "job_id": "blacksmith",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "crit",
+        "amount": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
   }
 ]
