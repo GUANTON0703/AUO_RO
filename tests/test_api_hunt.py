@@ -241,7 +241,7 @@ def test_online_time_accumulates_across_short_polls(client, auth, db_helpers):
 def test_underlevel_potion_not_auto_used(client, auth, db_helpers):
     """等級不足的補品：掛機引擎不會拿來喝（跟裝備一樣買得到、用不了）。"""
     _, h, _ = auth
-    ch = _ready_char(client, h, db_helpers, base_level=10)  # white_potion 需 Lv30
+    ch = _ready_char(client, h, db_helpers, base_level=10)  # white_potion 需 Lv40
     db_helpers.set_stats(ch["id"], {"str": 55, "agi": 1, "vit": 1, "int": 1,
                                     "dex": 30, "luk": 1})
     db_helpers.give_item(ch["id"], "white_potion", 400)

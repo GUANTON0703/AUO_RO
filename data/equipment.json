@@ -38,5 +38,26 @@
   {"id": "ring", "name": "戒指", "slot": "accessory", "rarity": "fine", "stats": {"atk": 2, "matk": 2}, "refinable": false, "card_slots": 0, "job_ids": [], "required_level": 20},
 
   {"id": "guardian_shield", "name": "守衛之盾", "slot": "offhand", "rarity": "fine", "stats": {"def": 40, "max_hp": 150}, "refinable": true, "card_slots": 0, "job_ids": ["swordman", "merchant", "acolyte"], "required_level": 20},
-  {"id": "buckler", "name": "圓盾", "slot": "offhand", "rarity": "common", "stats": {"def": 12}, "refinable": true, "card_slots": 0, "job_ids": ["swordman", "merchant", "acolyte", "thief"], "required_level": 6, "npc_buy": 180, "npc_sell": 90}
+  {"id": "buckler", "name": "圓盾", "slot": "offhand", "rarity": "common", "stats": {"def": 12}, "refinable": true, "card_slots": 0, "job_ids": ["swordman", "merchant", "acolyte", "thief"], "required_level": 6, "npc_buy": 180, "npc_sell": 90},
+  {"id": "round_shield", "name": "圓盾改", "slot": "offhand", "rarity": "common", "stats": {"def": 20}, "refinable": true, "card_slots": 0, "job_ids": ["swordman", "merchant", "acolyte", "thief"], "required_level": 30, "npc_buy": 420, "npc_sell": 210},
+
+  {"id": "gladius", "name": "格鬥短劍", "slot": "weapon", "rarity": "common", "stats": {"atk": 35}, "refinable": true, "card_slots": 1, "job_ids": ["swordman", "thief", "merchant"], "required_level": 10, "npc_buy": 520, "npc_sell": 260},
+  {"id": "saber", "name": "軍刀", "slot": "weapon", "rarity": "common", "stats": {"atk": 48}, "refinable": true, "card_slots": 1, "job_ids": ["swordman", "merchant"], "required_level": 20, "npc_buy": 900, "npc_sell": 450},
+  {"id": "survival_rod", "name": "生存之杖", "slot": "weapon", "rarity": "common", "stats": {"atk": 12, "matk": 30}, "refinable": true, "card_slots": 1, "job_ids": ["mage", "acolyte"], "required_level": 20, "npc_buy": 700, "npc_sell": 350},
+  {"id": "gakkung", "name": "角弓", "slot": "weapon", "rarity": "common", "stats": {"atk": 45}, "refinable": true, "card_slots": 1, "job_ids": ["archer"], "required_level": 20, "npc_buy": 650, "npc_sell": 325},
+  {"id": "chain", "name": "鐵鏈球", "slot": "weapon", "rarity": "common", "stats": {"atk": 52}, "refinable": true, "card_slots": 1, "job_ids": ["acolyte", "merchant"], "required_level": 30, "npc_buy": 1000, "npc_sell": 500},
+  {"id": "staff", "name": "法杖", "slot": "weapon", "rarity": "common", "stats": {"atk": 20, "matk": 42}, "refinable": true, "card_slots": 1, "job_ids": ["mage", "acolyte"], "required_level": 40, "npc_buy": 1400, "npc_sell": 700},
+  {"id": "war_axe", "name": "戰斧", "slot": "weapon", "rarity": "common", "stats": {"atk": 60}, "refinable": true, "card_slots": 1, "job_ids": ["swordman", "merchant"], "required_level": 50, "npc_buy": 1800, "npc_sell": 900},
+  {"id": "arbalest", "name": "十字弓", "slot": "weapon", "rarity": "common", "stats": {"atk": 65}, "refinable": true, "card_slots": 1, "job_ids": ["archer"], "required_level": 50, "npc_buy": 1600, "npc_sell": 800},
+
+  {"id": "helm", "name": "鋼盔", "slot": "head", "rarity": "common", "stats": {"def": 10}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 20, "npc_buy": 300, "npc_sell": 150},
+  {"id": "mantle", "name": "披肩", "slot": "garment", "rarity": "common", "stats": {"def": 12}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 20, "npc_buy": 300, "npc_sell": 150},
+  {"id": "safety_boots", "name": "安全靴", "slot": "shoes", "rarity": "common", "stats": {"def": 17, "max_hp": 50}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 30, "npc_buy": 420, "npc_sell": 210},
+  {"id": "plate", "name": "鋼鐵鎧甲", "slot": "armor", "rarity": "common", "stats": {"def": 38}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 30, "npc_buy": 650, "npc_sell": 325},
+  {"id": "full_plate", "name": "全身鎧甲", "slot": "armor", "rarity": "common", "stats": {"def": 40, "max_hp": 80}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 50, "npc_buy": 1200, "npc_sell": 600},
+  {"id": "circlet", "name": "髮冠", "slot": "head", "rarity": "common", "stats": {"def": 8, "max_sp": 20}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 40, "npc_buy": 500, "npc_sell": 250},
+  {"id": "wool_scarf", "name": "羊毛圍巾", "slot": "garment", "rarity": "common", "stats": {"def": 16, "flee": 4}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 50, "npc_buy": 600, "npc_sell": 300},
+  {"id": "high_heels", "name": "高跟鞋", "slot": "shoes", "rarity": "common", "stats": {"def": 20, "max_sp": 25}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 50, "npc_buy": 650, "npc_sell": 325},
+  {"id": "brooch", "name": "胸針", "slot": "accessory", "rarity": "common", "stats": {"flee": 2}, "refinable": false, "card_slots": 0, "job_ids": [], "required_level": 30, "npc_buy": 350, "npc_sell": 175},
+  {"id": "glove", "name": "手套", "slot": "accessory", "rarity": "common", "stats": {"hit": 2}, "refinable": false, "card_slots": 0, "job_ids": [], "required_level": 50, "npc_buy": 700, "npc_sell": 350}
 ]

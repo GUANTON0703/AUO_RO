@@ -77,3 +77,34 @@ def test_shop_has_varied_heal_potions(client, auth, db_helpers):
     white = next(e["amount"] for e in c.items["white_potion"].effects if e["type"] == "heal_hp")
     assert white > red
     assert c.items["white_potion"].required_level > 1
+
+
+def test_shop_covers_level_bands_with_healing_potions(client, auth, db_helpers):
+    _, h, _ = auth
+    _char(client, h, db_helpers)
+    from server.content import load_content
+
+    content = load_content()
+    shop_ids = {entry["id"] for entry in client.get("/api/shop", headers=h).json()["items"]}
+    potions = [item for item in content.items.values()
+               if item.id in shop_ids and any(e.get("type") == "heal_hp" for e in item.effects)]
+    assert {1, 10, 20, 30, 40, 50} <= {item.required_level for item in potions}
+    for lower, upper in ((1, 9), (10, 19), (20, 29), (30, 39), (40, 49), (50, 60)):
+        assert any(lower <= item.required_level <= upper for item in potions), (lower, upper)
+
+
+def test_shop_has_buyable_common_equipment_for_every_slot(client, auth, db_helpers):
+    _, h, _ = auth
+    _char(client, h, db_helpers)
+    equipment = client.get("/api/shop", headers=h).json()["equipment"]
+    slots = {entry["slot"] for entry in equipment}
+    assert {"weapon", "offhand", "head", "armor", "garment", "shoes", "accessory"} <= slots
+
+    from server.content import load_content
+    content = load_content()
+    shop_ids = {entry["id"] for entry in equipment}
+    for slot in slots:
+        common = [eq for eq in content.equipment.values()
+                  if eq.id in shop_ids and eq.slot == slot and eq.rarity == "common"]
+        assert common
+        assert max(eq.required_level for eq in common) >= 20
