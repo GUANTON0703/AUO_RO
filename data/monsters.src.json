@@ -1257,7 +1257,7 @@
   },
   {
     "id": "anubis", "name": "阿努比斯", "level": 58,
-    "element": "undead", "race": "demihuman", "size": "large", "role": "normal", "gen": true,
+    "element": "undead", "race": "demihuman", "size": "large", "role": "tank", "gen": true, "hp_mult": 1.2,
     "drops": [{"item_id": "ancient_lips", "rate": 0.4}, {"item_id": "dark_crystal", "rate": 0.15}, {"item_id": "anubis_card", "rate": 0.001}],
     "lore": "胡狼頭的冥界審判者，金字塔最深處的守門人。"
   },
