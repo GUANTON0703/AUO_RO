@@ -76,9 +76,9 @@ git commit -m "test: define Lv60 classic content batch contract"
 
 加入 `sunken_ship_1f`（Lv25–42，普隆德拉系）與 `sphinx_1f`（Lv32–48，夢羅克系）；各自包含 4–5 隻同級怪，`unlock_base_level` 分別為 24 與 32。
 
-- [ ] **Step 2: 在 `data/monsters.src.json` 新增怪物與掉落**
+- [ ] **Step 2: 在 `data/monsters.src.json` 新增沉沒之船怪物與掉落**
 
-新增沉沒之船的 `pirate_skeleton`、`pirate_ship`、`mimic`、`sword_fish`，以及斯芬克斯的 `pasana`、`side_winder`、`minorous`、`ancient_mummy`。所有條目使用：
+新增沉沒之船的 `pirate_skeleton`、`pirate_ship`、`ghostring`、`deviace`。斯芬克斯則重用既有的 `pasana`、`side_winder`、`minorous`、`ancient_mummy`，不複製怪物 ID 或卡片。所有新條目使用：
 
 ```json
 {
@@ -147,9 +147,9 @@ Expected: PASS 或顯示缺少的等級帶；若既有資料已通過，保留�
 
 地圖等級帶為 Lv45–60、解鎖 Lv44；怪物包含 `orc_skeleton`、`high_orc`、`orc_archer`、`zenorc`，避免與現有 `orc_dungeon` 只有相同名單。
 
-- [ ] **Step 4: 補怪物、卡片與材料，重新生成**
+- [ ] **Step 4: 補深層專屬怪物、卡片與材料，重新生成**
 
-新增 `zenorc` 及缺少的對應卡片／材料；若 `orc_skeleton`、`high_orc` 已存在，保留原 ID 與掉落，避免破壞既有角色。執行：
+新增 `zenorc` 及其對應卡片／材料；`orc_skeleton`、`high_orc`、`orc_archer` 已存在，保留原 ID 與掉落，避免破壞既有角色。執行：
 
 ```bash
 uv run python scripts/build_monsters.py
