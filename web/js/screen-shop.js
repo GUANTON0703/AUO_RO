@@ -54,32 +54,63 @@
       } catch (e) { if (this._stale("shop")) return; this._body().innerHTML = `<div class="card">${esc(e.detail || "載入失敗")}</div>`; return; }
       if (this._stale("shop")) return;
       const owned = inv.items || {};
+      const bl = S.char.base_level;
+      const cat = this._shopCat || "all";
 
-      const itemRows = (data.items || []).map((it) => {
+      // 需求等級標記：不足 → 紅字
+      const reqTag = (id, isEq) => {
+        const def = isEq ? S.catalog?.equipment?.[id] : S.catalog?.items?.[id];
+        const lv = def?.required_level || 1;
+        if (lv <= 1) return "";
+        const short = bl < lv;
+        return `<span style="color:${short ? "var(--bad)" : "var(--muted)"}">需 Lv ${lv}</span>　`;
+      };
+
+      const itemRow = (it) => {
         const d = itemDesc(it.id);
         const have = owned[it.id] ? `背包有 ${owned[it.id]}　` : "";
         return `
         <div class="item">
-          <div>${esc(it.name)}<div class="sub">${d ? esc(d) + "　" : ""}${have}賣 ${it.sell_price}</div></div>
+          <div>${esc(it.name)}<div class="sub">${reqTag(it.id, false)}${d ? esc(d) + "　" : ""}${have}賣 ${it.sell_price}</div></div>
           <div class="row tight">
             <button class="btn small primary" data-buy="${it.id}" data-name="${esc(it.name)}">買 ${it.price}</button>
             <button class="btn small" data-sell-item="${it.id}" data-name="${esc(it.name)}">賣</button>
           </div>
-        </div>`; }).join("");
-
-      const eqRows = (data.equipment || []).map((eq) => {
+        </div>`;
+      };
+      const eqRow = (eq) => {
         const d = gearDesc(eq.id);
         return `
         <div class="item">
-          <div>${esc(eq.name)}<div class="sub">${d ? esc(d) + "　" : ""}賣 ${eq.sell_price}</div></div>
+          <div>${esc(eq.name)}<div class="sub">${reqTag(eq.id, true)}${d ? esc(d) + "　" : ""}賣 ${eq.sell_price}</div></div>
           <button class="btn small primary" data-buy="${eq.id}" data-name="${esc(eq.name)}">買 ${eq.price}</button>
-        </div>`; }).join("");
+        </div>`;
+      };
 
-      this._body().innerHTML = `
-        <div class="card"><h3>道具</h3>
-          <div class="list">${itemRows || `<p class="muted">沒有商品。</p>`}</div></div>
-        <div class="card"><h3>裝備</h3>
-          <div class="list">${eqRows || `<p class="muted">沒有商品。</p>`}</div></div>`;
+      const SLOTS = [["weapon", "武器"], ["head", "頭部"], ["armor", "鎧甲"],
+        ["garment", "披肩"], ["shoes", "鞋子"], ["accessory", "飾品"], ["offhand", "副手"]];
+      const opt = (v, zh) => `<option value="${v}"${cat === v ? " selected" : ""}>${zh}</option>`;
+      const catSel = `<select id="shop-cat" style="width:100%;margin-bottom:8px">` +
+        opt("all", "全部") + opt("item", "道具") +
+        SLOTS.map(([v, zh]) => opt(v, zh)).join("") + `</select>`;
+
+      let sections = "";
+      if (cat === "all" || cat === "item") {
+        const rows = (data.items || []).map(itemRow).join("");
+        sections += `<div class="card"><h3>道具</h3><div class="list">${
+          rows || `<p class="muted">沒有商品。</p>`}</div></div>`;
+      }
+      if (cat !== "item") {
+        const eqs = (data.equipment || []).filter((e) => cat === "all" || e.slot === cat);
+        const rows = eqs.map(eqRow).join("");
+        const title = cat === "all" ? "裝備" : (SLOTS.find(([v]) => v === cat)?.[1] || "裝備");
+        sections += `<div class="card"><h3>${title}</h3><div class="list">${
+          rows || `<p class="muted">沒有商品。</p>`}</div></div>`;
+      }
+
+      this._body().innerHTML = `<div class="card">${catSel}</div>${sections}`;
+      const cs = this._body().querySelector("#shop-cat");
+      if (cs) cs.onchange = () => { this._shopCat = cs.value; this._drawShop(); };
 
       this._body().querySelectorAll("[data-buy]").forEach((b) => {
         b.onclick = async () => {
