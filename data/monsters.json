@@ -2037,5 +2037,156 @@
     ],
     "is_mvp": false,
     "lore": "墮落的神職者，會吸取生命與魔力。"
+  },
+  {
+    "id": "soldier_ant",
+    "name": "兵蟻",
+    "level": 28,
+    "element": "fire",
+    "race": "insect",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 403,
+    "job_exp": 202,
+    "stats": {"max_hp": 1306, "max_sp": 0, "atk": 50, "matk": 37, "defense": 8, "mdef": 8, "hit": 29, "flee": 33, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "ant_jaw", "rate": 0.45},
+      {"item_id": "brigan", "rate": 0.3}
+    ],
+    "is_mvp": false,
+    "lore": "螞蟻洞穴深層的守衛兵蟻，比工蟻兇很多。"
+  },
+  {
+    "id": "maya_purple",
+    "name": "紫色瑪雅",
+    "level": 40,
+    "element": "wind",
+    "race": "insect",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 720,
+    "job_exp": 360,
+    "stats": {"max_hp": 2280, "max_sp": 0, "atk": 69, "matk": 51, "defense": 12, "mdef": 12, "hit": 41, "flee": 45, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "brigan", "rate": 0.4},
+      {"item_id": "scarab_shell", "rate": 0.25},
+      {"item_id": "maya_purple_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "螞蟻洞穴女王的近衛，能看穿隱身。"
+  },
+  {
+    "id": "arclouse",
+    "name": "犰狳鼠",
+    "level": 42,
+    "element": "fire",
+    "race": "insect",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 781,
+    "job_exp": 390,
+    "stats": {"max_hp": 2468, "max_sp": 0, "atk": 72, "matk": 53, "defense": 13, "mdef": 13, "hit": 43, "flee": 47, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "brigan", "rate": 0.45},
+      {"item_id": "sand_lump", "rate": 0.3},
+      {"item_id": "arclouse_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "背甲會捲成球的沙漠鼠，撞人很痛。"
+  },
+  {
+    "id": "pasana",
+    "name": "沙漠武士",
+    "level": 45,
+    "element": "fire",
+    "race": "undead",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 878,
+    "job_exp": 439,
+    "stats": {"max_hp": 2762, "max_sp": 0, "atk": 77, "matk": 57, "defense": 14, "mdef": 14, "hit": 46, "flee": 50, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sand_lump", "rate": 0.4},
+      {"item_id": "cursed_ruby", "rate": 0.08},
+      {"item_id": "pasana_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "金字塔裡不滅的古代戰士亡魂。"
+  },
+  {
+    "id": "side_winder",
+    "name": "響尾蛇",
+    "level": 48,
+    "element": "poison",
+    "race": "animal",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 979,
+    "job_exp": 490,
+    "stats": {"max_hp": 2152, "max_sp": 0, "atk": 106, "matk": 61, "defense": 0, "mdef": 14, "hit": 49, "flee": 64, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "scorpion_tail", "rate": 0.4},
+      {"item_id": "snake_skin", "rate": 0.3},
+      {"item_id": "side_winder_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "藏在沙裡的雙頭毒蛇，會連咬兩口。"
+  },
+  {
+    "id": "minorous",
+    "name": "米諾陶洛斯",
+    "level": 52,
+    "element": "fire",
+    "race": "demihuman",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 1426,
+    "job_exp": 713,
+    "stats": {"max_hp": 6324, "max_sp": 0, "atk": 71, "matk": 65, "defense": 47, "mdef": 16, "hit": 53, "flee": 40, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "mane", "rate": 0.4},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "minorous_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "金字塔地下的牛頭人，一斧頭能劈飛人。"
+  },
+  {
+    "id": "ancient_mummy",
+    "name": "上級木乃伊",
+    "level": 55,
+    "element": "undead",
+    "race": "undead",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 1238,
+    "job_exp": 619,
+    "stats": {"max_hp": 3862, "max_sp": 0, "atk": 93, "matk": 69, "defense": 16, "mdef": 16, "hit": 56, "flee": 60, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "ancient_lips", "rate": 0.4},
+      {"item_id": "cursed_ruby", "rate": 0.12},
+      {"item_id": "ancient_mummy_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "裹著金線繃帶的高階祭司木乃伊，命中極高。"
+  },
+  {
+    "id": "anubis",
+    "name": "阿努比斯",
+    "level": 58,
+    "element": "undead",
+    "race": "demihuman",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 1357,
+    "job_exp": 678,
+    "stats": {"max_hp": 4228, "max_sp": 0, "atk": 98, "matk": 73, "defense": 17, "mdef": 17, "hit": 59, "flee": 63, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "ancient_lips", "rate": 0.4},
+      {"item_id": "dark_crystal", "rate": 0.15},
+      {"item_id": "anubis_card", "rate": 0.001}
+    ],
+    "is_mvp": false,
+    "lore": "胡狼頭的冥界審判者，金字塔最深處的守門人。"
   }
 ]

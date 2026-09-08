@@ -45,5 +45,10 @@
   {"id": "will_o_wisp", "name": "鬼火", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 28},
   {"id": "nightmare_horn", "name": "夢魘之角", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 48},
   {"id": "old_manteau", "name": "舊斗篷", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 40},
-  {"id": "dark_crystal", "name": "暗黑結晶", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 90}
+  {"id": "dark_crystal", "name": "暗黑結晶", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 90},
+  {"id": "brigan", "name": "昆蟲外皮", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 16},
+  {"id": "sand_lump", "name": "沙塊", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 12},
+  {"id": "scorpion_tail", "name": "蠍尾", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 34},
+  {"id": "scarab_shell", "name": "聖甲蟲殼", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 42},
+  {"id": "ancient_lips", "name": "木乃伊之唇", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 55}
 ]

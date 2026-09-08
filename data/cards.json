@@ -66,5 +66,12 @@
   {"id": "marduk_card", "name": "馬爾杜克卡片", "monster_id": "marduk", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "matk", "amount": 8}]},
   {"id": "marionette_card", "name": "魁儡娃娃卡片", "monster_id": "marionette", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "crit", "amount": 5}]},
   {"id": "bloody_murderer_card", "name": "血腥殺手卡片", "monster_id": "bloody_murderer", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 12}]},
-  {"id": "dark_priest_card", "name": "邪惡祭司卡片", "monster_id": "dark_priest", "slot": "accessory", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "max_sp", "amount": 50}]}
+  {"id": "dark_priest_card", "name": "邪惡祭司卡片", "monster_id": "dark_priest", "slot": "accessory", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "max_sp", "amount": 50}]},
+  {"id": "maya_purple_card", "name": "紫色瑪雅卡片", "monster_id": "maya_purple", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "hit", "amount": 10}]},
+  {"id": "arclouse_card", "name": "犰狳鼠卡片", "monster_id": "arclouse", "slot": "garment", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 6}]},
+  {"id": "pasana_card", "name": "沙漠武士卡片", "monster_id": "pasana", "slot": "armor", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "fire", "pct": 15}]},
+  {"id": "side_winder_card", "name": "響尾蛇卡片", "monster_id": "side_winder", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 12}]},
+  {"id": "minorous_card", "name": "米諾陶洛斯卡片", "monster_id": "minorous", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 120}]},
+  {"id": "ancient_mummy_card", "name": "上級木乃伊卡片", "monster_id": "ancient_mummy", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "hit", "amount": 15}]},
+  {"id": "anubis_card", "name": "阿努比斯卡片", "monster_id": "anubis", "slot": "weapon", "drop_rate": 0.001, "effects": [{"type": "flat_stat", "stat": "matk", "amount": 20}]}
 ]

@@ -250,5 +250,32 @@
     "monster_ids": ["mimic", "marduk", "marionette", "bloody_murderer", "dark_priest"],
     "mvp_id": null,
     "unlock_base_level": 46
+  },
+  {
+    "id": "ant_hell_3f",
+    "name": "螞蟻洞穴 3F",
+    "town": "morroc",
+    "level_range": [26, 42],
+    "monster_ids": ["soldier_ant", "maya_purple", "andre", "deniro"],
+    "mvp_id": null,
+    "unlock_base_level": 26
+  },
+  {
+    "id": "pyramid_3f",
+    "name": "金字塔 3F",
+    "town": "morroc",
+    "level_range": [40, 55],
+    "monster_ids": ["arclouse", "pasana", "side_winder", "mummy"],
+    "mvp_id": null,
+    "unlock_base_level": 40
+  },
+  {
+    "id": "pyramid_b1",
+    "name": "金字塔地下 1F",
+    "town": "morroc",
+    "level_range": [48, 60],
+    "monster_ids": ["minorous", "ancient_mummy", "anubis", "side_winder"],
+    "mvp_id": null,
+    "unlock_base_level": 48
   }
 ]
