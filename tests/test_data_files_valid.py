@@ -212,3 +212,13 @@ def test_size_damage_card_boosts_damage_vs_large():
     simulate_fight(mk([]), b1, rng=random.Random(3), max_rounds=4)
     simulate_fight(mk(["minorous_horn_card"]), b2, rng=random.Random(3), max_rounds=4)
     assert (b2.max_hp - b2.hp) > (b1.max_hp - b1.hp) * 1.08
+
+
+def test_p3_payon_gear_and_cards():
+    c = content.load_content()
+    assert c.cards["soldier_skeleton_card"].effects[0]["stat"] == "crit"
+    assert c.cards["soldier_skeleton_card"].effects[0]["amount"] == 9
+    for eid in ("gladius_3", "saints_robe_1", "rosary_1", "feather_beret"):
+        assert eid in c.equipment
+    assert "gladius_3" in {d.item_id for d in c.monsters["soldier_skeleton"].drops}
+    assert "saints_robe_1" in {d.item_id for d in c.monsters["munak"].drops}

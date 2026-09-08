@@ -67,5 +67,10 @@
 
   {"id": "saber_2", "name": "軍刀[2]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 48}, "refinable": true, "card_slots": 2, "job_ids": ["swordman", "merchant"], "required_level": 20},
   {"id": "composite_bow_4", "name": "複合弓[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 40}, "refinable": true, "card_slots": 4, "job_ids": ["archer"], "required_level": 24},
-  {"id": "chain_mail_1", "name": "鎖子甲[1]", "slot": "armor", "rarity": "fine", "stats": {"def": 55}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 40}
+  {"id": "chain_mail_1", "name": "鎖子甲[1]", "slot": "armor", "rarity": "fine", "stats": {"def": 55}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 40},
+
+  {"id": "gladius_3", "name": "格鬥短劍[3]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 35}, "refinable": true, "card_slots": 3, "job_ids": ["swordman", "thief", "merchant"], "required_level": 20},
+  {"id": "saints_robe_1", "name": "聖十字袍[1]", "slot": "armor", "rarity": "fine", "stats": {"def": 45, "mdef": 5}, "refinable": true, "card_slots": 1, "job_ids": ["acolyte"], "required_level": 30},
+  {"id": "rosary_1", "name": "十字架[1]", "slot": "accessory", "rarity": "fine", "stats": {"mdef": 3}, "refinable": false, "card_slots": 1, "job_ids": [], "required_level": 24},
+  {"id": "feather_beret", "name": "羽毛貝雷帽", "slot": "head", "rarity": "fine", "stats": {"def": 8, "flee": 5}, "refinable": true, "card_slots": 0, "job_ids": [], "required_level": 30, "npc_buy": 900, "npc_sell": 450}
 ]

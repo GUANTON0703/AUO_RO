@@ -108,5 +108,7 @@
   {"id": "vagabond_wolf_card", "name": "流浪之狼卡片", "monster_id": "vagabond_wolf", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "race_damage", "race": "animal", "pct": 15}]},
   {"id": "matyr_card", "name": "黑狐卡片", "monster_id": "matyr", "slot": "shoes", "drop_rate": 0.002, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 10}, {"type": "flat_stat", "stat": "agi", "amount": 1}]},
   {"id": "desert_wolf_card", "name": "沙漠幼狼卡片", "monster_id": "desert_wolf", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "size_damage", "size": "small", "pct": 15}, {"type": "flat_stat", "stat": "atk", "amount": 5}]},
-  {"id": "minorous_horn_card", "name": "米諾陶角卡片", "monster_id": "minorous", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "size_damage", "size": "large", "pct": 15}, {"type": "flat_stat", "stat": "atk", "amount": 5}]}
+  {"id": "minorous_horn_card", "name": "米諾陶角卡片", "monster_id": "minorous", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "size_damage", "size": "large", "pct": 15}, {"type": "flat_stat", "stat": "atk", "amount": 5}]},
+  {"id": "soldier_skeleton_card", "name": "士兵骷髏卡片", "monster_id": "soldier_skeleton", "slot": "weapon", "drop_rate": 0.001, "effects": [{"type": "flat_stat", "stat": "crit", "amount": 9}]},
+  {"id": "archer_skeleton_card", "name": "弓箭手骷髏卡片", "monster_id": "archer_skeleton", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 10}, {"type": "flat_stat", "stat": "hit", "amount": 5}]}
 ]
