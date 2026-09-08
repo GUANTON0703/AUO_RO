@@ -964,7 +964,7 @@
   {
     "id": "archer_skeleton", "name": "弓箭手骷髏", "level": 38,
     "element": "undead", "race": "undead", "size": "medium", "role": "glass", "gen": true,
-    "drops": [{"item_id": "skel_bone", "rate": 0.45}, {"item_id": "feather", "rate": 0.3}, {"item_id": "elunium", "rate": 0.05}, {"item_id": "archer_skeleton_card", "rate": 0.0015}],
+    "drops": [{"item_id": "skel_bone", "rate": 0.45}, {"item_id": "feather", "rate": 0.3}, {"item_id": "elunium", "rate": 0.05}, {"item_id": "hunter_bow_2", "rate": 0.015}, {"item_id": "archer_skeleton_card", "rate": 0.0015}],
     "lore": "躲在洞窟深處放冷箭的骷髏，命中很高。"
   },
   {
@@ -1251,7 +1251,7 @@
   },
   {
     "id": "ancient_mummy", "name": "上級木乃伊", "level": 55,
-    "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
+    "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true, "hp_mult": 1.25,
     "drops": [{"item_id": "ancient_lips", "rate": 0.4}, {"item_id": "cursed_ruby", "rate": 0.12}, {"item_id": "ancient_mummy_card", "rate": 0.0012}],
     "lore": "裹著金線繃帶的高階祭司木乃伊，命中極高。"
   },
@@ -1305,8 +1305,8 @@
   },
   {
     "id": "injustice", "name": "不義神官", "level": 52,
-    "element": "shadow", "race": "demihuman", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "dark_crystal", "rate": 0.35}, {"item_id": "rosary", "rate": 0.2}, {"item_id": "injustice_card", "rate": 0.0012}],
+    "element": "shadow", "race": "demihuman", "size": "medium", "role": "normal", "gen": true, "hp_mult": 1.25,
+    "drops": [{"item_id": "dark_crystal", "rate": 0.35}, {"item_id": "rosary", "rate": 0.2}, {"item_id": "two_handed_sword_2", "rate": 0.01}, {"item_id": "injustice_card", "rate": 0.0012}],
     "lore": "背叛信仰的黑騎士亡靈，劍上纏著怨氣。"
   },
   {
@@ -1317,8 +1317,8 @@
   },
   {
     "id": "raydric", "name": "雷德里克", "level": 55,
-    "element": "shadow", "race": "demihuman", "size": "large", "role": "normal", "gen": true,
-    "drops": [{"item_id": "old_manteau", "rate": 0.4}, {"item_id": "oridecon", "rate": 0.12}, {"item_id": "raydric_card", "rate": 0.001}],
+    "element": "shadow", "race": "demihuman", "size": "large", "role": "normal", "gen": true, "hp_mult": 1.3,
+    "drops": [{"item_id": "old_manteau", "rate": 0.4}, {"item_id": "oridecon", "rate": 0.12}, {"item_id": "bastard_sword_3", "rate": 0.01}, {"item_id": "raydric_card", "rate": 0.001}],
     "lore": "格拉斯神殿的無頭騎士亡靈，斗篷能擋刀。"
   },
   {
@@ -1359,7 +1359,7 @@
   },
   {
     "id": "rock_golem", "name": "岩石魔像", "level": 48,
-    "element": "earth", "race": "formless", "size": "large", "role": "tank", "gen": true,
+    "element": "earth", "race": "formless", "size": "large", "role": "tank", "gen": true, "hp_mult": 1.3,
     "drops": [{"item_id": "ore_fragment", "rate": 0.4}, {"item_id": "elunium", "rate": 0.1}, {"item_id": "rock_golem_card", "rate": 0.0014}],
     "lore": "礦坑守護用的石傀儡，一拳能砸穿坑道支架。"
   },
@@ -1383,7 +1383,7 @@
   },
   {
     "id": "deviace", "name": "深海魔物", "level": 42,
-    "element": "water", "race": "fish", "size": "large", "role": "normal", "gen": true,
+    "element": "water", "race": "fish", "size": "large", "role": "normal", "gen": true, "hp_mult": 1.2,
     "drops": [{"item_id": "coral_reef", "rate": 0.35}, {"item_id": "tendon", "rate": 0.2}, {"item_id": "deviace_card", "rate": 0.0012}],
     "lore": "從破船底艙爬出的深海怪物，外皮又濕又硬。"
   },

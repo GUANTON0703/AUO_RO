@@ -1274,6 +1274,7 @@
       {"item_id": "skel_bone", "rate": 0.45},
       {"item_id": "feather", "rate": 0.3},
       {"item_id": "elunium", "rate": 0.05},
+      {"item_id": "hunter_bow_2", "rate": 0.015},
       {"item_id": "archer_skeleton_card", "rate": 0.0015}
     ],
     "is_mvp": false,
@@ -2179,7 +2180,7 @@
     "role": "normal",
     "base_exp": 1238,
     "job_exp": 619,
-    "stats": {"max_hp": 3862, "max_sp": 0, "atk": 93, "matk": 69, "defense": 16, "mdef": 16, "hit": 56, "flee": 60, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4828, "max_sp": 0, "atk": 93, "matk": 69, "defense": 16, "mdef": 16, "hit": 56, "flee": 60, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ancient_lips", "rate": 0.4},
       {"item_id": "cursed_ruby", "rate": 0.12},
@@ -2348,10 +2349,11 @@
     "role": "normal",
     "base_exp": 1123,
     "job_exp": 562,
-    "stats": {"max_hp": 3514, "max_sp": 0, "atk": 88, "matk": 65, "defense": 16, "mdef": 16, "hit": 53, "flee": 57, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4392, "max_sp": 0, "atk": 88, "matk": 65, "defense": 16, "mdef": 16, "hit": 53, "flee": 57, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "dark_crystal", "rate": 0.35},
       {"item_id": "rosary", "rate": 0.2},
+      {"item_id": "two_handed_sword_2", "rate": 0.01},
       {"item_id": "injustice_card", "rate": 0.0012}
     ],
     "is_mvp": false,
@@ -2387,10 +2389,11 @@
     "role": "normal",
     "base_exp": 1238,
     "job_exp": 619,
-    "stats": {"max_hp": 3862, "max_sp": 0, "atk": 93, "matk": 69, "defense": 16, "mdef": 16, "hit": 56, "flee": 60, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5021, "max_sp": 0, "atk": 93, "matk": 69, "defense": 16, "mdef": 16, "hit": 56, "flee": 60, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "old_manteau", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.12},
+      {"item_id": "bastard_sword_3", "rate": 0.01},
       {"item_id": "raydric_card", "rate": 0.001}
     ],
     "is_mvp": false,
@@ -2520,7 +2523,7 @@
     "role": "tank",
     "base_exp": 1244,
     "job_exp": 622,
-    "stats": {"max_hp": 5532, "max_sp": 0, "atk": 65, "matk": 61, "defense": 43, "mdef": 14, "hit": 49, "flee": 37, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 7192, "max_sp": 0, "atk": 65, "matk": 61, "defense": 43, "mdef": 14, "hit": 49, "flee": 37, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ore_fragment", "rate": 0.4},
       {"item_id": "elunium", "rate": 0.1},
@@ -2596,7 +2599,7 @@
     "role": "normal",
     "base_exp": 781,
     "job_exp": 390,
-    "stats": {"max_hp": 2468, "max_sp": 0, "atk": 72, "matk": 53, "defense": 13, "mdef": 13, "hit": 43, "flee": 47, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2962, "max_sp": 0, "atk": 72, "matk": 53, "defense": 13, "mdef": 13, "hit": 43, "flee": 47, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "coral_reef", "rate": 0.35},
       {"item_id": "tendon", "rate": 0.2},

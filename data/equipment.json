@@ -81,5 +81,9 @@
 
   {"id": "katana_4", "name": "日本刀[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 55}, "refinable": true, "card_slots": 4, "job_ids": ["swordman", "knight"], "required_level": 24},
   {"id": "tights_1", "name": "緊身衣[1]", "slot": "armor", "rarity": "fine", "stats": {"def": 30, "dex": 1}, "refinable": true, "card_slots": 1, "job_ids": ["archer"], "required_level": 24},
-  {"id": "manteau_1", "name": "曼特尔[1]", "slot": "garment", "rarity": "fine", "stats": {"def": 12, "flee": 5}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 40}
+  {"id": "manteau_1", "name": "曼特尔[1]", "slot": "garment", "rarity": "fine", "stats": {"def": 12, "flee": 5}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 40},
+
+  {"id": "bastard_sword_3", "name": "私生子劍[3]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 90}, "refinable": true, "card_slots": 3, "job_ids": ["swordman", "knight"], "required_level": 40},
+  {"id": "two_handed_sword_2", "name": "兩手劍[2]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 100}, "refinable": true, "card_slots": 2, "job_ids": ["swordman", "knight"], "required_level": 40},
+  {"id": "hunter_bow_2", "name": "獵人弓[2]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 60}, "refinable": true, "card_slots": 2, "job_ids": ["archer"], "required_level": 30}
 ]

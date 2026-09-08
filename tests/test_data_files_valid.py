@@ -268,3 +268,20 @@ def test_equipment_primary_stat_applies_in_combat():
     with_dex = build_player_combatant(snap("tights_1"), c)
     plain = build_player_combatant(snap("chain_mail_1"), c)
     assert with_dex.hit == plain.hit + 1
+
+
+def test_p6_endgame_slotted_weapons_and_drops():
+    from server.content.monster_stats import baseline
+    c = content.load_content()
+    for eid, atk, slots in (("bastard_sword_3", 90, 3), ("two_handed_sword_2", 100, 2),
+                            ("hunter_bow_2", 60, 2)):
+        e = c.equipment[eid]
+        assert e.stats.get("atk") == atk and e.card_slots == slots
+    assert "bastard_sword_3" in {d.item_id for d in c.monsters["raydric"].drops}
+    assert "two_handed_sword_2" in {d.item_id for d in c.monsters["injustice"].drops}
+    assert "hunter_bow_2" in {d.item_id for d in c.monsters["archer_skeleton"].drops}
+    assert c.monsters["raydric"].stats.max_hp == round(baseline(55, "normal").max_hp * 1.3)
+    assert c.monsters["injustice"].stats.max_hp == round(baseline(52, "normal").max_hp * 1.25)
+    assert c.monsters["rock_golem"].stats.max_hp == round(baseline(48, "tank").max_hp * 1.3)
+    assert c.monsters["deviace"].stats.max_hp == round(baseline(42, "normal").max_hp * 1.2)
+    assert c.monsters["ancient_mummy"].stats.max_hp == round(baseline(55, "normal").max_hp * 1.25)
