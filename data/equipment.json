@@ -63,5 +63,9 @@
 
   {"id": "guard", "name": "防護盾", "slot": "offhand", "rarity": "common", "stats": {"def": 4}, "refinable": true, "card_slots": 1, "job_ids": ["swordman", "merchant", "acolyte", "thief"], "required_level": 1, "npc_buy": 120, "npc_sell": 60},
   {"id": "waghnak_3", "name": "拳刃[3]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 20}, "refinable": true, "card_slots": 3, "job_ids": ["acolyte", "merchant"], "required_level": 14},
-  {"id": "main_gauche_4", "name": "短劍[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 23}, "refinable": true, "card_slots": 4, "job_ids": ["swordman", "thief", "merchant"], "required_level": 14}
+  {"id": "main_gauche_4", "name": "短劍[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 23}, "refinable": true, "card_slots": 4, "job_ids": ["swordman", "thief", "merchant"], "required_level": 14},
+
+  {"id": "saber_2", "name": "軍刀[2]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 48}, "refinable": true, "card_slots": 2, "job_ids": ["swordman", "merchant"], "required_level": 20},
+  {"id": "composite_bow_4", "name": "複合弓[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 40}, "refinable": true, "card_slots": 4, "job_ids": ["archer"], "required_level": 24},
+  {"id": "chain_mail_1", "name": "鎖子甲[1]", "slot": "armor", "rarity": "fine", "stats": {"def": 55}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 40}
 ]

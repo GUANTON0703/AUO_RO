@@ -903,14 +903,14 @@
   },
   {
     "id": "mummy", "name": "木乃伊", "level": 39,
-    "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "decayed_nail", "rate": 0.45}, {"item_id": "cursed_ruby", "rate": 0.1}, {"item_id": "elunium", "rate": 0.08}],
+    "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true, "hp_mult": 1.3,
+    "drops": [{"item_id": "decayed_nail", "rate": 0.45}, {"item_id": "cursed_ruby", "rate": 0.1}, {"item_id": "elunium", "rate": 0.08}, {"item_id": "chain_mail_1", "rate": 0.02}],
     "lore": "裹著繃帶的古代亡者，命中極高，閃不掉。"
   },
   {
     "id": "isis", "name": "伊西斯", "level": 42,
-    "element": "shadow", "race": "demon", "size": "large", "role": "tank", "gen": true,
-    "drops": [{"item_id": "cursed_ruby", "rate": 0.15}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "isis_card", "rate": 0.0015}],
+    "element": "shadow", "race": "demon", "size": "large", "role": "tank", "gen": true, "hp_mult": 1.3,
+    "drops": [{"item_id": "cursed_ruby", "rate": 0.15}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "saber_2", "rate": 0.015}, {"item_id": "isis_card", "rate": 0.0015}],
     "lore": "上半身女人、下半身蛇的金字塔守護者。"
   },
   {
@@ -1234,7 +1234,7 @@
   {
     "id": "pasana", "name": "沙漠武士", "level": 45,
     "element": "fire", "race": "undead", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "sand_lump", "rate": 0.4}, {"item_id": "cursed_ruby", "rate": 0.08}, {"item_id": "pasana_card", "rate": 0.0015}],
+    "drops": [{"item_id": "sand_lump", "rate": 0.4}, {"item_id": "cursed_ruby", "rate": 0.08}, {"item_id": "composite_bow_4", "rate": 0.015}, {"item_id": "pasana_card", "rate": 0.0015}],
     "lore": "金字塔裡不滅的古代戰士亡魂。"
   },
   {
@@ -1245,8 +1245,8 @@
   },
   {
     "id": "minorous", "name": "米諾陶洛斯", "level": 52,
-    "element": "fire", "race": "demihuman", "size": "large", "role": "tank", "gen": true,
-    "drops": [{"item_id": "mane", "rate": 0.4}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "minorous_card", "rate": 0.0012}],
+    "element": "fire", "race": "demihuman", "size": "large", "role": "tank", "gen": true, "hp_mult": 1.2,
+    "drops": [{"item_id": "mane", "rate": 0.4}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "minorous_horn_card", "rate": 0.0012}, {"item_id": "minorous_card", "rate": 0.0012}],
     "lore": "金字塔地下的牛頭人，一斧頭能劈飛人。"
   },
   {
@@ -1470,5 +1470,11 @@
     "element": "neutral", "race": "animal", "size": "medium", "role": "normal", "gen": true,
     "drops": [{"item_id": "mane", "rate": 0.45}, {"item_id": "talon", "rate": 0.2}, {"item_id": "vagabond_wolf_card", "rate": 0.0016}],
     "lore": "離群獨行的老狼，在狗頭人森林邊緣徘徊獵食。"
+  },
+  {
+    "id": "desert_wolf", "name": "沙漠幼狼", "level": 30,
+    "element": "wind", "race": "animal", "size": "small", "role": "normal", "gen": true,
+    "drops": [{"item_id": "mane", "rate": 0.4}, {"item_id": "talon", "rate": 0.2}, {"item_id": "desert_wolf_card", "rate": 0.0015}],
+    "lore": "在摩洛克沙漠邊緣成群狩獵的幼狼，數量多、動作快。"
   }
 ]

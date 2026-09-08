@@ -180,3 +180,35 @@ def test_matyr_card_hp_bonus_in_combat():
     plain = build_player_combatant(snap([]), c)
     carded = build_player_combatant(snap(["matyr_card"]), c)
     assert carded.max_hp > plain.max_hp * 1.05
+
+
+def test_p2_morroc_size_damage_cards():
+    c = content.load_content()
+    for cid, size in (("desert_wolf_card", "small"), ("skel_worker_card", "medium"),
+                      ("minorous_horn_card", "large")):
+        eff = c.cards[cid].effects
+        assert any(e.get("type") == "size_damage" and e.get("size") == size for e in eff), cid
+    assert "desert_wolf" in c.monsters and c.monsters["desert_wolf"].size == "small"
+    assert "chain_mail_1" in c.equipment and c.equipment["chain_mail_1"].card_slots == 1
+    assert "composite_bow_4" in c.equipment
+    # hp_mult 生效：mummy 比 baseline 高
+    from server.content.monster_stats import baseline
+    base = baseline(39, "normal").max_hp
+    assert c.monsters["mummy"].stats.max_hp > base * 1.2
+
+
+def test_size_damage_card_boosts_damage_vs_large():
+    import random
+    from server.combat import simulate_fight
+    from server.combat.combatant import Combatant
+    from server.progression import CharacterSnapshot, EquippedPiece, build_player_combatant
+    c = content.load_content()
+    mk = lambda cards: build_player_combatant(CharacterSnapshot(
+        name="P", job_id="archer", base_level=45, job_level=45,
+        stats={"str": 20, "agi": 30, "vit": 20, "int": 5, "dex": 60, "luk": 10},
+        learned_skills={}, equipped=[EquippedPiece("composite_bow_4", 0, cards)]), c)
+    big = lambda: Combatant.from_monster(c.monsters["minorous"])
+    b1, b2 = big(), big()
+    simulate_fight(mk([]), b1, rng=random.Random(3), max_rounds=4)
+    simulate_fight(mk(["minorous_horn_card"]), b2, rng=random.Random(3), max_rounds=4)
+    assert (b2.max_hp - b2.hp) > (b1.max_hp - b1.hp) * 1.08

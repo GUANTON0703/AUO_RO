@@ -77,7 +77,7 @@
   {"id": "punk_card", "name": "龐克卡片", "monster_id": "punk", "slot": "garment", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "mdef", "amount": 4}]},
   {"id": "rideword_card", "name": "書蟲卡片", "monster_id": "rideword", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 10}]},
   {"id": "zombie_prisoner_card", "name": "殭屍囚犯卡片", "monster_id": "zombie_prisoner", "slot": "armor", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "undead", "pct": 20}]},
-  {"id": "skel_worker_card", "name": "骷髏工人卡片", "monster_id": "skel_worker", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 15}]},
+  {"id": "skel_worker_card", "name": "骷髏工人卡片", "monster_id": "skel_worker", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "size_damage", "size": "medium", "pct": 15}, {"type": "flat_stat", "stat": "atk", "amount": 5}]},
   {"id": "injustice_card", "name": "不義神官卡片", "monster_id": "injustice", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "crit", "amount": 6}]},
   {"id": "alarm_card", "name": "鬧鐘卡片", "monster_id": "alarm", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 150}]},
   {"id": "raydric_card", "name": "雷德里克卡片", "monster_id": "raydric", "slot": "garment", "drop_rate": 0.001, "effects": [{"type": "element_resist", "element": "neutral", "pct": 15}]},
@@ -106,5 +106,7 @@
   {"id": "kobold_axe_card", "name": "斧頭狗頭人卡片", "monster_id": "kobold_axe", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 14}, {"type": "flat_stat", "stat": "crit", "amount": 2}]},
   {"id": "kobold_hammer_card", "name": "槌子狗頭人卡片", "monster_id": "kobold_hammer", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 16}]},
   {"id": "vagabond_wolf_card", "name": "流浪之狼卡片", "monster_id": "vagabond_wolf", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "race_damage", "race": "animal", "pct": 15}]},
-  {"id": "matyr_card", "name": "黑狐卡片", "monster_id": "matyr", "slot": "shoes", "drop_rate": 0.002, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 10}, {"type": "flat_stat", "stat": "agi", "amount": 1}]}
+  {"id": "matyr_card", "name": "黑狐卡片", "monster_id": "matyr", "slot": "shoes", "drop_rate": 0.002, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 10}, {"type": "flat_stat", "stat": "agi", "amount": 1}]},
+  {"id": "desert_wolf_card", "name": "沙漠幼狼卡片", "monster_id": "desert_wolf", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "size_damage", "size": "small", "pct": 15}, {"type": "flat_stat", "stat": "atk", "amount": 5}]},
+  {"id": "minorous_horn_card", "name": "米諾陶角卡片", "monster_id": "minorous", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "size_damage", "size": "large", "pct": 15}, {"type": "flat_stat", "stat": "atk", "amount": 5}]}
 ]

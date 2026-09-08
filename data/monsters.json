@@ -1077,11 +1077,12 @@
     "role": "normal",
     "base_exp": 690,
     "job_exp": 345,
-    "stats": {"max_hp": 2189, "max_sp": 0, "atk": 67, "matk": 50, "defense": 12, "mdef": 12, "hit": 40, "flee": 44, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2846, "max_sp": 0, "atk": 67, "matk": 50, "defense": 12, "mdef": 12, "hit": 40, "flee": 44, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.45},
       {"item_id": "cursed_ruby", "rate": 0.1},
-      {"item_id": "elunium", "rate": 0.08}
+      {"item_id": "elunium", "rate": 0.08},
+      {"item_id": "chain_mail_1", "rate": 0.02}
     ],
     "is_mvp": false,
     "lore": "裹著繃帶的古代亡者，命中極高，閃不掉。"
@@ -1096,10 +1097,11 @@
     "role": "tank",
     "base_exp": 992,
     "job_exp": 496,
-    "stats": {"max_hp": 4442, "max_sp": 0, "atk": 58, "matk": 53, "defense": 38, "mdef": 13, "hit": 43, "flee": 33, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5775, "max_sp": 0, "atk": 58, "matk": 53, "defense": 38, "mdef": 13, "hit": 43, "flee": 33, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "cursed_ruby", "rate": 0.15},
       {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "saber_2", "rate": 0.015},
       {"item_id": "isis_card", "rate": 0.0015}
     ],
     "is_mvp": false,
@@ -2112,6 +2114,7 @@
     "drops": [
       {"item_id": "sand_lump", "rate": 0.4},
       {"item_id": "cursed_ruby", "rate": 0.08},
+      {"item_id": "composite_bow_4", "rate": 0.015},
       {"item_id": "pasana_card", "rate": 0.0015}
     ],
     "is_mvp": false,
@@ -2146,10 +2149,11 @@
     "role": "tank",
     "base_exp": 1426,
     "job_exp": 713,
-    "stats": {"max_hp": 6324, "max_sp": 0, "atk": 71, "matk": 65, "defense": 47, "mdef": 16, "hit": 53, "flee": 40, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 7589, "max_sp": 0, "atk": 71, "matk": 65, "defense": 47, "mdef": 16, "hit": 53, "flee": 40, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "mane", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "minorous_horn_card", "rate": 0.0012},
       {"item_id": "minorous_card", "rate": 0.0012}
     ],
     "is_mvp": false,
@@ -2855,5 +2859,24 @@
     ],
     "is_mvp": false,
     "lore": "離群獨行的老狼，在狗頭人森林邊緣徘徊獵食。"
+  },
+  {
+    "id": "desert_wolf",
+    "name": "沙漠幼狼",
+    "level": 30,
+    "element": "wind",
+    "race": "animal",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 450,
+    "job_exp": 225,
+    "stats": {"max_hp": 1450, "max_sp": 0, "atk": 53, "matk": 39, "defense": 9, "mdef": 9, "hit": 31, "flee": 35, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "mane", "rate": 0.4},
+      {"item_id": "talon", "rate": 0.2},
+      {"item_id": "desert_wolf_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "在摩洛克沙漠邊緣成群狩獵的幼狼，數量多、動作快。"
   }
 ]

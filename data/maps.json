@@ -76,7 +76,7 @@
     "name": "夢羅克野外-沙漠",
     "town": "morroc",
     "level_range": [15, 35],
-    "monster_ids": ["desert_condor", "peco_peco", "metaller", "sand_man"],
+    "monster_ids": ["desert_condor", "desert_wolf", "peco_peco", "metaller", "sand_man"],
     "mvp_id": null,
     "unlock_base_level": 14
   },
