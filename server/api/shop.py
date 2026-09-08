@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 from server.auth.dependencies import CurrentAccount
 from server.content import load_content
 from server.db import connection
+from server.loot.pricing import equip_sell_price as _equip_sell_price
+from server.loot.pricing import item_sell_price as _item_sell_price
 from server.repositories import characters as characters_repo
 
 router = APIRouter(prefix="/api/shop", tags=["shop"])
@@ -40,13 +42,13 @@ def list_shop(account_id: CurrentAccount):
     _current_character(account_id)
     items = [
         {"id": i.id, "name": i.name, "price": i.npc_buy,
-         "sell_price": i.npc_sell, "kind": i.kind}
+         "sell_price": _item_sell_price(i), "kind": i.kind}
         for i in _content.items.values()
         if i.npc_buy is not None
     ]
     equipment = [
         {"id": e.id, "name": e.name, "price": e.npc_buy,
-         "sell_price": e.npc_sell, "slot": e.slot}
+         "sell_price": _equip_sell_price(e), "slot": e.slot}
         for e in _content.equipment.values()
         if e.npc_buy is not None
     ]
@@ -107,7 +109,7 @@ def sell(body: SellRequest, account_id: CurrentAccount):
             if inst["equipped_slot"] is not None:
                 raise HTTPException(status_code=400, detail="裝備中的道具無法賣出")
             eq = _content.equipment.get(inst["equipment_id"])
-            price = eq.npc_sell if eq else 0
+            price = _equip_sell_price(eq) if eq else 0
             conn.execute(
                 "DELETE FROM character_equipment WHERE id = ?",
                 (body.equipment_instance_id,),
@@ -122,9 +124,7 @@ def sell(body: SellRequest, account_id: CurrentAccount):
     item = _content.items.get(body.item_id)
     if item is None:
         raise HTTPException(status_code=400, detail="道具不存在")
-    if item.npc_sell <= 0:
-        raise HTTPException(status_code=400, detail="這個道具 NPC 不收")
-    gained = item.npc_sell * body.qty
+    gained = _item_sell_price(item) * body.qty
     with connection.transaction() as conn:
         row = conn.execute(
             "SELECT qty FROM character_items WHERE character_id = ? AND item_id = ?",

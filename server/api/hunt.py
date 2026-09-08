@@ -10,6 +10,7 @@ from server.auth.dependencies import CurrentAccount
 from server.config import get_settings
 from server.content import load_content
 from server.db import connection
+from server.loot.pricing import item_sell_price
 from server.progression import CharacterSnapshot, EquippedPiece, build_player_combatant
 from server.progression.levels import apply_base_exp, apply_job_exp
 from server.repositories import characters as characters_repo
@@ -186,11 +187,11 @@ def _auto_sell(character_id: int, strategy) -> int:
     sold: dict = {}
     for iid in strategy.sell_item_ids or []:
         item = _content.items.get(iid)
-        if item is None or item.npc_sell <= 0:
+        if item is None:
             continue
         qty = inventory.item_qty(character_id, iid)
         if qty > 0 and inventory.consume_item(character_id, iid, qty):
-            gained += item.npc_sell * qty
+            gained += item_sell_price(item) * qty
             sold[iid] = qty
     if gained:
         characters_repo.adjust_zeny(character_id, gained)

@@ -313,7 +313,7 @@ Screens.home = {
   _lootHtml(loot) {
     const held = loot || {};
     const sell = new Set((this._strategy && this._strategy.sell_item_ids) || []);
-    const sellable = (id) => (S.catalog?.items?.[id]?.npc_sell || 0) > 0;
+    const sellable = (id) => !S.catalog?.cards?.[id];   // 卡片以外都能賣
     // 撿到的 + 已被自動賣掉的（清單裡有但背包已清空）都列出來，才能取消勾選
     const ids = [...new Set([...Object.keys(held), ...sell])];
     if (!ids.length) return `<p class="muted" style="margin-top:8px">本場還沒撿到東西</p>`;

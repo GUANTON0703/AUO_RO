@@ -108,3 +108,30 @@ def test_shop_has_buyable_common_equipment_for_every_slot(client, auth, db_helpe
                   if eq.id in shop_ids and eq.slot == slot and eq.rarity == "common"]
         assert common
         assert max(eq.required_level for eq in common) >= 20
+
+
+def test_sell_equipment_without_npc_sell_still_pays(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.give_equipment(ch["id"], "guardian_greatsword")  # 掉落裝，無 npc_sell
+    inst = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()["equipment"][0]
+    z0 = client.get("/api/characters", headers=h).json()[0]["zeny"]
+    r = client.post("/api/shop/sell", headers=h, json={"equipment_instance_id": inst["id"]})
+    assert r.status_code == 200 and r.json()["gained"] > 0
+    assert client.get("/api/characters", headers=h).json()[0]["zeny"] > z0
+
+
+def test_sell_material_without_npc_sell_still_works(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.give_item(ch["id"], "elunium", 3)   # npc_sell 未設
+    r = client.post("/api/shop/sell", headers=h, json={"item_id": "elunium", "qty": 3})
+    assert r.status_code == 200 and r.json()["gained"] >= 3
+
+
+def test_sell_price_helpers():
+    from server.content import load_content
+    from server.loot.pricing import equip_sell_price, item_sell_price
+    c = load_content()
+    assert equip_sell_price(c.equipment["guardian_greatsword"]) > 0
+    assert item_sell_price(c.items["elunium"]) >= 1
