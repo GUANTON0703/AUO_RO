@@ -85,7 +85,7 @@
     "name": "螞蟻洞穴 1F",
     "town": "morroc",
     "level_range": [16, 28],
-    "monster_ids": ["piere", "deniro", "vitata", "andre"],
+    "monster_ids": ["white_ant", "piere", "deniro", "vitata", "andre"],
     "mvp_id": null,
     "unlock_base_level": 16
   },
@@ -130,7 +130,7 @@
     "name": "斐揚洞窟 1F",
     "town": "payon",
     "level_range": [15, 32],
-    "monster_ids": ["bat_familiar", "poporing", "munak", "spore"],
+    "monster_ids": ["bat_familiar", "poporing", "cursed_soldier", "munak", "spore"],
     "mvp_id": null,
     "unlock_base_level": 14
   },
@@ -313,5 +313,14 @@
     "monster_ids": ["wander_man", "raydric", "injustice", "bathory"],
     "mvp_id": null,
     "unlock_base_level": 50
+  },
+  {
+    "id": "deep_mine",
+    "name": "深層礦坑",
+    "town": "prontera",
+    "level_range": [38, 52],
+    "monster_ids": ["tunnel_worm", "mine_bat", "cursed_miner", "rock_golem"],
+    "mvp_id": null,
+    "unlock_base_level": 38
   }
 ]

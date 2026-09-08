@@ -54,5 +54,7 @@
   {"id": "gear_wheel", "name": "齒輪", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 24},
   {"id": "resin", "name": "樹脂", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 18},
   {"id": "rusty_shackle", "name": "生鏽的枷鎖", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 20},
-  {"id": "old_page", "name": "古老書頁", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 35}
+  {"id": "old_page", "name": "古老書頁", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 35},
+  {"id": "coal", "name": "煤炭", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 22},
+  {"id": "ore_fragment", "name": "礦石碎片", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 28}
 ]

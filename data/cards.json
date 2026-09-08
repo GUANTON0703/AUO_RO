@@ -81,5 +81,10 @@
   {"id": "injustice_card", "name": "不義神官卡片", "monster_id": "injustice", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "crit", "amount": 6}]},
   {"id": "alarm_card", "name": "鬧鐘卡片", "monster_id": "alarm", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 150}]},
   {"id": "raydric_card", "name": "雷德里克卡片", "monster_id": "raydric", "slot": "garment", "drop_rate": 0.001, "effects": [{"type": "element_resist", "element": "neutral", "pct": 15}]},
-  {"id": "bathory_card", "name": "巴多力卡片", "monster_id": "bathory", "slot": "armor", "drop_rate": 0.001, "effects": [{"type": "element_resist", "element": "shadow", "pct": 20}]}
+  {"id": "bathory_card", "name": "巴多力卡片", "monster_id": "bathory", "slot": "armor", "drop_rate": 0.001, "effects": [{"type": "element_resist", "element": "shadow", "pct": 20}]},
+  {"id": "white_ant_card", "name": "白蟻卡片", "monster_id": "white_ant", "slot": "weapon", "drop_rate": 0.0025, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 8}]},
+  {"id": "cursed_soldier_card", "name": "邪骸士兵卡片", "monster_id": "cursed_soldier", "slot": "weapon", "drop_rate": 0.0022, "effects": [{"type": "flat_stat", "stat": "crit", "amount": 4}]},
+  {"id": "mine_bat_card", "name": "礦坑蝙蝠卡片", "monster_id": "mine_bat", "slot": "garment", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 6}]},
+  {"id": "cursed_miner_card", "name": "邪骸礦工卡片", "monster_id": "cursed_miner", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 16}]},
+  {"id": "rock_golem_card", "name": "岩石魔像卡片", "monster_id": "rock_golem", "slot": "armor", "drop_rate": 0.0014, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 130}]}
 ]

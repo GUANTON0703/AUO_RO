@@ -1324,5 +1324,41 @@
     "element": "shadow", "race": "demon", "size": "medium", "role": "normal", "gen": true,
     "drops": [{"item_id": "dark_crystal", "rate": 0.4}, {"item_id": "cursed_ruby", "rate": 0.15}, {"item_id": "bathory_card", "rate": 0.001}],
     "lore": "騎著掃帚的血腥女巫，會放暗黑魔法。"
+  },
+  {
+    "id": "white_ant", "name": "白蟻", "level": 16,
+    "element": "earth", "race": "insect", "size": "small", "role": "normal", "gen": true,
+    "drops": [{"item_id": "ant_jaw", "rate": 0.45}, {"item_id": "iron_ore", "rate": 0.3}, {"item_id": "white_ant_card", "rate": 0.0025}],
+    "lore": "啃食礦石的白色工蟻，大顎硬得能磨鐵。"
+  },
+  {
+    "id": "cursed_soldier", "name": "邪骸士兵", "level": 26,
+    "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "skel_bone", "rate": 0.5}, {"item_id": "rusty_shackle", "rate": 0.25}, {"item_id": "cursed_soldier_card", "rate": 0.0022}],
+    "lore": "戰死後被詛咒纏身、握著斷劍不肯倒下的士兵骨骸。"
+  },
+  {
+    "id": "tunnel_worm", "name": "隧道蟲", "level": 38,
+    "element": "earth", "race": "insect", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "brigan", "rate": 0.45}, {"item_id": "ore_fragment", "rate": 0.3}],
+    "lore": "在礦坑岩壁裡鑽洞的大蟲，撞上就是一嘴土。"
+  },
+  {
+    "id": "mine_bat", "name": "礦坑蝙蝠", "level": 40,
+    "element": "wind", "race": "animal", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "fluff", "rate": 0.4}, {"item_id": "coal", "rate": 0.25}, {"item_id": "mine_bat_card", "rate": 0.0018}],
+    "lore": "棲息在礦坑深處、被燈火驚動就成群撲人的蝙蝠。"
+  },
+  {
+    "id": "cursed_miner", "name": "邪骸礦工", "level": 44,
+    "element": "earth", "race": "undead", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "coal", "rate": 0.45}, {"item_id": "oridecon", "rate": 0.14}, {"item_id": "elunium", "rate": 0.07}, {"item_id": "cursed_miner_card", "rate": 0.0016}],
+    "lore": "埋死在坍方裡、還握著十字鎬繼續挖的礦工亡魂。"
+  },
+  {
+    "id": "rock_golem", "name": "岩石魔像", "level": 48,
+    "element": "earth", "race": "formless", "size": "large", "role": "tank", "gen": true,
+    "drops": [{"item_id": "ore_fragment", "rate": 0.4}, {"item_id": "elunium", "rate": 0.1}, {"item_id": "rock_golem_card", "rate": 0.0014}],
+    "lore": "礦坑守護用的石傀儡，一拳能砸穿坑道支架。"
   }
 ]
