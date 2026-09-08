@@ -238,3 +238,33 @@ def test_p4_geffen_gear_and_drops():
     assert c.monsters["high_orc"].stats.max_hp == round(baseline(40, "normal").max_hp * 1.3)
     assert c.monsters["orc_skeleton"].stats.max_hp == round(baseline(42, "normal").max_hp * 1.3)
     assert c.monsters["nightmare"].stats.max_hp == round(baseline(43, "normal").max_hp * 1.2)
+
+
+def test_p5_aldebaran_gear_and_drops():
+    from server.content.monster_stats import baseline
+    c = content.load_content()
+    assert c.equipment["katana_4"].card_slots == 4
+    assert c.equipment["tights_1"].slot == "armor"
+    assert c.equipment["tights_1"].stats.get("dex") == 1
+    assert c.equipment["manteau_1"].slot == "garment"
+    assert "katana_4" in {d.item_id for d in c.monsters["alarm"].drops}
+    assert "tights_1" in {d.item_id for d in c.monsters["myst_case"].drops}
+    assert "manteau_1" in {d.item_id for d in c.monsters["rideword"].drops}
+    assert c.monsters["alarm"].stats.max_hp == round(baseline(52, "tank").max_hp * 1.3)
+    assert c.monsters["rideword"].stats.max_hp == round(baseline(48, "glass").max_hp * 1.2)
+    assert c.monsters["chepet"].stats.max_hp == round(baseline(50, "tank").max_hp * 1.3)
+
+
+def test_equipment_primary_stat_applies_in_combat():
+    from server.progression import (
+        CharacterSnapshot, EquippedPiece, build_player_combatant,
+    )
+    c = content.load_content()
+    snap = lambda gear: CharacterSnapshot(
+        name="P", job_id="archer", base_level=30, job_level=30,
+        stats={"str": 10, "agi": 20, "vit": 10, "int": 5, "dex": 30, "luk": 10},
+        learned_skills={}, equipped=[EquippedPiece(gear, 0, [])])
+    # tights_1 帶 dex+1 → hit 應比穿沒 dex 的同防具高
+    with_dex = build_player_combatant(snap("tights_1"), c)
+    plain = build_player_combatant(snap("chain_mail_1"), c)
+    assert with_dex.hit == plain.hit + 1

@@ -77,5 +77,9 @@
   {"id": "orcish_axe_4", "name": "獸人斧[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 60}, "refinable": true, "card_slots": 4, "job_ids": ["merchant", "blacksmith"], "required_level": 32},
   {"id": "jur_3", "name": "爪[3]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 55}, "refinable": true, "card_slots": 3, "job_ids": ["thief"], "required_level": 24},
   {"id": "full_plate_1", "name": "全身鎧甲[1]", "slot": "armor", "rarity": "fine", "stats": {"def": 90}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 50},
-  {"id": "stone_buckler_1", "name": "石盾[1]", "slot": "offhand", "rarity": "fine", "stats": {"def": 25}, "refinable": true, "card_slots": 1, "job_ids": ["swordman", "merchant", "acolyte", "thief"], "required_level": 30}
+  {"id": "stone_buckler_1", "name": "石盾[1]", "slot": "offhand", "rarity": "fine", "stats": {"def": 25}, "refinable": true, "card_slots": 1, "job_ids": ["swordman", "merchant", "acolyte", "thief"], "required_level": 30},
+
+  {"id": "katana_4", "name": "日本刀[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 55}, "refinable": true, "card_slots": 4, "job_ids": ["swordman", "knight"], "required_level": 24},
+  {"id": "tights_1", "name": "緊身衣[1]", "slot": "armor", "rarity": "fine", "stats": {"def": 30, "dex": 1}, "refinable": true, "card_slots": 1, "job_ids": ["archer"], "required_level": 24},
+  {"id": "manteau_1", "name": "曼特尔[1]", "slot": "garment", "rarity": "fine", "stats": {"def": 12, "flee": 5}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 40}
 ]

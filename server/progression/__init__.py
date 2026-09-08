@@ -105,9 +105,12 @@ def _passive_stat_bonus(content, learned: dict) -> dict:
 def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     job = content.get_job(snap.job_id)
     s = snap.stats
-    STR, AGI, VIT, INT, DEX, LUK = (s["str"], s["agi"], s["vit"], s["int"], s["dex"], s["luk"])
-
     eq = _sum_equipment_stats(content, snap.equipped)
+    STR, AGI, VIT, INT, DEX, LUK = (
+        s["str"] + eq.get("str", 0), s["agi"] + eq.get("agi", 0),
+        s["vit"] + eq.get("vit", 0), s["int"] + eq.get("int", 0),
+        s["dex"] + eq.get("dex", 0), s["luk"] + eq.get("luk", 0))
+
     passives = _passive_stat_bonus(content, snap.learned_skills)
 
     # HP/SP 隨等級加速成長（配合怪物 HP 公式的 level² 項），玩家才打得動同級怪
