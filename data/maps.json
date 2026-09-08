@@ -322,5 +322,32 @@
     "monster_ids": ["tunnel_worm", "mine_bat", "cursed_miner", "rock_golem"],
     "mvp_id": null,
     "unlock_base_level": 38
+  },
+  {
+    "id": "sunken_ship_1f",
+    "name": "沉沒之船 1F",
+    "town": "prontera",
+    "level_range": [25, 42],
+    "monster_ids": ["pirate_skeleton", "pirate_ship", "ghostring", "deviace"],
+    "mvp_id": null,
+    "unlock_base_level": 24
+  },
+  {
+    "id": "sphinx_1f",
+    "name": "斯芬克斯迷宮 1F",
+    "town": "morroc",
+    "level_range": [42, 55],
+    "monster_ids": ["pasana", "side_winder", "minorous", "ancient_mummy"],
+    "mvp_id": null,
+    "unlock_base_level": 40
+  },
+  {
+    "id": "orc_dungeon_2f",
+    "name": "獸人地城 2F",
+    "town": "geffen",
+    "level_range": [38, 60],
+    "monster_ids": ["orc_skeleton", "high_orc", "orc_zombie", "zenorc"],
+    "mvp_id": null,
+    "unlock_base_level": 36
   }
 ]

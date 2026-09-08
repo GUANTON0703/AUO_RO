@@ -115,5 +115,5 @@ def test_lv60_classic_batch_one_maps_and_cards_exist():
     c = content.load_content()
     for map_id in ("sunken_ship_1f", "sphinx_1f", "orc_dungeon_2f"):
         assert map_id in c.maps
-    for card_id in ("pirate_skeleton_card", "pasana_card", "orc_skeleton_card"):
+    for card_id in ("pirate_skeleton_card", "pasana_card", "zenorc_card"):
         assert card_id in c.cards

@@ -1360,5 +1360,35 @@
     "element": "earth", "race": "formless", "size": "large", "role": "tank", "gen": true,
     "drops": [{"item_id": "ore_fragment", "rate": 0.4}, {"item_id": "elunium", "rate": 0.1}, {"item_id": "rock_golem_card", "rate": 0.0014}],
     "lore": "礦坑守護用的石傀儡，一拳能砸穿坑道支架。"
+  },
+  {
+    "id": "pirate_skeleton", "name": "海賊骷髏", "level": 30,
+    "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "skel_bone", "rate": 0.45}, {"item_id": "rusty_shackle", "rate": 0.25}, {"item_id": "pirate_skeleton_card", "rate": 0.002}],
+    "lore": "沉沒之船甲板上不肯離去的海賊亡魂。"
+  },
+  {
+    "id": "pirate_ship", "name": "幽靈船", "level": 34,
+    "element": "ghost", "race": "undead", "size": "large", "role": "tank", "gen": true,
+    "drops": [{"item_id": "old_manteau", "rate": 0.35}, {"item_id": "dark_crystal", "rate": 0.08}, {"item_id": "pirate_ship_card", "rate": 0.0018}],
+    "lore": "被怨靈附身的破船殘骸，甲板厚得難以擊穿。"
+  },
+  {
+    "id": "ghostring", "name": "幽靈波利", "level": 36,
+    "element": "ghost", "race": "formless", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "sticky_mucus", "rate": 0.35}, {"item_id": "dark_crystal", "rate": 0.06}, {"item_id": "ghostring_card", "rate": 0.0015}],
+    "lore": "漂浮在船艙裡的透明波利，靠近時會突然衝撞。"
+  },
+  {
+    "id": "deviace", "name": "深海魔物", "level": 42,
+    "element": "water", "race": "fish", "size": "large", "role": "normal", "gen": true,
+    "drops": [{"item_id": "coral_reef", "rate": 0.35}, {"item_id": "tendon", "rate": 0.2}, {"item_id": "deviace_card", "rate": 0.0012}],
+    "lore": "從破船底艙爬出的深海怪物，外皮又濕又硬。"
+  },
+  {
+    "id": "zenorc", "name": "獸人腐屍", "level": 54,
+    "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "orc_tooth", "rate": 0.45}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "zenorc_card", "rate": 0.0012}],
+    "lore": "獸人地城最深處復甦的腐屍，還保留著殘暴的戰意。"
   }
 ]

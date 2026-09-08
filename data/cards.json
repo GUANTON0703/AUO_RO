@@ -86,5 +86,10 @@
   {"id": "cursed_soldier_card", "name": "邪骸士兵卡片", "monster_id": "cursed_soldier", "slot": "weapon", "drop_rate": 0.0022, "effects": [{"type": "flat_stat", "stat": "crit", "amount": 4}]},
   {"id": "mine_bat_card", "name": "礦坑蝙蝠卡片", "monster_id": "mine_bat", "slot": "garment", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 6}]},
   {"id": "cursed_miner_card", "name": "邪骸礦工卡片", "monster_id": "cursed_miner", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 16}]},
-  {"id": "rock_golem_card", "name": "岩石魔像卡片", "monster_id": "rock_golem", "slot": "armor", "drop_rate": 0.0014, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 130}]}
+  {"id": "rock_golem_card", "name": "岩石魔像卡片", "monster_id": "rock_golem", "slot": "armor", "drop_rate": 0.0014, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 130}]},
+  {"id": "pirate_skeleton_card", "name": "海賊骷髏卡片", "monster_id": "pirate_skeleton", "slot": "weapon", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 10}, {"type": "flat_stat", "stat": "crit", "amount": 2}]},
+  {"id": "pirate_ship_card", "name": "幽靈船卡片", "monster_id": "pirate_ship", "slot": "armor", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 5}]},
+  {"id": "ghostring_card", "name": "幽靈波利卡片", "monster_id": "ghostring", "slot": "garment", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "ghost", "pct": 15}]},
+  {"id": "deviace_card", "name": "深海魔物卡片", "monster_id": "deviace", "slot": "garment", "drop_rate": 0.0012, "effects": [{"type": "element_resist", "element": "water", "pct": 20}]},
+  {"id": "zenorc_card", "name": "獸人腐屍卡片", "monster_id": "zenorc", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "race_damage", "race": "undead", "pct": 15}]}
 ]

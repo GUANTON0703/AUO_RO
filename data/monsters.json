@@ -2508,5 +2508,100 @@
     ],
     "is_mvp": false,
     "lore": "礦坑守護用的石傀儡，一拳能砸穿坑道支架。"
+  },
+  {
+    "id": "pirate_skeleton",
+    "name": "海賊骷髏",
+    "level": 30,
+    "element": "undead",
+    "race": "undead",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 450,
+    "job_exp": 225,
+    "stats": {"max_hp": 1450, "max_sp": 0, "atk": 53, "matk": 39, "defense": 9, "mdef": 9, "hit": 31, "flee": 35, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "skel_bone", "rate": 0.45},
+      {"item_id": "rusty_shackle", "rate": 0.25},
+      {"item_id": "pirate_skeleton_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "沉沒之船甲板上不肯離去的海賊亡魂。"
+  },
+  {
+    "id": "pirate_ship",
+    "name": "幽靈船",
+    "level": 34,
+    "element": "ghost",
+    "race": "undead",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 700,
+    "job_exp": 350,
+    "stats": {"max_hp": 3169, "max_sp": 0, "atk": 48, "matk": 44, "defense": 31, "mdef": 10, "hit": 35, "flee": 27, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "old_manteau", "rate": 0.35},
+      {"item_id": "dark_crystal", "rate": 0.08},
+      {"item_id": "pirate_ship_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "被怨靈附身的破船殘骸，甲板厚得難以擊穿。"
+  },
+  {
+    "id": "ghostring",
+    "name": "幽靈波利",
+    "level": 36,
+    "element": "ghost",
+    "race": "formless",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 605,
+    "job_exp": 302,
+    "stats": {"max_hp": 1348, "max_sp": 0, "atk": 81, "matk": 46, "defense": 0, "mdef": 11, "hit": 37, "flee": 49, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.35},
+      {"item_id": "dark_crystal", "rate": 0.06},
+      {"item_id": "ghostring_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "漂浮在船艙裡的透明波利，靠近時會突然衝撞。"
+  },
+  {
+    "id": "deviace",
+    "name": "深海魔物",
+    "level": 42,
+    "element": "water",
+    "race": "fish",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 781,
+    "job_exp": 390,
+    "stats": {"max_hp": 2468, "max_sp": 0, "atk": 72, "matk": 53, "defense": 13, "mdef": 13, "hit": 43, "flee": 47, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "coral_reef", "rate": 0.35},
+      {"item_id": "tendon", "rate": 0.2},
+      {"item_id": "deviace_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "從破船底艙爬出的深海怪物，外皮又濕又硬。"
+  },
+  {
+    "id": "zenorc",
+    "name": "獸人腐屍",
+    "level": 54,
+    "element": "undead",
+    "race": "undead",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 1199,
+    "job_exp": 600,
+    "stats": {"max_hp": 3744, "max_sp": 0, "atk": 91, "matk": 68, "defense": 16, "mdef": 16, "hit": 55, "flee": 59, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "orc_tooth", "rate": 0.45},
+      {"item_id": "oridecon", "rate": 0.1},
+      {"item_id": "zenorc_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "獸人地城最深處復甦的腐屍，還保留著殘暴的戰意。"
   }
 ]
