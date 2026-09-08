@@ -20,6 +20,8 @@ class CharacterSnapshot:
     stats: dict
     learned_skills: dict = field(default_factory=dict)
     equipped: list = field(default_factory=list)
+    primary_skill_id: str | None = None
+    skill_toggles: dict = field(default_factory=dict)
     hp: int | None = None
     sp: int | None = None
 
@@ -141,12 +143,17 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         if not sk or sk.kind != "active":
             continue
         idle = sk.idle_default or {}
+        if not snap.skill_toggles.get(sid, idle.get("enabled", True)):
+            continue   # 玩家關掉的、或預設就不掛機放的技能
         sp_cost = sk.sp_cost[min(lvl, len(sk.sp_cost)) - 1] if sk.sp_cost else 0
+        priority = idle.get("priority", 1)
+        if sid == snap.primary_skill_id:
+            priority = 99   # 指定主攻 → 蓋過其他攻擊技
         resolved.append(ResolvedSkill(
             skill_id=sid, name=sk.name, level=lvl, kind="active",
             sp_cost=sp_cost, cooldown_rounds=round(sk.cooldown_s / 2),
             effects=sk.effects, trigger=idle.get("trigger", "every_turn"),
-            priority=idle.get("priority", 1),
+            priority=priority,
         ))
 
     return Combatant(

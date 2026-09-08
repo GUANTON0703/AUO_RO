@@ -62,6 +62,8 @@ class HuntStrategyRequest(BaseModel):
     buy_potion_upto: int = Field(default=0, ge=0, le=999)
     sell_item_ids: list[str] = []
     skill_min_sp_pct: float = Field(default=0.0, ge=0.0, le=0.95)
+    primary_skill_id: str | None = None
+    skill_toggles: dict[str, bool] = {}
 
 
 def _load_strategy(character_id: int) -> HuntStrategy:
@@ -99,7 +101,11 @@ def put_hunt_strategy(character_id: int, body: HuntStrategyRequest, account_id: 
     return body.model_dump()
 
 
-def _snapshot(row, *, hp=None, sp=None) -> CharacterSnapshot:
+def _snapshot(row, *, hp=None, sp=None, apply_prefs=True) -> CharacterSnapshot:
+    try:
+        strat = json.loads(row["hunt_strategy"] or "{}") if apply_prefs else {}
+    except (KeyError, IndexError, TypeError):
+        strat = {}
     return CharacterSnapshot(
         name=row["name"], job_id=row["job_id"],
         base_level=row["base_level"], job_level=row["job_level"],
@@ -112,6 +118,8 @@ def _snapshot(row, *, hp=None, sp=None) -> CharacterSnapshot:
             )
             for e in inventory.list_equipped(row["id"])
         ],
+        primary_skill_id=strat.get("primary_skill_id"),
+        skill_toggles=strat.get("skill_toggles") or {},
         hp=hp, sp=sp,
     )
 

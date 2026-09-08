@@ -53,7 +53,7 @@ def challenge(body: ChallengeRequest, account_id: CurrentAccount):
         raise HTTPException(status_code=400, detail="冷卻中")
 
     job = _content.get_job(row["job_id"])
-    player = build_player_combatant(_snapshot(row), _content)
+    player = build_player_combatant(_snapshot(row, apply_prefs=False), _content)
 
     cfg = ChallengeConfig()
     if body.flee_hp_frac is not None:

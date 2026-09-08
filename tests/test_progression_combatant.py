@@ -91,3 +91,31 @@ def test_hp_sp_preserved_when_given():
     c = load_content()
     cb = build_player_combatant(_snap(hp=50, sp=10), c)
     assert cb.hp == 50 and cb.sp == 10
+
+
+def test_skill_toggle_off_removes_skill():
+    c = load_content()
+    on = build_player_combatant(_snap(learned_skills={"bash": 3, "magnum_break": 3}), c)
+    off = build_player_combatant(_snap(learned_skills={"bash": 3, "magnum_break": 3},
+                                       skill_toggles={"magnum_break": False}), c)
+    assert {s.skill_id for s in on.skills} == {"bash", "magnum_break"}
+    assert {s.skill_id for s in off.skills} == {"bash"}
+
+
+def test_primary_skill_gets_top_priority():
+    c = load_content()
+    cb = build_player_combatant(_snap(learned_skills={"bash": 3, "magnum_break": 3},
+                                      primary_skill_id="magnum_break"), c)
+    prio = {s.skill_id: s.priority for s in cb.skills}
+    assert prio["magnum_break"] > prio["bash"]
+    assert prio["magnum_break"] == 99
+
+
+def test_default_disabled_skill_excluded_unless_toggled_on():
+    c = load_content()
+    # provoke 的 idle_default.enabled = false
+    base = build_player_combatant(_snap(learned_skills={"bash": 3, "provoke": 3}), c)
+    forced = build_player_combatant(_snap(learned_skills={"bash": 3, "provoke": 3},
+                                          skill_toggles={"provoke": True}), c)
+    assert "provoke" not in {s.skill_id for s in base.skills}
+    assert "provoke" in {s.skill_id for s in forced.skills}

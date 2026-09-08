@@ -15,6 +15,8 @@ class HuntStrategy:
     buy_potion_upto: int = 0                    # 補到手上有這麼多瓶
     sell_item_ids: list[str] = field(default_factory=list)   # 每次結算自動賣掉這些道具
     skill_min_sp_pct: float = 0.0              # SP 高於此比例才放主動技能（0 = 一律放）
+    primary_skill_id: str | None = None        # 指定主攻技能（None = 引擎自動挑）
+    skill_toggles: dict[str, bool] = field(default_factory=dict)  # {技能id: 掛機要不要放}
 
     def allows(self, monster_id: str) -> bool:
         return monster_id not in self.exclude_monsters and (
