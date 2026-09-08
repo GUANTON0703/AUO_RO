@@ -73,5 +73,13 @@
   {"id": "side_winder_card", "name": "響尾蛇卡片", "monster_id": "side_winder", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 12}]},
   {"id": "minorous_card", "name": "米諾陶洛斯卡片", "monster_id": "minorous", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 120}]},
   {"id": "ancient_mummy_card", "name": "上級木乃伊卡片", "monster_id": "ancient_mummy", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "hit", "amount": 15}]},
-  {"id": "anubis_card", "name": "阿努比斯卡片", "monster_id": "anubis", "slot": "weapon", "drop_rate": 0.001, "effects": [{"type": "flat_stat", "stat": "matk", "amount": 20}]}
+  {"id": "anubis_card", "name": "阿努比斯卡片", "monster_id": "anubis", "slot": "weapon", "drop_rate": 0.001, "effects": [{"type": "flat_stat", "stat": "matk", "amount": 20}]},
+  {"id": "punk_card", "name": "龐克卡片", "monster_id": "punk", "slot": "garment", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "mdef", "amount": 4}]},
+  {"id": "rideword_card", "name": "書蟲卡片", "monster_id": "rideword", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 10}]},
+  {"id": "zombie_prisoner_card", "name": "殭屍囚犯卡片", "monster_id": "zombie_prisoner", "slot": "armor", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "undead", "pct": 20}]},
+  {"id": "skel_worker_card", "name": "骷髏工人卡片", "monster_id": "skel_worker", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 15}]},
+  {"id": "injustice_card", "name": "不義神官卡片", "monster_id": "injustice", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "crit", "amount": 6}]},
+  {"id": "alarm_card", "name": "鬧鐘卡片", "monster_id": "alarm", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 150}]},
+  {"id": "raydric_card", "name": "雷德里克卡片", "monster_id": "raydric", "slot": "garment", "drop_rate": 0.001, "effects": [{"type": "element_resist", "element": "neutral", "pct": 15}]},
+  {"id": "bathory_card", "name": "巴多力卡片", "monster_id": "bathory", "slot": "armor", "drop_rate": 0.001, "effects": [{"type": "element_resist", "element": "shadow", "pct": 20}]}
 ]

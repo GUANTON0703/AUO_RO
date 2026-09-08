@@ -71,6 +71,10 @@ def test_map_def():
                    level_range=[20, 35], monster_ids=["zombie"], unlock_base_level=18)
     assert payon.town == "payon"
 
+    ald = MapDef(id="clock_tower_1f", name="時計塔 1F", town="aldebaran",
+                 level_range=[42, 54], monster_ids=["tick"], unlock_base_level=42)
+    assert ald.town == "aldebaran"
+
 
 def test_skill_def_effects_are_structured():
     from shared.content import SkillDef

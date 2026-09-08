@@ -277,5 +277,41 @@
     "monster_ids": ["minorous", "ancient_mummy", "anubis", "side_winder"],
     "mvp_id": null,
     "unlock_base_level": 48
+  },
+  {
+    "id": "clock_tower_1f",
+    "name": "時計塔 1F",
+    "town": "aldebaran",
+    "level_range": [42, 54],
+    "monster_ids": ["tick", "punk", "rideword", "alarm"],
+    "mvp_id": null,
+    "unlock_base_level": 42
+  },
+  {
+    "id": "clock_tower_2f",
+    "name": "時計塔 2F",
+    "town": "aldebaran",
+    "level_range": [48, 60],
+    "monster_ids": ["skel_worker", "alarm", "injustice", "bathory"],
+    "mvp_id": null,
+    "unlock_base_level": 48
+  },
+  {
+    "id": "glast_heim_prison",
+    "name": "格拉斯神殿 監獄",
+    "town": "aldebaran",
+    "level_range": [44, 58],
+    "monster_ids": ["skeleton_prisoner", "zombie_prisoner", "injustice", "wander_man"],
+    "mvp_id": null,
+    "unlock_base_level": 44
+  },
+  {
+    "id": "glast_heim_outer",
+    "name": "格拉斯神殿 外苑",
+    "town": "aldebaran",
+    "level_range": [50, 60],
+    "monster_ids": ["wander_man", "raydric", "injustice", "bathory"],
+    "mvp_id": null,
+    "unlock_base_level": 50
   }
 ]

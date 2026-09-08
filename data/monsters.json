@@ -2188,5 +2188,211 @@
     ],
     "is_mvp": false,
     "lore": "胡狼頭的冥界審判者，金字塔最深處的守門人。"
+  },
+  {
+    "id": "tick",
+    "name": "鐘擺蟲",
+    "level": 44,
+    "element": "earth",
+    "race": "formless",
+    "size": "small",
+    "role": "tank",
+    "base_exp": 1073,
+    "job_exp": 536,
+    "stats": {"max_hp": 4792, "max_sp": 0, "atk": 60, "matk": 56, "defense": 40, "mdef": 13, "hit": 45, "flee": 34, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "gear_wheel", "rate": 0.45},
+      {"item_id": "sticky_mucus", "rate": 0.25}
+    ],
+    "is_mvp": false,
+    "lore": "吸附在時計塔齒輪上的機械蟲，殼很硬。"
+  },
+  {
+    "id": "punk",
+    "name": "龐克",
+    "level": 45,
+    "element": "wind",
+    "race": "plant",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 878,
+    "job_exp": 439,
+    "stats": {"max_hp": 1934, "max_sp": 0, "atk": 100, "matk": 57, "defense": 0, "mdef": 14, "hit": 46, "flee": 60, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "resin", "rate": 0.4},
+      {"item_id": "clover", "rate": 0.25},
+      {"item_id": "punk_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "會飄的紫色球狀植物，靠近會爆孢子。"
+  },
+  {
+    "id": "skeleton_prisoner",
+    "name": "骷髏囚犯",
+    "level": 46,
+    "element": "undead",
+    "race": "undead",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 911,
+    "job_exp": 456,
+    "stats": {"max_hp": 2864, "max_sp": 0, "atk": 79, "matk": 58, "defense": 14, "mdef": 14, "hit": 47, "flee": 51, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "skel_bone", "rate": 0.5},
+      {"item_id": "rusty_shackle", "rate": 0.3}
+    ],
+    "is_mvp": false,
+    "lore": "被鎖在格拉斯神殿地牢裡、死了還掙扎的骷髏。"
+  },
+  {
+    "id": "rideword",
+    "name": "書蟲",
+    "level": 48,
+    "element": "shadow",
+    "race": "formless",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 979,
+    "job_exp": 490,
+    "stats": {"max_hp": 2152, "max_sp": 0, "atk": 106, "matk": 61, "defense": 0, "mdef": 14, "hit": 49, "flee": 64, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "old_page", "rate": 0.4},
+      {"item_id": "oridecon", "rate": 0.06},
+      {"item_id": "rideword_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "會咬人的魔法書，翻頁時噴墨。"
+  },
+  {
+    "id": "zombie_prisoner",
+    "name": "殭屍囚犯",
+    "level": 48,
+    "element": "undead",
+    "race": "undead",
+    "size": "medium",
+    "role": "tank",
+    "base_exp": 1244,
+    "job_exp": 622,
+    "stats": {"max_hp": 5532, "max_sp": 0, "atk": 65, "matk": 61, "defense": 43, "mdef": 14, "hit": 49, "flee": 37, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "decayed_nail", "rate": 0.5},
+      {"item_id": "rusty_shackle", "rate": 0.3},
+      {"item_id": "zombie_prisoner_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "地牢裡腐爛卻爬不出鐵欄的囚犯亡屍。"
+  },
+  {
+    "id": "wander_man",
+    "name": "流浪者",
+    "level": 50,
+    "element": "wind",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "glass",
+    "base_exp": 1050,
+    "job_exp": 525,
+    "stats": {"max_hp": 2303, "max_sp": 0, "atk": 110, "matk": 63, "defense": 0, "mdef": 15, "hit": 51, "flee": 66, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "old_manteau", "rate": 0.35},
+      {"item_id": "old_page", "rate": 0.25}
+    ],
+    "is_mvp": false,
+    "lore": "披著破斗篷、在神殿外苑徘徊的遊魂。"
+  },
+  {
+    "id": "skel_worker",
+    "name": "骷髏工人",
+    "level": 50,
+    "element": "earth",
+    "race": "undead",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 1050,
+    "job_exp": 525,
+    "stats": {"max_hp": 3290, "max_sp": 0, "atk": 85, "matk": 63, "defense": 15, "mdef": 15, "hit": 51, "flee": 55, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "gear_wheel", "rate": 0.4},
+      {"item_id": "iron_ore", "rate": 0.3},
+      {"item_id": "skel_worker_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "時計塔裡永遠在敲打齒輪的骷髏工，鎚子很重。"
+  },
+  {
+    "id": "injustice",
+    "name": "不義神官",
+    "level": 52,
+    "element": "shadow",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 1123,
+    "job_exp": 562,
+    "stats": {"max_hp": 3514, "max_sp": 0, "atk": 88, "matk": 65, "defense": 16, "mdef": 16, "hit": 53, "flee": 57, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "dark_crystal", "rate": 0.35},
+      {"item_id": "rosary", "rate": 0.2},
+      {"item_id": "injustice_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "背叛信仰的黑騎士亡靈，劍上纏著怨氣。"
+  },
+  {
+    "id": "alarm",
+    "name": "鬧鐘",
+    "level": 52,
+    "element": "earth",
+    "race": "formless",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 1426,
+    "job_exp": 713,
+    "stats": {"max_hp": 6324, "max_sp": 0, "atk": 71, "matk": 65, "defense": 47, "mdef": 16, "hit": 53, "flee": 40, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "gear_wheel", "rate": 0.45},
+      {"item_id": "elunium", "rate": 0.06},
+      {"item_id": "alarm_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "會走路的巨型鬧鐘，鈴聲震得人頭暈。"
+  },
+  {
+    "id": "raydric",
+    "name": "雷德里克",
+    "level": 55,
+    "element": "shadow",
+    "race": "demihuman",
+    "size": "large",
+    "role": "normal",
+    "base_exp": 1238,
+    "job_exp": 619,
+    "stats": {"max_hp": 3862, "max_sp": 0, "atk": 93, "matk": 69, "defense": 16, "mdef": 16, "hit": 56, "flee": 60, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "old_manteau", "rate": 0.4},
+      {"item_id": "oridecon", "rate": 0.12},
+      {"item_id": "raydric_card", "rate": 0.001}
+    ],
+    "is_mvp": false,
+    "lore": "格拉斯神殿的無頭騎士亡靈，斗篷能擋刀。"
+  },
+  {
+    "id": "bathory",
+    "name": "巴多力",
+    "level": 58,
+    "element": "shadow",
+    "race": "demon",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 1357,
+    "job_exp": 678,
+    "stats": {"max_hp": 4228, "max_sp": 0, "atk": 98, "matk": 73, "defense": 17, "mdef": 17, "hit": 59, "flee": 63, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "dark_crystal", "rate": 0.4},
+      {"item_id": "cursed_ruby", "rate": 0.15},
+      {"item_id": "bathory_card", "rate": 0.001}
+    ],
+    "is_mvp": false,
+    "lore": "騎著掃帚的血腥女巫，會放暗黑魔法。"
   }
 ]

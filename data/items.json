@@ -50,5 +50,9 @@
   {"id": "sand_lump", "name": "沙塊", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 12},
   {"id": "scorpion_tail", "name": "蠍尾", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 34},
   {"id": "scarab_shell", "name": "聖甲蟲殼", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 42},
-  {"id": "ancient_lips", "name": "木乃伊之唇", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 55}
+  {"id": "ancient_lips", "name": "木乃伊之唇", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 55},
+  {"id": "gear_wheel", "name": "齒輪", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 24},
+  {"id": "resin", "name": "樹脂", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 18},
+  {"id": "rusty_shackle", "name": "生鏽的枷鎖", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 20},
+  {"id": "old_page", "name": "古老書頁", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 35}
 ]
