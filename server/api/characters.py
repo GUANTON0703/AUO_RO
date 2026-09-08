@@ -42,7 +42,8 @@ def _to_public(row) -> CharacterPublic:
             row["base_level"], {k: row[f"stat_{k}"] for k in _STAT_KEYS}
         ),
         skill_points=skill_points_available(
-            row["job_level"], json.loads(row["learned_skills"])
+            row["job_level"], json.loads(row["learned_skills"]),
+            carried=row["skill_points"],
         ),
         zeny=row["zeny"],
         location_map=row["location_map"],

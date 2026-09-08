@@ -86,9 +86,22 @@ def _migration_1(conn: sqlite3.Connection) -> None:
     )
 
 
+def _migration_2(conn: sqlite3.Connection) -> None:
+    """轉職技能點修正之前二轉的角色：skill_points 欄位（= carried）還是 0，
+    補上一轉練到門檻至少會有的點數（二轉門檻 40 → 39）。"""
+    second_jobs = ("knight", "wizard", "hunter", "priest", "blacksmith", "assassin")
+    placeholders = ",".join("?" * len(second_jobs))
+    conn.execute(
+        f"UPDATE characters SET skill_points = 39 "
+        f"WHERE job_id IN ({placeholders}) AND skill_points = 0",
+        second_jobs,
+    )
+
+
 # (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
 _MIGRATIONS: list[tuple[int, "callable"]] = [
     (1, _migration_1),
+    (2, _migration_2),
 ]
 
 

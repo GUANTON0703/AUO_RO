@@ -57,5 +57,27 @@ def test_migrations_recorded_and_idempotent(tmp_path):
         versions = {r[0] for r in conn.execute(
             "SELECT version FROM schema_migrations").fetchall()}
         cols = {r[1] for r in conn.execute("PRAGMA table_info(characters)").fetchall()}
-    assert 1 in versions
+    assert {1, 2} <= versions
     assert "hunt_kills" in cols   # migration 1 加的欄位在
+
+
+def test_migration_2_backfills_carried_points_for_second_jobbers(tmp_path):
+    connection.configure(str(tmp_path / "t.db"))
+    connection.init_db()
+    with connection.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO accounts (username, password_hash, created_at) VALUES (?,?,?)",
+            ("a", "h", "t"),
+        )
+        aid = conn.execute("SELECT id FROM accounts").fetchone()["id"]
+        for job, name in (("assassin", "老刺客"), ("thief", "新賊"), ("novice", "菜")):
+            conn.execute(
+                "INSERT INTO characters (account_id, name, job_id, location_map, created_at) "
+                "VALUES (?,?,?,?,?)", (aid, name, job, "prontera_east_gate", "t"),
+            )
+        connection._migration_2(conn)   # 直接套一次（migration runner 只會跑一次）
+        got = {r["name"]: r["skill_points"]
+               for r in conn.execute("SELECT name, skill_points FROM characters")}
+    assert got["老刺客"] == 39   # 二轉角色補上 carried
+    assert got["新賊"] == 0      # 一轉角色不動
+    assert got["菜"] == 0

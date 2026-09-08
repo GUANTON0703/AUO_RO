@@ -80,3 +80,41 @@ def test_reset_skills_clears_learned(client, auth, db_helpers):
     assert r.status_code == 200
     r2 = client.post(f"/api/characters/{ch['id']}/skills", headers=h, json={"skill_id": "bash", "level": 5})
     assert r2.status_code == 200
+
+
+def test_second_jobchange_thief_to_assassin_at_job_40(client, auth, db_helpers):
+    _, headers, _ = auth
+    ch = _make_char(client, headers)
+    db_helpers.set_job_level(ch["id"], 10)
+    client.post(f"/api/characters/{ch['id']}/jobchange", headers=headers,
+                json={"target_job_id": "thief"})
+    db_helpers.set_job_level(ch["id"], 40)
+    r = client.post(f"/api/characters/{ch['id']}/jobchange", headers=headers,
+                    json={"target_job_id": "assassin"})
+    assert r.status_code == 200, r.json()
+    assert r.json()["job_id"] == "assassin"
+
+
+def test_second_job_keeps_first_job_skill_points(client, auth, db_helpers):
+    """二轉後：一轉練的等級要帶進來，才不會學不了二轉技能。"""
+    _, headers, _ = auth
+    ch = _make_char(client, headers)
+    db_helpers.set_job_level(ch["id"], 10)
+    client.post(f"/api/characters/{ch['id']}/jobchange", headers=headers,
+                json={"target_job_id": "thief"})
+    # 一轉練滿並把技能點花在賊技能上
+    db_helpers.set_job_level(ch["id"], 40)
+    for sid in ("double_attack", "steal", "envenom"):
+        client.post(f"/api/characters/{ch['id']}/skills", headers=headers,
+                    json={"skill_id": sid, "level": 5})
+    # 二轉
+    r = client.post(f"/api/characters/{ch['id']}/jobchange", headers=headers,
+                    json={"target_job_id": "assassin"})
+    assert r.status_code == 200
+    assert r.json()["job_level"] == 1
+    # 二轉後應該還有可用技能點（一轉的 39 級 - 已花 15 = 24），不是負的
+    assert r.json()["skill_points"] >= 20, r.json()
+    # 而且真的學得起來二轉技能
+    lr = client.post(f"/api/characters/{ch['id']}/skills", headers=headers,
+                     json={"skill_id": "katar_mastery", "level": 3})
+    assert lr.status_code == 200, lr.json()

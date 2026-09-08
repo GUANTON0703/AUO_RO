@@ -239,12 +239,20 @@ def set_stats(character_id: int, stats: dict) -> None:
         )
 
 
-def set_job(character_id: int, job_id: str, job_level: int, job_exp: int) -> None:
+def set_job(character_id: int, job_id: str, job_level: int, job_exp: int,
+            carried_skill_points: int | None = None) -> None:
     with connection.get_connection() as conn:
-        conn.execute(
-            "UPDATE characters SET job_id = ?, job_level = ?, job_exp = ? WHERE id = ?",
-            (job_id, job_level, job_exp, character_id),
-        )
+        if carried_skill_points is None:
+            conn.execute(
+                "UPDATE characters SET job_id = ?, job_level = ?, job_exp = ? WHERE id = ?",
+                (job_id, job_level, job_exp, character_id),
+            )
+        else:
+            conn.execute(
+                "UPDATE characters SET job_id = ?, job_level = ?, job_exp = ?, "
+                "skill_points = ? WHERE id = ?",
+                (job_id, job_level, job_exp, carried_skill_points, character_id),
+            )
 
 
 def delete_character(character_id: int, account_id: int) -> bool:

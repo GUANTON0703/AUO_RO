@@ -38,7 +38,8 @@ def _public(row) -> dict:
             row["base_level"], {k: row[f"stat_{k}"] for k in STAT_KEYS}
         ),
         "skill_points": skill_points_available(
-            row["job_level"], json.loads(row["learned_skills"])
+            row["job_level"], json.loads(row["learned_skills"]),
+            carried=row["skill_points"],
         ),
         "learned_skills": json.loads(row["learned_skills"]),
     }
@@ -78,7 +79,8 @@ def allocate_stats(character_id: int, body: dict[str, int], account_id: CurrentA
 def learn_skill(character_id: int, body: SkillRequest, account_id: CurrentAccount):
     row = _owned(character_id, account_id)
     learned = json.loads(row["learned_skills"])
-    available = skill_points_available(row["job_level"], learned, carried=0)
+    available = skill_points_available(row["job_level"], learned,
+                                      carried=row["skill_points"])
     ok, reason = can_learn(_content, row["job_id"], body.skill_id, body.level,
                            learned, available)
     if not ok:
@@ -131,5 +133,9 @@ def change_job(character_id: int, body: JobChangeRequest, account_id: CurrentAcc
             status_code=400,
             detail=f"Job Level 未達門檻（需 {target.change_job_level}）",
         )
-    characters_repo.set_job(character_id, body.target_job_id, 1, 0)
+    # 轉職後 job 等級歸 1，但這一轉練到的等級要存進 carried，
+    # 否則技能點會突然變負、學不了下一階技能
+    carried = row["skill_points"] + (row["job_level"] - 1)
+    characters_repo.set_job(character_id, body.target_job_id, 1, 0,
+                            carried_skill_points=carried)
     return _public(_owned(character_id, account_id))
