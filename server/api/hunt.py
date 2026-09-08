@@ -1,6 +1,6 @@
 import json
 import random
-from dataclasses import asdict
+from dataclasses import asdict, fields
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, HTTPException
@@ -24,7 +24,6 @@ router = APIRouter(prefix="/api/hunt", tags=["hunt"])
 _content = load_content()
 
 _STAT_KEYS = ("str", "agi", "vit", "int", "dex", "luk")
-_strategies: dict[int, HuntStrategy] = {}
 # character_id -> {"batch_id": iso 時間戳, "events": [...]}；記憶體暫存，重啟掉了無所謂
 _last_batch: dict[int, dict] = {}
 # character_id -> (快取鍵, 可打怪清單)；避免每次結算都重跑勝率模擬
@@ -65,6 +64,12 @@ class HuntStrategyRequest(BaseModel):
     skill_min_sp_pct: float = Field(default=0.0, ge=0.0, le=0.95)
 
 
+def _load_strategy(character_id: int) -> HuntStrategy:
+    data = characters_repo.get_hunt_strategy(character_id)
+    known = {f.name for f in fields(HuntStrategy)}
+    return HuntStrategy(**{k: v for k, v in data.items() if k in known})
+
+
 def _current_character(account_id: int):
     rows = characters_repo.list_for_account(account_id)
     if not rows:
@@ -82,14 +87,14 @@ def _owned_character(character_id: int, account_id: int):
 @router.get("/strategy/{character_id}")
 def get_hunt_strategy(character_id: int, account_id: CurrentAccount):
     _owned_character(character_id, account_id)
-    strategy = _strategies.get(character_id, HuntStrategy())
+    strategy = _load_strategy(character_id)
     return HuntStrategyRequest.model_validate(asdict(strategy)).model_dump()
 
 
 @router.put("/strategy/{character_id}")
 def put_hunt_strategy(character_id: int, body: HuntStrategyRequest, account_id: CurrentAccount):
     _owned_character(character_id, account_id)
-    _strategies[character_id] = HuntStrategy(**body.model_dump())
+    characters_repo.set_hunt_strategy(character_id, body.model_dump())
     _hunt_meta.pop(character_id, None)   # 策略改了，可打怪清單要重算
     return body.model_dump()
 
@@ -206,13 +211,13 @@ def start_hunt(body: StartRequest, account_id: CurrentAccount):
     else:
         picked = None
 
-    strategy = _strategies.get(row["id"], HuntStrategy())
+    strategy = _load_strategy(row["id"])
     if picked is not None:
         for mid in picked:
             if mid not in map_def.monster_ids:
                 raise HTTPException(status_code=400, detail="該怪不在此地圖")
         strategy.include_monsters = picked
-    _strategies[row["id"]] = strategy
+    characters_repo.set_hunt_strategy(row["id"], asdict(strategy))
 
     player = build_player_combatant(_snapshot(row), _content)
     cfg = HuntConfig.from_settings(get_settings())
@@ -351,7 +356,7 @@ def _settle_current(row, *, force=False) -> dict:
             (now.isoformat(), row["id"]),
         )
 
-    strategy = _strategies.get(row["id"], HuntStrategy())
+    strategy = _load_strategy(row["id"])
     _auto_buy_potions(row["id"], strategy, row["base_level"])
 
     if strategy.auto_potion:

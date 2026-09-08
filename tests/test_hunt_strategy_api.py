@@ -14,6 +14,37 @@ def test_hunt_strategy_can_be_saved_and_read(client, auth, db_helpers):
     assert client.get(f"/api/hunt/strategy/{ch['id']}", headers=headers).json() == body
 
 
+def test_hunt_strategy_survives_restart(client, auth, db_helpers):
+    from server.repositories import characters as characters_repo
+
+    _, headers, _ = auth
+    ch = client.post("/api/characters", headers=headers, json={"name": "重啟王"}).json()
+    body = {
+        "include_monsters": ["poring", "lunatic"], "exclude_monsters": ["boss"],
+        "flee_on_boss": False, "auto_potion": True,
+        "potion_item_id": "red_potion", "potion_hp_pct": 0.35,
+        "auto_buy_potion": True, "buy_potion_id": "red_potion",
+        "buy_potion_upto": 50, "sell_item_ids": ["jellopy"],
+        "skill_min_sp_pct": 0.2,
+    }
+    assert client.put(f"/api/hunt/strategy/{ch['id']}", headers=headers, json=body).status_code == 200
+    # 策略進了 DB（模擬重啟：記憶體沒有任何暫存，直接查資料表）
+    assert characters_repo.get_hunt_strategy(ch["id"]) == body
+    assert client.get(f"/api/hunt/strategy/{ch['id']}", headers=headers).json() == body
+
+
+def test_hunt_strategy_load_ignores_unknown_keys(client, auth, db_helpers):
+    from server.repositories import characters as characters_repo
+    from server.api.hunt import _load_strategy
+
+    _, headers, _ = auth
+    ch = client.post("/api/characters", headers=headers, json={"name": "未知欄"}).json()
+    characters_repo.set_hunt_strategy(ch["id"], {"flee_on_boss": False, "legacy_field": 123})
+    strategy = _load_strategy(ch["id"])
+    assert strategy.flee_on_boss is False
+    assert not hasattr(strategy, "legacy_field")
+
+
 def test_hunt_start_rejects_monster_not_in_map(client, auth, db_helpers):
     _, headers, _ = auth
     client.post("/api/characters", headers=headers, json={"name": "排除王"}).json()

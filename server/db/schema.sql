@@ -63,7 +63,8 @@ CREATE TABLE IF NOT EXISTS characters (
     hunt_loot            TEXT NOT NULL DEFAULT '{}',
     learned_skills       TEXT NOT NULL DEFAULT '{}',
     equipped_items       TEXT NOT NULL DEFAULT '[]',
-    socketed_cards       TEXT NOT NULL DEFAULT '[]'
+    socketed_cards       TEXT NOT NULL DEFAULT '[]',
+    hunt_strategy        TEXT NOT NULL DEFAULT '{}'
 );
 
 CREATE INDEX IF NOT EXISTS idx_characters_account ON characters(account_id);

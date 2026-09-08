@@ -121,12 +121,18 @@ def _migration_4(conn: sqlite3.Connection) -> None:
     _rename_learned_skills(conn, {"frost_armor": "frost_nova"})
 
 
+def _migration_5(conn: sqlite3.Connection) -> None:
+    """掛機策略持久化：characters 加 hunt_strategy JSON 欄。"""
+    _add_col(conn, "characters", "hunt_strategy", "TEXT NOT NULL DEFAULT '{}'")
+
+
 # (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
 _MIGRATIONS: list[tuple[int, "callable"]] = [
     (1, _migration_1),
     (2, _migration_2),
     (3, _migration_3),
     (4, _migration_4),
+    (5, _migration_5),
 ]
 
 

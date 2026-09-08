@@ -222,6 +222,22 @@ def reduce_hunt_loot(character_id: int, sold: dict) -> None:
         )
 
 
+def get_hunt_strategy(character_id: int) -> dict:
+    with connection.get_connection() as conn:
+        row = conn.execute(
+            "SELECT hunt_strategy FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()
+    return json.loads(row["hunt_strategy"]) if row and row["hunt_strategy"] else {}
+
+
+def set_hunt_strategy(character_id: int, strategy: dict) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            "UPDATE characters SET hunt_strategy = ? WHERE id = ?",
+            (json.dumps(strategy), character_id),
+        )
+
+
 def set_learned_skills(character_id: int, learned: dict) -> None:
     with connection.get_connection() as conn:
         conn.execute(

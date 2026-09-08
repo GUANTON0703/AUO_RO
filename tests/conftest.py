@@ -13,13 +13,11 @@ def _reset_hunt_memory():
     會沿用上一個測試留下的狀態。每個測試前後清乾淨。"""
     from server.api import hunt
 
-    hunt._strategies.clear()
     hunt._last_batch.clear()
     hunt._hunt_meta.clear()
     hunt._warm_start_at.clear()
     hunt._warm_start_pending.clear()
     yield
-    hunt._strategies.clear()
     hunt._last_batch.clear()
     hunt._hunt_meta.clear()
     hunt._warm_start_at.clear()
