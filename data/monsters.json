@@ -1477,14 +1477,14 @@
   {
     "id": "orc_archer",
     "name": "獸人弓箭手",
-    "level": 30,
+    "level": 40,
     "element": "earth",
     "race": "demihuman",
     "size": "medium",
     "role": "glass",
-    "base_exp": 450,
-    "job_exp": 225,
-    "stats": {"max_hp": 1015, "max_sp": 0, "atk": 69, "matk": 39, "defense": 0, "mdef": 9, "hit": 31, "flee": 42, "aspd": 100, "crit": 0},
+    "base_exp": 720,
+    "job_exp": 360,
+    "stats": {"max_hp": 1596, "max_sp": 0, "atk": 90, "matk": 51, "defense": 0, "mdef": 12, "hit": 41, "flee": 54, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "orc_tooth", "rate": 0.4},
       {"item_id": "feather", "rate": 0.3}
@@ -1551,18 +1551,19 @@
   {
     "id": "orc_skeleton",
     "name": "獸人骷髏",
-    "level": 36,
+    "level": 42,
     "element": "undead",
     "race": "undead",
     "size": "large",
     "role": "normal",
-    "base_exp": 605,
-    "job_exp": 302,
-    "stats": {"max_hp": 1926, "max_sp": 0, "atk": 63, "matk": 46, "defense": 11, "mdef": 11, "hit": 37, "flee": 41, "aspd": 100, "crit": 0},
+    "base_exp": 781,
+    "job_exp": 390,
+    "stats": {"max_hp": 2468, "max_sp": 0, "atk": 72, "matk": 53, "defense": 13, "mdef": 13, "hit": 43, "flee": 47, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "skel_bone", "rate": 0.5},
       {"item_id": "orc_tooth", "rate": 0.3},
-      {"item_id": "oridecon", "rate": 0.06}
+      {"item_id": "oridecon", "rate": 0.06},
+      {"item_id": "orc_skeleton_card", "rate": 0.0015}
     ],
     "is_mvp": false,
     "lore": "獸人地城深處的骨戰士，還握著生鏽的鈍器。"

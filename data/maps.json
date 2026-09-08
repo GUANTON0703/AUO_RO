@@ -345,9 +345,9 @@
     "id": "orc_dungeon_2f",
     "name": "獸人地城 2F",
     "town": "geffen",
-    "level_range": [38, 60],
-    "monster_ids": ["orc_skeleton", "high_orc", "orc_zombie", "zenorc"],
+    "level_range": [45, 60],
+    "monster_ids": ["orc_skeleton", "high_orc", "orc_archer", "zenorc"],
     "mvp_id": null,
-    "unlock_base_level": 36
+    "unlock_base_level": 44
   }
 ]

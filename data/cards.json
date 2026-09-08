@@ -91,5 +91,6 @@
   {"id": "pirate_ship_card", "name": "幽靈船卡片", "monster_id": "pirate_ship", "slot": "armor", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 5}]},
   {"id": "ghostring_card", "name": "幽靈波利卡片", "monster_id": "ghostring", "slot": "garment", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "ghost", "pct": 15}]},
   {"id": "deviace_card", "name": "深海魔物卡片", "monster_id": "deviace", "slot": "garment", "drop_rate": 0.0012, "effects": [{"type": "element_resist", "element": "water", "pct": 20}]},
-  {"id": "zenorc_card", "name": "獸人腐屍卡片", "monster_id": "zenorc", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "race_damage", "race": "undead", "pct": 15}]}
+  {"id": "zenorc_card", "name": "獸人腐屍卡片", "monster_id": "zenorc", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "race_damage", "race": "undead", "pct": 15}]},
+  {"id": "orc_skeleton_card", "name": "獸人骷髏卡片", "monster_id": "orc_skeleton", "slot": "armor", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 4}, {"type": "flat_stat", "stat": "max_hp", "amount": 80}]}
 ]

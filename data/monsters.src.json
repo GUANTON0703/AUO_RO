@@ -1032,7 +1032,7 @@
     "lore": "戴著怪面具、拿著小刀的哥布林，成群結隊很煩。"
   },
   {
-    "id": "orc_archer", "name": "獸人弓箭手", "level": 30,
+    "id": "orc_archer", "name": "獸人弓箭手", "level": 40,
     "element": "earth", "race": "demihuman", "size": "medium", "role": "glass", "gen": true,
     "drops": [{"item_id": "orc_tooth", "rate": 0.4}, {"item_id": "feather", "rate": 0.3}],
     "lore": "站在後排放冷箭的獸人。"
@@ -1056,9 +1056,9 @@
     "lore": "死在戰場又爬起來的獸人，臭氣沖天。"
   },
   {
-    "id": "orc_skeleton", "name": "獸人骷髏", "level": 36,
+    "id": "orc_skeleton", "name": "獸人骷髏", "level": 42,
     "element": "undead", "race": "undead", "size": "large", "role": "normal", "gen": true,
-    "drops": [{"item_id": "skel_bone", "rate": 0.5}, {"item_id": "orc_tooth", "rate": 0.3}, {"item_id": "oridecon", "rate": 0.06}],
+    "drops": [{"item_id": "skel_bone", "rate": 0.5}, {"item_id": "orc_tooth", "rate": 0.3}, {"item_id": "oridecon", "rate": 0.06}, {"item_id": "orc_skeleton_card", "rate": 0.0015}],
     "lore": "獸人地城深處的骨戰士，還握著生鏽的鈍器。"
   },
   {
