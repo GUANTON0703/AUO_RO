@@ -1806,7 +1806,7 @@
       "priority": 0
     },
     "requires": {
-      "owls_eye": 1
+      "falconry_mastery": 1
     }
   },
   {
@@ -4982,5 +4982,486 @@
     "requires": {
       "aspersio": 3
     }
+  },
+  {
+    "id": "falconry_mastery",
+    "name": "鷹匠訓練",
+    "job_id": "hunter",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "crit",
+        "amount": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "detect",
+    "name": "探測",
+    "job_id": "hunter",
+    "kind": "passive",
+    "max_level": 1,
+    "sp_cost": [
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "hit",
+        "amount": [
+          0
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "skid_trap",
+    "name": "滑地陷阱",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "flee",
+        "pct": [
+          -10,
+          -15,
+          -20,
+          -25,
+          -30
+        ],
+        "duration_s": 15
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {}
+  },
+  {
+    "id": "ankle_snare",
+    "name": "足枷陷阱",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "aspd",
+        "pct": [
+          -15,
+          -20,
+          -25,
+          -30,
+          -35
+        ],
+        "duration_s": 15
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {
+      "skid_trap": 1
+    }
+  },
+  {
+    "id": "landmine",
+    "name": "地雷",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "earth",
+        "power_pct": [
+          120,
+          145,
+          170,
+          195,
+          220
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "ankle_snare": 1
+    }
+  },
+  {
+    "id": "sandman",
+    "name": "睡沙陷阱",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "hit",
+        "pct": [
+          -10,
+          -14,
+          -18,
+          -22,
+          -26
+        ],
+        "duration_s": 15
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {
+      "landmine": 1
+    }
+  },
+  {
+    "id": "flasher",
+    "name": "閃光陷阱",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "hit",
+        "pct": [
+          -8,
+          -12,
+          -16,
+          -20,
+          -24
+        ],
+        "duration_s": 12
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {
+      "sandman": 1
+    }
+  },
+  {
+    "id": "shockwave_trap",
+    "name": "電擊陷阱",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "aspd",
+        "pct": [
+          -8,
+          -12,
+          -16,
+          -20,
+          -24
+        ],
+        "duration_s": 12
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    },
+    "requires": {
+      "flasher": 1
+    }
+  },
+  {
+    "id": "freezing_trap",
+    "name": "結冰陷阱",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      14,
+      17,
+      20,
+      23,
+      26
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "water",
+        "power_pct": [
+          100,
+          120,
+          140,
+          160,
+          180
+        ]
+      },
+      {
+        "type": "debuff",
+        "stat": "aspd",
+        "pct": [
+          -10,
+          -15,
+          -20,
+          -25,
+          -30
+        ],
+        "duration_s": 8
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "shockwave_trap": 1
+    }
+  },
+  {
+    "id": "blast_mine",
+    "name": "爆裂地雷",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "wind",
+        "power_pct": [
+          110,
+          135,
+          160,
+          185,
+          210
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "freezing_trap": 1
+    }
+  },
+  {
+    "id": "claymore_trap",
+    "name": "詭雷",
+    "job_id": "hunter",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      16,
+      20,
+      24,
+      28,
+      32
+    ],
+    "cooldown_s": 4,
+    "effects": [
+      {
+        "type": "aoe",
+        "element": "fire",
+        "power_pct": [
+          160,
+          195,
+          230,
+          265,
+          300
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "blast_mine": 1
+    }
+  },
+  {
+    "id": "remove_trap",
+    "name": "拆除陷阱",
+    "job_id": "hunter",
+    "kind": "passive",
+    "max_level": 1,
+    "sp_cost": [
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "hit",
+        "amount": [
+          0
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "skid_trap": 1
+    }
+  },
+  {
+    "id": "spring_trap",
+    "name": "彈簧陷阱",
+    "job_id": "hunter",
+    "kind": "passive",
+    "max_level": 1,
+    "sp_cost": [
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "hit",
+        "amount": [
+          0
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "remove_trap": 1
+    }
+  },
+  {
+    "id": "talkie_box",
+    "name": "留言板",
+    "job_id": "hunter",
+    "kind": "passive",
+    "max_level": 1,
+    "sp_cost": [
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "hit",
+        "amount": [
+          0
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
   }
 ]
