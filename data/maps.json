@@ -358,5 +358,23 @@
     "monster_ids": ["thief_bug_egg", "thief_bug", "tarou", "thief_bug_female"],
     "mvp_id": null,
     "unlock_base_level": 3
+  },
+  {
+    "id": "toy_factory_1f",
+    "name": "玩具工廠 1F",
+    "town": "aldebaran",
+    "level_range": [40, 52],
+    "monster_ids": ["cookie", "myst_case", "cruiser", "chepet"],
+    "mvp_id": null,
+    "unlock_base_level": 40
+  },
+  {
+    "id": "toy_factory_2f",
+    "name": "玩具工廠 2F",
+    "town": "aldebaran",
+    "level_range": [48, 60],
+    "monster_ids": ["myst_case", "cruiser", "chepet", "christmas_cookie"],
+    "mvp_id": null,
+    "unlock_base_level": 48
   }
 ]

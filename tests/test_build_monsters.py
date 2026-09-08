@@ -50,3 +50,13 @@ def test_generated_lv1_20_culvert_monsters_are_gen_entries():
         assert entries[monster_id]["gen"] is True
         assert entries[monster_id]["level"] <= 20
         assert entries[monster_id]["drops"]
+
+
+def test_generated_toy_factory_monsters_keep_required_drops():
+    source = json.loads((build_monsters.DATA / "monsters.src.json").read_text(encoding="utf-8"))
+    entries = {entry["id"]: entry for entry in source}
+    for monster_id in ("myst_case", "cruiser", "cookie", "chepet", "christmas_cookie"):
+        assert entries[monster_id]["gen"] is True
+        drop_ids = {d["item_id"] for d in entries[monster_id]["drops"]}
+        assert drop_ids, monster_id
+        assert f"{monster_id}_card" in drop_ids

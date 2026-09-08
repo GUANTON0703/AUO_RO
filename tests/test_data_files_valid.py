@@ -131,3 +131,13 @@ def test_lv1_20_culvert_route_content_exists():
     for card_id in ("thief_bug_egg_card", "thief_bug_card", "tarou_card", "thief_bug_female_card"):
         assert card_id in c.cards
         assert c.cards[card_id].monster_id in c.monsters
+
+
+def test_toy_factory_route_maps_and_cards_exist():
+    c = content.load_content()
+    for map_id in ("toy_factory_1f", "toy_factory_2f"):
+        assert map_id in c.maps
+    for card_id in ("myst_case_card", "cruiser_card", "cookie_card",
+                    "chepet_card", "christmas_cookie_card"):
+        assert card_id in c.cards
+        assert c.cards[card_id].monster_id in c.monsters
