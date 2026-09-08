@@ -906,5 +906,6 @@ window.jobName = jobName; window.jobTier = jobTier;
 window.monName = monName; window.mapName = mapName; window.itemName = itemName;
 window.skillName = skillName;
 window.itemDesc = itemDesc; window.gearDesc = gearDesc; window.effectText = effectText;
+window.STAT_ZH = STAT_ZH;
 window.skillExplain = skillExplain;
 window.cardDesc = cardDesc; window.SLOT_ZH = SLOT_ZH;
