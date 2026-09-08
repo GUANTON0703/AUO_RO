@@ -390,10 +390,18 @@ Screens.home = {
       return `<div class="kv"><span class="k">${zh}</span>` +
         `<span>${esc(itemName(e.equipment_id))}${rf}${tail}</span></div>`;
     }).join("");
+    const sh = S._sheet || {};
+    const statBlock = sh.atk != null ? `
+      <div class="kv"><span class="k">攻擊 / 魔攻</span><span>${sh.atk} / ${sh.matk}</span></div>
+      <div class="kv"><span class="k">防禦 / 魔防</span><span>${sh.defense} / ${sh.mdef}</span></div>
+      <div class="kv"><span class="k">命中 / 迴避</span><span>${sh.hit} / ${sh.flee}</span></div>
+      <div class="kv"><span class="k">爆擊 / 攻速</span><span>${sh.crit} / ${sh.aspd}</span></div>
+      <div class="kv"><span class="k">HP / SP 上限</span><span>${sh.max_hp} / ${sh.max_sp}</span></div>
+      <div class="sub" style="margin:8px 0 2px">— 裝備欄 —</div>` : "";
     return `<details class="card" id="equip-box"${open ? " open" : ""}` +
       ` ontoggle="try{localStorage.setItem('rotxt_equip_open',this.open?'1':'0')}catch(e){}">` +
-      `<summary style="cursor:pointer;font-weight:600">裝備（${worn}/${SLOT_ORDER.length}）</summary>` +
-      rows + `</details>`;
+      `<summary style="cursor:pointer;font-weight:600">裝備與數值（${worn}/${SLOT_ORDER.length}）</summary>` +
+      statBlock + rows + `</details>`;
   },
   async _refreshEquip() {
     this._inv = await API.inventory(S.char.id).catch(() => this._inv);
@@ -752,10 +760,16 @@ Screens.hunt = {
           esc(TOWN_ZH[r] || r)}</option>`).join("") + `</select>`
       : "";
 
-    let html = `<div class="card"><h3>選狩獵地圖</h3>${regSel}<div class="list" id="maplist"></div></div>` +
+    this._search = "";
+    let html = `<div class="card"><h3>選狩獵地圖</h3>${regSel}` +
+      `<input id="hunt-search" placeholder="搜尋地圖或怪物名稱" style="width:100%;margin-bottom:8px">` +
+      `<div class="list" id="maplist"></div></div>` +
       `<div id="monsterpick"></div>` + this._strategyCard();
     view().innerHTML = html;
     this._renderMapList();
+
+    const ss = document.querySelector("#hunt-search");
+    if (ss) ss.oninput = () => { this._search = ss.value; this._renderMapList(); };
 
     const rs = document.querySelector("#hunt-region");
     if (rs) rs.onchange = () => {
@@ -777,11 +791,15 @@ Screens.hunt = {
   _renderMapList() {
     const box = document.querySelector("#maplist");
     if (!box) return;
-    const maps = this._maps.filter((m) => !this._region || m.town === this._region);
+    const q = (this._search || "").trim().toLowerCase();
+    let maps = this._maps.filter((m) => !this._region || m.town === this._region);
+    if (q) maps = maps.filter((m) =>
+      m.name.toLowerCase().includes(q)
+      || m.monster_ids.some((id) => monName(id).toLowerCase().includes(q)));
     box.innerHTML = maps.map((m) => `<button class="btn choice" data-map="${m.id}">
         ${esc(m.name)}<div class="sub">解鎖 Lv ${m.unlock_base_level || 1}
         ・${m.monster_ids.map(monName).join("、")}</div></button>`).join("")
-      || `<p class="muted">這個地區還沒有解鎖的地圖。</p>`;
+      || `<p class="muted">${q ? "沒有符合的地圖或怪物。" : "這個地區還沒有解鎖的地圖。"}</p>`;
     box.querySelectorAll("[data-map]").forEach((b) => {
       b.classList.toggle("sel", b.dataset.map === this._mapId);
       b.onclick = () => { this._selectMap(b.dataset.map); };
