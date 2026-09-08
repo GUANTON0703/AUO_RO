@@ -230,3 +230,31 @@ def test_offline_settlement_has_no_per_round_events():
     r = settle(_hero(), c.get_monster("poring"), elapsed_seconds=3600,
                cfg=HuntConfig(), rng=random.Random(0), offline=True, pity_in={})
     assert not any(e.kind in ("attack", "skill") for e in r.events)
+
+
+def test_active_buff_carries_source_skill_name():
+    c = load_content()
+    bless, bash = c.skills["blessing"], c.skills["bash"]
+    hero = _hero(max_sp=200, skills=[
+        ResolvedSkill("bash", bash.name, 1, "active", 5, 0, bash.effects, "every_turn", 3),
+        ResolvedSkill("blessing", bless.name, 3, "active", 5, 0, bless.effects,
+                      "sp_available", 1),
+    ])
+    r = settle(hero, c.get_monster("poring"), elapsed_seconds=60, cfg=HuntConfig(),
+               rng=random.Random(1), offline=False, pity_in={})
+    assert any(b.get("source") == bless.name for b in r.active_buffs)
+
+
+def test_zero_kill_window_still_reports_buffs():
+    """時間窗還不夠殺一隻時，掛機畫面的 buff 不該閃掉。"""
+    c = load_content()
+    bless = c.skills["blessing"]
+    hero = _hero(max_sp=200, skills=[
+        ResolvedSkill("blessing", bless.name, 3, "active", 5, 0, bless.effects,
+                      "sp_available", 1),
+    ])
+    # elapsed 只有 1 秒，湊不滿一場 → kills 0
+    r = settle(hero, c.get_monster("poring"), elapsed_seconds=1, cfg=HuntConfig(),
+               rng=random.Random(1), offline=False, pity_in={})
+    assert r.kills == 0
+    assert r.active_buffs  # 仍有 buff 可顯示

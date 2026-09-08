@@ -360,9 +360,10 @@ Screens.home = {
     const rows = live.map((b) => {
       const zh = STAT_ZH[b.stat] || b.stat;
       const sign = b.magnitude >= 0 ? "+" : "";
-      const t = b.left > 0 ? `　剩約 ${b.left} 秒` : "　續投中…";
-      return `<div class="kv"><span class="k">${esc(zh)}</span>` +
-        `<span>${sign}${b.magnitude}${t}</span></div>`;
+      const t = b.left > 0 ? `剩約 ${b.left} 秒` : "續投中…";
+      const name = b.source ? esc(b.source) : zh;
+      return `<div class="kv"><span class="k">${name}</span>` +
+        `<span>${esc(zh)} ${sign}${b.magnitude}　${t}</span></div>`;
     }).join("");
     return `<details style="margin-top:4px">` +
       `<summary style="cursor:pointer" class="dim">增益中 ×${buffs.length}（點開看效果）</summary>` +

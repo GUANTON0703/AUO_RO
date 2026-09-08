@@ -294,15 +294,34 @@ def _no_op_settlement(fresh) -> dict:
     }
 
 
+def _probe_hunt_buffs(row) -> list:
+    """掛機剛開始、還沒有結算批次時，跑一場拿 buff 狀態給畫面顯示。"""
+    from server.settlement.engine import _probe_active_buffs
+    try:
+        player = build_player_combatant(
+            _snapshot(row, hp=row["hunt_hp"], sp=row["hunt_sp"]), _content)
+        monster = _content.get_monster(row["hunting_monster_id"])
+        cfg = HuntConfig.from_settings(get_settings())
+        strat = _load_strategy(row["id"])
+        return _probe_active_buffs(player, monster, random.Random(),
+                                   cfg, strat.skill_min_sp_pct)
+    except Exception:
+        return []
+
+
 def _accumulated_snapshot(row) -> dict:
     """未達結算地板時回這個：目前場次累積值 + 最後一批事件，不重算、不寫入。"""
     batch = _last_batch.get(row["id"], {})
+    buffs = batch.get("buffs")
+    if not buffs:
+        # 還沒有任何結算批次（掛機剛開始）→ 探測一場拿 buff，畫面才不會空著
+        buffs = _probe_hunt_buffs(row)
     return {
         "monster_id": row["hunting_monster_id"],
         "monster_name": _content.get_monster(row["hunting_monster_id"]).name,
         "batch_id": batch.get("batch_id"),
         "pace_seconds": batch.get("pace_seconds", 0.0),
-        "buffs": batch.get("buffs", []),
+        "buffs": buffs,
         "kills": row["hunt_kills"], "base_exp": row["hunt_base_exp"],
         "job_exp": row["hunt_job_exp"], "zeny": row["hunt_zeny"], "drops": {},
         "loot": _loot(row),

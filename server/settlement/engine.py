@@ -92,7 +92,8 @@ def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
     else:
         result = _settle_statistical(player, monster, elapsed_seconds, effective,
                                time_per_kill, potential, prof, cfg, rng, offline,
-                               pity_in, potion_item_id, potion_heal, potion_count)
+                               pity_in, potion_item_id, potion_heal, potion_count,
+                               skill_min_sp_pct)
     if random_event:
         result.events.insert(0, random_event)
     return result
@@ -100,24 +101,26 @@ def settle(player: Combatant, monster: MonsterDef, elapsed_seconds: float,
 
 def _buffs_from_statuses(statuses, cfg) -> list:
     return [
-        {"stat": s.stat, "magnitude": s.magnitude,
+        {"stat": s.stat, "magnitude": s.magnitude, "source": s.source,
          "remaining_s": round(s.duration * cfg.round_seconds)}
-        for s in statuses if s.kind == "stat_mod"
+        for s in statuses if s.kind == "stat_mod" and s.magnitude > 0
     ]
 
 
-def _probe_active_buffs(player, monster, rng, cfg) -> list:
+def _probe_active_buffs(player, monster, rng, cfg, skill_min_sp_pct: float = 0.0) -> list:
     """統計路徑沒有逐場模擬，跑一場拿身上的 buff 狀態給畫面顯示用。"""
     probe = copy.deepcopy(player)
     for s in probe.skills:
         s._cd_left = 0
-    simulate_fight(probe, Combatant.from_monster(monster), rng)
+    simulate_fight(probe, Combatant.from_monster(monster), rng,
+                   a_skill_min_sp_frac=skill_min_sp_pct)
     return _buffs_from_statuses(probe.statuses, cfg)
 
 
 def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_kill,
                         potential, prof, cfg, rng, offline, pity_in,
-                        potion_item_id, potion_heal, potion_count) -> SettlementResult:
+                        potion_item_id, potion_heal, potion_count,
+                        skill_min_sp_pct=0.0) -> SettlementResult:
     potions_used = 0
     retreated = False
     reason = ""
@@ -178,8 +181,9 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
     if retreated:
         events.append(RetreatEvent(reason, used_seconds))
 
-    active_buffs = ([] if retreated or kills <= 0
-                    else _probe_active_buffs(player, monster, rng, cfg))
+    # kills==0（時間窗還不夠殺一隻）也要回 buff，不然掛機畫面會閃掉
+    active_buffs = ([] if retreated
+                    else _probe_active_buffs(player, monster, rng, cfg, skill_min_sp_pct))
 
     return SettlementResult(
         kills=kills, base_exp=base_exp, job_exp=job_exp, zeny=zeny, drops=drops,
@@ -269,7 +273,13 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
     if retreated:
         events.append(RetreatEvent(reason, elapsed))
 
-    active_buffs = [] if retreated else _buffs_from_statuses(p.statuses, cfg)
+    if retreated:
+        active_buffs = []
+    elif kills > 0:
+        active_buffs = _buffs_from_statuses(p.statuses, cfg)
+    else:
+        # 時間窗還不夠殺一隻 → 探測一場拿 buff 狀態，別讓畫面閃掉
+        active_buffs = _probe_active_buffs(player, monster, rng, cfg, skill_min_sp_pct)
 
     return SettlementResult(
         kills=kills, base_exp=base_exp, job_exp=job_exp, zeny=zeny, drops=drops,

@@ -10,12 +10,15 @@ class Status:
     duration: int
     magnitude: int
     stat: str = ""     # kind=stat_mod 用
+    source: str = ""   # 來源技能名（顯示用）
 
 
 def apply_status(target, status: Status, events: list | None = None) -> None:
     for s in target.statuses:
         if s.name == status.name:
             s.duration = status.duration
+            s.magnitude = status.magnitude
+            s.source = status.source
             return
     target.statuses.append(status)
     if events is not None:
