@@ -16,7 +16,16 @@
       this._tab = this._tab || "stats";
       this._pending = {};
       for (const [k] of STATS) this._pending[k] = 0;
+      if (this._tab === "skills" && !this._strategy) {
+        this._strategy = await API.huntStrategy(S.char.id).catch(() => ({}));
+      }
       this._draw();
+    },
+
+    async _saveStrategy() {
+      const s = this._strategy || {};
+      try { await API.setHuntStrategy(S.char.id, s); }
+      catch (err) { App.toast(err.detail || "掛機設定儲存失敗", true); }
     },
 
     _draw() {
@@ -161,10 +170,15 @@
         (rank(a.job_id) - rank(b.job_id))
         || ((tierCache[a.id] || 0) - (tierCache[b.id] || 0))
         || (a.kind === b.kind ? 0 : a.kind === "active" ? -1 : 1));
+      const strat = this._strategy || {};
+      const toggles = strat.skill_toggles || {};
       for (const sk of sorted) {
         const lv = learned[sk.id] || 0;
         const maxed = lv >= sk.max_level;
         const inherited = sk.job_id !== c.job_id;
+        const active = sk.kind === "active" && lv > 0;
+        const idleOn = toggles[sk.id] ?? (sk.idle_default?.enabled ?? true);
+        const isPrimary = strat.primary_skill_id === sk.id;
         const tag = sk.kind === "active"
           ? `<span class="pill good">主動</span>`
           : `<span class="pill">被動</span>`;
@@ -180,6 +194,13 @@
         const btn = inherited
           ? ""
           : `<button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}" ${maxed ? "disabled" : ""}>學 +1</button>`;
+        const idleCtl = active ? `
+              <div class="sub" style="margin-top:4px">
+                <label style="margin-right:12px"><input type="checkbox" style="width:auto"
+                  data-idle="${sk.id}" ${idleOn ? "checked" : ""}> 掛機放</label>
+                <label><input type="checkbox" style="width:auto"
+                  data-primary="${sk.id}" ${isPrimary ? "checked" : ""}> 設為主攻</label>
+              </div>` : "";
         rows += `
           <div class="item" style="align-items:flex-start">
             <div>${tag} ${inheritTag} ${tierTag} ${esc(sk.name)}
@@ -187,6 +208,7 @@
               ${explain ? `<div class="sub">${esc(explain)}</div>` : ""}
               ${req ? `<div class="sub" style="color:var(--warn)">前置：${esc(req)}</div>` : ""}
               ${unlockNames ? `<div class="sub" style="color:var(--muted)">解鎖：${esc(unlockNames)}</div>` : ""}
+              ${idleCtl}
             </div>
             ${btn}
           </div>`;
@@ -212,6 +234,21 @@
             if (this._stale() || this._tab !== "skills") return;
             this._drawSkills();
           } catch (err) { App.toast(err.detail || "學習失敗", true); b.disabled = false; }
+        };
+      });
+      document.querySelectorAll("[data-idle]").forEach((cb) => {
+        cb.onchange = () => {
+          const s = (this._strategy = this._strategy || {});
+          s.skill_toggles = { ...(s.skill_toggles || {}), [cb.dataset.idle]: cb.checked };
+          this._saveStrategy();
+        };
+      });
+      document.querySelectorAll("[data-primary]").forEach((cb) => {
+        cb.onchange = () => {
+          const s = (this._strategy = this._strategy || {});
+          s.primary_skill_id = cb.checked ? cb.dataset.primary : null;
+          this._saveStrategy();
+          this._drawSkills();
         };
       });
       document.querySelector("#skill-reset").onclick = async () => {
