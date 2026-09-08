@@ -1390,5 +1390,29 @@
     "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
     "drops": [{"item_id": "orc_tooth", "rate": 0.45}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "zenorc_card", "rate": 0.0012}],
     "lore": "獸人地城最深處復甦的腐屍，還保留著殘暴的戰意。"
+  },
+  {
+    "id": "thief_bug_egg", "name": "飯匙蟲卵", "level": 4,
+    "element": "shadow", "race": "insect", "size": "small", "role": "tank", "gen": true,
+    "drops": [{"item_id": "jellopy", "rate": 0.5}, {"item_id": "sticky_mucus", "rate": 0.2}, {"item_id": "thief_bug_egg_card", "rate": 0.002}],
+    "lore": "黏在下水道牆上的白色蟲卵，孵化前不會動。"
+  },
+  {
+    "id": "thief_bug", "name": "飯匙客", "level": 10,
+    "element": "shadow", "race": "insect", "size": "small", "role": "glass", "gen": true,
+    "drops": [{"item_id": "jellopy", "rate": 0.55}, {"item_id": "sticky_mucus", "rate": 0.3}, {"item_id": "thief_bug_card", "rate": 0.002}],
+    "lore": "普隆德拉下水道的常客，動作快、成群出現。"
+  },
+  {
+    "id": "tarou", "name": "塔羅鼠", "level": 11,
+    "element": "shadow", "race": "animal", "size": "small", "role": "normal", "gen": true,
+    "drops": [{"item_id": "jellopy", "rate": 0.5}, {"item_id": "fluff", "rate": 0.35}, {"item_id": "tarou_card", "rate": 0.0018}],
+    "lore": "在下水道裡亂竄的大老鼠，咬人很痛。"
+  },
+  {
+    "id": "thief_bug_female", "name": "母飯匙客", "level": 16,
+    "element": "shadow", "race": "insect", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "sticky_mucus", "rate": 0.4}, {"item_id": "jellopy", "rate": 0.4}, {"item_id": "thief_bug_female_card", "rate": 0.0016}],
+    "lore": "體型較大的飯匙客，帶著一窩幼蟲，攻擊比同伴狠。"
   }
 ]

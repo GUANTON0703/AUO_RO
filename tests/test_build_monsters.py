@@ -41,3 +41,12 @@ def test_generated_classic_batch_one_monsters_keep_required_drops():
     for monster_id in ("pirate_skeleton", "pasana", "orc_skeleton"):
         assert entries[monster_id]["gen"] is True
         assert entries[monster_id]["drops"]
+
+
+def test_generated_lv1_20_culvert_monsters_are_gen_entries():
+    source = json.loads((build_monsters.DATA / "monsters.src.json").read_text(encoding="utf-8"))
+    entries = {entry["id"]: entry for entry in source}
+    for monster_id in ("thief_bug_egg", "thief_bug", "tarou", "thief_bug_female"):
+        assert entries[monster_id]["gen"] is True
+        assert entries[monster_id]["level"] <= 20
+        assert entries[monster_id]["drops"]

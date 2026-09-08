@@ -2604,5 +2604,81 @@
     ],
     "is_mvp": false,
     "lore": "獸人地城最深處復甦的腐屍，還保留著殘暴的戰意。"
+  },
+  {
+    "id": "thief_bug_egg",
+    "name": "飯匙蟲卵",
+    "level": 4,
+    "element": "shadow",
+    "race": "insect",
+    "size": "small",
+    "role": "tank",
+    "base_exp": 37,
+    "job_exp": 18,
+    "stats": {"max_hp": 242, "max_sp": 0, "atk": 9, "matk": 8, "defense": 4, "mdef": 1, "hit": 5, "flee": 6, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "jellopy", "rate": 0.5},
+      {"item_id": "sticky_mucus", "rate": 0.2},
+      {"item_id": "thief_bug_egg_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "黏在下水道牆上的白色蟲卵，孵化前不會動。"
+  },
+  {
+    "id": "thief_bug",
+    "name": "飯匙客",
+    "level": 10,
+    "element": "shadow",
+    "race": "insect",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 90,
+    "job_exp": 45,
+    "stats": {"max_hp": 231, "max_sp": 0, "atk": 27, "matk": 15, "defense": 0, "mdef": 3, "hit": 11, "flee": 18, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "jellopy", "rate": 0.55},
+      {"item_id": "sticky_mucus", "rate": 0.3},
+      {"item_id": "thief_bug_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "普隆德拉下水道的常客，動作快、成群出現。"
+  },
+  {
+    "id": "tarou",
+    "name": "塔羅鼠",
+    "level": 11,
+    "element": "shadow",
+    "race": "animal",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 102,
+    "job_exp": 51,
+    "stats": {"max_hp": 369, "max_sp": 0, "atk": 23, "matk": 16, "defense": 3, "mdef": 3, "hit": 12, "flee": 16, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "jellopy", "rate": 0.5},
+      {"item_id": "fluff", "rate": 0.35},
+      {"item_id": "tarou_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "在下水道裡亂竄的大老鼠，咬人很痛。"
+  },
+  {
+    "id": "thief_bug_female",
+    "name": "母飯匙客",
+    "level": 16,
+    "element": "shadow",
+    "race": "insect",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 173,
+    "job_exp": 86,
+    "stats": {"max_hp": 590, "max_sp": 0, "atk": 31, "matk": 22, "defense": 5, "mdef": 5, "hit": 17, "flee": 21, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "sticky_mucus", "rate": 0.4},
+      {"item_id": "jellopy", "rate": 0.4},
+      {"item_id": "thief_bug_female_card", "rate": 0.0016}
+    ],
+    "is_mvp": false,
+    "lore": "體型較大的飯匙客，帶著一窩幼蟲，攻擊比同伴狠。"
   }
 ]

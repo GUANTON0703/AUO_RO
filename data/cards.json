@@ -92,5 +92,9 @@
   {"id": "ghostring_card", "name": "幽靈波利卡片", "monster_id": "ghostring", "slot": "garment", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "ghost", "pct": 15}]},
   {"id": "deviace_card", "name": "深海魔物卡片", "monster_id": "deviace", "slot": "garment", "drop_rate": 0.0012, "effects": [{"type": "element_resist", "element": "water", "pct": 20}]},
   {"id": "zenorc_card", "name": "獸人腐屍卡片", "monster_id": "zenorc", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "race_damage", "race": "undead", "pct": 15}]},
-  {"id": "orc_skeleton_card", "name": "獸人骷髏卡片", "monster_id": "orc_skeleton", "slot": "armor", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 4}, {"type": "flat_stat", "stat": "max_hp", "amount": 80}]}
+  {"id": "orc_skeleton_card", "name": "獸人骷髏卡片", "monster_id": "orc_skeleton", "slot": "armor", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 4}, {"type": "flat_stat", "stat": "max_hp", "amount": 80}]},
+  {"id": "thief_bug_egg_card", "name": "飯匙蟲卵卡片", "monster_id": "thief_bug_egg", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 80}]},
+  {"id": "thief_bug_card", "name": "飯匙客卡片", "monster_id": "thief_bug", "slot": "accessory", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "agi", "amount": 2}]},
+  {"id": "tarou_card", "name": "塔羅鼠卡片", "monster_id": "tarou", "slot": "weapon", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "str", "amount": 2}]},
+  {"id": "thief_bug_female_card", "name": "母飯匙客卡片", "monster_id": "thief_bug_female", "slot": "garment", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 8}]}
 ]
