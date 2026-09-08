@@ -40,3 +40,14 @@ def test_mvp_challenge_ignores_hunt_skill_toggles(client, auth, db_helpers):
     mvp_snap = _snapshot(row, apply_prefs=False)
     assert hunt_snap.skill_toggles == {"magnum_break": False}
     assert mvp_snap.skill_toggles == {}
+
+
+def test_challenge_cooldown_is_20_minutes(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = client.post("/api/characters", headers=h, json={"name": "王殺CD"}).json()
+    db_helpers.set_base_level(ch["id"], 16)
+    db_helpers.set_stats(ch["id"], {"str": 40, "agi": 12, "vit": 20, "int": 5, "dex": 18, "luk": 8})
+    client.post("/api/mvp/challenge", headers=h, json={"mvp_id": "angel_poring"})
+    row = next(m for m in client.get("/api/mvp", headers=h).json() if m["id"] == "angel_poring")
+    assert row["cooldown_minutes"] == 20
+    assert 1000 < row["seconds_remaining"] <= 1200   # ~20 分鐘內

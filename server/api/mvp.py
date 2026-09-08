@@ -18,6 +18,9 @@ router = APIRouter(prefix="/api/mvp", tags=["mvp"])
 
 _content = load_content()
 
+# 所有 MVP 統一冷卻 20 分鐘（蓋過 mvps.json 各自的 cooldown_hours）
+_MVP_COOLDOWN_HOURS = 20 / 60
+
 
 class ChallengeRequest(BaseModel):
     mvp_id: str
@@ -38,7 +41,7 @@ def list_mvp(account_id: CurrentAccount):
             "home_map_name": home.name if home else m.home_map_id,
             "available": mvp_repo.is_available(row["id"], m.id),
             "seconds_remaining": mvp_repo.seconds_remaining(row["id"], m.id),
-            "cooldown_hours": m.cooldown_hours,
+            "cooldown_minutes": round(_MVP_COOLDOWN_HOURS * 60),
         })
     return out
 
@@ -78,8 +81,7 @@ def challenge(body: ChallengeRequest, account_id: CurrentAccount):
             job_level=row["job_level"], job_exp=row["job_exp"], zeny_delta=0,
         )
 
-    hours = mvp.cooldown_hours if result.outcome != "fled" else 1
-    mvp_repo.set_cooldown(row["id"], mvp.id, hours)
+    mvp_repo.set_cooldown(row["id"], mvp.id, _MVP_COOLDOWN_HOURS)
 
     fresh = characters_repo.get_character(row["id"])
     return {
