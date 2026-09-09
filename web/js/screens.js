@@ -33,7 +33,7 @@ const monName = (id) => S.catalog?.monsters?.[id]?.name || S.catalog?.mvps?.[id]
 const mapName = (id) => S.catalog?.maps?.[id]?.name || id;
 const skillName = (id) => S.catalog?.skills?.[id]?.name || id;
 const TOWN_ZH = { prontera: "普隆德拉", morroc: "摩洛克", payon: "斐揚",
-  geffen: "吉芬", aldebaran: "阿爾迪巴朗" };
+  geffen: "吉芬", aldebaran: "阿爾迪巴朗", nifflheim: "尼夫赫姆" };
 const itemName = (id) =>
   S.catalog?.items?.[id]?.name || S.catalog?.equipment?.[id]?.name ||
   S.catalog?.cards?.[id]?.name || id;

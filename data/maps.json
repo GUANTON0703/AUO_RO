@@ -434,7 +434,7 @@
   {
     "id": "nifflheim_street",
     "name": "尼夫赫姆 街道",
-    "town": "aldebaran",
+    "town": "nifflheim",
     "level_range": [58, 68],
     "monster_ids": ["quve", "gibbet", "nightmare_terror", "disguise"],
     "mvp_id": null,
@@ -443,7 +443,7 @@
   {
     "id": "nifflheim_shrine",
     "name": "尼夫赫姆 神殿",
-    "town": "aldebaran",
+    "town": "nifflheim",
     "level_range": [64, 72],
     "monster_ids": ["loli_ruri", "disguise", "nightmare_terror", "evil_nymph"],
     "mvp_id": null,
