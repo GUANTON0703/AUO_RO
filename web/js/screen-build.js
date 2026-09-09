@@ -9,6 +9,37 @@
     ["luk", "LUK 幸運", "爆擊率（少量攻擊）"],
   ];
   const statCost = (v) => Math.floor(v / 10) + 2;
+  const SKILL_STAGE_META = [
+    ["novice", "新手技能"],
+    ["first", "一轉技能"],
+    ["second", "二轉技能"],
+  ];
+
+  // 技能分區只讀 jobs 的 tier；技能本身仍由 catalog.skills 提供。
+  function groupSkillsByTier(skills, jobs, currentJobId) {
+    const currentTier = jobs[currentJobId]?.tier || "first";
+    return SKILL_STAGE_META.map(([tier, label]) => ({
+      tier,
+      label,
+      open: tier === currentTier,
+      skills: skills.filter((sk) => jobs[sk.job_id]?.tier === tier),
+    }));
+  }
+
+  // 這只是前端即時提示；送出後端仍由 can_learn 做最終驗證。
+  function getSkillPrerequisiteState(skill, learned) {
+    const levels = learned || {};
+    const unmet = Object.entries(skill.requires || {})
+      .filter(([id, required]) => Number(levels[id] || 0) < Number(required))
+      .map(([id, required]) => ({
+        id,
+        required: Number(required),
+        current: Number(levels[id] || 0),
+      }));
+    return { met: unmet.length === 0, unmet };
+  }
+
+  window.ROSkillView = { groupSkillsByTier, getSkillPrerequisiteState };
 
   Screens.build = {
     _stale() { return App.state.view !== "build"; },
@@ -165,17 +196,19 @@
           (unlocks[rid] = unlocks[rid] || []).push(sk.id);
         }
       }
-      let rows = "";
       const sorted = [...skills].sort((a, b) =>
         (rank(a.job_id) - rank(b.job_id))
         || ((tierCache[a.id] || 0) - (tierCache[b.id] || 0))
         || (a.kind === b.kind ? 0 : a.kind === "active" ? -1 : 1));
       const strat = this._strategy || {};
       const toggles = strat.skill_toggles || {};
+      const rowsById = {};
       for (const sk of sorted) {
         const lv = learned[sk.id] || 0;
         const maxed = lv >= sk.max_level;
         const inherited = sk.job_id !== c.job_id;
+        const prereq = getSkillPrerequisiteState(sk, learned);
+        const locked = !maxed && !prereq.met;
         const active = sk.kind === "active" && lv > 0;
         const idleOn = toggles[sk.id] ?? (sk.idle_default?.enabled ?? true);
         const isPrimary = strat.primary_skill_id === sk.id;
@@ -193,7 +226,8 @@
           ? `　SP ${sk.sp_cost[Math.min(Math.max(1, lv), sk.sp_cost.length) - 1]}` : "";
         const btn = inherited
           ? ""
-          : `<button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}" ${maxed ? "disabled" : ""}>學 +1</button>`;
+          : `<button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}"
+              ${maxed || locked ? "disabled" : ""}>學 +1</button>`;
         const idleCtl = active ? `
               <div class="sub" style="margin-top:4px">
                 <label style="margin-right:12px"><input type="checkbox" style="width:auto"
@@ -201,9 +235,10 @@
                 <label><input type="checkbox" style="width:auto"
                   data-primary="${sk.id}" ${isPrimary ? "checked" : ""}> 設為主攻</label>
               </div>` : "";
-        rows += `
-          <div class="item" style="align-items:flex-start">
+        rowsById[sk.id] = `
+          <div class="item skill-row${locked ? " skill-locked" : ""}" style="align-items:flex-start">
             <div>${tag} ${inheritTag} ${tierTag} ${esc(sk.name)}
+              ${locked ? `<span class="pill bad">前置未達</span>` : ""}
               <div class="sub">Lv ${lv} / ${sk.max_level}${cost}</div>
               ${explain ? `<div class="sub">${esc(explain)}</div>` : ""}
               ${req ? `<div class="sub" style="color:var(--warn)">前置：${esc(req)}</div>` : ""}
@@ -213,12 +248,21 @@
             ${btn}
           </div>`;
       }
-      if (!skills.length) rows = `<p class="muted">這個職業沒有可學的技能。</p>`;
+      const sections = groupSkillsByTier(sorted, jobs, c.job_id).map((group) => {
+        const rows = group.skills.length
+          ? group.skills.map((sk) => rowsById[sk.id]).join("")
+          : `<p class="muted">這個階段沒有可查看的技能。</p>`;
+        return `
+          <details class="skill-tier" data-skill-tier="${group.tier}"${group.open ? " open" : ""}>
+            <summary>${group.label}<span class="skill-tier-count">${group.skills.length} 個技能</span></summary>
+            <div class="skill-tier-list">${rows}</div>
+          </details>`;
+      }).join("");
       document.querySelector("#build-body").innerHTML = `
         <div class="card">
           <h3>技能</h3>
           <div class="kv"><span class="k">可用技能點</span><span>${c.skill_points || 0}</span></div>
-          <div class="list">${rows}</div>
+          <div class="skill-tiers">${sections}</div>
           <div class="row" style="margin-top:10px">
             <button class="btn ghost" id="skill-reset">洗技能</button>
           </div>

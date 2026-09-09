@@ -69,6 +69,18 @@ input:focus,select:focus{outline:none; border-color:var(--accent)}
 .item{display:flex; justify-content:space-between; align-items:center; gap:8px;
   background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 12px}
 .item .sub{color:var(--muted); font-size:.8rem}
+.skill-tiers{display:flex; flex-direction:column; gap:8px; margin-top:10px}
+.skill-tier{background:var(--panel2); border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.skill-tier summary{display:flex; justify-content:space-between; align-items:center; gap:8px;
+  padding:10px 12px; cursor:pointer; font-weight:600; list-style:none}
+.skill-tier summary::-webkit-details-marker{display:none}
+.skill-tier summary::before{content:"▸"; color:var(--muted); margin-right:2px}
+.skill-tier[open] summary::before{content:"▾"}
+.skill-tier-count{color:var(--muted); font-size:.8rem; font-weight:400}
+.skill-tier-list{display:flex; flex-direction:column; gap:8px; padding:0 8px 8px}
+.skill-row.skill-locked{background:#35171b; border-color:#713238; color:#ffc7c3}
+.skill-row.skill-locked .sub{color:#d99591}
+.skill-row.skill-locked .pill{border-color:#713238; color:#ffaaa5}
 .choice{padding:12px; text-align:left; border-radius:10px}
 .choice.sel{border-color:var(--accent); background:var(--panel2)}
 
