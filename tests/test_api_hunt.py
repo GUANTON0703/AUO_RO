@@ -210,6 +210,80 @@ def test_repeat_status_without_time_advance_adds_no_exp(client, auth, db_helpers
     assert after_second["base_level"] == after_first["base_level"]
 
 
+def test_status_event_cursor_deduplicates_repeated_polling(client, auth, db_helpers):
+    _, headers, _ = auth
+    ch = _ready_char(client, headers, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=headers,
+                json={"map_id": "prontera_south_field"})
+
+    first = client.get("/api/hunt/status", headers=headers).json()
+    assert first["event_cursor"]
+    assert first["event_batch"]["cursor"] == first["event_cursor"]
+    assert first["event_batch"]["mode"] == "live"
+    assert first["combat_state"] == "combat"
+
+    repeated = client.get("/api/hunt/status", headers=headers,
+                          params={"cursor": first["event_cursor"]}).json()
+    assert repeated["event_cursor"] == first["event_cursor"]
+    assert repeated["event_batch"]["events"] == []
+    assert repeated["events"] == []
+    assert repeated["combat_state"] == "hunting"
+
+
+def test_status_without_events_is_hunting_not_combat(client, auth, db_helpers):
+    from server.api import hunt
+
+    _, headers, _ = auth
+    ch = _ready_char(client, headers, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=headers,
+                json={"map_id": "prontera_south_field"})
+    hunt._warm_start_pending.discard(ch["id"])
+
+    status = client.get("/api/hunt/status", headers=headers).json()
+    assert status["hunt_state"] == "active"
+    assert status["combat_state"] == "hunting"
+    assert status["events"] == []
+
+
+def test_eventless_short_status_does_not_probe_a_fight(client, auth, db_helpers, monkeypatch):
+    from server.api import hunt
+
+    _, headers, _ = auth
+    ch = _ready_char(client, headers, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=headers,
+                json={"map_id": "prontera_south_field"})
+    hunt._warm_start_pending.discard(ch["id"])
+    monkeypatch.setattr(
+        hunt, "_probe_hunt_buffs",
+        lambda row: (_ for _ in ()).throw(AssertionError("unexpected combat probe")),
+    )
+
+    status = client.get("/api/hunt/status", headers=headers).json()
+    assert status["events"] == []
+
+
+def test_stop_waits_for_an_inflight_settlement(client, auth, db_helpers):
+    from server.api import hunt
+
+    _, headers, _ = auth
+    ch = _ready_char(client, headers, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=headers,
+                json={"map_id": "prontera_south_field"})
+    lock = hunt._settlement_lock(ch["id"])
+    lock.acquire()
+    result = []
+    thread = threading.Thread(
+        target=lambda: result.append(client.post("/api/hunt/stop", headers=headers)),
+    )
+    thread.start()
+    thread.join(timeout=0.05)
+    assert thread.is_alive()
+    lock.release()
+    thread.join(timeout=2)
+    assert not thread.is_alive()
+    assert result[0].status_code == 200
+
+
 def test_levelup_from_hunting(client, auth, db_helpers):
     _, headers, _ = auth
     ch = _ready_char(client, headers, db_helpers, base_level=5)

@@ -9,12 +9,24 @@ const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
 
 // exp curve — mirrors server/progression/levels.py
 const Curve = {
+  baseCap: 60,
+  jobCaps: { novice: 10, first: 50, second: 70 },
   baseNext: (lvl) => Math.round(30 * Math.pow(lvl, 2.4) + 40 * lvl + 30),
   jobNext: (jl, tier) => {
     const m = { novice: 0.6, first: 1.0, second: 1.8 }[tier] ?? 1.0;
     return Math.round((20 * Math.pow(jl, 2.2) + 30 * jl + 20) * m);
   },
 };
+function xpProgress(current, next, maxed = false) {
+  const cur = Math.max(0, Number(current) || 0);
+  const need = Math.max(0, Number(next) || 0);
+  const percent = maxed ? 100 : (need <= 0 ? 0 : Math.max(0, Math.min(100, cur / need * 100)));
+  return { current: cur, next: need, percent: Math.round(percent * 10) / 10 };
+}
+function xpText(current, next, maxed = false) {
+  const p = xpProgress(current, next, maxed);
+  return `${p.current} / ${p.next}（${p.percent}%）`;
+}
 const jobName = (id) => S.catalog?.jobs?.[id]?.name || id;
 const jobTier = (id) => S.catalog?.jobs?.[id]?.tier || "first";
 const monName = (id) => S.catalog?.monsters?.[id]?.name || S.catalog?.mvps?.[id]?.name || id;
@@ -162,23 +174,31 @@ Screens.home = {
     this._queue = [];
     this._shown = [];
     this._lastBatch = null;
+    this._lastEventCursor = null;
+    this._combatState = "idle";
     this._hunting = null;
     this._dripMs = 0;
     this._paceBudget = 0;
     this._curMon = null;
     this._buffs = [];
     this._buffsAt = 0;
-    this._sheet = await API.sheet(S.char.id).catch(() => null);
+    const [sheet, strategy, announce, status] = await Promise.all([
+      API.sheet(S.char.id).catch(() => null),
+      API.huntStrategy(S.char.id).catch(() => null),
+      API.announcement().catch(() => null),
+      API.huntStatus().catch((e) => { if (e.status !== 409) throw e; return null; }),
+    ]);
+    this._sheet = sheet;
     S._sheet = this._sheet;
-    this._strategy = await API.huntStrategy(S.char.id).catch(() => null);
-    this._announce = await API.announcement().catch(() => null);
-    let status = null;
-    try { status = await API.huntStatus(); } catch (e) { if (e.status !== 409) throw e; }
+    this._strategy = strategy;
+    this._announce = announce;
+    App.state.huntCursor = status?.event_cursor || null;
     // status 這一趟可能撿到裝備，所以裝備清單在它之後才抓
     this._inv = await API.inventory(S.char.id).catch(() => null);
     if (status && status.buffs) { this._buffs = status.buffs; this._buffsAt = Date.now(); }
     this._layout(status);
-    if (status && !status.retreated) {
+    if (status && (status.hunt_state
+      ? status.hunt_state === "active" : !status.retreated)) {
       this._ingest(status);
       this._drip();
       App.startHuntPoll();
@@ -188,7 +208,8 @@ Screens.home = {
   // 每 poll 呼叫：掛機狀態沒切換就只更新數字、不碰戰鬥紀錄；切換才整個重畫
   render(status) {
     if (S.view !== "home") return;
-    const hunting = !!(status && !status.retreated);
+    const hunting = !!(status && (status.hunt_state
+      ? status.hunt_state === "active" : !status.retreated));
     if (hunting !== this._hunting || (status && status.retreated)) {
       this._layout(status);
       if (hunting) { this._ingest(status); this._drip(); }
@@ -232,7 +253,7 @@ Screens.home = {
       this._recalcDrip();
     } else if (!this._shown.length) {
       box.innerHTML = "<span class='dim'>搜尋目標中…</span>";
-    } else if (this._hunting) {
+    } else if (this._hunting && this._combatState === "combat" && this._queue.length) {
       // 佇列清空、還在掛機 → 顯示一個跳動的「交戰中」，畫面才不會像卡住
       box.innerHTML = this._shown.join("\n") + "\n" + this._heartbeat();
       box.scrollTop = box.scrollHeight;
@@ -244,10 +265,15 @@ Screens.home = {
     this._dripTimer = setTimeout(() => this._drip(), wait);
   },
   _ingest(status) {
-    if (!status || status.retreated) return;
+    if (!status) return;
+    this._combatState = status.combat_state || (status.retreated ? "idle" : "hunting");
+    if (status.retreated) return;
     if (status.monster_id) this._curMon = status.monster_id;
-    if (!status.batch_id || status.batch_id === this._lastBatch) return;
-    this._lastBatch = status.batch_id;
+    const batch = status.event_batch || status;
+    const cursor = status.event_cursor || batch.cursor || status.batch_id;
+    if (!cursor || cursor === this._lastEventCursor) return;
+    this._lastEventCursor = cursor;
+    this._lastBatch = status.batch_id || batch.batch_id || cursor;
     if (status.buffs) { this._buffs = status.buffs; this._buffsAt = Date.now(); }
     const lines = this._logLines(status.events || []);
     const drops = status.drops || {};
@@ -258,7 +284,7 @@ Screens.home = {
       // 撿到裝備 → 更新狀態頁的裝備欄
       if (dk.some((k) => S.catalog?.equipment?.[k])) this._refreshEquip();
     }
-    if (status.offline || lines.length > 30) {          // 離線大批次直接倒完
+    if (status.offline || batch.mode === "offline") {  // 離線大批次直接倒完
       this._queue.length = 0;
       this._dripMs = 0;
       this._paceBudget = 0;
@@ -276,22 +302,27 @@ Screens.home = {
   },
 
   _updateKV(status) {
-    const c = S.char, sheet = this._sheet || {};
-    const tier = jobTier(c.job_id);
+    const c = S.char, progression = status?.character || c, sheet = this._sheet || {};
+    const tier = jobTier(progression.job_id || c.job_id);
     const hp = status?.character?.hunt_hp ?? sheet.hunt_hp ?? sheet.max_hp ?? 0;
     const sp = status?.character?.hunt_sp ?? sheet.hunt_sp ?? sheet.max_sp ?? 0;
     const setT = (id, v) => { const el = document.querySelector(id); if (el) el.textContent = v; };
     const setW = (id, cur, max) => { const el = document.querySelector(id);
       if (el) el.style.width = Math.max(0, Math.min(100, (cur / Math.max(1, max)) * 100)) + "%"; };
-    setT("#hm-btext", `${c.base_exp} / ${Curve.baseNext(c.base_level)}`);
-    setW("#hm-bbar", c.base_exp, Curve.baseNext(c.base_level));
-    setT("#hm-jtext", `${c.job_exp} / ${Curve.jobNext(c.job_level, tier)}`);
-    setW("#hm-jbar", c.job_exp, Curve.jobNext(c.job_level, tier));
+    const bMaxed = progression.base_level >= Curve.baseCap;
+    const jMaxed = progression.job_level >= (Curve.jobCaps[tier] ?? Curve.jobCaps.first);
+    const bNext = bMaxed ? 0 : Curve.baseNext(progression.base_level);
+    const jNext = jMaxed ? 0 : Curve.jobNext(progression.job_level, tier);
+    setT("#hm-btext", xpText(progression.base_exp, bNext, bMaxed));
+    setW("#hm-bbar", xpProgress(progression.base_exp, bNext, bMaxed).percent, 100);
+    setT("#hm-jtext", xpText(progression.job_exp, jNext, jMaxed));
+    setW("#hm-jbar", xpProgress(progression.job_exp, jNext, jMaxed).percent, 100);
+    setT("#hk-state", this._combatState === "combat" ? "交戰中" : "等待下一回合");
     setT("#hm-hptext", `${hp} / ${sheet.max_hp ?? "?"}`);
     setW("#hm-hpbar", hp, sheet.max_hp ?? 1);
     setT("#hm-sptext", `${sp} / ${sheet.max_sp ?? "?"}`);
     setW("#hm-spbar", sp, sheet.max_sp ?? 1);
-    setT("#hm-zeny", c.zeny);
+    setT("#hm-zeny", progression.zeny ?? c.zeny);
     setT("#hk-mon", monName(status.monster_id));
     setT("#hk-kills", status.kills);
     setT("#hk-exp", `+${status.base_exp} / +${status.job_exp}`);
@@ -413,9 +444,18 @@ Screens.home = {
   },
 
   _layout(status) {
-    this._hunting = !!(status && !status.retreated);
-    const c = S.char, sheet = this._sheet || {};
-    const tier = jobTier(c.job_id);
+    this._hunting = !!(status && (status.hunt_state
+      ? status.hunt_state === "active" : !status.retreated));
+    const c = S.char, progression = status?.character || c, sheet = this._sheet || {};
+    const tier = jobTier(progression.job_id || c.job_id);
+    const bMaxed = progression.base_level >= Curve.baseCap;
+    const jMaxed = progression.job_level >= (Curve.jobCaps[tier] ?? Curve.jobCaps.first);
+    const bNext = bMaxed ? 0 : Curve.baseNext(progression.base_level);
+    const jNext = jMaxed ? 0 : Curve.jobNext(progression.job_level, tier);
+    const bPct = xpProgress(progression.base_exp, bNext, bMaxed).percent;
+    const jPct = xpProgress(progression.job_exp, jNext, jMaxed).percent;
+    const combatLabel = (status?.combat_state || this._combatState) === "combat"
+      ? "交戰中" : "等待下一回合";
     const hp = status?.character?.hunt_hp ?? sheet.hunt_hp ?? sheet.max_hp ?? 0;
     const sp = status?.character?.hunt_sp ?? sheet.hunt_sp ?? sheet.max_sp ?? 0;
 
@@ -429,12 +469,12 @@ Screens.home = {
       <div class="card">
         <div class="section-title"><h2>${esc(c.name)}</h2>
           <span class="pill">${esc(jobName(c.job_id))}</span></div>
-        <div class="kv"><span class="k">Base Lv ${c.base_level}</span>
-          <span id="hm-btext">${c.base_exp} / ${Curve.baseNext(c.base_level)}</span></div>
-        <div class="bar exp"><i id="hm-bbar" style="width:${Math.min(100,(c.base_exp/Math.max(1,Curve.baseNext(c.base_level)))*100)}%"></i></div>
-        <div class="kv"><span class="k">Job Lv ${c.job_level}</span>
-          <span id="hm-jtext">${c.job_exp} / ${Curve.jobNext(c.job_level, tier)}</span></div>
-        <div class="bar exp"><i id="hm-jbar" style="width:${Math.min(100,(c.job_exp/Math.max(1,Curve.jobNext(c.job_level,tier)))*100)}%"></i></div>
+         <div class="kv"><span class="k">Base Lv ${progression.base_level}</span>
+           <span id="hm-btext">${xpText(progression.base_exp, bNext, bMaxed)}</span></div>
+         <div class="bar exp"><i id="hm-bbar" style="width:${bPct}%"></i></div>
+         <div class="kv"><span class="k">Job Lv ${progression.job_level}</span>
+           <span id="hm-jtext">${xpText(progression.job_exp, jNext, jMaxed)}</span></div>
+         <div class="bar exp"><i id="hm-jbar" style="width:${jPct}%"></i></div>
         <div class="kv"><span class="k">HP</span><span id="hm-hptext">${hp} / ${sheet.max_hp ?? "?"}</span></div>
         <div class="bar hp"><i id="hm-hpbar" style="width:${Math.min(100,(hp/Math.max(1,sheet.max_hp??1))*100)}%"></i></div>
         <div class="kv"><span class="k">SP</span><span id="hm-sptext">${sp} / ${sheet.max_sp ?? "?"}</span></div>
@@ -449,7 +489,8 @@ Screens.home = {
       html += `
         <div class="card">
           <div class="section-title"><h3>掛機中</h3>
-            <span class="pill good" id="hk-mon">${esc(monName(status.monster_id))}</span></div>
+             <span class="pill good" id="hk-mon">${esc(monName(status.monster_id))}</span>
+             <span class="sub" id="hk-state">${combatLabel}</span></div>
           <div class="kv"><span class="k">擊殺</span><span id="hk-kills">${status.kills}</span></div>
           <div class="kv"><span class="k">本場經驗</span><span id="hk-exp">+${status.base_exp} / +${status.job_exp}</span></div>
           <div class="kv"><span class="k">本場 Zeny</span><span id="hk-zeny">+${status.zeny}</span></div>
@@ -969,6 +1010,7 @@ window.Screens = Screens;
 window.S = S;
 window.esc = esc; window.bar = bar; window.view = view;
 window.Curve = Curve;
+window.XP = { progress: xpProgress, text: xpText };
 window.jobName = jobName; window.jobTier = jobTier;
 window.monName = monName; window.mapName = mapName; window.itemName = itemName;
 window.skillName = skillName;

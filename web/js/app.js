@@ -7,6 +7,7 @@ const App = (() => {
     view: "home",
     poll: null,        // setInterval id for hunt polling
     huntSecs: 0, huntSecsAt: 0,   // client-side interpolation of 掛機時間
+    huntCursor: null, huntPollBusy: false,
     chatLast: 0,
   };
 
@@ -115,20 +116,27 @@ const App = (() => {
   }
 
   async function tickHunt() {
+    if (state.huntPollBusy) return;       // API latency must not create overlapping polls
+    state.huntPollBusy = true;
     let status = null;
-    try { status = await API.huntStatus(); }
-    catch (e) {
-      // 沒在掛機 → 停止輪詢（避免每 2.5 秒打一次 409）
-      if (e.status === 409) { stopHuntPoll(); status = null; }
-      else return;
+    try {
+      try { status = await API.huntStatus(state.huntCursor); }
+      catch (e) {
+        // 沒在掛機 → 停止輪詢（避免每 2.5 秒打一次 409）
+        if (e.status === 409) { stopHuntPoll(); status = null; }
+        else return;
+      }
+      if (status) {
+        const s = Number(status.effective_seconds || 0);
+        if (s !== state.huntSecs) { state.huntSecs = s; state.huntSecsAt = Date.now(); }
+        if (status.event_cursor) state.huntCursor = status.event_cursor;
+        if (status.retreated) { stopHuntPoll(); }
+      }
+      await refreshChar();
+      if (state.view === "home") Screens.home.render(status);
+    } finally {
+      state.huntPollBusy = false;
     }
-    if (status) {
-      const s = Number(status.effective_seconds || 0);
-      if (s !== state.huntSecs) { state.huntSecs = s; state.huntSecsAt = Date.now(); }
-      if (status.retreated) { stopHuntPoll(); }
-    }
-    await refreshChar();
-    if (state.view === "home") Screens.home.render(status);
   }
 
   function huntSecsShown() {

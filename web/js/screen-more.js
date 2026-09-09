@@ -1,5 +1,13 @@
 // screen-more — MVP 挑戰 / 面對面交易 / GM 面板 / 登出
 (() => {
+  function playbackDelayMs(rounds, lineCount) {
+    const lines = Math.max(1, Number(lineCount) || 1);
+    const floor = Math.max(7000, Math.max(0, Number(rounds) || 0) * 800);
+    return Math.max(90, Math.ceil(floor / lines));
+  }
+
+  window.ROFightView = { playbackDelayMs };
+
   function fightLogLines(events) {
     const out = [];
     for (const e of events || []) {
@@ -72,7 +80,7 @@
       if (!log) { this._fighting = false; done(); return; }
       log.hidden = false;
       log.innerHTML = "";
-      const step = Math.max(90, Math.min(280, Math.round(7000 / (lines.length || 1))));
+      const step = playbackDelayMs(this._fightRounds, lines.length);
       let i = 0;
 
       // ended=true → 補完訊息並結算；ended=false → 只清理（畫面已切走）
@@ -146,6 +154,7 @@
         return;
       }
       if (gen !== (this._fightGen || 0)) return;   // 已離開 More 畫面，丟棄結果
+      this._fightRounds = r.rounds || 0;
       this._playFight(fightLogLines(r.events), async () => {
         const label = { win: "勝利", loss: "戰敗", fled: "撤退" }[r.outcome] || r.outcome;
         const cls = r.outcome === "win" ? "good" : r.outcome === "loss" ? "bad" : "warn";

@@ -65,7 +65,7 @@ const API = (() => {
 
     // hunt
     huntStart: (map_id, monster_ids) => post("/hunt/start", { map_id, monster_ids: monster_ids || [] }),
-    huntStatus: () => get("/hunt/status"),
+    huntStatus: (cursor) => get("/hunt/status" + (cursor ? "?cursor=" + encodeURIComponent(cursor) : "")),
     huntStop: () => post("/hunt/stop"),
     huntStrategy: (cid) => get("/hunt/strategy/" + cid),
     setHuntStrategy: (cid, strat) => put("/hunt/strategy/" + cid, strat),

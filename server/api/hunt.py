@@ -1,5 +1,6 @@
 import json
 import random
+import threading
 from dataclasses import asdict, fields
 from datetime import datetime, timedelta, timezone
 
@@ -34,6 +35,11 @@ _warm_start_at: dict[int, "datetime"] = {}
 # 已標記、還沒被第一次 /status 消化的暖啟動
 _warm_start_pending: set[int] = set()
 _WARM_START_COOLDOWN = 90.0
+_settlement_locks: dict[int, threading.Lock] = {}
+_settlement_locks_guard = threading.Lock()
+_COMBAT_EVENT_KINDS = {
+    "attack", "skill", "heal", "kill", "fled", "status_applied", "status_expired",
+}
 
 
 def _forget_hunt(cid: int) -> None:
@@ -332,10 +338,48 @@ def _loot(row) -> dict:
         return {}
 
 
-def _no_op_settlement(fresh) -> dict:
+def _event_view(batch: dict | None, requested_cursor: str | None,
+                *, force_empty: bool = False) -> tuple[dict, list, str]:
+    batch = batch or {}
+    cursor = batch.get("cursor")
+    events = list(batch.get("events", []))
+    if force_empty or (requested_cursor is not None and requested_cursor == cursor):
+        events = []
+    mode = batch.get("mode", "live")
+    return {
+        "batch_id": batch.get("batch_id"),
+        "cursor": cursor,
+        "mode": mode,
+        "events": events,
+    }, events, mode
+
+
+def _with_event_state(payload: dict, *, row, batch: dict | None,
+                      requested_cursor: str | None, force_empty: bool = False) -> dict:
+    event_batch, events, mode = _event_view(batch, requested_cursor, force_empty=force_empty)
+    payload["events"] = events
+    payload["event_cursor"] = event_batch["cursor"]
+    payload["event_batch"] = event_batch
+    if payload.get("retreated"):
+        payload["hunt_state"] = "retreated"
+        payload["combat_state"] = "idle"
+    elif row["hunting_map_id"] is not None:
+        payload["hunt_state"] = "active"
+        payload["combat_state"] = (
+            "combat" if mode == "live"
+            and any(e.get("kind") in _COMBAT_EVENT_KINDS for e in events)
+            else "hunting"
+        )
+    else:
+        payload["hunt_state"] = "idle"
+        payload["combat_state"] = "idle"
+    return payload
+
+
+def _no_op_settlement(fresh, event_cursor: str | None = None) -> dict:
     """別的並發請求已結算過時回這個：目前角色狀態、無增量。"""
     batch = _last_batch.get(fresh["id"], {})
-    return {
+    payload = {
         "monster_id": fresh["hunting_monster_id"],
         "monster_name": _content.get_monster(fresh["hunting_monster_id"]).name,
         "batch_id": batch.get("batch_id"),
@@ -345,9 +389,11 @@ def _no_op_settlement(fresh) -> dict:
         "job_exp": fresh["hunt_job_exp"], "zeny": fresh["hunt_zeny"], "drops": {},
         "loot": _loot(fresh),
         "offline": False, "effective_seconds": fresh["hunt_seconds"],
-        "retreated": False, "retreat_reason": None, "events": [],
+        "retreated": False, "retreat_reason": None,
         "character": _character_block(fresh),
     }
+    return _with_event_state(payload, row=fresh, batch=batch,
+                             requested_cursor=event_cursor, force_empty=True)
 
 
 def _probe_hunt_buffs(row) -> list:
@@ -365,14 +411,12 @@ def _probe_hunt_buffs(row) -> list:
         return []
 
 
-def _accumulated_snapshot(row) -> dict:
-    """未達結算地板時回這個：目前場次累積值 + 最後一批事件，不重算、不寫入。"""
+def _accumulated_snapshot(row, event_cursor: str | None = None) -> dict:
+    """未達結算地板時回這個：目前場次累積值 + 最後一批事件，不重算、不寫入。
+    沒有結算批次時不探測 combat；短輪詢只應讀狀態，不能偷偷跑一場模擬。"""
     batch = _last_batch.get(row["id"], {})
-    buffs = batch.get("buffs")
-    if not buffs:
-        # 還沒有任何結算批次（掛機剛開始）→ 探測一場拿 buff，畫面才不會空著
-        buffs = _probe_hunt_buffs(row)
-    return {
+    buffs = batch.get("buffs", [])
+    payload = {
         "monster_id": row["hunting_monster_id"],
         "monster_name": _content.get_monster(row["hunting_monster_id"]).name,
         "batch_id": batch.get("batch_id"),
@@ -383,12 +427,43 @@ def _accumulated_snapshot(row) -> dict:
         "loot": _loot(row),
         "offline": False, "effective_seconds": row["hunt_seconds"],
         "retreated": False, "retreat_reason": None,
-        "events": batch.get("events", []),
         "character": _character_block(row),
     }
+    return _with_event_state(payload, row=row, batch=batch,
+                             requested_cursor=event_cursor)
 
 
-def _settle_current(row, *, force=False) -> dict:
+def _settlement_lock(character_id: int) -> threading.Lock:
+    with _settlement_locks_guard:
+        return _settlement_locks.setdefault(character_id, threading.Lock())
+
+
+def _settle_current(row, *, force=False, event_cursor: str | None = None) -> dict:
+    """Serialize one character's full settlement, including the final progress write.
+
+    The DB claim protects the normal path, but an online settlement deliberately writes
+    back only the consumed seconds. A second request that starts after that write could
+    otherwise mistake the remaining seconds for a new batch. The non-blocking lock makes
+    that overlapping request an explicit no-op instead of applying rewards twice.
+    """
+    lock = _settlement_lock(row["id"])
+    if force:
+        lock.acquire()
+        acquired = True
+    else:
+        acquired = lock.acquire(blocking=False)
+    if not acquired:
+        fresh = characters_repo.get_character(row["id"])
+        if fresh["hunting_map_id"] is None:
+            raise HTTPException(status_code=409, detail="目前沒有在掛機")
+        return _no_op_settlement(fresh, event_cursor)
+    try:
+        return _settle_current_locked(row, force=force, event_cursor=event_cursor)
+    finally:
+        lock.release()
+
+
+def _settle_current_locked(row, *, force=False, event_cursor: str | None = None) -> dict:
     if row["hunting_map_id"] is None:
         raise HTTPException(status_code=409, detail="目前沒有在掛機")
 
@@ -408,7 +483,7 @@ def _settle_current(row, *, force=False) -> dict:
     # 暖啟動要跳過防抖，讓玩家按下掛機的第一次 /status 就結算得出東西。
     if not force and not offline and not warm_start \
             and elapsed < cfg.settle_floor_seconds:
-        return _accumulated_snapshot(row)
+        return _accumulated_snapshot(row, event_cursor)
 
     snap = _snapshot(row, hp=row["hunt_hp"], sp=row["hunt_sp"])
     player = build_player_combatant(snap, _content)
@@ -434,7 +509,7 @@ def _settle_current(row, *, force=False) -> dict:
             "SELECT hunt_last_settled_at FROM characters WHERE id = ?", (row["id"],)
         ).fetchone()[0]
         if current_last != initial_last:
-            return _no_op_settlement(characters_repo.get_character(row["id"]))
+            return _no_op_settlement(characters_repo.get_character(row["id"]), event_cursor)
         conn.execute(
             "UPDATE characters SET hunt_last_settled_at = ? WHERE id = ?",
             (now.isoformat(), row["id"]),
@@ -483,7 +558,7 @@ def _settle_current(row, *, force=False) -> dict:
                 "UPDATE characters SET hunt_last_settled_at = ? WHERE id = ?",
                 (initial_last, row["id"]),
             )
-        return _accumulated_snapshot(characters_repo.get_character(row["id"]))
+        return _accumulated_snapshot(characters_repo.get_character(row["id"]), event_cursor)
 
     new_bl, new_bexp, _ = apply_base_exp(row["base_level"], row["base_exp"], result.base_exp)
     new_jl, new_jexp, _ = apply_job_exp(row["job_level"], row["job_exp"],
@@ -572,14 +647,15 @@ def _settle_current(row, *, force=False) -> dict:
     events = [asdict(e) for e in result.events]
     # 這批事件代表的遊戲內時間：客戶端用它把逐擊訊息平均攤開，填滿到下一批之間
     pace_seconds = max(result.consumed_seconds, result.effective_seconds if offline else 0.0)
-    _last_batch[row["id"]] = {"batch_id": batch_id, "events": events,
-                              "pace_seconds": pace_seconds,
+    _last_batch[row["id"]] = {"batch_id": batch_id, "cursor": batch_id,
+                              "mode": "offline" if offline else "live",
+                              "events": events, "pace_seconds": pace_seconds,
                               "buffs": result.active_buffs}
 
     fresh = characters_repo.get_character(row["id"])
     # 輪替後目標可能已換，回傳新的（撤退清空後 fall back 到這次打的那隻）
     cur_mid = fresh["hunting_monster_id"] or row["hunting_monster_id"]
-    return {
+    payload = {
         "monster_id": cur_mid,
         "monster_name": _content.get_monster(cur_mid).name,
         "batch_id": batch_id,
@@ -596,14 +672,19 @@ def _settle_current(row, *, force=False) -> dict:
         "effective_seconds": fresh["hunt_seconds"],
         "retreated": retreated,
         "retreat_reason": retreat_reason,
-        "events": events,
         "character": _character_block(fresh),
     }
+    return _with_event_state(payload, row=fresh, batch=_last_batch[row["id"]],
+                             requested_cursor=event_cursor)
 
 
 @router.get("/status")
-def hunt_status(account_id: CurrentAccount):
-    return _settle_current(_current_character(account_id))
+def hunt_status(account_id: CurrentAccount, cursor: str | None = None,
+                event_cursor: str | None = None):
+    return _settle_current(
+        _current_character(account_id),
+        event_cursor=event_cursor or cursor,
+    )
 
 
 @router.post("/stop")
