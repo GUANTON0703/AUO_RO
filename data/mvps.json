@@ -692,5 +692,110 @@
       {"item_id": "elunium", "rate": 0.3}
     ],
     "lore": "盤踞樓蘭廢墟的火獸妖將，吼聲能震落殿頂的瓦片。"
+  },
+  {
+    "id": "maero_of_thanatos",
+    "name": "塔納托斯的憤怒",
+    "level": 89,
+    "element": "shadow",
+    "race": "demon",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 78000,
+    "job_exp": 39000,
+    "cooldown_hours": 24,
+    "home_map_id": "thanatos_tower_high",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 40270,
+      "max_sp": 0,
+      "atk": 295,
+      "matk": 154,
+      "defense": 85,
+      "mdef": 27,
+      "hit": 135,
+      "flee": 94,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {"item_id": "maero_of_thanatos_card", "rate": 0.03},
+      {"item_id": "claymore_2h_85", "rate": 0.06},
+      {"item_id": "aegis_plate", "rate": 0.05},
+      {"item_id": "dark_crystal", "rate": 0.3},
+      {"item_id": "oridecon", "rate": 0.2},
+      {"item_id": "elunium", "rate": 0.3}
+    ],
+    "lore": "封印在塔納托斯之塔頂層的憎恨之魂，塔身的裂痕都是它掙扎的痕跡。"
+  },
+  {
+    "id": "apocalypse",
+    "name": "阿波卡利普斯",
+    "level": 90,
+    "element": "neutral",
+    "race": "formless",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 81000,
+    "job_exp": 40500,
+    "cooldown_hours": 24,
+    "home_map_id": "juperos_core",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 41085,
+      "max_sp": 0,
+      "atk": 298,
+      "matk": 155,
+      "defense": 85,
+      "mdef": 27,
+      "hit": 136,
+      "flee": 95,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {"item_id": "apocalypse_card", "rate": 0.03},
+      {"item_id": "god_slayer_2h", "rate": 0.06},
+      {"item_id": "plate_armor_85", "rate": 0.05},
+      {"item_id": "gear_wheel", "rate": 0.3},
+      {"item_id": "oridecon", "rate": 0.2},
+      {"item_id": "elunium", "rate": 0.3}
+    ],
+    "lore": "朱諾遺跡核心沉睡的古代兵器，甦醒時整座遺跡都在震動。"
+  },
+  {
+    "id": "valkyrie_randgris",
+    "name": "女武神蘭德古利斯",
+    "level": 95,
+    "element": "holy",
+    "race": "angel",
+    "size": "medium",
+    "role": "boss",
+    "base_exp": 85000,
+    "job_exp": 42500,
+    "cooldown_hours": 24,
+    "home_map_id": "odin_temple_inner",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 45281,
+      "max_sp": 0,
+      "atk": 314,
+      "matk": 164,
+      "defense": 85,
+      "mdef": 28,
+      "hit": 144,
+      "flee": 100,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {"item_id": "valkyrie_randgris_card", "rate": 0.03},
+      {"item_id": "staff_of_ruin", "rate": 0.07},
+      {"item_id": "aegis_plate", "rate": 0.06},
+      {"item_id": "sniper_longbow", "rate": 0.05},
+      {"item_id": "oridecon", "rate": 0.2},
+      {"item_id": "elunium", "rate": 0.3}
+    ],
+    "lore": "奧丁神殿內殿的守護女武神，聖翼展開時連空氣都被淨化。"
   }
 ]

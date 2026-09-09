@@ -149,5 +149,21 @@
   {"id": "mao_guai_card", "name": "貓妖卡片", "monster_id": "mao_guai", "slot": "accessory", "drop_rate": 0.0014, "effects": [{"type": "flat_stat", "stat": "int", "amount": 2}, {"type": "flat_stat", "stat": "dex", "amount": 1}]},
   {"id": "jing_guai_card", "name": "精怪卡片", "monster_id": "jing_guai", "slot": "armor", "drop_rate": 0.0013, "effects": [{"type": "element_resist", "element": "shadow", "pct": 18}]},
   {"id": "turtle_general_card", "name": "龜將軍卡片", "monster_id": "turtle_general", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "fish", "pct": 20}]},
-  {"id": "yao_jun_card", "name": "妖將卡片", "monster_id": "yao_jun", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "size_damage", "size": "large", "pct": 20}]}
+  {"id": "yao_jun_card", "name": "妖將卡片", "monster_id": "yao_jun", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "size_damage", "size": "large", "pct": 20}]},
+  {"id": "aliot_card", "name": "艾里歐特卡片", "monster_id": "aliot", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "race_damage", "race": "formless", "pct": 20}]},
+  {"id": "aliza_card", "name": "艾里莎卡片", "monster_id": "aliza", "slot": "accessory", "drop_rate": 0.0017, "effects": [{"type": "flat_stat", "stat": "agi", "amount": 3}]},
+  {"id": "dolomedes_card", "name": "多羅梅德斯卡片", "monster_id": "dolomedes", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "element_resist", "element": "water", "pct": 18}]},
+  {"id": "rmb_tower_card", "name": "塔之守望卡片", "monster_id": "rmb_tower", "slot": "armor", "drop_rate": 0.0014, "effects": [{"type": "element_resist", "element": "shadow", "pct": 20}]},
+  {"id": "venatu_card", "name": "維納托卡片", "monster_id": "venatu", "slot": "garment", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 16}]},
+  {"id": "dimik_card", "name": "迪米克卡片", "monster_id": "dimik", "slot": "armor", "drop_rate": 0.0011, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 380}]},
+  {"id": "archdam_card", "name": "亞克丹卡片", "monster_id": "archdam", "slot": "armor", "drop_rate": 0.0017, "effects": [{"type": "element_resist", "element": "wind", "pct": 18}]},
+  {"id": "venatu_prime_card", "name": "維納托核心卡片", "monster_id": "venatu_prime", "slot": "weapon", "drop_rate": 0.0013, "effects": [{"type": "size_damage", "size": "small", "pct": 22}]},
+  {"id": "frus_card", "name": "弗魯斯卡片", "monster_id": "frus", "slot": "armor", "drop_rate": 0.0016, "effects": [{"type": "element_resist", "element": "holy", "pct": 18}]},
+  {"id": "skogul_card", "name": "斯庫格爾卡片", "monster_id": "skogul", "slot": "weapon", "drop_rate": 0.0014, "effects": [{"type": "race_damage", "race": "demihuman", "pct": 20}]},
+  {"id": "skeggiold_card", "name": "斯凱吉歐德卡片", "monster_id": "skeggiold", "slot": "armor", "drop_rate": 0.0011, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 17}]},
+  {"id": "valkyrie_soldier_card", "name": "女武神親衛卡片", "monster_id": "valkyrie_soldier", "slot": "accessory", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "int", "amount": 3}]},
+  {"id": "horn_scaraba_card", "name": "獨角聖甲蟲卡片", "monster_id": "horn_scaraba", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "race_damage", "race": "insect", "pct": 22}]},
+  {"id": "maero_of_thanatos_card", "name": "塔納托斯的憤怒卡片", "monster_id": "maero_of_thanatos", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "demon", "pct": 22}]},
+  {"id": "apocalypse_card", "name": "阿波卡利普斯卡片", "monster_id": "apocalypse", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "formless", "pct": 22}]},
+  {"id": "valkyrie_randgris_card", "name": "女武神蘭德古利斯卡片", "monster_id": "valkyrie_randgris", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "element_resist", "element": "holy", "pct": 20}]}
 ]

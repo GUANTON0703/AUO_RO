@@ -502,5 +502,59 @@
     "monster_ids": ["green_maiden", "mao_guai", "jing_guai", "increase_soil"],
     "mvp_id": "yao_jun",
     "unlock_base_level": 77
+  },
+  {
+    "id": "thanatos_tower_low",
+    "name": "塔納托斯之塔 下層",
+    "town": "aldebaran",
+    "level_range": [83, 91],
+    "monster_ids": ["aliza", "aliot", "dolomedes"],
+    "mvp_id": null,
+    "unlock_base_level": 83
+  },
+  {
+    "id": "thanatos_tower_high",
+    "name": "塔納托斯之塔 上層",
+    "town": "aldebaran",
+    "level_range": [88, 97],
+    "monster_ids": ["aliot", "dolomedes", "rmb_tower"],
+    "mvp_id": "maero_of_thanatos",
+    "unlock_base_level": 88
+  },
+  {
+    "id": "juperos_1f",
+    "name": "朱諾遺跡 1F",
+    "town": "aldebaran",
+    "level_range": [83, 91],
+    "monster_ids": ["archdam", "venatu", "dimik"],
+    "mvp_id": null,
+    "unlock_base_level": 85
+  },
+  {
+    "id": "juperos_core",
+    "name": "朱諾遺跡 深層",
+    "town": "aldebaran",
+    "level_range": [88, 97],
+    "monster_ids": ["venatu", "dimik", "venatu_prime"],
+    "mvp_id": "apocalypse",
+    "unlock_base_level": 90
+  },
+  {
+    "id": "odin_temple_1f",
+    "name": "奧丁神殿 外殿",
+    "town": "aldebaran",
+    "level_range": [85, 93],
+    "monster_ids": ["frus", "horn_scaraba", "skogul"],
+    "mvp_id": null,
+    "unlock_base_level": 87
+  },
+  {
+    "id": "odin_temple_inner",
+    "name": "奧丁神殿 內殿",
+    "town": "aldebaran",
+    "level_range": [90, 97],
+    "monster_ids": ["skogul", "skeggiold", "valkyrie_soldier"],
+    "mvp_id": "valkyrie_randgris",
+    "unlock_base_level": 92
   }
 ]

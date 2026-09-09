@@ -46,6 +46,10 @@
 - job 系統加 tier=transcendent，12 個新 job + ~60 技能。
 - Codex 的爬文資料這期直接用。
 
+## 已知技術債
+
+- **高等 MVP 防禦被測試樣本壓低**：`test_mvp_beatable_by_geared_same_level_player` 用通用劍士 + 對應等級 tier 裝，但 `physical_damage` 在高防禦區間掉得很陡，lv85+ 的 MVP（turtle_general/yao_jun 填 88、maero/apocalypse/valkyrie 填 85）defense 都遠低於 `baseline(lv,"boss")`（~100–120）。真正的修法：樣本帶 MVP 對應的屬性/種族卡，或檢視傷害公式在高防禦的曲線，或這些 MVP 本來就不該是純肉牆。之後專門一批處理。
+
 ## 開放問題
 
 1. 重生機制走經典硬重置（1 級 / 微量加成）還是寬鬆版（保留等級 / 大加成）？
