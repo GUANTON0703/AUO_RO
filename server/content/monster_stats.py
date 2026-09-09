@@ -18,7 +18,9 @@ def baseline(level: int, role: MonsterRole) -> CombatStats:
     hp_base = 40 + 20 * level + 0.9 * level**2
     atk_base = 5 + 1.6 * level
     def_base = 0.6 * level
-    hit_base = level + 1
+    # 命中要跟得上玩家 FLEE（= base_level + AGI + 裝備）。原本 level+1 讓任何
+    # 有練 AGI 的角色都能對中高階怪 100% 迴避，太誇張。
+    hit_base = round(level * 1.4) + 10
     flee_base = level + 5
     matk_base = 3 + 1.2 * level
     mdef_base = 0.3 * level
