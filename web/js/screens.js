@@ -457,17 +457,26 @@ Screens.home = {
     const buffs = this._buffs || [];
     if (!this._hunting || !buffs.length) return "";
     const gone = (Date.now() - (this._buffsAt || Date.now())) / 1000;
-    const live = buffs.map((b) => ({ ...b, left: Math.max(0, Math.round((b.remaining_s || 0) - gone)) }));
-    const rows = live.map((b) => {
+    // 同一個技能的多個 stat（例：音速加速 = 攻速 + 命中）併成一行
+    const groups = new Map();
+    for (const b of buffs) {
+      const key = b.source || b.stat;
+      const left = Math.max(0, Math.round((b.remaining_s || 0) - gone));
       const zh = STAT_ZH[b.stat] || b.stat;
       const sign = b.magnitude >= 0 ? "+" : "";
-      const t = b.left > 0 ? `剩約 ${b.left} 秒` : "續投中…";
-      const name = b.source ? esc(b.source) : zh;
-      return `<div class="kv"><span class="k">${name}</span>` +
-        `<span>${esc(zh)} ${sign}${b.magnitude}　${t}</span></div>`;
+      const g = groups.get(key)
+        || { name: b.source || zh, parts: [], left };
+      g.parts.push(`${zh} ${sign}${b.magnitude}`);
+      g.left = Math.min(g.left, left);
+      groups.set(key, g);
+    }
+    const rows = [...groups.values()].map((g) => {
+      const t = g.left > 0 ? `剩約 ${g.left} 秒` : "續投中…";
+      return `<div class="kv"><span class="k">${esc(g.name)}</span>` +
+        `<span>${esc(g.parts.join("、"))}　${t}</span></div>`;
     }).join("");
     return `<details style="margin-top:4px">` +
-      `<summary style="cursor:pointer" class="dim">增益中 ×${buffs.length}（點開看效果）</summary>` +
+      `<summary style="cursor:pointer" class="dim">增益中 ×${groups.size}（點開看效果）</summary>` +
       rows + `</details>`;
   },
   _equipHtml(inv) {

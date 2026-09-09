@@ -111,11 +111,13 @@ def set_hunt_state(character_id: int, *, map_id, monster_id, started_at,
             UPDATE characters SET
                 hunting_map_id = ?, hunting_monster_id = ?, hunt_started_at = ?,
                 hunt_last_settled_at = ?, hunt_hp = ?, hunt_sp = ?,
+                location_map = ?,
                 hunt_kills = 0, hunt_base_exp = 0, hunt_job_exp = 0, hunt_zeny = 0,
                 hunt_seconds = 0, hunt_loot = '{}'
             WHERE id = ?
             """,
-            (map_id, monster_id, started_at, last_settled_at, hp, sp, character_id),
+            (map_id, monster_id, started_at, last_settled_at, hp, sp, map_id,
+             character_id),
         )
 
 
