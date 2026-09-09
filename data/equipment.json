@@ -49,7 +49,7 @@
   {"id": "circlet", "name": "髮冠", "slot": "head", "rarity": "common", "stats": {"defense": 8, "max_sp": 20}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 40, "npc_buy": 500, "npc_sell": 250},
   {"id": "wool_scarf", "name": "羊毛圍巾", "slot": "garment", "rarity": "common", "stats": {"defense": 16, "flee": 4}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 50, "npc_buy": 600, "npc_sell": 300},
   {"id": "high_heels", "name": "高跟鞋", "slot": "shoes", "rarity": "common", "stats": {"defense": 20, "max_sp": 25}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 50, "npc_buy": 650, "npc_sell": 325},
-  {"id": "brooch", "name": "胸針", "slot": "accessory", "rarity": "common", "stats": {"flee": 2}, "refinable": false, "card_slots": 0, "job_ids": [], "required_level": 30, "npc_buy": 350, "npc_sell": 175},
+  {"id": "brooch", "name": "胸針", "slot": "accessory", "rarity": "fine", "stats": {"agi": 1}, "refinable": false, "card_slots": 1, "job_ids": [], "required_level": 30, "npc_buy": 8000, "npc_sell": 4000},
   {"id": "glove", "name": "手套", "slot": "accessory", "rarity": "common", "stats": {"hit": 2}, "refinable": false, "card_slots": 0, "job_ids": [], "required_level": 50, "npc_buy": 700, "npc_sell": 350},
   {"id": "guard", "name": "防護盾", "slot": "offhand", "rarity": "common", "stats": {"defense": 4}, "refinable": true, "card_slots": 1, "job_ids": ["swordman", "merchant", "acolyte", "thief"], "required_level": 1, "npc_buy": 120, "npc_sell": 60},
   {"id": "waghnak_3", "name": "拳套[3]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 20}, "refinable": true, "card_slots": 3, "job_ids": ["acolyte", "merchant"], "required_level": 14},
@@ -111,5 +111,8 @@
   {"id": "god_slayer_2h", "name": "弒神巨劍", "slot": "weapon", "rarity": "legendary", "stats": {"atk": 240}, "refinable": true, "card_slots": 2, "job_ids": ["swordman", "knight", "crusader", "merchant", "blacksmith", "alchemist", "thief", "assassin", "rogue", "monk", "acolyte"], "required_level": 95, "npc_sell": 5000, "two_handed": true},
   {"id": "staff_of_ruin", "name": "毀滅之杖", "slot": "weapon", "rarity": "legendary", "stats": {"atk": 45, "matk": 220}, "refinable": true, "card_slots": 1, "job_ids": ["mage", "wizard", "sage", "acolyte", "priest"], "required_level": 95, "npc_sell": 4800},
   {"id": "aegis_plate", "name": "神盾鎧", "slot": "armor", "rarity": "legendary", "stats": {"defense": 165, "max_hp": 600, "mdef": 5}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 95, "npc_sell": 4200},
-  {"id": "sniper_longbow", "name": "狙擊長弓", "slot": "weapon", "rarity": "legendary", "stats": {"atk": 200}, "refinable": true, "card_slots": 2, "job_ids": ["archer", "hunter", "bard"], "required_level": 95, "npc_sell": 4400, "two_handed": true}
+  {"id": "sniper_longbow", "name": "狙擊長弓", "slot": "weapon", "rarity": "legendary", "stats": {"atk": 200}, "refinable": true, "card_slots": 2, "job_ids": ["archer", "hunter", "bard"], "required_level": 95, "npc_sell": 4400, "two_handed": true},
+  {"id": "the_sign", "name": "神秘徽記", "slot": "accessory", "rarity": "legendary", "stats": {"atk": 6, "crit": 8}, "refinable": false, "card_slots": 0, "job_ids": [], "required_level": 75, "npc_sell": 20000},
+  {"id": "morrigane_helm", "name": "莫麗甘之盔", "slot": "head", "rarity": "legendary", "stats": {"defense": 18, "crit": 5}, "refinable": true, "card_slots": 0, "job_ids": [], "required_level": 65, "npc_sell": 15000},
+  {"id": "morrigane_pendant", "name": "莫麗甘之墜", "slot": "accessory", "rarity": "legendary", "stats": {"str": 2, "crit": 5}, "refinable": false, "card_slots": 0, "job_ids": [], "required_level": 65, "npc_sell": 15000}
 ]

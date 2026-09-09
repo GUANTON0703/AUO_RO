@@ -1775,5 +1775,11 @@
     "drops": [{"item_id": "scarab_shell", "rate": 0.4}, {"item_id": "scorpion_tail", "rate": 0.15}, {"item_id": "horn_scaraba_card", "rate": 0.0015},
       {"item_id": "greaves_85", "rate": 0.008}],
     "lore": "在奧丁神殿地基裂縫中築巢的甲蟲，額角能鑿穿石壁。"
+  },
+  {
+    "id": "hyegun", "name": "犬妖", "level": 77,
+    "element": "shadow", "race": "demon", "size": "medium", "role": "normal", "gen": true,
+    "drops": [{"item_id": "fox_tail", "rate": 0.4}, {"item_id": "voodoo_doll", "rate": 0.1}, {"item_id": "hyegun_card", "rate": 0.0015}],
+    "lore": "樓蘭古墓外遊蕩的犬首妖靈，據說是守墓犬含怨所化。"
   }
 ]

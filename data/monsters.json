@@ -3742,5 +3742,24 @@
     ],
     "is_mvp": false,
     "lore": "在奧丁神殿地基裂縫中築巢的甲蟲，額角能鑿穿石壁。"
+  },
+  {
+    "id": "hyegun",
+    "name": "犬妖",
+    "level": 77,
+    "element": "shadow",
+    "race": "demon",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2241,
+    "job_exp": 1120,
+    "stats": {"max_hp": 6916, "max_sp": 0, "atk": 128, "matk": 95, "defense": 23, "mdef": 23, "hit": 78, "flee": 82, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fox_tail", "rate": 0.4},
+      {"item_id": "voodoo_doll", "rate": 0.1},
+      {"item_id": "hyegun_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "樓蘭古墓外遊蕩的犬首妖靈，據說是守墓犬含怨所化。"
   }
 ]

@@ -165,5 +165,6 @@
   {"id": "horn_scaraba_card", "name": "獨角聖甲蟲卡片", "monster_id": "horn_scaraba", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "race_damage", "race": "insect", "pct": 22}]},
   {"id": "maero_of_thanatos_card", "name": "塔納托斯的憤怒卡片", "monster_id": "maero_of_thanatos", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "demon", "pct": 22}]},
   {"id": "apocalypse_card", "name": "阿波卡利普斯卡片", "monster_id": "apocalypse", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "formless", "pct": 22}]},
-  {"id": "valkyrie_randgris_card", "name": "女武神蘭德古利斯卡片", "monster_id": "valkyrie_randgris", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "element_resist", "element": "holy", "pct": 20}]}
+  {"id": "valkyrie_randgris_card", "name": "女武神蘭德古利斯卡片", "monster_id": "valkyrie_randgris", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "element_resist", "element": "holy", "pct": 20}]},
+  {"id": "hyegun_card", "name": "犬妖卡片", "monster_id": "hyegun", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "str", "amount": 3}]}
 ]

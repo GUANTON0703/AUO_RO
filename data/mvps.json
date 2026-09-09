@@ -793,6 +793,9 @@
       {"item_id": "staff_of_ruin", "rate": 0.07},
       {"item_id": "aegis_plate", "rate": 0.06},
       {"item_id": "sniper_longbow", "rate": 0.05},
+      {"item_id": "the_sign", "rate": 0.06},
+      {"item_id": "morrigane_helm", "rate": 0.06},
+      {"item_id": "morrigane_pendant", "rate": 0.06},
       {"item_id": "oridecon", "rate": 0.2},
       {"item_id": "elunium", "rate": 0.3}
     ],

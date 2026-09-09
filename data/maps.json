@@ -490,7 +490,7 @@
     "name": "樓蘭 郊野",
     "town": "aldebaran",
     "level_range": [72, 80],
-    "monster_ids": ["zhu_po_long", "green_maiden", "increase_soil", "mao_guai"],
+    "monster_ids": ["zhu_po_long", "green_maiden", "increase_soil", "mao_guai", "hyegun"],
     "mvp_id": null,
     "unlock_base_level": 74
   },
