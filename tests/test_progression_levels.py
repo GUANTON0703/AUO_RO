@@ -8,8 +8,8 @@ def test_exp_curve_is_increasing():
     assert base_exp_for_next(1) < base_exp_for_next(10) < base_exp_for_next(40)
 
 
-def test_base_level_cap_is_60():
-    assert BASE_LEVEL_CAP == 60
+def test_base_level_cap_is_99():
+    assert BASE_LEVEL_CAP == 99
 
 
 def test_job_level_cap_by_tier():
@@ -34,8 +34,8 @@ def test_apply_base_exp_multi_levelup_and_remainder():
 
 
 def test_apply_base_exp_stops_at_cap():
-    lv, exp, _ = apply_base_exp(cur_level=59, cur_exp=0, amount=10**12)
-    assert lv == 60
+    lv, exp, _ = apply_base_exp(cur_level=98, cur_exp=0, amount=10**15)
+    assert lv == 99
     assert exp == 0
 
 

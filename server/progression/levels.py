@@ -1,4 +1,4 @@
-BASE_LEVEL_CAP = 60
+BASE_LEVEL_CAP = 99
 _JOB_CAP = {"novice": 10, "first": 50, "second": 70}
 
 

@@ -9,7 +9,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
 
 // exp curve — mirrors server/progression/levels.py
 const Curve = {
-  baseCap: 60,
+  baseCap: 99,
   jobCaps: { novice: 10, first: 50, second: 70 },
   baseNext: (lvl) => Math.round(30 * Math.pow(lvl, 2.4) + 40 * lvl + 30),
   jobNext: (jl, tier) => {
