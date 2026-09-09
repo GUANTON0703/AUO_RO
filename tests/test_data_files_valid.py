@@ -106,12 +106,26 @@ def test_mvp_beatable_by_geared_same_level_player():
         CharacterSnapshot, EquippedPiece, build_player_combatant,
     )
     c = content.load_content()
+
+    def _tier(lv, t40, t55, t70, t85):
+        if lv >= 78:
+            return t85
+        if lv >= 64:
+            return t70
+        if lv >= 52:
+            return t55
+        return t40
+
     for mvp in c.mvps.values():
         lv = mvp.level
-        weapon = "bastard_sword_3" if lv >= 40 else "blade"
-        armor = "full_plate_1" if lv >= 50 else "chain_mail_1"
-        weapon_cards = ["skel_worker_card", "wolf_card", "skeleton_card"] \
-            if lv >= 40 else ["skeleton_card"]
+        weapon = _tier(lv, "bastard_sword_3" if lv >= 40 else "blade",
+                       "claymore_2h", "claymore_2h_70", "claymore_2h_85")
+        armor = _tier(lv, "full_plate_1" if lv >= 50 else "chain_mail_1",
+                      "plate_armor_55", "plate_armor_70", "plate_armor_85")
+        shoes = _tier(lv, "boots", "greaves_55", "greaves_70", "greaves_85")
+        weapon_cards = (["skel_worker_card", "wolf_card"] if lv >= 52
+                        else ["skel_worker_card", "wolf_card", "skeleton_card"] if lv >= 40
+                        else ["skeleton_card"])
         hero = build_player_combatant(CharacterSnapshot(
             name="P", job_id="swordman", base_level=lv, job_level=min(lv, 50),
             stats={"str": lv + 25, "agi": lv // 2, "vit": lv + 2,
@@ -120,7 +134,7 @@ def test_mvp_beatable_by_geared_same_level_player():
                             "bowling_bash": 5, "twohand_quicken": 5},
             equipped=[EquippedPiece(weapon, 5, weapon_cards),
                       EquippedPiece(armor, 5, []),
-                      EquippedPiece("boots", 5, ["matyr_card"])],
+                      EquippedPiece(shoes, 5, ["matyr_card"])],
         ), c)
         r = simulate_fight(hero, Combatant.from_monster(mvp), rng=random.Random(0),
                            max_rounds=300)

@@ -641,7 +641,7 @@
       "max_sp": 0,
       "atk": 272,
       "matk": 142,
-      "defense": 78,
+      "defense": 88,
       "mdef": 25,
       "hit": 124,
       "flee": 87,
@@ -650,6 +650,8 @@
     },
     "drops": [
       {"item_id": "turtle_general_card", "rate": 0.03},
+      {"item_id": "god_slayer_2h", "rate": 0.05},
+      {"item_id": "aegis_plate", "rate": 0.05},
       {"item_id": "shell", "rate": 0.3},
       {"item_id": "oridecon", "rate": 0.2},
       {"item_id": "elunium", "rate": 0.3}
@@ -674,7 +676,7 @@
       "max_sp": 0,
       "atk": 266,
       "matk": 139,
-      "defense": 78,
+      "defense": 88,
       "mdef": 24,
       "hit": 122,
       "flee": 85,
@@ -683,6 +685,8 @@
     },
     "drops": [
       {"item_id": "yao_jun_card", "rate": 0.03},
+      {"item_id": "staff_of_ruin", "rate": 0.05},
+      {"item_id": "sniper_longbow", "rate": 0.05},
       {"item_id": "ancient_lips", "rate": 0.3},
       {"item_id": "oridecon", "rate": 0.2},
       {"item_id": "elunium", "rate": 0.3}

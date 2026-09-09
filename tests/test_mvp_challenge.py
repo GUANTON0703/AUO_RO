@@ -24,14 +24,25 @@ def _hero(lv, **kw):
 
 def _graduated_knight(lv):
     c = load_content()
+
+    def _tier(t40, t55, t70, t85):
+        if lv >= 78:
+            return t85
+        if lv >= 64:
+            return t70
+        if lv >= 52:
+            return t55
+        return t40
+
+    weapon = _tier("bastard_sword_3", "claymore_2h", "claymore_2h_70", "claymore_2h_85")
+    armor = _tier("full_plate_1", "plate_armor_55", "plate_armor_70", "plate_armor_85")
+    shoes = _tier("boots", "greaves_55", "greaves_70", "greaves_85")
+    wcards = (["skel_worker_card", "wolf_card"] if lv >= 52
+              else ["skel_worker_card", "wolf_card", "skeleton_card"])
     gear = [
-        EquippedPiece(
-            "bastard_sword_3",
-            4,
-            ["skel_worker_card", "wolf_card", "skeleton_card"],
-        ),
-        EquippedPiece("full_plate_1", 4, []),
-        EquippedPiece("boots", 4, ["matyr_card"]),
+        EquippedPiece(weapon, 4, wcards),
+        EquippedPiece(armor, 4, []),
+        EquippedPiece(shoes, 4, ["matyr_card"]),
     ]
     return build_player_combatant(CharacterSnapshot(
         name="畢業騎士", job_id="knight", base_level=lv, job_level=min(lv, 50),
