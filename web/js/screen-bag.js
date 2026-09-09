@@ -250,13 +250,26 @@
           const mode = choice.trim() === "2" ? "random" :
             (choice.trim() === "1" ? "normal" : null);
           if (!mode) { App.toast("模式不對", true); return; }
+          const times = num("連續精煉幾次？（成功或失敗都算一次，遇到 +10、缺料、Zeny 不足會自動停）", 1);
+          if (times == null) return;
           b.disabled = true;
-          try {
-            const r = await API.refine(S.char.id, b.dataset.refine, mode);
-            App.toast(r.message || (r.success ? `精煉成功 +${r.refine}` : "精煉失敗"), !r.success);
-            await this._reloadHeader();
-            reload();
-          } catch (e) { App.toast(e.detail || "精煉失敗", true); b.disabled = false; }
+          let last = null;
+          for (let i = 0; i < times; i++) {
+            try {
+              const r = await API.refine(S.char.id, b.dataset.refine, mode);
+              last = r;
+              if (r.refine >= 10) break;
+            } catch (e) {
+              App.toast(e.detail || "精煉中止", true);
+              break;
+            }
+          }
+          if (last) {
+            App.toast(last.message || (last.success ? `精煉 +${last.refine}` : "精煉失敗"),
+                      !last.success);
+          }
+          await this._reloadHeader();
+          reload();
         };
       });
       this._body().querySelectorAll("[data-socket]").forEach((b) => {

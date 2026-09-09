@@ -275,12 +275,14 @@
             ${btn}
           </div>`;
       }
+      const tierOpen = this._tierOpen || (this._tierOpen = {});
       const sections = groupSkillsByTier(sorted, jobs, c.job_id).map((group) => {
         const rows = group.skills.length
           ? group.skills.map((sk) => rowsById[sk.id]).join("")
           : `<p class="muted">這個階段沒有可查看的技能。</p>`;
+        const open = tierOpen[group.tier] ?? group.open;
         return `
-          <details class="skill-tier" data-skill-tier="${group.tier}"${group.open ? " open" : ""}>
+          <details class="skill-tier" data-skill-tier="${group.tier}"${open ? " open" : ""}>
             <summary>${group.label}<span class="skill-tier-count">${group.skills.length} 個技能</span></summary>
             <div class="skill-tier-list">${rows}</div>
           </details>`;
@@ -294,6 +296,10 @@
             <button class="btn ghost" id="skill-reset">洗技能</button>
           </div>
         </div>`;
+
+      document.querySelectorAll("details[data-skill-tier]").forEach((d) => {
+        d.ontoggle = () => { this._tierOpen[d.dataset.skillTier] = d.open; };
+      });
 
       document.querySelectorAll("[data-skill]").forEach((b) => {
         b.onclick = async () => {
