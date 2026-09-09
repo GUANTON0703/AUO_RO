@@ -118,3 +118,44 @@ def test_second_job_keeps_first_job_skill_points(client, auth, db_helpers):
     lr = client.post(f"/api/characters/{ch['id']}/skills", headers=headers,
                      json={"skill_id": "katar_mastery", "level": 3})
     assert lr.status_code == 200, lr.json()
+
+
+def test_second_job_can_relearn_full_ancestry_after_skill_reset(client, auth, db_helpers):
+    _, headers, _ = auth
+    ch = _make_char(client, headers, name="重修刺客")
+
+    db_helpers.set_job_level(ch["id"], 10)
+    r = client.post(
+        f"/api/characters/{ch['id']}/jobchange",
+        headers=headers,
+        json={"target_job_id": "thief"},
+    )
+    assert r.status_code == 200, r.json()
+
+    db_helpers.set_job_level(ch["id"], 40)
+    r = client.post(
+        f"/api/characters/{ch['id']}/jobchange",
+        headers=headers,
+        json={"target_job_id": "assassin"},
+    )
+    assert r.status_code == 200, r.json()
+
+    r = client.post(f"/api/characters/{ch['id']}/resetskills", headers=headers)
+    assert r.status_code == 200, r.json()
+
+    for skill_id in ("basic_attack_boost", "double_attack", "katar_mastery"):
+        r = client.post(
+            f"/api/characters/{ch['id']}/skills",
+            headers=headers,
+            json={"skill_id": skill_id, "level": 1},
+        )
+        assert r.status_code == 200, (skill_id, r.json())
+        assert r.json()["learned_skills"][skill_id] == 1
+
+    r = client.post(
+        f"/api/characters/{ch['id']}/skills",
+        headers=headers,
+        json={"skill_id": "fire_bolt", "level": 1},
+    )
+    assert r.status_code == 400
+    assert r.json()["detail"] == "非目前職業或前職技能"

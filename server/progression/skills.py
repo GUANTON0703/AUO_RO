@@ -7,8 +7,8 @@ def can_learn(content, character_job: str, skill_id: str, target_level: int,
     skill = content.skills.get(skill_id)
     if skill is None:
         return False, "技能不存在"
-    if skill.job_id != character_job:
-        return False, "非本職技能"
+    if skill.job_id not in content.job_ancestry(character_job):
+        return False, "非目前職業或前職技能"
     if target_level < 1 or target_level > skill.max_level:
         return False, "技能等級超出範圍"
     have = current_learned.get(skill_id, 0)

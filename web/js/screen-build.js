@@ -39,7 +39,37 @@
     return { met: unmet.length === 0, unmet };
   }
 
-  window.ROSkillView = { groupSkillsByTier, getSkillPrerequisiteState };
+  function getJobAncestry(jobs, currentJobId) {
+    const ancestry = [];
+    const seen = new Set();
+    for (let jid = currentJobId; jid && !seen.has(jid); jid = jobs[jid]?.parent_id) {
+      ancestry.push(jid);
+      seen.add(jid);
+    }
+    return ancestry;
+  }
+
+  function getSkillLearnState(skill, learned, pointsAvailable, ancestry) {
+    const level = Number(learned?.[skill.id] || 0);
+    const visible = ancestry.includes(skill.job_id);
+    const maxed = level >= skill.max_level;
+    const prerequisite = getSkillPrerequisiteState(skill, learned);
+    return {
+      visible,
+      inherited: visible && skill.job_id !== ancestry[0],
+      maxed,
+      prerequisite,
+      locked: !maxed && !prerequisite.met,
+      disabled: !visible || maxed || !prerequisite.met || Number(pointsAvailable || 0) <= 0,
+    };
+  }
+
+  window.ROSkillView = {
+    groupSkillsByTier,
+    getSkillPrerequisiteState,
+    getJobAncestry,
+    getSkillLearnState,
+  };
 
   Screens.build = {
     _stale() { return App.state.view !== "build"; },
@@ -165,8 +195,7 @@
       const c = S.char;
       const learned = c.learned_skills || {};
       const jobs = S.catalog.jobs || {};
-      const chain = [];
-      for (let jid = c.job_id; jid; jid = (jobs[jid] || {}).parent_id) chain.push(jid);
+      const chain = getJobAncestry(jobs, c.job_id);
       const rank = (jid) => (jid === c.job_id ? 0 : 1);
       const skills = Object.values(S.catalog.skills || {})
         .filter((sk) => chain.includes(sk.job_id));
@@ -205,10 +234,9 @@
       const rowsById = {};
       for (const sk of sorted) {
         const lv = learned[sk.id] || 0;
-        const maxed = lv >= sk.max_level;
-        const inherited = sk.job_id !== c.job_id;
-        const prereq = getSkillPrerequisiteState(sk, learned);
-        const locked = !maxed && !prereq.met;
+        const learnState = getSkillLearnState(sk, learned, c.skill_points, chain);
+        const { maxed, inherited, locked } = learnState;
+        const prereq = learnState.prerequisite;
         const active = sk.kind === "active" && lv > 0;
         const idleOn = toggles[sk.id] ?? (sk.idle_default?.enabled ?? true);
         const isPrimary = strat.primary_skill_id === sk.id;
@@ -224,10 +252,8 @@
           .map(([rid, rlv]) => `${skillName(rid)} Lv${rlv}`).join("、");
         const cost = sk.kind === "active" && (sk.sp_cost || []).length
           ? `　SP ${sk.sp_cost[Math.min(Math.max(1, lv), sk.sp_cost.length) - 1]}` : "";
-        const btn = inherited
-          ? ""
-          : `<button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}"
-              ${maxed || locked ? "disabled" : ""}>學 +1</button>`;
+        const btn = `<button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}"
+              ${learnState.disabled ? "disabled" : ""}>學 +1</button>`;
         const idleCtl = active ? `
               <div class="sub" style="margin-top:4px">
                 <label style="margin-right:12px"><input type="checkbox" style="width:auto"

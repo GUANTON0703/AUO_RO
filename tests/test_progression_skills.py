@@ -23,6 +23,33 @@ def test_can_learn_checks_job_and_points():
     assert bad is False
 
 
+def test_second_job_can_learn_skills_from_its_full_ancestry_only():
+    from server.content import load_content
+    c = load_content()
+
+    for skill_id in ("basic_attack_boost", "double_attack", "katar_mastery"):
+        ok, reason = can_learn(
+            c,
+            character_job="assassin",
+            skill_id=skill_id,
+            target_level=1,
+            current_learned={},
+            points_available=5,
+        )
+        assert ok is True, reason
+
+    ok, reason = can_learn(
+        c,
+        character_job="assassin",
+        skill_id="fire_bolt",
+        target_level=1,
+        current_learned={},
+        points_available=5,
+    )
+    assert ok is False
+    assert reason == "非目前職業或前職技能"
+
+
 def test_cannot_exceed_skill_max_level():
     from server.content import load_content
     c = load_content()

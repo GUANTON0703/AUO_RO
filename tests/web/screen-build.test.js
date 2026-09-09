@@ -54,3 +54,51 @@ test("marks a skill locked when any requires level is not learned", () => {
     [{ id: "bash", required: 3, current: 2 }],
   );
 });
+
+test("returns only the current job ancestry from second job to novice", () => {
+  const jobs = {
+    novice: { tier: "novice" },
+    thief: { tier: "first", parent_id: "novice" },
+    mage: { tier: "first", parent_id: "novice" },
+    assassin: { tier: "second", parent_id: "thief" },
+  };
+
+  assert.equal(typeof skillView.getJobAncestry, "function");
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(skillView.getJobAncestry(jobs, "assassin"))),
+    ["assassin", "thief", "novice"],
+  );
+  assert.equal(skillView.getJobAncestry(jobs, "assassin").includes("mage"), false);
+});
+
+test("enables ancestry skill buttons only with points, prerequisites, and room to level", () => {
+  assert.equal(typeof skillView.getSkillLearnState, "function");
+  const ancestry = ["assassin", "thief", "novice"];
+  const skill = { id: "double_attack", job_id: "thief", max_level: 5, requires: {} };
+
+  assert.equal(skillView.getSkillLearnState(skill, {}, 1, ancestry).disabled, false);
+  assert.equal(skillView.getSkillLearnState(skill, {}, 0, ancestry).disabled, true);
+  assert.equal(skillView.getSkillLearnState(skill, {}, undefined, ancestry).disabled, true);
+  assert.equal(
+    skillView.getSkillLearnState(skill, { double_attack: 5 }, 1, ancestry).disabled,
+    true,
+  );
+  assert.equal(
+    skillView.getSkillLearnState(
+      { ...skill, requires: { envenom: 1 } },
+      {},
+      1,
+      ancestry,
+    ).disabled,
+    true,
+  );
+  assert.equal(
+    skillView.getSkillLearnState(
+      { ...skill, job_id: "mage" },
+      {},
+      1,
+      ancestry,
+    ).visible,
+    false,
+  );
+});
