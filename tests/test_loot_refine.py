@@ -64,4 +64,4 @@ def test_attempt_random_refine_caps_at_maximum():
         def random(self):
             return 0.99
 
-    assert attempt_random_refine(9, rng=FixedRng()) == (REFINE_CAP, 3)
+    assert attempt_random_refine(9, rng=FixedRng()) == (REFINE_CAP, 1)

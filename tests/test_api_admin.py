@@ -123,6 +123,17 @@ def test_drop_rate_override_input_is_bounded(client):
         assert response.status_code == 422
 
 
+def test_source_drop_rate_rejects_item_not_dropped_by_source(client):
+    _make_gm("gmdrop-source-validation")
+    headers = {"Authorization": f"Bearer {_login(client, 'gmdrop-source-validation').json()['token']}"}
+    response = client.put(
+        "/api/admin/drop-rates",
+        json={"source_id": "poring", "item_id": "angel_poring_card", "rate": 0.5},
+        headers=headers,
+    )
+    assert response.status_code == 404
+
+
 def test_gm_can_delete_orphaned_source_drop_override(client):
     _make_gm("gmdropcleanup")
     headers = {"Authorization": f"Bearer {_login(client, 'gmdropcleanup').json()['token']}"}

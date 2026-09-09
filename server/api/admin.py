@@ -180,7 +180,11 @@ def set_drop_rate(body: DropRateRequest, _: GMAccount):
                 (body.item_id, body.rate),
             )
         else:
-            _content_drop_rate(body.source_id, body.item_id)
+            source_rate = _content_drop_rate(body.source_id, body.item_id)
+            card = _content.cards.get(body.item_id)
+            card_source = card is not None and card.monster_id == body.source_id
+            if source_rate == 0.0 and not card_source:
+                raise HTTPException(status_code=404, detail="該來源不會掉落此裝備或卡片")
             conn.execute(
                 "INSERT INTO source_drop_rates(source_id, item_id, rate) VALUES (?, ?, ?) "
                 "ON CONFLICT(source_id, item_id) DO UPDATE SET rate=excluded.rate",

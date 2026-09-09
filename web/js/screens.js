@@ -284,7 +284,8 @@ Screens.home = {
       // 撿到裝備 → 更新狀態頁的裝備欄
       if (dk.some((k) => S.catalog?.equipment?.[k])) this._refreshEquip();
     }
-    if (status.offline || batch.mode === "offline") {  // 離線大批次直接倒完
+    if (status.offline || batch.mode === "offline" || lines.length > 120) {
+      // 離線或異常大的批次直接倒完；正常 30 回合 Boss 仍逐回合播放。
       this._queue.length = 0;
       this._dripMs = 0;
       this._paceBudget = 0;

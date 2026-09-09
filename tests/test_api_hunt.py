@@ -167,6 +167,8 @@ def test_stop_hunt_settles_and_clears(client, auth, db_helpers):
     db_helpers.rewind_hunt(ch["id"], seconds=1800)
     assert client.post("/api/hunt/stop", headers=headers).status_code == 200
     assert client.get("/api/hunt/status", headers=headers).status_code == 409
+    from server.api import hunt as hunt_api
+    assert ch["id"] not in hunt_api._settlement_locks
 
 
 def test_concurrent_status_settles_once(client, auth, db_helpers):

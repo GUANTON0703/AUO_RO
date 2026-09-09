@@ -47,6 +47,11 @@ def _forget_hunt(cid: int) -> None:
     _hunt_meta.pop(cid, None)
 
 
+def _discard_settlement_lock(cid: int) -> None:
+    with _settlement_locks_guard:
+        _settlement_locks.pop(cid, None)
+
+
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -446,6 +451,8 @@ def _settle_current(row, *, force=False, event_cursor: str | None = None) -> dic
     otherwise mistake the remaining seconds for a new batch. The non-blocking lock makes
     that overlapping request an explicit no-op instead of applying rewards twice.
     """
+    if row["hunting_map_id"] is None:
+        raise HTTPException(status_code=409, detail="目前沒有在掛機")
     lock = _settlement_lock(row["id"])
     if force:
         lock.acquire()
@@ -461,6 +468,8 @@ def _settle_current(row, *, force=False, event_cursor: str | None = None) -> dic
         return _settle_current_locked(row, force=force, event_cursor=event_cursor)
     finally:
         lock.release()
+        if force:
+            _discard_settlement_lock(row["id"])
 
 
 def _settle_current_locked(row, *, force=False, event_cursor: str | None = None) -> dict:

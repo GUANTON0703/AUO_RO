@@ -40,7 +40,8 @@ def attempt_random_refine(current_refine: int, rng: random.Random) -> tuple[int,
         increment = 2
     else:
         increment = 3
-    return min(REFINE_CAP, current_refine + increment), increment
+    new_refine = min(REFINE_CAP, current_refine + increment)
+    return new_refine, new_refine - current_refine
 
 
 REFINE_BONUS_PER_LEVEL = {"atk": 2, "matk": 2, "def": 1, "mdef": 1,
