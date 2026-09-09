@@ -55,7 +55,8 @@ def _physical_skill(caster, target, skill, eff, rng):
     mult, resist, race = elements.damage_mods(caster, target, element)
     total = landed = 0
     for _ in range(hits):
-        if rng.random() >= hit_chance(caster.effective_hit, target.effective_flee):
+        if rng.random() >= max(hit_chance(caster.effective_hit, target.effective_flee),
+                               caster.min_hit_chance):
             continue
         landed += 1
         dmg = physical_damage(round(caster.effective_atk * power), target.effective_defense,

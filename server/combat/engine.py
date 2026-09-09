@@ -69,7 +69,8 @@ def _trigger_ok(c, trigger: str) -> bool:
 
 def _one_hit(attacker, defender, rng, events):
     """打一擊。回 True = 有命中。"""
-    hit = rng.random() < hit_chance(attacker.effective_hit, defender.effective_flee)
+    hit = rng.random() < max(hit_chance(attacker.effective_hit, defender.effective_flee),
+                             attacker.min_hit_chance)
     if not hit:
         events.append(AttackEvent(attacker.name, defender.name, 0, False, False))
         return False

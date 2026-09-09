@@ -48,11 +48,14 @@ def _graduated_knight(lv):
 def test_geared_player_wins_and_gets_rewards():
     c = load_content()
     m = c.mvps["angel_poring"]
-    r = challenge_mvp(_hero(m.level), m, ChallengeConfig(), random.Random(0), m.level)
+    r = challenge_mvp(_graduated_knight(m.level), m, ChallengeConfig(),
+                      random.Random(0), m.level)
     assert r.outcome == "win"
     assert r.base_exp > 0 and r.zeny > 0
     assert sum(r.drops.values()) >= 0
     assert len(r.events) > 5
+    # Boss 一定放得出共用技能
+    assert any(e.get("skill_name") in {"王者重擊", "元素爆發", "狂暴"} for e in r.events)
 
 
 def test_weak_player_loses_and_pays_exp():
@@ -108,7 +111,7 @@ def test_mvp_uses_source_specific_drop_rate_override(tmp_path):
     mvp = original.model_copy(update={
         "drops": [DropEntry(item_id="angel_poring_card", rate=0.0)],
     })
-    result = challenge_mvp(_hero(mvp.level), mvp, ChallengeConfig(),
+    result = challenge_mvp(_graduated_knight(mvp.level), mvp, ChallengeConfig(),
                            random.Random(0), mvp.level)
 
     assert result.outcome == "win"

@@ -2,7 +2,7 @@ import random
 from dataclasses import asdict, dataclass, field, is_dataclass
 
 from server.combat import simulate_fight
-from server.combat.combatant import Combatant
+from server.combat.combatant import Combatant, ResolvedSkill
 from server.progression.levels import base_exp_for_next
 from server.settlement.economy import zeny_per_kill
 from server.settlement.drops import effective_drop_rate, load_drop_rate_overrides
@@ -32,9 +32,47 @@ def _event_dict(e) -> dict:
     return asdict(e) if is_dataclass(e) else dict(e)
 
 
+BOSS_MIN_HIT_CHANCE = 0.35
+
+
+def boss_skills(atk: int, hit: int, element: str) -> list[ResolvedSkill]:
+    """所有 MVP 共用的一組基礎技能：王者重擊 / 元素爆發 / 狂暴。"""
+    return [
+        ResolvedSkill(
+            skill_id="mvp_royal_smash", name="王者重擊", level=1, kind="active",
+            sp_cost=20, cooldown_rounds=2,
+            effects=[{"type": "physical_hit", "power_pct": 160}],
+            trigger="cooldown_ready", priority=10,
+        ),
+        ResolvedSkill(
+            skill_id="mvp_elemental_burst", name="元素爆發", level=1, kind="active",
+            sp_cost=30, cooldown_rounds=4,
+            effects=[{"type": "magic_hit", "power_pct": 140, "element": element}],
+            trigger="cooldown_ready", priority=8,
+        ),
+        ResolvedSkill(
+            skill_id="mvp_rage", name="狂暴", level=1, kind="active",
+            sp_cost=15, cooldown_rounds=999,
+            effects=[{"type": "buff",
+                      "stats": {"atk": [max(1, round(atk * 0.25))],
+                                "hit": [max(1, round(hit * 0.25))]},
+                      "duration_s": 10}],
+            trigger="hp_below_50", priority=20,
+        ),
+    ]
+
+
+def apply_boss_kit(foe: Combatant) -> None:
+    """把 Boss 命中下限、SP 池與共用技能掛到 MVP 戰鬥角色上。"""
+    foe.min_hit_chance = BOSS_MIN_HIT_CHANCE
+    foe.max_sp = foe.sp = 9999
+    foe.skills = boss_skills(foe.atk, foe.hit, foe.element)
+
+
 def challenge_mvp(player: Combatant, mvp, cfg: ChallengeConfig, rng: random.Random,
                   player_base_level: int = 1) -> ChallengeResult:
     foe = Combatant.from_monster(mvp)
+    apply_boss_kit(foe)
     fight = simulate_fight(player, foe, rng, max_rounds=400,
                            flee_hp_frac=cfg.flee_hp_frac)
 
