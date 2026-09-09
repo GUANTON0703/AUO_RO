@@ -4,10 +4,13 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from server.auth.dependencies import GMAccount
+from server.content import load_content
 from server.db import connection
 from server.settlement.config import HuntConfig
+from server.settlement.drops import effective_drop_rate, load_drop_rate_overrides
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
+_content = load_content()
 
 
 class MoneyRequest(BaseModel):
@@ -34,6 +37,12 @@ class AnnouncementRequest(BaseModel):
     text: str = Field(default="", max_length=500)
 
 
+class DropRateRequest(BaseModel):
+    source_id: str | None = Field(default=None, min_length=1, max_length=100)
+    item_id: str = Field(min_length=1, max_length=100)
+    rate: float = Field(ge=0, le=1)
+
+
 _SETTING_DEFAULTS = {
     "experience_multiplier": 1.0,
     "drop_multiplier": 1.0,
@@ -49,6 +58,71 @@ def _character(character_id: int):
     if row is None:
         raise HTTPException(status_code=404, detail="找不到角色")
     return row
+
+
+def _validate_drop_item(item_id: str) -> None:
+    if item_id not in _content.equipment and item_id not in _content.cards:
+        raise HTTPException(status_code=404, detail="只支援裝備或卡片掉落率")
+
+
+def _content_drop_rate(source_id: str | None, item_id: str,
+                       *, allow_missing_source: bool = False) -> float:
+    if source_id is not None:
+        source = _content.monsters.get(source_id) or _content.mvps.get(source_id)
+        if source is None:
+            if allow_missing_source:
+                return 0.0
+            raise HTTPException(status_code=404, detail="找不到掉落來源")
+        for drop in source.drops:
+            if drop.item_id == item_id:
+                return drop.rate
+        card = _content.cards.get(item_id)
+        if card and card.monster_id == source_id:
+            return card.drop_rate
+        return 0.0
+    card = _content.cards.get(item_id)
+    if card is not None:
+        return card.drop_rate
+    return 0.0
+
+
+def _drop_rate_view(item_id: str, source_id: str | None = None,
+                    *, allow_missing_source: bool = False) -> dict:
+    _validate_drop_item(item_id)
+    overrides = load_drop_rate_overrides()
+    content_rate = _content_drop_rate(
+        source_id, item_id, allow_missing_source=allow_missing_source
+    )
+    global_rate = overrides.global_rates.get(item_id)
+    source_rate = (
+        overrides.source_rates.get((source_id, item_id))
+        if source_id is not None else None
+    )
+    return {
+        "source_id": source_id,
+        "item_id": item_id,
+        "content_rate": content_rate,
+        "global_rate": global_rate,
+        "source_rate": source_rate,
+        "effective_rate": effective_drop_rate(
+            source_id, item_id, content_rate, overrides
+        ),
+    }
+
+
+def _drop_rate_overrides() -> dict:
+    with connection.get_connection() as conn:
+        global_rows = conn.execute(
+            "SELECT item_id, rate FROM global_drop_rates ORDER BY item_id"
+        ).fetchall()
+        source_rows = conn.execute(
+            "SELECT source_id, item_id, rate FROM source_drop_rates "
+            "ORDER BY source_id, item_id"
+        ).fetchall()
+    return {
+        "global": [dict(row) for row in global_rows],
+        "source": [dict(row) for row in source_rows],
+    }
 
 
 @router.post("/characters/{character_id}/money")
@@ -83,6 +157,51 @@ def set_multipliers(body: MultipliersRequest, _: GMAccount):
     zeny = float(got["zeny_multiplier"]) if "zeny_multiplier" in got \
         else HuntConfig().zeny_multiplier
     return {"experience": body.experience, "drop": body.drop, "zeny": zeny}
+
+
+@router.get("/settings/drop-rates")
+@router.get("/drop-rates")
+def get_drop_rates(_: GMAccount, item_id: str | None = None,
+                   source_id: str | None = None):
+    if item_id is None:
+        return _drop_rate_overrides()
+    return _drop_rate_view(item_id, source_id)
+
+
+@router.put("/settings/drop-rates")
+@router.put("/drop-rates")
+def set_drop_rate(body: DropRateRequest, _: GMAccount):
+    _validate_drop_item(body.item_id)
+    with connection.transaction() as conn:
+        if body.source_id is None:
+            conn.execute(
+                "INSERT INTO global_drop_rates(item_id, rate) VALUES (?, ?) "
+                "ON CONFLICT(item_id) DO UPDATE SET rate=excluded.rate",
+                (body.item_id, body.rate),
+            )
+        else:
+            _content_drop_rate(body.source_id, body.item_id)
+            conn.execute(
+                "INSERT INTO source_drop_rates(source_id, item_id, rate) VALUES (?, ?, ?) "
+                "ON CONFLICT(source_id, item_id) DO UPDATE SET rate=excluded.rate",
+                (body.source_id, body.item_id, body.rate),
+            )
+    return _drop_rate_view(body.item_id, body.source_id)
+
+
+@router.delete("/settings/drop-rates")
+@router.delete("/drop-rates")
+def delete_drop_rate(_: GMAccount, item_id: str, source_id: str | None = None):
+    _validate_drop_item(item_id)
+    with connection.transaction() as conn:
+        if source_id is None:
+            conn.execute("DELETE FROM global_drop_rates WHERE item_id = ?", (item_id,))
+        else:
+            conn.execute(
+                "DELETE FROM source_drop_rates WHERE source_id = ? AND item_id = ?",
+                (source_id, item_id),
+            )
+    return _drop_rate_view(item_id, source_id, allow_missing_source=True)
 
 
 @router.put("/settings/hunt")

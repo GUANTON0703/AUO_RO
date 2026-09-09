@@ -14,6 +14,19 @@ CREATE TABLE IF NOT EXISTS server_settings (
 INSERT OR IGNORE INTO server_settings (key, value) VALUES ('experience_multiplier', '1.0');
 INSERT OR IGNORE INTO server_settings (key, value) VALUES ('drop_multiplier', '1.0');
 
+CREATE TABLE IF NOT EXISTS global_drop_rates (
+    item_id TEXT PRIMARY KEY,
+    rate    REAL NOT NULL CHECK (rate >= 0.0 AND rate <= 1.0)
+);
+
+CREATE TABLE IF NOT EXISTS source_drop_rates (
+    source_id TEXT NOT NULL,
+    item_id   TEXT NOT NULL,
+    rate      REAL NOT NULL CHECK (rate >= 0.0 AND rate <= 1.0),
+    PRIMARY KEY (source_id, item_id)
+);
+CREATE INDEX IF NOT EXISTS idx_source_drop_rates_item ON source_drop_rates(item_id);
+
 CREATE TABLE IF NOT EXISTS invite_codes (
     code            TEXT PRIMARY KEY,
     created_at      TEXT NOT NULL,

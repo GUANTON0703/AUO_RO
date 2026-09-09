@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 from server.auth.dependencies import CurrentAccount
 from server.content import load_content
 from server.repositories import characters as characters_repo
+from server.settlement.drops import effective_drop_rate, load_drop_rate_overrides
 
 router = APIRouter(prefix="/api/content", tags=["content"])
 _content = load_content()
@@ -28,11 +29,30 @@ def _get(kind: str, item_id: str):
     return item
 
 
+def _monster_body(monster, overrides=None) -> dict:
+    overrides = overrides or load_drop_rate_overrides()
+    body = monster.model_dump(mode="json")
+    body["drops"] = [
+        {
+            **drop.model_dump(),
+            "rate": effective_drop_rate(monster.id, drop.item_id, drop.rate, overrides),
+            "item_name": _item_name(drop.item_id),
+        }
+        for drop in monster.drops
+    ]
+    return body
+
+
 @router.get("/catalog")
 def catalog(account_id: CurrentAccount):
     """網頁前端一次抓齊靜態內容（地圖 / 怪 / 物品 / 裝備 / 卡 / 職業 / 技能）。"""
+    overrides = load_drop_rate_overrides()
     def dump(coll):
-        return {k: v.model_dump(mode="json") for k, v in coll.items()}
+        return {
+            k: (_monster_body(v, overrides) if hasattr(v, "drops")
+                else v.model_dump(mode="json"))
+            for k, v in coll.items()
+        }
     return {
         "maps": dump(_content.maps),
         "monsters": dump(_content.monsters),
@@ -50,11 +70,7 @@ def monster_detail(monster_id: str, account_id: CurrentAccount):
     monster = _content.monsters.get(monster_id) or _content.mvps.get(monster_id)
     if monster is None:
         raise HTTPException(status_code=404, detail="怪物不存在")
-    body = monster.model_dump(mode="json")
-    body["drops"] = [
-        {**drop.model_dump(), "item_name": _item_name(drop.item_id)} for drop in monster.drops
-    ]
-    return body
+    return _monster_body(monster)
 
 
 def _detail(kind: str, item_id: str, account_id: int):

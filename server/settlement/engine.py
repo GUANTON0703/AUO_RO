@@ -177,7 +177,7 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
         * cfg.zeny_multiplier)
     zeny = round(kills * zeny_per_kill(monster) * cfg.zeny_multiplier) + steal_zeny
     drops, pity_out = roll_drops(monster.drops, kills, rng, offline=offline,
-                                 pity_in=pity_in, cfg=cfg)
+                                 pity_in=pity_in, cfg=cfg, source_id=monster.id)
 
     events: list = []
     if kills > 0:
@@ -286,7 +286,7 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
     steal_zeny = round(steal_hits * zeny_per_kill(monster) * 0.5 * cfg.zeny_multiplier)
     zeny = round(kills * zeny_per_kill(monster) * cfg.zeny_multiplier) + steal_zeny
     drops, pity_out = roll_drops(monster.drops, kills, rng, offline=False,
-                                 pity_in=pity_in, cfg=cfg)
+                                 pity_in=pity_in, cfg=cfg, source_id=monster.id)
 
     events: list = list(combat_events[-60:])
     if kills > 0:

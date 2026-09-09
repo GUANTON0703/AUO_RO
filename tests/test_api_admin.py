@@ -70,6 +70,81 @@ def test_gm_can_set_bounded_multipliers(client):
     assert client.put("/api/admin/settings/multipliers", json={"experience": 0, "drop": 1}, headers=headers).status_code == 422
 
 
+def test_gm_can_set_and_read_drop_rate_overrides(client, auth):
+    _make_gm("gmdrops")
+    headers = {"Authorization": f"Bearer {_login(client, 'gmdrops').json()['token']}"}
+
+    global_response = client.put(
+        "/api/admin/drop-rates",
+        json={"item_id": "angel_poring_card", "rate": 0.25},
+        headers=headers,
+    )
+    assert global_response.status_code == 200
+    assert global_response.json()["effective_rate"] == 0.25
+
+    source_response = client.put(
+        "/api/admin/drop-rates",
+        json={"source_id": "angel_poring", "item_id": "angel_poring_card", "rate": 0.0},
+        headers=headers,
+    )
+    assert source_response.status_code == 200
+    assert source_response.json()["effective_rate"] == 0.0
+
+    read = client.get(
+        "/api/admin/drop-rates",
+        params={"source_id": "angel_poring", "item_id": "angel_poring_card"},
+        headers=headers,
+    )
+    assert read.status_code == 200
+    assert read.json() == {
+        "source_id": "angel_poring",
+        "item_id": "angel_poring_card",
+        "content_rate": 0.03,
+        "global_rate": 0.25,
+        "source_rate": 0.0,
+        "effective_rate": 0.0,
+    }
+
+    detail = client.get("/api/content/monsters/angel_poring", headers=auth[1])
+    assert detail.status_code == 200
+    card = next(d for d in detail.json()["drops"] if d["item_id"] == "angel_poring_card")
+    assert card["rate"] == 0.0
+
+
+def test_drop_rate_override_input_is_bounded(client):
+    _make_gm("gmdropbounds")
+    headers = {"Authorization": f"Bearer {_login(client, 'gmdropbounds').json()['token']}"}
+    for rate in (-0.01, 1.01):
+        response = client.put(
+            "/api/admin/drop-rates",
+            json={"item_id": "angel_poring_card", "rate": rate},
+            headers=headers,
+        )
+        assert response.status_code == 422
+
+
+def test_gm_can_delete_orphaned_source_drop_override(client):
+    _make_gm("gmdropcleanup")
+    headers = {"Authorization": f"Bearer {_login(client, 'gmdropcleanup').json()['token']}"}
+    with connection.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO source_drop_rates(source_id, item_id, rate) VALUES (?, ?, ?)",
+            ("removed_monster", "angel_poring_card", 0.0),
+        )
+
+    response = client.delete(
+        "/api/admin/drop-rates",
+        params={"source_id": "removed_monster", "item_id": "angel_poring_card"},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    with connection.get_connection() as conn:
+        assert conn.execute(
+            "SELECT 1 FROM source_drop_rates WHERE source_id = ? AND item_id = ?",
+            ("removed_monster", "angel_poring_card"),
+        ).fetchone() is None
+
+
 def test_me_reports_gm_flag(client):
     _make_account("plain")
     plain_token = _login(client, "plain").json()["token"]

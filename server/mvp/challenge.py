@@ -5,6 +5,7 @@ from server.combat import simulate_fight
 from server.combat.combatant import Combatant
 from server.progression.levels import base_exp_for_next
 from server.settlement.economy import zeny_per_kill
+from server.settlement.drops import effective_drop_rate, load_drop_rate_overrides
 
 
 @dataclass
@@ -50,8 +51,10 @@ def challenge_mvp(player: Combatant, mvp, cfg: ChallengeConfig, rng: random.Rand
 
     if outcome == "win":
         drops: dict = {}
+        overrides = load_drop_rate_overrides()
         for d in mvp.drops:
-            rate = min(1.0, d.rate * cfg.mvp_drop_multiplier)
+            content_rate = effective_drop_rate(mvp.id, d.item_id, d.rate, overrides)
+            rate = min(1.0, content_rate * cfg.mvp_drop_multiplier)
             if rng.random() < rate:
                 drops[d.item_id] = drops.get(d.item_id, 0) + rng.randint(d.min_qty, d.max_qty)
         result.drops = drops
