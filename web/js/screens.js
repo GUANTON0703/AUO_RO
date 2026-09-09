@@ -149,7 +149,10 @@ function combatLogLines(events, opts) {
     } else if (e.kind === "skill") {
       const dmg = e.damage ? ` → ${e.damage}` : "";
       const tgt = e.target && e.target !== e.actor ? `對 ${esc(e.target)} ` : "";
-      out.push(`<span class="${side(e.actor, e.target)}">  ${esc(e.actor)} ${tgt}施放【${esc(e.skill_name)}】${dmg}</span>`);
+      // 被動技能觸發時用「觸發」而不是「施放」，才不會看起來像主動放招
+      const passive = S.catalog?.skills?.[e.skill_id]?.kind === "passive";
+      const verb = passive ? `發動【${esc(e.skill_name)}】` : `${tgt}施放【${esc(e.skill_name)}】`;
+      out.push(`<span class="${side(e.actor, e.target)}">  ${esc(e.actor)} ${verb}${dmg}</span>`);
     } else if (e.kind === "kill") {
       out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}</span>`);
     } else if (e.kind === "heal") {
