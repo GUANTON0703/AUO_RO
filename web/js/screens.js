@@ -119,7 +119,64 @@ function effectText(e) {
   if (e.type === "race_damage") return `對${RACE_ZH[e.race] || e.race}傷害 +${e.pct}%`;
   if (e.type === "size_damage") return `對${SIZE_ZH[e.size] || e.size}傷害 +${e.pct}%`;
   if (e.type === "on_hit_proc") return `攻擊 ${e.chance_pct}% 機率${PROC_ZH[e.effect] || e.effect}`;
+  if (e.type === "weapon_element" || e.type === "element_endow")
+    return `武器附${ELEM_ZH[e.element] || e.element}屬性`;
   return e.type;
+}
+
+// 戰鬥記錄：掛機播放與 MVP 挑戰共用。用角色名分辨「你打」與「你被打」的顏色。
+function combatLogLines(events, opts) {
+  const me = (opts && opts.playerName) || (S.char && S.char.name) || "";
+  const side = (actor, target) =>
+    actor === me ? "atk-mine" : (target === me ? "atk-foe" : "hit");
+  const out = [];
+  const list = events || [];
+  for (let i = 0; i < list.length; i++) {
+    const e = list[i];
+    if (e.kind === "attack") {
+      const nums = [];
+      let j = i;
+      while (j < list.length && list[j].kind === "attack"
+             && list[j].actor === e.actor && list[j].target === e.target) {
+        const a = list[j];
+        if (!a.hit) nums.push(`<span class="dim">MISS</span>`);
+        else if (a.crit) nums.push(`${a.damage}爆`);
+        else nums.push(`${a.damage}`);
+        j++;
+      }
+      i = j - 1;
+      out.push(`<span class="${side(e.actor, e.target)}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${nums.join(" ")}</span>`);
+    } else if (e.kind === "skill") {
+      const dmg = e.damage ? ` → ${e.damage}` : "";
+      const tgt = e.target && e.target !== e.actor ? `對 ${esc(e.target)} ` : "";
+      out.push(`<span class="${side(e.actor, e.target)}">  ${esc(e.actor)} ${tgt}施放【${esc(e.skill_name)}】${dmg}</span>`);
+    } else if (e.kind === "kill") {
+      out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}</span>`);
+    } else if (e.kind === "heal") {
+      const how = e.source === "potion" ? "喝藥水"
+        : e.source === "sp_potion" ? "喝 SP 藥水" : "施放治療";
+      out.push(`<span class="dim">  ${esc(e.actor)} ${how} 回復 ${e.amount}</span>`);
+    } else if (e.kind === "fled" || e.kind === "retreat") {
+      const hp = e.hp != null ? `（HP ${e.hp}）` : "";
+      const why = e.reason ? "：" + esc(e.reason) : "";
+      out.push(`<span class="dim">${esc(e.actor || "")} 撤退${hp}${why}</span>`);
+    } else if (e.kind === "status_expired") {
+      const st = (e.status || "").replace(/_mod$/, "");
+      out.push(`<span class="dim">  ${esc(e.target)} 的 ${esc(STAT_ZH[st] || st)} 加成結束</span>`);
+    } else if (e.kind === "status_applied") {
+      out.push(`<span class="dim">  ${esc(e.target)} 陷入 ${esc(e.status)}</span>`);
+    } else if (e.kind === "challenge_result") {
+      const label = { win: "勝利", loss: "戰敗", fled: "撤退" }[e.outcome] || e.outcome;
+      out.push(`<span class="crit">— ${label}（${e.rounds} 回合）—</span>`);
+    } else if (e.kind === "kill_batch") {
+      out.push(`<span class="kill">擊殺 ${esc(e.monster_name)} ×${e.count}　+經驗 ${e.base_exp}/${e.job_exp}　+Zeny ${e.zeny}</span>`);
+    } else if (e.kind === "potion_used") {
+      out.push(`<span class="dim">  使用 ${esc(itemName(e.item_id))} ×${e.count}（剩 ${e.remaining}）</span>`);
+    } else if (e.kind === "find_monster") {
+      out.push(`<span class="dim">正在尋找怪物…</span>`);
+    }
+  }
+  return out;
 }
 
 // 道具說明字串
@@ -259,8 +316,11 @@ Screens.home = {
       box.scrollTop = box.scrollHeight;
     }
     let wait;
-    if (this._queue.length > 40) wait = 50;
-    else if (this._queue.length) wait = this._dripInterval();
+    if (this._queue.length > 40) {
+      // 佇列積太多（離開分頁回來、或大批次）→ 丟掉最舊的，用還看得清的節奏追上，不用狂閃
+      this._queue.splice(0, this._queue.length - 24);
+      wait = 140;
+    } else if (this._queue.length) wait = this._dripInterval();
     else wait = 900;                        // 心跳更新節奏
     this._dripTimer = setTimeout(() => this._drip(), wait);
   },
@@ -749,49 +809,10 @@ Screens.home = {
 
   _logLines(events) {
     if (!events) return [];
-    const out = [];
-    const bbb = events.some((e) => ["attack", "skill", "kill"].includes(e.kind));
-    for (let i = 0; i < events.length; i++) {
-      const e = events[i];
-      if (e.kind === "attack") {
-        // 同一 actor→target 連續的普攻併成一行，攻速快就會看到多筆數字
-        const nums = [];
-        let anyCrit = false;
-        let j = i;
-        while (j < events.length && events[j].kind === "attack"
-               && events[j].actor === e.actor && events[j].target === e.target) {
-          const a = events[j];
-          if (!a.hit) nums.push(`<span class="dim">MISS</span>`);
-          else if (a.crit) { nums.push(`${a.damage}爆`); anyCrit = true; }
-          else nums.push(`${a.damage}`);
-          j++;
-        }
-        i = j - 1;
-        out.push(`<span class="${anyCrit ? "crit" : "hit"}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${nums.join(" ")}</span>`);
-      } else if (e.kind === "skill") {
-        const dmg = e.damage ? ` → ${e.damage}` : "";
-        const tgt = e.target && e.target !== e.actor ? `對 ${esc(e.target)} ` : "";
-        out.push(`<span class="${e.damage ? "crit" : "hit"}">  ${esc(e.actor)} ${tgt}施放【${esc(e.skill_name)}】${dmg}</span>`);
-      } else if (e.kind === "status_expired") {
-        const st = (e.status || "").replace(/_mod$/, "");
-        out.push(`<span class="dim">  ${esc(e.target)} 的 ${esc(STAT_ZH[st] || st)} 加成結束</span>`);
-      } else if (e.kind === "kill") {
-        out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}</span>`);
-      } else if (e.kind === "heal") {
-        const how = e.source === "potion" ? "喝藥水"
-          : e.source === "sp_potion" ? "喝 SP 藥水" : "施放治療";
-        out.push(`<span class="dim">  ${esc(e.actor)} ${how} 回復 ${e.amount}</span>`);
-      } else if (e.kind === "kill_batch" && !bbb) {
-        out.push(`<span class="kill">擊殺 ${esc(e.monster_name)} ×${e.count}　+經驗 ${e.base_exp}/${e.job_exp}　+Zeny ${e.zeny}</span>`);
-      } else if (e.kind === "potion_used") {
-        out.push(`<span class="dim">  使用 ${esc(itemName(e.item_id))} ×${e.count}（剩 ${e.remaining}）</span>`);
-      } else if (e.kind === "find_monster") {
-        out.push(`<span class="dim">正在尋找怪物…</span>`);
-      } else if (e.kind === "retreat") {
-        out.push(`<span class="dim">撤退：${esc(e.reason || "")}</span>`);
-      }
-    }
-    return out.slice(-40);
+    // 這批有逐擊事件時，不再顯示彙總的 kill_batch（避免重複）
+    const detailed = events.some((e) => ["attack", "skill", "kill"].includes(e.kind));
+    const src = detailed ? events.filter((e) => e.kind !== "kill_batch") : events;
+    return combatLogLines(src).slice(-40);
   },
 };
 
@@ -1019,3 +1040,4 @@ window.itemDesc = itemDesc; window.gearDesc = gearDesc; window.effectText = effe
 window.STAT_ZH = STAT_ZH;
 window.skillExplain = skillExplain;
 window.cardDesc = cardDesc; window.SLOT_ZH = SLOT_ZH;
+window.combatLogLines = combatLogLines;

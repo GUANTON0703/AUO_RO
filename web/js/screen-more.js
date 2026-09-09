@@ -40,6 +40,8 @@
   window.ROFightView = { playbackDelayMs };
 
   function fightLogLines(events) {
+    // 掛機播放與 MVP 挑戰共用 combatLogLines（連續普攻併行、你打/你被打分色）
+    if (typeof window.combatLogLines === "function") return window.combatLogLines(events);
     const out = [];
     for (const e of events || []) {
       if (e.kind === "attack") {

@@ -64,6 +64,8 @@ input:focus,select:focus{outline:none; border-color:var(--accent)}
   height:220px; overflow-y:auto; white-space:pre-wrap}
 .log .dim{color:var(--muted)}
 .log .hit{color:var(--fg)} .log .crit{color:var(--gold)} .log .kill{color:var(--good)}
+.log .atk-mine{color:var(--accent)}
+.log .atk-foe{color:var(--bad)}
 
 .list{display:flex; flex-direction:column; gap:8px}
 .item{display:flex; justify-content:space-between; align-items:center; gap:8px;
