@@ -57,6 +57,21 @@ def test_mvps_loaded_with_cooldown_and_home_map():
         assert mvp.is_mvp is True
 
 
+def test_mvp_roster_covers_mid_late_maps():
+    c = content.load_content()
+    expected = {
+        "drake", "moonlight_flower", "doppelganger", "orc_lord",
+        "stormy_knight", "pharaoh", "dark_lord",
+    }
+    assert len(c.mvps) >= 15
+    assert expected <= set(c.mvps)
+    for mvp_id in expected:
+        mvp = c.mvps[mvp_id]
+        assert mvp.level >= 45
+        assert mvp.home_map_id in c.maps
+        assert c.maps[mvp.home_map_id].mvp_id == mvp_id
+
+
 def test_all_seven_starting_jobs_plus_second_tier():
     c = content.load_content()
     assert c.get_job("novice").tier == "novice"
@@ -93,12 +108,19 @@ def test_mvp_beatable_by_geared_same_level_player():
     c = content.load_content()
     for mvp in c.mvps.values():
         lv = mvp.level
+        weapon = "bastard_sword_3" if lv >= 40 else "blade"
+        armor = "full_plate_1" if lv >= 50 else "chain_mail_1"
+        weapon_cards = ["skel_worker_card", "wolf_card", "skeleton_card"] \
+            if lv >= 40 else ["skeleton_card"]
         hero = build_player_combatant(CharacterSnapshot(
             name="P", job_id="swordman", base_level=lv, job_level=min(lv, 50),
-            stats={"str": lv + 20, "agi": lv // 2, "vit": lv, "int": 5,
-                   "dex": lv, "luk": lv // 3},
-            learned_skills={"bash": 5},
-            equipped=[EquippedPiece("blade", 5, []), EquippedPiece("cotton_shirt", 5, [])],
+            stats={"str": lv + 25, "agi": lv // 2, "vit": lv + 2,
+                   "int": 5, "dex": lv + 5, "luk": lv // 3},
+            learned_skills={"bash": 5, "sword_mastery": 5,
+                            "bowling_bash": 5, "twohand_quicken": 5},
+            equipped=[EquippedPiece(weapon, 5, weapon_cards),
+                      EquippedPiece(armor, 5, []),
+                      EquippedPiece("boots", 5, ["matyr_card"])],
         ), c)
         r = simulate_fight(hero, Combatant.from_monster(mvp), rng=random.Random(0),
                            max_rounds=300)

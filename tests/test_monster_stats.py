@@ -32,6 +32,14 @@ def test_boss_role_scales_hard():
     assert b.max_hp >= n.max_hp * 3
 
 
+def test_boss_role_has_mvp_difficulty_multipliers():
+    normal = baseline(level=40, role="normal")
+    boss = baseline(level=40, role="boss")
+    assert boss.max_hp >= round(normal.max_hp * 4.5)
+    assert boss.atk >= round(normal.atk * 2.0)
+    assert boss.defense >= round(normal.defense * 2.1)
+
+
 def test_returns_valid_combat_stats():
     from shared.content import CombatStats
 

@@ -149,7 +149,7 @@
     "town": "payon",
     "level_range": [38, 55],
     "monster_ids": ["ghoul", "bon_gun", "sohee", "nine_tail"],
-    "mvp_id": null,
+    "mvp_id": "moonlight_flower",
     "unlock_base_level": 36
   },
   {
@@ -248,7 +248,7 @@
     "town": "geffen",
     "level_range": [46, 58],
     "monster_ids": ["mimic", "marduk", "marionette", "bloody_murderer", "dark_priest"],
-    "mvp_id": null,
+    "mvp_id": "doppelganger",
     "unlock_base_level": 46
   },
   {
@@ -311,7 +311,7 @@
     "town": "aldebaran",
     "level_range": [50, 60],
     "monster_ids": ["wander_man", "raydric", "injustice", "bathory"],
-    "mvp_id": null,
+    "mvp_id": "dark_lord",
     "unlock_base_level": 50
   },
   {
@@ -329,7 +329,7 @@
     "town": "prontera",
     "level_range": [25, 42],
     "monster_ids": ["pirate_skeleton", "pirate_ship", "ghostring", "deviace"],
-    "mvp_id": null,
+    "mvp_id": "drake",
     "unlock_base_level": 24
   },
   {
@@ -338,7 +338,7 @@
     "town": "morroc",
     "level_range": [42, 55],
     "monster_ids": ["pasana", "side_winder", "minorous", "ancient_mummy"],
-    "mvp_id": null,
+    "mvp_id": "pharaoh",
     "unlock_base_level": 40
   },
   {
@@ -365,7 +365,7 @@
     "town": "geffen",
     "level_range": [45, 60],
     "monster_ids": ["orc_skeleton", "high_orc", "orc_archer", "zenorc"],
-    "mvp_id": null,
+    "mvp_id": "orc_lord",
     "unlock_base_level": 44
   },
   {
@@ -383,7 +383,7 @@
     "town": "aldebaran",
     "level_range": [48, 60],
     "monster_ids": ["myst_case", "cruiser", "chepet", "christmas_cookie"],
-    "mvp_id": null,
+    "mvp_id": "stormy_knight",
     "unlock_base_level": 48
   }
 ]

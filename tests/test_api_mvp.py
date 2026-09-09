@@ -6,6 +6,17 @@ def test_list_mvp_shows_availability(client, auth, db_helpers):
     assert all("available" in m for m in r.json())
 
 
+def test_list_mvp_includes_mid_late_roster(client, auth):
+    _, h, _ = auth
+    client.post("/api/characters", headers=h, json={"name": "王名冊"})
+    rows = client.get("/api/mvp", headers=h).json()
+    ids = {row["id"] for row in rows}
+    assert {
+        "drake", "moonlight_flower", "doppelganger", "orc_lord",
+        "stormy_knight", "pharaoh", "dark_lord",
+    } <= ids
+
+
 def test_challenge_sets_cooldown(client, auth, db_helpers):
     _, h, _ = auth
     ch = client.post("/api/characters", headers=h, json={"name": "王殺2"}).json()

@@ -110,5 +110,12 @@
   {"id": "desert_wolf_card", "name": "沙漠幼狼卡片", "monster_id": "desert_wolf", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "size_damage", "size": "small", "pct": 15}, {"type": "flat_stat", "stat": "atk", "amount": 5}]},
   {"id": "minorous_horn_card", "name": "米諾陶角卡片", "monster_id": "minorous", "slot": "weapon", "drop_rate": 0.0012, "effects": [{"type": "size_damage", "size": "large", "pct": 15}, {"type": "flat_stat", "stat": "atk", "amount": 5}]},
   {"id": "soldier_skeleton_card", "name": "士兵骷髏卡片", "monster_id": "soldier_skeleton", "slot": "weapon", "drop_rate": 0.001, "effects": [{"type": "flat_stat", "stat": "crit", "amount": 9}]},
-  {"id": "archer_skeleton_card", "name": "弓箭手骷髏卡片", "monster_id": "archer_skeleton", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 10}, {"type": "flat_stat", "stat": "hit", "amount": 5}]}
+  {"id": "archer_skeleton_card", "name": "弓箭手骷髏卡片", "monster_id": "archer_skeleton", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 10}, {"type": "flat_stat", "stat": "hit", "amount": 5}]},
+  {"id": "drake_card", "name": "海盜船長卡片", "monster_id": "drake", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "element_resist", "element": "water", "pct": 15}]},
+  {"id": "moonlight_flower_card", "name": "月夜貓卡片", "monster_id": "moonlight_flower", "slot": "shoes", "drop_rate": 0.03, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 8}]},
+  {"id": "doppelganger_card", "name": "幽靈劍士卡片", "monster_id": "doppelganger", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 25}]},
+  {"id": "orc_lord_card", "name": "獸人酋長卡片", "monster_id": "orc_lord", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 8}]},
+  {"id": "stormy_knight_card", "name": "暴風雪騎士卡片", "monster_id": "stormy_knight", "slot": "garment", "drop_rate": 0.03, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 15}]},
+  {"id": "pharaoh_card", "name": "法老王卡片", "monster_id": "pharaoh", "slot": "accessory", "drop_rate": 0.03, "effects": [{"type": "flat_stat", "stat": "mdef", "amount": 8}]},
+  {"id": "dark_lord_card", "name": "黑暗之王卡片", "monster_id": "dark_lord", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "element_resist", "element": "shadow", "pct": 20}]}
 ]
