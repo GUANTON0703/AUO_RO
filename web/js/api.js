@@ -74,8 +74,11 @@ const API = (() => {
     equip: (cid, eqInstanceId) =>
       post(`/characters/${cid}/inventory/equip`, { equipment_instance_id: eqInstanceId }),
     unequip: (cid, slot) => post(`/characters/${cid}/inventory/unequip`, { slot }),
-    refine: (cid, eqInstanceId) =>
-      post(`/characters/${cid}/inventory/refine`, { equipment_instance_id: eqInstanceId }),
+    refine: (cid, eqInstanceId, mode = "normal") =>
+      post(`/characters/${cid}/inventory/refine`, {
+        equipment_instance_id: eqInstanceId,
+        mode,
+      }),
     socket: (cid, eqInstanceId, cardItemId) =>
       post(`/characters/${cid}/inventory/socket`,
            { equipment_instance_id: eqInstanceId, card_item_id: cardItemId }),

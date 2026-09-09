@@ -200,9 +200,17 @@
       });
       this._body().querySelectorAll("[data-refine]").forEach((b) => {
         b.onclick = async () => {
+          const choice = prompt(
+            "選擇精煉模式：\n1. 普通（成功率／失敗降級）\n2. 隨機（+0／+1／+2／+3）",
+            "1",
+          );
+          if (choice == null) return;
+          const mode = choice.trim() === "2" ? "random" :
+            (choice.trim() === "1" ? "normal" : null);
+          if (!mode) { App.toast("模式不對", true); return; }
           b.disabled = true;
           try {
-            const r = await API.refine(S.char.id, b.dataset.refine);
+            const r = await API.refine(S.char.id, b.dataset.refine, mode);
             App.toast(r.message || (r.success ? `精煉成功 +${r.refine}` : "精煉失敗"), !r.success);
             await this._reloadHeader();
             reload();

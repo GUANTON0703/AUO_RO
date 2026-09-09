@@ -1,5 +1,6 @@
 import json
 import random
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -45,6 +46,7 @@ class SocketRequest(BaseModel):
 
 class RefineRequest(BaseModel):
     equipment_instance_id: int
+    mode: Literal["normal", "random"] = "normal"
 
 
 @router.get("/{character_id}/inventory")
@@ -191,14 +193,30 @@ def refine(character_id: int, body: RefineRequest, account_id: CurrentAccount):
             "UPDATE characters SET zeny = zeny - ? WHERE id = ?",
             (zeny_cost, character_id),
         )
-        new_refine, ok = refine_mod.attempt_refine(current, random.Random())
+        if body.mode == "random":
+            new_refine, increment = refine_mod.attempt_random_refine(
+                current, random.Random()
+            )
+            ok = True
+        else:
+            new_refine, ok = refine_mod.attempt_refine(current, random.Random())
+            increment = new_refine - current
         conn.execute(
             "UPDATE character_equipment SET refine = ? WHERE id = ?",
             (new_refine, inst["id"]),
         )
-    message = (
-        f"精煉成功，{eq.name} +{new_refine}"
-        if ok
-        else f"精煉失敗，{eq.name} 降至 +{new_refine}"
-    )
-    return {"success": ok, "refine": new_refine, "message": message}
+    if body.mode == "random":
+        message = f"隨機精煉抽中 +{increment}，{eq.name} +{new_refine}"
+    else:
+        message = (
+            f"精煉成功，{eq.name} +{new_refine}"
+            if ok
+            else f"精煉失敗，{eq.name} 降至 +{new_refine}"
+        )
+    return {
+        "success": ok,
+        "refine": new_refine,
+        "message": message,
+        "mode": body.mode,
+        "increment": increment,
+    }

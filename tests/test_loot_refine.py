@@ -2,6 +2,7 @@ import random
 
 from server.loot.refine import (
     REFINE_CAP, success_rate, refine_ore_for, refine_zeny_cost, attempt_refine,
+    attempt_random_refine,
 )
 
 
@@ -42,3 +43,25 @@ def test_attempt_refine_failure_downgrades():
 def test_cannot_downgrade_below_zero():
     new, ok = attempt_refine(0, rng=random.Random(0))
     assert new == 1
+
+
+def test_attempt_random_refine_uses_weighted_increment_boundaries():
+    class FixedRng:
+        def __init__(self, value):
+            self.value = value
+
+        def random(self):
+            return self.value
+
+    assert attempt_random_refine(4, rng=FixedRng(0.00)) == (4, 0)
+    assert attempt_random_refine(4, rng=FixedRng(0.10)) == (5, 1)
+    assert attempt_random_refine(4, rng=FixedRng(0.60)) == (6, 2)
+    assert attempt_random_refine(4, rng=FixedRng(0.95)) == (7, 3)
+
+
+def test_attempt_random_refine_caps_at_maximum():
+    class FixedRng:
+        def random(self):
+            return 0.99
+
+    assert attempt_random_refine(9, rng=FixedRng()) == (REFINE_CAP, 3)

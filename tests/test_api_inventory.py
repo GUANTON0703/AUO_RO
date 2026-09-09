@@ -188,8 +188,34 @@ def test_refine_safe_level_succeeds(client, auth, db_helpers):
                     json={"equipment_instance_id": inst["id"]})
     assert r.status_code == 200
     assert r.json()["success"] is True and r.json()["refine"] == 1
+    assert r.json()["mode"] == "normal" and r.json()["increment"] == 1
     inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
     assert inv["items"]["oridecon"] == 9
+
+
+def test_refine_random_mode_uses_increment_and_keeps_costs(client, auth, db_helpers, monkeypatch):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.give_equipment(ch["id"], "knife")
+    db_helpers.give_item(ch["id"], "oridecon", 2)
+    db_helpers.set_zeny(ch["id"], 99999)
+    inst = _equip_list(client, ch, h)[0]
+
+    class FixedRng:
+        def random(self):
+            return 0.99
+
+    import server.api.inventory as inventory_api
+    monkeypatch.setattr(inventory_api.random, "Random", FixedRng)
+    r = client.post(f"/api/characters/{ch['id']}/inventory/refine", headers=h,
+                    json={"equipment_instance_id": inst["id"], "mode": "random"})
+
+    assert r.status_code == 200
+    assert r.json()["mode"] == "random"
+    assert r.json()["increment"] == 3
+    assert r.json()["success"] is True and r.json()["refine"] == 3
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert inv["items"]["oridecon"] == 1
 
 
 def test_refine_rejects_no_ore(client, auth, db_helpers):

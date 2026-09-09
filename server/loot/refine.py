@@ -28,6 +28,21 @@ def attempt_refine(current_refine: int, rng: random.Random) -> tuple[int, bool]:
     return max(0, current_refine - 1), False
 
 
+def attempt_random_refine(current_refine: int, rng: random.Random) -> tuple[int, int]:
+    if current_refine >= REFINE_CAP:
+        return current_refine, 0
+    roll = rng.random()
+    if roll < 0.10:
+        increment = 0
+    elif roll < 0.60:
+        increment = 1
+    elif roll < 0.95:
+        increment = 2
+    else:
+        increment = 3
+    return min(REFINE_CAP, current_refine + increment), increment
+
+
 REFINE_BONUS_PER_LEVEL = {"atk": 2, "matk": 2, "def": 1, "mdef": 1,
                           "max_hp": 15, "flee": 1, "hit": 1, "crit": 1}
 
