@@ -3,11 +3,11 @@
   {"id": "novice_rod", "name": "新手法杖", "slot": "weapon", "rarity": "common", "stats": {"atk": 3, "matk": 15}, "refinable": true, "card_slots": 1, "job_ids": ["novice", "mage", "acolyte"], "required_level": 1, "npc_buy": 200, "npc_sell": 100},
   {"id": "novice_bow", "name": "新手弓", "slot": "weapon", "rarity": "common", "stats": {"atk": 15}, "refinable": true, "card_slots": 1, "job_ids": ["novice", "archer"], "required_level": 1, "npc_buy": 180, "npc_sell": 90},
   {"id": "rod", "name": "短杖", "slot": "weapon", "rarity": "common", "stats": {"atk": 6, "matk": 10}, "refinable": true, "card_slots": 1, "job_ids": ["novice", "mage", "acolyte"], "required_level": 4, "npc_buy": 220, "npc_sell": 110},
-  {"id": "waghnak", "name": "拳刃", "slot": "weapon", "rarity": "common", "stats": {"atk": 20}, "refinable": true, "card_slots": 1, "job_ids": ["acolyte", "merchant"], "required_level": 1, "npc_buy": 240, "npc_sell": 120},
+  {"id": "waghnak", "name": "拳套", "slot": "weapon", "rarity": "common", "stats": {"atk": 20}, "refinable": true, "card_slots": 1, "job_ids": ["acolyte", "merchant"], "required_level": 1, "npc_buy": 240, "npc_sell": 120},
   {"id": "main_gauche", "name": "短劍", "slot": "weapon", "rarity": "common", "stats": {"atk": 23}, "refinable": true, "card_slots": 1, "job_ids": ["swordman", "thief", "merchant"], "required_level": 1, "npc_buy": 280, "npc_sell": 140},
 
   {"id": "blade", "name": "劍", "slot": "weapon", "rarity": "fine", "stats": {"atk": 53}, "refinable": true, "card_slots": 2, "job_ids": ["swordman", "thief"], "required_level": 14},
-  {"id": "jur", "name": "爪", "slot": "weapon", "rarity": "fine", "stats": {"atk": 55}, "refinable": true, "card_slots": 2, "job_ids": ["thief"], "required_level": 24},
+  {"id": "jur", "name": "拳刃", "slot": "weapon", "rarity": "fine", "stats": {"atk": 55}, "refinable": true, "card_slots": 2, "job_ids": ["thief"], "required_level": 24},
   {"id": "stunner", "name": "錘矛", "slot": "weapon", "rarity": "fine", "stats": {"atk": 70}, "refinable": true, "card_slots": 0, "job_ids": ["acolyte"], "required_level": 30},
   {"id": "hunter_bow", "name": "獵人弓", "slot": "weapon", "rarity": "fine", "stats": {"atk": 60}, "refinable": true, "card_slots": 1, "job_ids": ["archer"], "required_level": 30},
   {"id": "queen_staff", "name": "蜂后法杖", "slot": "weapon", "rarity": "legendary", "stats": {"atk": 30, "matk": 90}, "refinable": true, "card_slots": 1, "job_ids": ["mage", "acolyte"], "required_level": 20},
@@ -62,7 +62,7 @@
   {"id": "glove", "name": "手套", "slot": "accessory", "rarity": "common", "stats": {"hit": 2}, "refinable": false, "card_slots": 0, "job_ids": [], "required_level": 50, "npc_buy": 700, "npc_sell": 350},
 
   {"id": "guard", "name": "防護盾", "slot": "offhand", "rarity": "common", "stats": {"def": 4}, "refinable": true, "card_slots": 1, "job_ids": ["swordman", "merchant", "acolyte", "thief"], "required_level": 1, "npc_buy": 120, "npc_sell": 60},
-  {"id": "waghnak_3", "name": "拳刃[3]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 20}, "refinable": true, "card_slots": 3, "job_ids": ["acolyte", "merchant"], "required_level": 14},
+  {"id": "waghnak_3", "name": "拳套[3]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 20}, "refinable": true, "card_slots": 3, "job_ids": ["acolyte", "merchant"], "required_level": 14},
   {"id": "main_gauche_4", "name": "短劍[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 23}, "refinable": true, "card_slots": 4, "job_ids": ["swordman", "thief", "merchant"], "required_level": 14},
 
   {"id": "saber_2", "name": "軍刀[2]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 48}, "refinable": true, "card_slots": 2, "job_ids": ["swordman", "merchant"], "required_level": 20},
@@ -75,7 +75,7 @@
   {"id": "feather_beret", "name": "羽毛貝雷帽", "slot": "head", "rarity": "fine", "stats": {"def": 8, "flee": 5}, "refinable": true, "card_slots": 0, "job_ids": [], "required_level": 30, "npc_buy": 900, "npc_sell": 450},
 
   {"id": "orcish_axe_4", "name": "獸人斧[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 60}, "refinable": true, "card_slots": 4, "job_ids": ["merchant", "blacksmith"], "required_level": 32},
-  {"id": "jur_3", "name": "爪[3]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 55}, "refinable": true, "card_slots": 3, "job_ids": ["thief"], "required_level": 24},
+  {"id": "jur_3", "name": "拳刃[3]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 55}, "refinable": true, "card_slots": 3, "job_ids": ["thief"], "required_level": 24},
   {"id": "full_plate_1", "name": "全身鎧甲[1]", "slot": "armor", "rarity": "fine", "stats": {"def": 90}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 50},
   {"id": "stone_buckler_1", "name": "石盾[1]", "slot": "offhand", "rarity": "fine", "stats": {"def": 25}, "refinable": true, "card_slots": 1, "job_ids": ["swordman", "merchant", "acolyte", "thief"], "required_level": 30},
 
@@ -83,7 +83,7 @@
   {"id": "tights_1", "name": "緊身衣[1]", "slot": "armor", "rarity": "fine", "stats": {"def": 30, "dex": 1}, "refinable": true, "card_slots": 1, "job_ids": ["archer"], "required_level": 24},
   {"id": "manteau_1", "name": "曼特尔[1]", "slot": "garment", "rarity": "fine", "stats": {"def": 12, "flee": 5}, "refinable": true, "card_slots": 1, "job_ids": [], "required_level": 40},
 
-  {"id": "jur_4", "name": "爪[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 55}, "refinable": true, "card_slots": 4, "job_ids": ["thief"], "required_level": 24},
+  {"id": "jur_4", "name": "拳刃[4]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 55}, "refinable": true, "card_slots": 4, "job_ids": ["thief"], "required_level": 24},
   {"id": "bastard_sword_3", "name": "私生子劍[3]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 90}, "refinable": true, "card_slots": 3, "job_ids": ["swordman", "knight"], "required_level": 40},
   {"id": "two_handed_sword_2", "name": "兩手劍[2]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 100}, "refinable": true, "card_slots": 2, "job_ids": ["swordman", "knight"], "required_level": 40},
   {"id": "hunter_bow_2", "name": "獵人弓[2]", "slot": "weapon", "rarity": "fine", "stats": {"atk": 60}, "refinable": true, "card_slots": 2, "job_ids": ["archer"], "required_level": 30}
