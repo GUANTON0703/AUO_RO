@@ -121,6 +121,7 @@
               ? `<div class="sub" style="color:var(--muted)">目前這個部位沒穿東西</div>` : "");
           const def = S.catalog?.equipment?.[inst.equipment_id];
           const canRefine = def && def.refinable !== false && (inst.refine || 0) < 10;
+          const freeSockets = (def?.card_slots || 0) - (inst.card_ids || []).length;
           const oreName = slotOf(inst.equipment_id) === "weapon" ? "神之金屬" : "鋁";
           const refCost = ((inst.refine || 0) + 1) * 200;
           const refLine = canRefine
@@ -137,7 +138,7 @@
                 ? `<button class="btn small" data-unequip="${inst.equipped_slot}">卸下</button>`
                 : `<button class="btn small primary" data-equip="${inst.id}">裝備</button>`}
               ${canRefine ? `<button class="btn small" data-refine="${inst.id}">精煉</button>` : ""}
-              <button class="btn small" data-socket="${inst.id}">鑲卡</button>
+              ${freeSockets > 0 ? `<button class="btn small" data-socket="${inst.id}" data-eqslot="${slotOf(inst.equipment_id)}">鑲卡</button>` : ""}
               ${equipped ? "" : `<button class="btn small" data-sell-eq="${inst.id}" data-name="${esc(eqName(inst.equipment_id))}">賣出</button>`}
             </div>
           </div>
@@ -219,7 +220,7 @@
       });
       this._body().querySelectorAll("[data-socket]").forEach((b) => {
         b.onclick = async () => {
-          const cardId = this._pickCard(inv.items || {});
+          const cardId = this._pickCard(inv.items || {}, b.dataset.eqslot);
           if (!cardId) return;
           b.disabled = true;
           try {
@@ -232,11 +233,14 @@
       });
     },
 
-    _pickCard(items) {
-      const cards = Object.keys(items).filter((id) => S.catalog?.cards?.[id]);
-      if (!cards.length) { App.toast("背包沒有卡片", true); return null; }
-      const list = cards.map((id, i) => `${i + 1}. ${itemName(id)} ×${items[id]}`).join("\n");
-      const pick = prompt(`要鑲哪張卡？輸入編號：\n${list}`, "1");
+    _pickCard(items, eqSlot) {
+      const slotZh = SLOT_ZH[eqSlot] || eqSlot;
+      const cards = Object.keys(items).filter(
+        (id) => S.catalog?.cards?.[id] && S.catalog.cards[id].slot === eqSlot,
+      );
+      if (!cards.length) { App.toast(`背包沒有可鑲「${slotZh}」的卡片`, true); return null; }
+      const list = cards.map((id, i) => `${i + 1}. ${itemName(id)} ×${items[id]}（${slotZh}）`).join("\n");
+      const pick = prompt(`要鑲哪張卡？這件裝備吃「${slotZh}」卡。輸入編號：\n${list}`, "1");
       if (pick == null) return null;
       const idx = Math.floor(Number(pick)) - 1;
       if (idx < 0 || idx >= cards.length) { App.toast("編號不對", true); return null; }
