@@ -48,7 +48,7 @@
 
 ## 已知技術債
 
-- **高等 MVP 防禦被測試樣本壓低**：`test_mvp_beatable_by_geared_same_level_player` 用通用劍士 + 對應等級 tier 裝，但 `physical_damage` 在高防禦區間掉得很陡，lv85+ 的 MVP（turtle_general/yao_jun 填 88、maero/apocalypse/valkyrie 填 85）defense 都遠低於 `baseline(lv,"boss")`（~100–120）。真正的修法：樣本帶 MVP 對應的屬性/種族卡，或檢視傷害公式在高防禦的曲線，或這些 MVP 本來就不該是純肉牆。之後專門一批處理。
+- ~~高等 MVP 防禦被測試樣本壓低~~ **已解決（2026-09-10）**：把 `physical_damage` 的防禦從「線性百分比、夾 95%」改成遞減報酬 `def/(def+70)`，高防禦不再夾死，turtle_general / yao_jun / maero / apocalypse / valkyrie 的 defense 全部還原成 `baseline(lv,"boss")`。
 
 ## 開放問題
 

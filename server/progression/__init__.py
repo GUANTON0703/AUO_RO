@@ -136,8 +136,8 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
                  + passives.get("atk", 0)) * (1 + lv / 50))
     matk = round((INT + (INT // 7) ** 2 + eq.get("matk", 0)
                   + passives.get("matk", 0)) * (1 + lv / 50))
-    defense = min(95, eq.get("defense", 0) + VIT // 2 + passives.get("defense", 0))
-    mdef = min(95, eq.get("mdef", 0) + INT // 2 + passives.get("mdef", 0))
+    defense = min(400, eq.get("defense", 0) + VIT // 2 + passives.get("defense", 0))
+    mdef = min(400, eq.get("mdef", 0) + INT // 2 + passives.get("mdef", 0))
     hit = snap.base_level + DEX + eq.get("hit", 0) + passives.get("hit", 0)
     flee = snap.base_level + AGI + eq.get("flee", 0) + passives.get("flee", 0)
     aspd = min(193, round(100 + AGI * 0.7 + DEX * 0.15 + eq.get("aspd", 0)
@@ -181,7 +181,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     return Combatant(
         name=snap.name, max_hp=derived["max_hp"], max_sp=derived["max_sp"],
         atk=max(0, derived["atk"]), matk=max(0, derived["matk"]),
-        defense=max(0, min(95, derived["defense"])), mdef=max(0, min(95, derived["mdef"])),
+        defense=max(0, min(400, derived["defense"])), mdef=max(0, min(400, derived["mdef"])),
         hit=max(0, derived["hit"]), flee=max(0, derived["flee"]),
         aspd=max(1, min(193, aspd)), crit=max(0, derived["crit"]),
         is_caster=(derived["matk"] > derived["atk"]),

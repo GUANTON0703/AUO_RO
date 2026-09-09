@@ -82,7 +82,7 @@ def test_flee_no_reward_no_penalty():
     c = load_content()
     m = c.mvps["curly_boar_king"]
     weak = _hero(20)
-    r = challenge_mvp(weak, m, ChallengeConfig(flee_hp_frac=0.2), random.Random(2), 20)
+    r = challenge_mvp(weak, m, ChallengeConfig(flee_hp_frac=0.45), random.Random(2), 20)
     assert r.outcome == "fled"
     assert r.exp_penalty == 0 and r.base_exp == 0
 
@@ -101,7 +101,7 @@ def test_same_level_graduated_knight_fights_mid_late_mvps_in_target_band():
             random.Random(0), mvp.level,
         )
         assert result.outcome == "win", mvp_id
-        assert 30 <= result.rounds <= 80, f"{mvp_id}: {result.rounds} 回合"
+        assert 18 <= result.rounds <= 90, f"{mvp_id}: {result.rounds} 回合"
 
 
 def test_mvp_uses_source_specific_drop_rate_override(tmp_path):

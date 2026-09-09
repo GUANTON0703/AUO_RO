@@ -11,17 +11,27 @@ def _mods(base: float, element_multiplier: float, resist_pct: int, race_pct: int
             * (1 - _clamp(resist_pct, -100, 100) / 100))
 
 
+# 防禦用「遞減報酬」而非線性百分比：reduction = def / (def + K)。
+# 永遠打不到 100%，重甲有感但不會變無敵（原本 def 95 = 95% 減傷、直接夾死）。
+_DEF_K = 70
+
+
+def _dmg_reduction(defense: int) -> float:
+    d = max(0, defense)
+    return d / (d + _DEF_K)
+
+
 def physical_damage(atk: int, target_defense: int, element_multiplier: float = 1.0,
                     soft_def: int = 0, resist_pct: int = 0, race_pct: int = 0) -> int:
-    reduction = _clamp(target_defense, 0, 95) / 100
-    raw = _mods(atk * (1 - reduction), element_multiplier, resist_pct, race_pct)
+    raw = _mods(atk * (1 - _dmg_reduction(target_defense)),
+                element_multiplier, resist_pct, race_pct)
     return max(1, round(raw) - max(0, soft_def))
 
 
 def magic_damage(matk: int, target_mdef: int, element_multiplier: float = 1.0,
                  soft_mdef: int = 0, resist_pct: int = 0, race_pct: int = 0) -> int:
-    reduction = _clamp(target_mdef, 0, 95) / 100
-    raw = _mods(matk * (1 - reduction), element_multiplier, resist_pct, race_pct)
+    raw = _mods(matk * (1 - _dmg_reduction(target_mdef)),
+                element_multiplier, resist_pct, race_pct)
     return max(1, round(raw) - max(0, soft_mdef))
 
 

@@ -3,10 +3,12 @@ import random
 from server.combat import formulas as f
 
 
-def test_physical_damage_reduced_by_defense_pct():
+def test_physical_damage_defense_has_diminishing_returns():
     assert f.physical_damage(atk=100, target_defense=0) == 100
-    assert f.physical_damage(atk=100, target_defense=30) == 70
-    assert f.physical_damage(atk=100, target_defense=100) == 5  # clamp 95% → 5
+    assert f.physical_damage(atk=100, target_defense=70) == 50    # def/(def+70) = 50%
+    # 高防禦仍會被打到（不再夾死在 95%）
+    assert 30 <= f.physical_damage(atk=100, target_defense=100) <= 45
+    assert f.physical_damage(atk=100, target_defense=300) > 10
 
 
 def test_physical_damage_floor_is_one():
@@ -14,7 +16,7 @@ def test_physical_damage_floor_is_one():
 
 
 def test_magic_damage_uses_mdef():
-    assert f.magic_damage(matk=200, target_mdef=50) == 100
+    assert f.magic_damage(matk=200, target_mdef=70) == 100
 
 
 def test_hit_chance_formula():
