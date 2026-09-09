@@ -131,6 +131,21 @@ def _migration_6(conn: sqlite3.Connection) -> None:
     _add_col(conn, "characters", "is_rebirth", "INTEGER NOT NULL DEFAULT 0")
 
 
+def _migration_7(conn: sqlite3.Connection) -> None:
+    """刺客技能對齊原版：移除自訂的 sonic_acceleration，技能點退回（carried +N）。"""
+    import json as _json
+    for cid, raw, sp in conn.execute(
+        "SELECT id, learned_skills, skill_points FROM characters"
+    ).fetchall():
+        learned = _json.loads(raw or "{}")
+        lv = learned.pop("sonic_acceleration", 0)
+        if lv:
+            conn.execute(
+                "UPDATE characters SET learned_skills = ?, skill_points = ? WHERE id = ?",
+                (_json.dumps(learned), sp + lv, cid),
+            )
+
+
 # (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
 _MIGRATIONS: list[tuple[int, "callable"]] = [
     (1, _migration_1),
@@ -139,6 +154,7 @@ _MIGRATIONS: list[tuple[int, "callable"]] = [
     (4, _migration_4),
     (5, _migration_5),
     (6, _migration_6),
+    (7, _migration_7),
 ]
 
 

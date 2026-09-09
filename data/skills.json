@@ -2605,7 +2605,7 @@
   },
   {
     "id": "dual_wield",
-    "name": "左右手互擊",
+    "name": "左右手修練",
     "job_id": "assassin",
     "kind": "passive",
     "max_level": 5,
@@ -2627,6 +2627,17 @@
           9,
           12,
           15
+        ]
+      },
+      {
+        "type": "passive_stat",
+        "stat": "aspd",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
         ]
       },
       {
@@ -2652,35 +2663,33 @@
     "id": "enchant_poison",
     "name": "附毒術",
     "job_id": "assassin",
-    "kind": "active",
+    "kind": "passive",
     "max_level": 5,
     "sp_cost": [
-      14,
-      16,
-      18,
-      20,
-      22
+      0,
+      0,
+      0,
+      0,
+      0
     ],
     "cooldown_s": 0,
     "effects": [
       {
-        "type": "buff",
-        "stats": {
-          "atk": [
-            6,
-            9,
-            12,
-            15,
-            18
-          ]
-        },
-        "duration_s": 120
+        "type": "proc",
+        "effect": "poison",
+        "chance_pct": [
+          15,
+          20,
+          25,
+          30,
+          35
+        ]
       }
     ],
     "idle_default": {
       "enabled": true,
-      "trigger": "sp_available",
-      "priority": 1
+      "trigger": "passive",
+      "priority": 0
     },
     "requires": {
       "envenom": 1
@@ -4043,51 +4052,6 @@
     },
     "requires": {
       "envenom": 1
-    }
-  },
-  {
-    "id": "sonic_acceleration",
-    "name": "音速加速",
-    "job_id": "assassin",
-    "kind": "active",
-    "max_level": 5,
-    "sp_cost": [
-      14,
-      16,
-      18,
-      20,
-      22
-    ],
-    "cooldown_s": 0,
-    "effects": [
-      {
-        "type": "buff",
-        "stats": {
-          "aspd": [
-            10,
-            15,
-            20,
-            25,
-            30
-          ],
-          "hit": [
-            5,
-            8,
-            11,
-            14,
-            17
-          ]
-        },
-        "duration_s": 90
-      }
-    ],
-    "idle_default": {
-      "enabled": true,
-      "trigger": "sp_available",
-      "priority": 1
-    },
-    "requires": {
-      "sonic_blow": 1
     }
   },
   {

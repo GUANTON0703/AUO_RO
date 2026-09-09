@@ -97,6 +97,16 @@ def _one_hit(attacker, defender, rng, events):
         from server.combat.events import SkillEvent
         events.append(SkillEvent(actor=attacker.name, target=defender.name,
                                  skill_id="steal", skill_name="偷竊"))
+    poison = attacker.procs.get("poison", 0) if hasattr(attacker, "procs") else 0
+    if poison and rng.random() < poison / 100 \
+            and not any(s.name == "poison" for s in defender.statuses):
+        from server.combat.status import Status, apply_status
+        per_tick = round(defender.max_hp * 0.012) + 8
+        apply_status(defender, Status(kind="dot", name="poison", duration=4,
+                                      magnitude=per_tick))
+        from server.combat.events import SkillEvent
+        events.append(SkillEvent(actor="", target=defender.name,
+                                 skill_id="poison", skill_name="中毒"))
     return True
 
 
