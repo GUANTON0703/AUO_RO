@@ -133,5 +133,21 @@
   {"id": "gibbet_card", "name": "吊首鬼卡片", "monster_id": "gibbet", "slot": "head", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "mdef", "amount": 8}]},
   {"id": "disguise_card", "name": "變裝鬼卡片", "monster_id": "disguise", "slot": "shoes", "drop_rate": 0.0014, "effects": [{"type": "flat_stat", "stat": "agi", "amount": 2}]},
   {"id": "nightmare_terror_card", "name": "夢魘魔卡片", "monster_id": "nightmare_terror", "slot": "armor", "drop_rate": 0.0014, "effects": [{"type": "element_resist", "element": "shadow", "pct": 20}]},
-  {"id": "clock_tower_manager_card", "name": "時計塔管理者卡片", "monster_id": "clock_tower_manager", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "formless", "pct": 20}]}
+  {"id": "clock_tower_manager_card", "name": "時計塔管理者卡片", "monster_id": "clock_tower_manager", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "formless", "pct": 20}]},
+  {"id": "assaulter_card", "name": "突擊者卡片", "monster_id": "assaulter", "slot": "weapon", "drop_rate": 0.0016, "effects": [{"type": "race_damage", "race": "fish", "pct": 18}]},
+  {"id": "solider_card", "name": "士兵魚卡片", "monster_id": "solider", "slot": "weapon", "drop_rate": 0.0015, "effects": [{"type": "size_damage", "size": "medium", "pct": 18}]},
+  {"id": "freezer_card", "name": "急凍獸卡片", "monster_id": "freezer", "slot": "armor", "drop_rate": 0.0018, "effects": [{"type": "element_resist", "element": "water", "pct": 15}]},
+  {"id": "heater_card", "name": "火熱獸卡片", "monster_id": "heater", "slot": "armor", "drop_rate": 0.0018, "effects": [{"type": "element_resist", "element": "fire", "pct": 15}]},
+  {"id": "permeter_card", "name": "滲透者卡片", "monster_id": "permeter", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 14}]},
+  {"id": "siroma_card", "name": "希羅瑪卡片", "monster_id": "siroma", "slot": "garment", "drop_rate": 0.0016, "effects": [{"type": "element_resist", "element": "water", "pct": 16}]},
+  {"id": "snowier_card", "name": "雪片精卡片", "monster_id": "snowier", "slot": "armor", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "water", "pct": 18}]},
+  {"id": "gazeti_card", "name": "加傑提卡片", "monster_id": "gazeti", "slot": "garment", "drop_rate": 0.0014, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 14}]},
+  {"id": "ice_titan_card", "name": "冰巨人卡片", "monster_id": "ice_titan", "slot": "armor", "drop_rate": 0.0011, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 320}]},
+  {"id": "zhu_po_long_card", "name": "豬婆龍卡片", "monster_id": "zhu_po_long", "slot": "armor", "drop_rate": 0.0017, "effects": [{"type": "element_resist", "element": "fire", "pct": 16}]},
+  {"id": "green_maiden_card", "name": "青花娘娘卡片", "monster_id": "green_maiden", "slot": "garment", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 13}]},
+  {"id": "increase_soil_card", "name": "土之精卡片", "monster_id": "increase_soil", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 14}, {"type": "flat_stat", "stat": "vit", "amount": 1}]},
+  {"id": "mao_guai_card", "name": "貓妖卡片", "monster_id": "mao_guai", "slot": "accessory", "drop_rate": 0.0014, "effects": [{"type": "flat_stat", "stat": "int", "amount": 2}, {"type": "flat_stat", "stat": "dex", "amount": 1}]},
+  {"id": "jing_guai_card", "name": "精怪卡片", "monster_id": "jing_guai", "slot": "armor", "drop_rate": 0.0013, "effects": [{"type": "element_resist", "element": "shadow", "pct": 18}]},
+  {"id": "turtle_general_card", "name": "龜將軍卡片", "monster_id": "turtle_general", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "fish", "pct": 20}]},
+  {"id": "yao_jun_card", "name": "妖將卡片", "monster_id": "yao_jun", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "size_damage", "size": "large", "pct": 20}]}
 ]

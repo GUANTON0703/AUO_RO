@@ -448,5 +448,59 @@
     "monster_ids": ["loli_ruri", "disguise", "nightmare_terror", "evil_nymph"],
     "mvp_id": null,
     "unlock_base_level": 67
+  },
+  {
+    "id": "turtle_island_field",
+    "name": "龜島 岸邊",
+    "town": "aldebaran",
+    "level_range": [72, 80],
+    "monster_ids": ["assaulter", "solider", "freezer", "heater"],
+    "mvp_id": null,
+    "unlock_base_level": 72
+  },
+  {
+    "id": "turtle_island_cave",
+    "name": "龜島洞窟 深層",
+    "town": "aldebaran",
+    "level_range": [76, 85],
+    "monster_ids": ["solider", "permeter", "assaulter", "heater"],
+    "mvp_id": "turtle_general",
+    "unlock_base_level": 76
+  },
+  {
+    "id": "ice_dungeon_1f",
+    "name": "冰之洞窟 1F",
+    "town": "aldebaran",
+    "level_range": [73, 82],
+    "monster_ids": ["siroma", "snowier", "gazeti"],
+    "mvp_id": null,
+    "unlock_base_level": 73
+  },
+  {
+    "id": "ice_dungeon_2f",
+    "name": "冰之洞窟 2F",
+    "town": "aldebaran",
+    "level_range": [78, 85],
+    "monster_ids": ["snowier", "gazeti", "ice_titan"],
+    "mvp_id": null,
+    "unlock_base_level": 78
+  },
+  {
+    "id": "louyang_field",
+    "name": "樓蘭 郊野",
+    "town": "aldebaran",
+    "level_range": [72, 80],
+    "monster_ids": ["zhu_po_long", "green_maiden", "increase_soil", "mao_guai"],
+    "mvp_id": null,
+    "unlock_base_level": 74
+  },
+  {
+    "id": "louyang_ruins",
+    "name": "樓蘭 廢墟",
+    "town": "aldebaran",
+    "level_range": [76, 85],
+    "monster_ids": ["green_maiden", "mao_guai", "jing_guai", "increase_soil"],
+    "mvp_id": "yao_jun",
+    "unlock_base_level": 77
   }
 ]

@@ -3180,5 +3180,272 @@
     ],
     "is_mvp": false,
     "lore": "尼夫赫姆神殿深處的惡夢化身，會把入侵者拖進沉睡。"
+  },
+  {
+    "id": "assaulter",
+    "name": "突擊者",
+    "level": 75,
+    "element": "neutral",
+    "race": "fish",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2138,
+    "job_exp": 1069,
+    "stats": {"max_hp": 6602, "max_sp": 0, "atk": 125, "matk": 93, "defense": 22, "mdef": 22, "hit": 76, "flee": 80, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "nipper", "rate": 0.4},
+      {"item_id": "shell", "rate": 0.2},
+      {"item_id": "assaulter_card", "rate": 0.0016}
+    ],
+    "is_mvp": false,
+    "lore": "龜島岸邊成群突襲的兩棲戰士，動作快得像浪。"
+  },
+  {
+    "id": "solider",
+    "name": "士兵魚",
+    "level": 77,
+    "element": "neutral",
+    "race": "fish",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2241,
+    "job_exp": 1120,
+    "stats": {"max_hp": 6916, "max_sp": 0, "atk": 128, "matk": 95, "defense": 23, "mdef": 23, "hit": 78, "flee": 82, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "gill", "rate": 0.4},
+      {"item_id": "tendon", "rate": 0.15},
+      {"item_id": "solider_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "列隊巡邏龜島的魚形步兵，服從龜將軍的號令。"
+  },
+  {
+    "id": "freezer",
+    "name": "急凍獸",
+    "level": 74,
+    "element": "water",
+    "race": "fish",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2087,
+    "job_exp": 1044,
+    "stats": {"max_hp": 6448, "max_sp": 0, "atk": 123, "matk": 92, "defense": 22, "mdef": 22, "hit": 75, "flee": 79, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "gill", "rate": 0.35},
+      {"item_id": "coral_reef", "rate": 0.15},
+      {"item_id": "freezer_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "體表結霜的龜島怪魚，靠近就覺得寒氣刺骨。"
+  },
+  {
+    "id": "heater",
+    "name": "火熱獸",
+    "level": 74,
+    "element": "fire",
+    "race": "fish",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2087,
+    "job_exp": 1044,
+    "stats": {"max_hp": 6448, "max_sp": 0, "atk": 123, "matk": 92, "defense": 22, "mdef": 22, "hit": 75, "flee": 79, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fish_tail", "rate": 0.35},
+      {"item_id": "coral_reef", "rate": 0.15},
+      {"item_id": "heater_card", "rate": 0.0018}
+    ],
+    "is_mvp": false,
+    "lore": "體內像燒著炭火的龜島怪魚，和急凍獸總是成對出現。"
+  },
+  {
+    "id": "permeter",
+    "name": "滲透者",
+    "level": 76,
+    "element": "neutral",
+    "race": "fish",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 2780,
+    "job_exp": 1390,
+    "stats": {"max_hp": 15814, "max_sp": 0, "atk": 101, "matk": 94, "defense": 68, "mdef": 23, "hit": 77, "flee": 57, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "shell", "rate": 0.45},
+      {"item_id": "nipper", "rate": 0.2},
+      {"item_id": "permeter_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "龜島洞窟裡厚甲的巨型守衛，擋在通往深層的路口。"
+  },
+  {
+    "id": "siroma",
+    "name": "希羅瑪",
+    "level": 75,
+    "element": "water",
+    "race": "formless",
+    "size": "small",
+    "role": "normal",
+    "base_exp": 2138,
+    "job_exp": 1069,
+    "stats": {"max_hp": 6602, "max_sp": 0, "atk": 125, "matk": 93, "defense": 22, "mdef": 22, "hit": 76, "flee": 80, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "gill", "rate": 0.4},
+      {"item_id": "ore_fragment", "rate": 0.12},
+      {"item_id": "siroma_card", "rate": 0.0016}
+    ],
+    "is_mvp": false,
+    "lore": "冰洞裡漂浮的藍色黏液團，碰到會凍傷。"
+  },
+  {
+    "id": "snowier",
+    "name": "雪片精",
+    "level": 78,
+    "element": "water",
+    "race": "formless",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2293,
+    "job_exp": 1146,
+    "stats": {"max_hp": 7076, "max_sp": 0, "atk": 130, "matk": 97, "defense": 23, "mdef": 23, "hit": 79, "flee": 83, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "ore_fragment", "rate": 0.35},
+      {"item_id": "coal", "rate": 0.12},
+      {"item_id": "snowier_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "冰洞深處成形的暴風雪碎片，飛舞時割人如刀。"
+  },
+  {
+    "id": "gazeti",
+    "name": "加傑提",
+    "level": 80,
+    "element": "water",
+    "race": "animal",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2400,
+    "job_exp": 1200,
+    "stats": {"max_hp": 7400, "max_sp": 0, "atk": 133, "matk": 99, "defense": 24, "mdef": 24, "hit": 81, "flee": 85, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "mane", "rate": 0.35},
+      {"item_id": "ore_fragment", "rate": 0.12},
+      {"item_id": "gazeti_card", "rate": 0.0014}
+    ],
+    "is_mvp": false,
+    "lore": "披著冰晶皮毛的冰洞走獸，跑起來帶起一陣霜霧。"
+  },
+  {
+    "id": "ice_titan",
+    "name": "冰巨人",
+    "level": 83,
+    "element": "water",
+    "race": "demihuman",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 3257,
+    "job_exp": 1628,
+    "stats": {"max_hp": 18486, "max_sp": 0, "atk": 110, "matk": 103, "defense": 75, "mdef": 25, "hit": 84, "flee": 62, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "ore_fragment", "rate": 0.45},
+      {"item_id": "coal", "rate": 0.2},
+      {"item_id": "elunium", "rate": 0.08},
+      {"item_id": "ice_titan_card", "rate": 0.0011}
+    ],
+    "is_mvp": false,
+    "lore": "冰洞最深處的冰封巨人，每一拳都像冰山崩落。"
+  },
+  {
+    "id": "zhu_po_long",
+    "name": "豬婆龍",
+    "level": 73,
+    "element": "fire",
+    "race": "demon",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2037,
+    "job_exp": 1018,
+    "stats": {"max_hp": 6296, "max_sp": 0, "atk": 122, "matk": 91, "defense": 22, "mdef": 22, "hit": 74, "flee": 78, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "snake_skin", "rate": 0.35},
+      {"item_id": "resin", "rate": 0.12},
+      {"item_id": "zhu_po_long_card", "rate": 0.0017}
+    ],
+    "is_mvp": false,
+    "lore": "樓蘭郊野遊蕩的火紅蛟龍，性情暴烈。"
+  },
+  {
+    "id": "green_maiden",
+    "name": "青花娘娘",
+    "level": 76,
+    "element": "earth",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2189,
+    "job_exp": 1094,
+    "stats": {"max_hp": 6758, "max_sp": 0, "atk": 127, "matk": 94, "defense": 23, "mdef": 23, "hit": 77, "flee": 81, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "ancient_lips", "rate": 0.35},
+      {"item_id": "resin", "rate": 0.12},
+      {"item_id": "green_maiden_card", "rate": 0.0015}
+    ],
+    "is_mvp": false,
+    "lore": "身著青花衣裙的樓蘭女鬼，笑聲在廢墟裡回盪。"
+  },
+  {
+    "id": "increase_soil",
+    "name": "土之精",
+    "level": 74,
+    "element": "earth",
+    "race": "plant",
+    "size": "large",
+    "role": "tank",
+    "base_exp": 2650,
+    "job_exp": 1325,
+    "stats": {"max_hp": 15089, "max_sp": 0, "atk": 99, "matk": 92, "defense": 67, "mdef": 22, "hit": 75, "flee": 55, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "resin", "rate": 0.45},
+      {"item_id": "trunk", "rate": 0.2},
+      {"item_id": "increase_soil_card", "rate": 0.0012}
+    ],
+    "is_mvp": false,
+    "lore": "樓蘭土地隆起而成的守護塊，越打越硬。"
+  },
+  {
+    "id": "mao_guai",
+    "name": "貓妖",
+    "level": 78,
+    "element": "wind",
+    "race": "demon",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2293,
+    "job_exp": 1146,
+    "stats": {"max_hp": 7076, "max_sp": 0, "atk": 130, "matk": 97, "defense": 23, "mdef": 23, "hit": 79, "flee": 83, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "fox_tail", "rate": 0.35},
+      {"item_id": "voodoo_doll", "rate": 0.12},
+      {"item_id": "mao_guai_card", "rate": 0.0014}
+    ],
+    "is_mvp": false,
+    "lore": "樓蘭古宅裡修行的貓妖，行動無聲如風。"
+  },
+  {
+    "id": "jing_guai",
+    "name": "精怪",
+    "level": 81,
+    "element": "shadow",
+    "race": "demon",
+    "size": "medium",
+    "role": "normal",
+    "base_exp": 2454,
+    "job_exp": 1227,
+    "stats": {"max_hp": 7565, "max_sp": 0, "atk": 135, "matk": 100, "defense": 24, "mdef": 24, "hit": 82, "flee": 86, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "voodoo_doll", "rate": 0.35},
+      {"item_id": "dark_crystal", "rate": 0.1},
+      {"item_id": "jing_guai_card", "rate": 0.0013}
+    ],
+    "is_mvp": false,
+    "lore": "樓蘭廢墟聚而不散的怨氣，化作半透明的鬼影。"
   }
 ]

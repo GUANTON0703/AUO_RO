@@ -622,5 +622,71 @@
       {"item_id": "elunium", "rate": 0.3}
     ],
     "lore": "掌管時計塔全部齒輪的機械魔像，停擺的時鐘在它腳邊堆成小山。"
+  },
+  {
+    "id": "turtle_general",
+    "name": "龜將軍",
+    "level": 82,
+    "element": "water",
+    "race": "fish",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 52000,
+    "job_exp": 26000,
+    "cooldown_hours": 24,
+    "home_map_id": "turtle_island_cave",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 34792,
+      "max_sp": 0,
+      "atk": 272,
+      "matk": 142,
+      "defense": 78,
+      "mdef": 25,
+      "hit": 124,
+      "flee": 87,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {"item_id": "turtle_general_card", "rate": 0.03},
+      {"item_id": "shell", "rate": 0.3},
+      {"item_id": "oridecon", "rate": 0.2},
+      {"item_id": "elunium", "rate": 0.3}
+    ],
+    "lore": "統率龜島全軍的巨龜將領，甲殼上刻滿歷代征戰的裂痕。"
+  },
+  {
+    "id": "yao_jun",
+    "name": "妖將",
+    "level": 80,
+    "element": "fire",
+    "race": "animal",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 48000,
+    "job_exp": 24000,
+    "cooldown_hours": 24,
+    "home_map_id": "louyang_ruins",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 33300,
+      "max_sp": 0,
+      "atk": 266,
+      "matk": 139,
+      "defense": 78,
+      "mdef": 24,
+      "hit": 122,
+      "flee": 85,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {"item_id": "yao_jun_card", "rate": 0.03},
+      {"item_id": "ancient_lips", "rate": 0.3},
+      {"item_id": "oridecon", "rate": 0.2},
+      {"item_id": "elunium", "rate": 0.3}
+    ],
+    "lore": "盤踞樓蘭廢墟的火獸妖將，吼聲能震落殿頂的瓦片。"
   }
 ]
