@@ -1486,13 +1486,16 @@
   {
     "id": "khalitzburg", "name": "卡利茲堡", "level": 67,
     "element": "holy", "race": "demihuman", "size": "large", "role": "tank", "gen": true, "hp_mult": 1.3,
-    "drops": [{"item_id": "rusty_shackle", "rate": 0.4}, {"item_id": "elunium", "rate": 0.08}, {"item_id": "khalitzburg_card", "rate": 0.0012}],
+    "drops": [{"item_id": "rusty_shackle", "rate": 0.4}, {"item_id": "elunium", "rate": 0.08}, {"item_id": "khalitzburg_card", "rate": 0.0012},
+      {"item_id": "plate_armor_70", "rate": 0.006},
+      {"item_id": "tower_shield_70", "rate": 0.006}],
     "lore": "披著聖十字重甲的騎士團守衛，盾牆推進時整條迴廊都在震。"
   },
   {
     "id": "abysmal_knight", "name": "深淵騎士", "level": 72,
     "element": "shadow", "race": "demihuman", "size": "large", "role": "tank", "gen": true, "hp_mult": 1.35,
-    "drops": [{"item_id": "oridecon", "rate": 0.15}, {"item_id": "dark_crystal", "rate": 0.1}, {"item_id": "abysmal_knight_card", "rate": 0.001}],
+    "drops": [{"item_id": "oridecon", "rate": 0.15}, {"item_id": "dark_crystal", "rate": 0.1}, {"item_id": "abysmal_knight_card", "rate": 0.001},
+      {"item_id": "claymore_2h_70", "rate": 0.006}],
     "lore": "墮入深淵的騎士團首領，巨劍一揮連空氣都裂開。"
   },
   {
@@ -1510,7 +1513,8 @@
   {
     "id": "evil_nymph", "name": "邪精靈", "level": 66,
     "element": "shadow", "race": "demon", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "will_o_wisp", "rate": 0.4}, {"item_id": "elunium", "rate": 0.06}, {"item_id": "evil_nymph_card", "rate": 0.0015}],
+    "drops": [{"item_id": "will_o_wisp", "rate": 0.4}, {"item_id": "elunium", "rate": 0.06}, {"item_id": "evil_nymph_card", "rate": 0.0015},
+      {"item_id": "battle_manteau_70", "rate": 0.01}],
     "lore": "被神殿黑暗侵蝕的森林精靈，歌聲會擾亂心神。"
   },
   {
@@ -1522,25 +1526,31 @@
   {
     "id": "clock", "name": "大時鐘", "level": 68,
     "element": "neutral", "race": "formless", "size": "large", "role": "tank", "gen": true, "hp_mult": 1.35,
-    "drops": [{"item_id": "gear_wheel", "rate": 0.45}, {"item_id": "oridecon", "rate": 0.08}, {"item_id": "clock_card", "rate": 0.0012}],
+    "drops": [{"item_id": "gear_wheel", "rate": 0.45}, {"item_id": "oridecon", "rate": 0.08}, {"item_id": "clock_card", "rate": 0.0012},
+      {"item_id": "war_helm_70", "rate": 0.008}],
     "lore": "時計塔地下自行運轉的落地大鐘，鐘擺砸下來像重鎚。"
   },
   {
     "id": "owl_baron", "name": "貓頭鷹男爵", "level": 71,
     "element": "shadow", "race": "demihuman", "size": "medium", "role": "normal", "gen": true, "hp_mult": 1.2,
-    "drops": [{"item_id": "rosary", "rate": 0.35}, {"item_id": "oridecon", "rate": 0.12}, {"item_id": "owl_baron_card", "rate": 0.001}],
+    "drops": [{"item_id": "rosary", "rate": 0.35}, {"item_id": "oridecon", "rate": 0.12}, {"item_id": "owl_baron_card", "rate": 0.001},
+      {"item_id": "knight_sabre_70", "rate": 0.008}],
     "lore": "統領時計塔地下亡魂的貴族幽靈，會召喚僕役圍毆入侵者。"
   },
   {
     "id": "owl_duke", "name": "貓頭鷹公爵", "level": 68,
     "element": "holy", "race": "demihuman", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "rosary", "rate": 0.4}, {"item_id": "elunium", "rate": 0.1}, {"item_id": "owl_duke_card", "rate": 0.0012}],
+    "drops": [{"item_id": "rosary", "rate": 0.4}, {"item_id": "elunium", "rate": 0.1}, {"item_id": "owl_duke_card", "rate": 0.0012},
+      {"item_id": "battle_mace_70", "rate": 0.008},
+      {"item_id": "power_ring_70", "rate": 0.006}],
     "lore": "時計塔地下的老紳士幽靈，舉止優雅但法術狠辣。"
   },
   {
     "id": "loli_ruri", "name": "蘿莉露莉", "level": 68,
     "element": "undead", "race": "demon", "size": "small", "role": "normal", "gen": true,
-    "drops": [{"item_id": "horrendous_mouth", "rate": 0.35}, {"item_id": "cursed_ruby", "rate": 0.06}, {"item_id": "loli_ruri_card", "rate": 0.0015}],
+    "drops": [{"item_id": "horrendous_mouth", "rate": 0.35}, {"item_id": "cursed_ruby", "rate": 0.06}, {"item_id": "loli_ruri_card", "rate": 0.0015},
+      {"item_id": "arcane_staff_70", "rate": 0.008},
+      {"item_id": "mage_ring_70", "rate": 0.006}],
     "lore": "尼夫赫姆神殿裡抱著鐮刀的少女死靈，會替同伴治療。"
   },
   {
@@ -1558,25 +1568,29 @@
   {
     "id": "disguise", "name": "變裝鬼", "level": 66,
     "element": "shadow", "race": "demihuman", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "dark_crystal", "rate": 0.3}, {"item_id": "oridecon", "rate": 0.08}, {"item_id": "disguise_card", "rate": 0.0014}],
+    "drops": [{"item_id": "dark_crystal", "rate": 0.3}, {"item_id": "oridecon", "rate": 0.08}, {"item_id": "disguise_card", "rate": 0.0014},
+      {"item_id": "ranger_bow_70", "rate": 0.008}],
     "lore": "披著死者衣物混在人群裡的鬼，靠近才露出真面目。"
   },
   {
     "id": "nightmare_terror", "name": "夢魘魔", "level": 65,
     "element": "shadow", "race": "demon", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "nightmare_horn", "rate": 0.4}, {"item_id": "dark_crystal", "rate": 0.1}, {"item_id": "nightmare_terror_card", "rate": 0.0014}],
+    "drops": [{"item_id": "nightmare_horn", "rate": 0.4}, {"item_id": "dark_crystal", "rate": 0.1}, {"item_id": "nightmare_terror_card", "rate": 0.0014},
+      {"item_id": "greaves_70", "rate": 0.01}],
     "lore": "尼夫赫姆神殿深處的惡夢化身，會把入侵者拖進沉睡。"
   },
   {
     "id": "assaulter", "name": "突擊者", "level": 75,
     "element": "neutral", "race": "fish", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "nipper", "rate": 0.4}, {"item_id": "shell", "rate": 0.2}, {"item_id": "assaulter_card", "rate": 0.0016}],
+    "drops": [{"item_id": "nipper", "rate": 0.4}, {"item_id": "shell", "rate": 0.2}, {"item_id": "assaulter_card", "rate": 0.0016},
+      {"item_id": "power_ring_85", "rate": 0.008}],
     "lore": "龜島岸邊成群突襲的兩棲戰士，動作快得像浪。"
   },
   {
     "id": "solider", "name": "士兵魚", "level": 77,
     "element": "neutral", "race": "fish", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "gill", "rate": 0.4}, {"item_id": "tendon", "rate": 0.15}, {"item_id": "solider_card", "rate": 0.0015}],
+    "drops": [{"item_id": "gill", "rate": 0.4}, {"item_id": "tendon", "rate": 0.15}, {"item_id": "solider_card", "rate": 0.0015},
+      {"item_id": "battle_mace_85", "rate": 0.007}],
     "lore": "列隊巡邏龜島的魚形步兵，服從龜將軍的號令。"
   },
   {
@@ -1594,7 +1608,9 @@
   {
     "id": "permeter", "name": "滲透者", "level": 76,
     "element": "neutral", "race": "fish", "size": "large", "role": "tank", "gen": true, "hp_mult": 1.3,
-    "drops": [{"item_id": "shell", "rate": 0.45}, {"item_id": "nipper", "rate": 0.2}, {"item_id": "permeter_card", "rate": 0.0012}],
+    "drops": [{"item_id": "shell", "rate": 0.45}, {"item_id": "nipper", "rate": 0.2}, {"item_id": "permeter_card", "rate": 0.0012},
+      {"item_id": "knight_sabre_85", "rate": 0.007},
+      {"item_id": "tower_shield_85", "rate": 0.007}],
     "lore": "龜島洞窟裡厚甲的巨型守衛，擋在通往深層的路口。"
   },
   {
@@ -1606,19 +1622,26 @@
   {
     "id": "snowier", "name": "雪片精", "level": 78,
     "element": "water", "race": "formless", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "ore_fragment", "rate": 0.35}, {"item_id": "coal", "rate": 0.12}, {"item_id": "snowier_card", "rate": 0.0015}],
+    "drops": [{"item_id": "ore_fragment", "rate": 0.35}, {"item_id": "coal", "rate": 0.12}, {"item_id": "snowier_card", "rate": 0.0015},
+      {"item_id": "greaves_85", "rate": 0.009},
+      {"item_id": "sniper_longbow", "rate": 0.005}],
     "lore": "冰洞深處成形的暴風雪碎片，飛舞時割人如刀。"
   },
   {
     "id": "gazeti", "name": "加傑提", "level": 80,
     "element": "water", "race": "animal", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "mane", "rate": 0.35}, {"item_id": "ore_fragment", "rate": 0.12}, {"item_id": "gazeti_card", "rate": 0.0014}],
+    "drops": [{"item_id": "mane", "rate": 0.35}, {"item_id": "ore_fragment", "rate": 0.12}, {"item_id": "gazeti_card", "rate": 0.0014},
+      {"item_id": "ranger_bow_85", "rate": 0.007},
+      {"item_id": "aegis_plate", "rate": 0.004}],
     "lore": "披著冰晶皮毛的冰洞走獸，跑起來帶起一陣霜霧。"
   },
   {
     "id": "ice_titan", "name": "冰巨人", "level": 83,
     "element": "water", "race": "demihuman", "size": "large", "role": "tank", "gen": true, "hp_mult": 1.3,
-    "drops": [{"item_id": "ore_fragment", "rate": 0.45}, {"item_id": "coal", "rate": 0.2}, {"item_id": "elunium", "rate": 0.08}, {"item_id": "ice_titan_card", "rate": 0.0011}],
+    "drops": [{"item_id": "ore_fragment", "rate": 0.45}, {"item_id": "coal", "rate": 0.2}, {"item_id": "elunium", "rate": 0.08}, {"item_id": "ice_titan_card", "rate": 0.0011},
+      {"item_id": "claymore_2h_85", "rate": 0.005},
+      {"item_id": "plate_armor_85", "rate": 0.005},
+      {"item_id": "god_slayer_2h", "rate": 0.004}],
     "lore": "冰洞最深處的冰封巨人，每一拳都像冰山崩落。"
   },
   {
@@ -1630,7 +1653,8 @@
   {
     "id": "green_maiden", "name": "青花娘娘", "level": 76,
     "element": "earth", "race": "demihuman", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "ancient_lips", "rate": 0.35}, {"item_id": "resin", "rate": 0.12}, {"item_id": "green_maiden_card", "rate": 0.0015}],
+    "drops": [{"item_id": "ancient_lips", "rate": 0.35}, {"item_id": "resin", "rate": 0.12}, {"item_id": "green_maiden_card", "rate": 0.0015},
+      {"item_id": "battle_manteau_85", "rate": 0.009}],
     "lore": "身著青花衣裙的樓蘭女鬼，笑聲在廢墟裡回盪。"
   },
   {
@@ -1642,13 +1666,17 @@
   {
     "id": "mao_guai", "name": "貓妖", "level": 78,
     "element": "wind", "race": "demon", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "fox_tail", "rate": 0.35}, {"item_id": "voodoo_doll", "rate": 0.12}, {"item_id": "mao_guai_card", "rate": 0.0014}],
+    "drops": [{"item_id": "fox_tail", "rate": 0.35}, {"item_id": "voodoo_doll", "rate": 0.12}, {"item_id": "mao_guai_card", "rate": 0.0014},
+      {"item_id": "war_helm_85", "rate": 0.009}],
     "lore": "樓蘭古宅裡修行的貓妖，行動無聲如風。"
   },
   {
     "id": "jing_guai", "name": "精怪", "level": 81,
     "element": "shadow", "race": "demon", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "voodoo_doll", "rate": 0.35}, {"item_id": "dark_crystal", "rate": 0.1}, {"item_id": "jing_guai_card", "rate": 0.0013}],
+    "drops": [{"item_id": "voodoo_doll", "rate": 0.35}, {"item_id": "dark_crystal", "rate": 0.1}, {"item_id": "jing_guai_card", "rate": 0.0013},
+      {"item_id": "arcane_staff_85", "rate": 0.007},
+      {"item_id": "mage_ring_85", "rate": 0.007},
+      {"item_id": "staff_of_ruin", "rate": 0.004}],
     "lore": "樓蘭廢墟聚而不散的怨氣，化作半透明的鬼影。"
   }
 ]
