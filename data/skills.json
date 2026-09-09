@@ -5463,5 +5463,1049 @@
       "priority": 0
     },
     "requires": {}
+  },
+  {
+    "id": "faith",
+    "name": "信仰",
+    "job_id": "crusader",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "max_hp",
+        "amount": [
+          80,
+          160,
+          240,
+          320,
+          400
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "holy_cross",
+    "name": "聖十字攻擊",
+    "job_id": "crusader",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          130,
+          155,
+          180,
+          205,
+          230
+        ],
+        "element": "holy"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    }
+  },
+  {
+    "id": "grand_cross",
+    "name": "聖十字審判",
+    "job_id": "crusader",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      24,
+      27,
+      30,
+      33,
+      36
+    ],
+    "cooldown_s": 3,
+    "effects": [
+      {
+        "type": "aoe",
+        "power_pct": [
+          140,
+          170,
+          200,
+          230,
+          260
+        ],
+        "element": "holy"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    },
+    "requires": {
+      "holy_cross": 3
+    }
+  },
+  {
+    "id": "shield_boomerang",
+    "name": "迴旋盾",
+    "job_id": "crusader",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          135,
+          160,
+          185,
+          210,
+          235
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    }
+  },
+  {
+    "id": "auto_guard",
+    "name": "自動格擋",
+    "job_id": "crusader",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      18,
+      22,
+      26,
+      30,
+      34
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "def": [
+            4,
+            8,
+            12,
+            16,
+            20
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    }
+  },
+  {
+    "id": "free_cast",
+    "name": "自由施法",
+    "job_id": "sage",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "aspd",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "mystic_amplify",
+    "name": "魔力增幅",
+    "job_id": "sage",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "matk",
+        "amount": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "stone_lance",
+    "name": "石槍",
+    "job_id": "sage",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      14,
+      17,
+      20,
+      23,
+      26
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "magic_hit",
+        "power_pct": [
+          125,
+          150,
+          175,
+          200,
+          225
+        ],
+        "element": "earth"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    }
+  },
+  {
+    "id": "spell_breaker",
+    "name": "破咒術",
+    "job_id": "sage",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "matk",
+        "pct": [
+          -12,
+          -18,
+          -24,
+          -30,
+          -36
+        ],
+        "duration_s": 15
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    }
+  },
+  {
+    "id": "elemental_shield",
+    "name": "元素護盾",
+    "job_id": "sage",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      28,
+      32,
+      36,
+      40,
+      44
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "mdef": [
+            6,
+            10,
+            14,
+            18,
+            22
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    }
+  },
+  {
+    "id": "musical_strike",
+    "name": "音波攻擊",
+    "job_id": "bard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          120,
+          140,
+          160,
+          180,
+          200
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    }
+  },
+  {
+    "id": "arrow_vulcan",
+    "name": "神箭連射",
+    "job_id": "bard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      14,
+      17,
+      20,
+      23,
+      26
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          150,
+          180,
+          210,
+          240,
+          270
+        ],
+        "hits": [
+          2,
+          2,
+          3,
+          3,
+          3
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    },
+    "requires": {
+      "musical_strike": 3
+    }
+  },
+  {
+    "id": "poem_of_bragi",
+    "name": "布拉基之詩",
+    "job_id": "bard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      20,
+      24,
+      28,
+      32,
+      36
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "aspd": [
+            6,
+            12,
+            18,
+            24,
+            30
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    }
+  },
+  {
+    "id": "guardian_song",
+    "name": "守護之歌",
+    "job_id": "bard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      18,
+      22,
+      26,
+      30,
+      34
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "def": [
+            3,
+            6,
+            9,
+            12,
+            15
+          ],
+          "mdef": [
+            3,
+            6,
+            9,
+            12,
+            15
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    }
+  },
+  {
+    "id": "scream",
+    "name": "尖叫",
+    "job_id": "bard",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      14,
+      16,
+      18,
+      20
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "flee",
+        "pct": [
+          -8,
+          -12,
+          -16,
+          -20,
+          -24
+        ],
+        "duration_s": 10
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    }
+  },
+  {
+    "id": "iron_fist",
+    "name": "鐵拳",
+    "job_id": "monk",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "finger_offensive",
+    "name": "氣彈指",
+    "job_id": "monk",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          150,
+          185,
+          220,
+          255,
+          290
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    }
+  },
+  {
+    "id": "raging_trifecta",
+    "name": "連環拳",
+    "job_id": "monk",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "proc",
+        "effect": "extra_hit",
+        "chance_pct": [
+          12,
+          16,
+          20,
+          24,
+          28
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "steel_body",
+    "name": "剛體",
+    "job_id": "monk",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      24,
+      27,
+      30,
+      33,
+      36
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "def": [
+            5,
+            10,
+            15,
+            20,
+            25
+          ],
+          "mdef": [
+            3,
+            6,
+            9,
+            12,
+            15
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_50",
+      "priority": 2
+    }
+  },
+  {
+    "id": "asura_strike",
+    "name": "阿修羅霸凰拳",
+    "job_id": "monk",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      70,
+      80,
+      90,
+      100,
+      110
+    ],
+    "cooldown_s": 4,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          240,
+          300,
+          360,
+          420,
+          480
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 3
+    },
+    "requires": {
+      "finger_offensive": 3
+    }
+  },
+  {
+    "id": "axe_mastery",
+    "name": "斧術鍛鍊",
+    "job_id": "alchemist",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "acid_terror",
+    "name": "強酸攻擊",
+    "job_id": "alchemist",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      15,
+      18,
+      21,
+      24,
+      27
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          130,
+          160,
+          190,
+          220,
+          250
+        ],
+        "hits": [
+          2,
+          2,
+          2,
+          3,
+          3
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    }
+  },
+  {
+    "id": "demonstration",
+    "name": "火焰瓶投擲",
+    "job_id": "alchemist",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "aoe",
+        "power_pct": [
+          120,
+          150,
+          180,
+          210,
+          240
+        ],
+        "element": "fire"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 2
+    }
+  },
+  {
+    "id": "chemical_protection",
+    "name": "化學保護",
+    "job_id": "alchemist",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      20,
+      24,
+      28,
+      32,
+      36
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "def": [
+            5,
+            10,
+            15,
+            20,
+            25
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    }
+  },
+  {
+    "id": "bio_boost",
+    "name": "生命體強化",
+    "job_id": "alchemist",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      22,
+      26,
+      30,
+      34,
+      38
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "atk": [
+            8,
+            12,
+            16,
+            20,
+            24
+          ],
+          "hit": [
+            3,
+            6,
+            9,
+            12,
+            15
+          ]
+        },
+        "duration_s": 60
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    }
+  },
+  {
+    "id": "rogue_mastery",
+    "name": "短劍修練",
+    "job_id": "rogue",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "back_stab",
+    "name": "背刺",
+    "job_id": "rogue",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          180,
+          220,
+          260,
+          300,
+          340
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 3
+    }
+  },
+  {
+    "id": "snatcher",
+    "name": "掠奪",
+    "job_id": "rogue",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "proc",
+        "effect": "steal_loot",
+        "chance_pct": [
+          6,
+          9,
+          12,
+          15,
+          18
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    }
+  },
+  {
+    "id": "strip_armor",
+    "name": "剝奪護甲",
+    "job_id": "rogue",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      14,
+      16,
+      18,
+      20,
+      22
+    ],
+    "cooldown_s": 2,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "defense",
+        "pct": [
+          -10,
+          -15,
+          -20,
+          -25,
+          -30
+        ],
+        "duration_s": 20
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "cooldown_ready",
+      "priority": 1
+    }
+  },
+  {
+    "id": "shadow_slash",
+    "name": "暗影斬",
+    "job_id": "rogue",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      16,
+      18,
+      20,
+      22,
+      24
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "physical_hit",
+        "power_pct": [
+          150,
+          185,
+          220,
+          255,
+          290
+        ],
+        "element": "shadow"
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "every_turn",
+      "priority": 2
+    }
   }
 ]
