@@ -71,6 +71,16 @@ class StatusExpiredEvent(CombatEvent):
 
 
 @dataclass
+class DotEvent(CombatEvent):
+    target: str
+    status: str
+    damage: int
+
+    def __post_init__(self):
+        self.kind = "dot"
+
+
+@dataclass
 class FledEvent(CombatEvent):
     actor: str
     hp: int

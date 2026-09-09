@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from server.combat.events import StatusAppliedEvent, StatusExpiredEvent
+from server.combat.events import DotEvent, StatusAppliedEvent, StatusExpiredEvent
 
 
 @dataclass
@@ -30,6 +30,8 @@ def tick_statuses(target, events: list) -> None:
     for s in list(target.statuses):
         if s.kind == "dot":
             target.take_damage(s.magnitude)
+            events.append(DotEvent(target=target.name, status=s.name,
+                                   damage=s.magnitude))
         s.duration -= 1
         if s.duration <= 0:
             target.statuses.remove(s)

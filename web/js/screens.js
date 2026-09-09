@@ -53,6 +53,7 @@ const SLOT_ORDER = [
   ["garment", "披肩"], ["shoes", "鞋子"],
   ["accessory1", "飾品（左）"], ["accessory2", "飾品（右）"],
 ];
+const STATUS_ZH = { poison: "中毒", bleed: "流血", burn: "灼燒", stun: "暈眩" };
 const STAT_ZH = { str: "力量", agi: "敏捷", vit: "體質", int: "智力", dex: "靈巧",
   luk: "幸運", atk: "攻擊", matk: "魔攻", def: "防禦", defense: "防禦", mdef: "魔防", hit: "命中",
   flee: "迴避", crit: "爆擊", aspd: "攻速", max_hp: "HP上限", max_sp: "SP上限",
@@ -167,7 +168,10 @@ function combatLogLines(events, opts) {
       const st = (e.status || "").replace(/_mod$/, "");
       out.push(`<span class="dim">  ${esc(e.target)} 的 ${esc(STAT_ZH[st] || st)} 加成結束</span>`);
     } else if (e.kind === "status_applied") {
-      out.push(`<span class="dim">  ${esc(e.target)} 陷入 ${esc(e.status)}</span>`);
+      out.push(`<span class="dim">  ${esc(e.target)} 陷入 ${esc(STATUS_ZH[e.status] || e.status)}</span>`);
+    } else if (e.kind === "dot") {
+      const cls = e.target === me ? "atk-foe" : "hit";
+      out.push(`<span class="${cls}">  ${esc(e.target)} 受到 ${esc(STATUS_ZH[e.status] || e.status)} ${e.damage}</span>`);
     } else if (e.kind === "challenge_result") {
       const label = { win: "勝利", loss: "戰敗", fled: "撤退" }[e.outcome] || e.outcome;
       out.push(`<span class="crit">— ${label}（${e.rounds} 回合）—</span>`);

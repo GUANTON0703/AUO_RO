@@ -42,10 +42,12 @@ def cast_skill(caster, target, skill, rng: random.Random) -> list:
 
 def _apply_poison(target, level: int, events: list) -> None:
     per_tick = round(target.max_hp * 0.015) + level * 3
+    fresh = not any(s.name == "poison" for s in target.statuses)
     apply_status(target, Status(kind="dot", name="poison", duration=4,
                                 magnitude=per_tick))
-    events.append(SkillEvent(actor="", target=target.name, skill_id="poison",
-                             skill_name="中毒"))
+    if fresh:
+        events.append(SkillEvent(actor="", target=target.name, skill_id="poison",
+                                 skill_name="中毒"))
 
 
 def _physical_skill(caster, target, skill, eff, rng):
