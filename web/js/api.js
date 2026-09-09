@@ -62,6 +62,7 @@ const API = (() => {
     resetStats: (cid) => post(`/characters/${cid}/resetstats`),
     resetSkills: (cid) => post(`/characters/${cid}/resetskills`),
     jobchange: (cid, target_job_id) => post(`/characters/${cid}/jobchange`, { target_job_id }),
+    rebirth: (cid) => post(`/characters/${cid}/rebirth`),
 
     // hunt
     huntStart: (map_id, monster_ids) => post("/hunt/start", { map_id, monster_ids: monster_ids || [] }),

@@ -126,6 +126,11 @@ def _migration_5(conn: sqlite3.Connection) -> None:
     _add_col(conn, "characters", "hunt_strategy", "TEXT NOT NULL DEFAULT '{}'")
 
 
+def _migration_6(conn: sqlite3.Connection) -> None:
+    """轉生：characters 加 is_rebirth 旗標（滿等重生過的角色 = 1）。"""
+    _add_col(conn, "characters", "is_rebirth", "INTEGER NOT NULL DEFAULT 0")
+
+
 # (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
 _MIGRATIONS: list[tuple[int, "callable"]] = [
     (1, _migration_1),
@@ -133,6 +138,7 @@ _MIGRATIONS: list[tuple[int, "callable"]] = [
     (3, _migration_3),
     (4, _migration_4),
     (5, _migration_5),
+    (6, _migration_6),
 ]
 
 

@@ -271,6 +271,23 @@ def set_job(character_id: int, job_id: str, job_level: int, job_exp: int,
             )
 
 
+def rebirth(character_id: int) -> None:
+    """滿等重生：等級歸 1、屬性技能清空、設 is_rebirth；裝備 / 背包 / Zeny / 名字保留。"""
+    with connection.get_connection() as conn:
+        conn.execute(
+            """
+            UPDATE characters SET
+                job_id = 'novice', base_level = 1, job_level = 1,
+                base_exp = 0, job_exp = 0, skill_points = 0,
+                learned_skills = '{}', is_rebirth = 1,
+                stat_str = 1, stat_agi = 1, stat_vit = 1,
+                stat_int = 1, stat_dex = 1, stat_luk = 1
+            WHERE id = ?
+            """,
+            (character_id,),
+        )
+
+
 def delete_character(character_id: int, account_id: int) -> bool:
     with connection.transaction() as conn:
         owned = conn.execute(

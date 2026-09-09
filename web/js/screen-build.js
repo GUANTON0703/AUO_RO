@@ -95,7 +95,8 @@
       let html = `
         <div class="card">
           <div class="section-title"><h2>${esc(c.name)}</h2>
-            <span class="pill">${esc(jobName(c.job_id))} Job Lv ${c.job_level}</span></div>
+            <span class="pill">${esc(jobName(c.job_id))} Job Lv ${c.job_level}</span>
+            ${c.is_rebirth ? `<span class="pill good">轉生</span>` : ""}</div>
           <div class="row tight">
             <button class="btn small ${tab === "stats" ? "primary" : ""}" data-tab="stats">屬性加點</button>
             <button class="btn small ${tab === "skills" ? "primary" : ""}" data-tab="skills">技能</button>
@@ -336,22 +337,53 @@
     // ---------- 轉職 ----------
     _drawJob() {
       const c = S.char;
-      const targets = Object.values(S.catalog.jobs || {})
-        .filter((j) => j.parent_id === c.job_id);
+      const jobs = S.catalog.jobs || {};
+      const curTier = jobs[c.job_id]?.tier;
+      const targets = Object.values(jobs).filter((j) => j.parent_id === c.job_id);
       let rows = "";
       for (const j of targets) {
-        const ok = c.job_level >= j.change_job_level;
+        const lvOk = c.job_level >= j.change_job_level;
+        const needRebirth = j.tier === "third" && !c.is_rebirth;
         rows += `
           <div class="item">
-            <div>${esc(j.name)}<div class="sub">需 Job Lv ${j.change_job_level}</div></div>
-            ${ok
-              ? `<button class="btn small primary" data-job="${j.id}" data-name="${esc(j.name)}">轉職</button>`
-              : `<span class="pill warn">Job Lv 不足（${c.job_level}/${j.change_job_level}）</span>`}
+            <div>${esc(j.name)}<div class="sub">需 Job Lv ${j.change_job_level}${
+              j.tier === "third" ? "、需先重生" : ""}</div></div>
+            ${needRebirth
+              ? `<span class="pill warn">需先重生</span>`
+              : lvOk
+                ? `<button class="btn small primary" data-job="${j.id}" data-name="${esc(j.name)}">轉職</button>`
+                : `<span class="pill warn">Job Lv 不足（${c.job_level}/${j.change_job_level}）</span>`}
           </div>`;
       }
       if (!targets.length) rows = `<p class="muted">目前沒有可轉的下一階職業。</p>`;
-      document.querySelector("#build-body").innerHTML = `
-        <div class="card"><h3>轉職</h3><div class="list">${rows}</div></div>`;
+
+      const jobCap = (window.Curve?.jobCaps?.second) || 70;
+      const canRebirth = curTier === "second" && !c.is_rebirth
+        && c.base_level >= 99 && c.job_level >= jobCap;
+      const rebirthCard = (curTier === "second" && !c.is_rebirth) ? `
+        <div class="card"><h3>重生</h3>
+          <p class="sub">Base 99 + Job ${jobCap} 後可重生：等級歸 1、屬性技能全清，裝備背包 Zeny 保留。
+          重生後可再轉生二轉，屬性點 +52、HP/SP 成長更高。</p>
+          ${canRebirth
+            ? `<button class="btn primary" id="do-rebirth">重生（不可逆）</button>`
+            : `<span class="pill warn">需 Base 99 且 Job ${jobCap}（目前 ${c.base_level} / ${c.job_level}）</span>`}
+        </div>` : "";
+
+      document.querySelector("#build-body").innerHTML = rebirthCard
+        + `<div class="card"><h3>轉職</h3><div class="list">${rows}</div></div>`;
+
+      const rb = document.querySelector("#do-rebirth");
+      if (rb) rb.onclick = async () => {
+        if (!confirm("確定重生？等級歸 1、屬性技能全清，這一步不可逆。")) return;
+        rb.disabled = true;
+        try {
+          await API.rebirth(S.char.id);
+          await App.refreshChar();
+          App.toast("重生完成，重新開始吧");
+          if (this._stale()) return;
+          App.navigate("build");
+        } catch (err) { App.toast(err.detail || "重生失敗", true); rb.disabled = false; }
+      };
 
       document.querySelectorAll("[data-job]").forEach((b) => {
         b.onclick = async () => {

@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS characters (
     stat_luk     INTEGER NOT NULL DEFAULT 1,
     stat_points  INTEGER NOT NULL DEFAULT 0,
     skill_points INTEGER NOT NULL DEFAULT 0,
+    is_rebirth   INTEGER NOT NULL DEFAULT 0,
     zeny         INTEGER NOT NULL DEFAULT 0,
     location_map TEXT NOT NULL,
     created_at   TEXT NOT NULL,

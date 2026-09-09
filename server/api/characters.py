@@ -39,12 +39,14 @@ def _to_public(row) -> CharacterPublic:
         stat_dex=row["stat_dex"],
         stat_luk=row["stat_luk"],
         stat_points=stat_points_available(
-            row["base_level"], {k: row[f"stat_{k}"] for k in _STAT_KEYS}
+            row["base_level"], {k: row[f"stat_{k}"] for k in _STAT_KEYS},
+            bool(row["is_rebirth"]),
         ),
         skill_points=skill_points_available(
             row["job_level"], json.loads(row["learned_skills"]),
             carried=row["skill_points"],
         ),
+        is_rebirth=bool(row["is_rebirth"]),
         zeny=row["zeny"],
         location_map=row["location_map"],
         learned_skills=json.loads(row["learned_skills"]),

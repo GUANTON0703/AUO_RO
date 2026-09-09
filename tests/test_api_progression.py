@@ -159,3 +159,36 @@ def test_second_job_can_relearn_full_ancestry_after_skill_reset(client, auth, db
     )
     assert r.status_code == 400
     assert r.json()["detail"] == "非目前職業或前職技能"
+
+
+def _to_knight(client, headers, db_helpers, ch):
+    db_helpers.set_job_level(ch["id"], 10)
+    client.post(f"/api/characters/{ch['id']}/jobchange", headers=headers,
+                json={"target_job_id": "swordman"})
+    db_helpers.set_job_level(ch["id"], 40)
+    client.post(f"/api/characters/{ch['id']}/jobchange", headers=headers,
+                json={"target_job_id": "knight"})
+
+
+def test_rebirth_requires_max_second_job(client, auth, db_helpers):
+    _, headers, _ = auth
+    ch = _make_char(client, headers)
+    _to_knight(client, headers, db_helpers, ch)
+    # job 50 但 base 還沒 99 → 擋
+    db_helpers.set_job_level(ch["id"], 70)
+    r = client.post(f"/api/characters/{ch['id']}/rebirth", headers=headers)
+    assert r.status_code == 400
+    db_helpers.set_base_level(ch["id"], 99)
+    r = client.post(f"/api/characters/{ch['id']}/rebirth", headers=headers)
+    assert r.status_code == 200, r.json()
+    body = r.json()
+    assert body["is_rebirth"] is True
+    assert body["job_id"] == "novice"
+    assert body["base_level"] == 1 and body["job_level"] == 1
+    assert body["stat_str"] == 1
+    # 起手 48 + 重生 52 = 100 可用點
+    assert body["stat_points"] == 100
+    # 不能重生第二次
+    r2 = client.post(f"/api/characters/{ch['id']}/rebirth", headers=headers)
+    assert r2.status_code == 400
+

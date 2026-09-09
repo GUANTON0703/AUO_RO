@@ -7,6 +7,7 @@ from server.auth.dependencies import CurrentAccount
 from server.config import get_settings
 from server.content import load_content
 from server.db import connection
+from server.progression.levels import job_level_cap
 from server.progression.skills import can_learn, skill_points_available
 from server.progression.stats import STAT_KEYS, STAT_MAX, stat_points_available
 from server.repositories import characters as characters_repo
@@ -34,8 +35,10 @@ def _public(row) -> dict:
         "base_exp": row["base_exp"], "job_exp": row["job_exp"],
         "zeny": row["zeny"],
         **{f"stat_{k}": row[f"stat_{k}"] for k in STAT_KEYS},
+        "is_rebirth": bool(row["is_rebirth"]),
         "stat_points": stat_points_available(
-            row["base_level"], {k: row[f"stat_{k}"] for k in STAT_KEYS}
+            row["base_level"], {k: row[f"stat_{k}"] for k in STAT_KEYS},
+            bool(row["is_rebirth"]),
         ),
         "skill_points": skill_points_available(
             row["job_level"], json.loads(row["learned_skills"]),
@@ -68,7 +71,7 @@ def allocate_stats(character_id: int, body: dict[str, int], account_id: CurrentA
         if target[k] > STAT_MAX:
             raise HTTPException(status_code=400, detail=f"{k} 超過上限 {STAT_MAX}")
 
-    if stat_points_available(row["base_level"], target) < 0:
+    if stat_points_available(row["base_level"], target, bool(row["is_rebirth"])) < 0:
         raise HTTPException(status_code=400, detail="屬性點不足")
 
     characters_repo.set_stats(character_id, target)
@@ -133,9 +136,25 @@ def change_job(character_id: int, body: JobChangeRequest, account_id: CurrentAcc
             status_code=400,
             detail=f"Job Level 未達門檻（需 {target.change_job_level}）",
         )
+    if target.tier == "third" and not row["is_rebirth"]:
+        raise HTTPException(status_code=400, detail="轉生職業需先完成重生")
     # 轉職後 job 等級歸 1，但這一轉練到的等級要存進 carried，
     # 否則技能點會突然變負、學不了下一階技能
     carried = row["skill_points"] + (row["job_level"] - 1)
     characters_repo.set_job(character_id, body.target_job_id, 1, 0,
                             carried_skill_points=carried)
+    return _public(_owned(character_id, account_id))
+
+
+@router.post("/{character_id}/rebirth")
+def rebirth(character_id: int, account_id: CurrentAccount):
+    row = _owned(character_id, account_id)
+    job = _content.jobs.get(row["job_id"])
+    if row["is_rebirth"]:
+        raise HTTPException(status_code=400, detail="已經重生過了")
+    if job is None or job.tier != "second":
+        raise HTTPException(status_code=400, detail="需為二轉職業才能重生")
+    if row["base_level"] < 99 or row["job_level"] < job_level_cap("second"):
+        raise HTTPException(status_code=400, detail="需 Base 99 且 Job 滿級才能重生")
+    characters_repo.rebirth(character_id)
     return _public(_owned(character_id, account_id))

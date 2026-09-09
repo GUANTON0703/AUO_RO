@@ -8,7 +8,7 @@
 
 經典 RO 的重生線是 High 新手 → High 一轉 → 轉生二轉。ROtxt 不需要把 High 一轉做成獨立職業 —— 那只是「重練同一批一轉技能」。改成：
 
-**重生條件：** base_level 99 且 job_level 50 且目前是二轉（tier second）。
+**重生條件：** base_level 99 且 job_level 70（二轉上限）且目前是二轉（tier second）。
 
 **重生動作（`POST /api/characters/{id}/rebirth`）：**
 1. base_level → 1、job_level → 1、base_exp / job_exp → 0
