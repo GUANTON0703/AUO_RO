@@ -41,6 +41,7 @@ class Combatant:
     aspd: int
     crit: int
     is_caster: bool = False
+    crit_mult: float = 1.4        # 爆擊傷害倍率（拳刃 = 2.0）
     min_hit_chance: float = 0.0   # 物理命中率下限（Boss 用，讓高 FLEE 玩家仍會被打到）
     soft_def: int = 0     # 平減物理傷害（Pre-Renewal VIT 軟防）
     soft_mdef: int = 0    # 平減魔法傷害

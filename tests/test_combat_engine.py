@@ -170,3 +170,25 @@ def test_size_bonus_increases_damage():
     simulate_fight(plain, big1, rng=random.Random(4), max_rounds=3)
     simulate_fight(hunter, big2, rng=random.Random(4), max_rounds=3)
     assert (99999 - big2.hp) > (99999 - big1.hp) * 1.5
+
+
+def test_crit_bypasses_flee():
+    # 100% 爆擊 vs 極高 FLEE：仍然每擊命中
+    attacker = _mk("暴擊哥", crit=100, hit=1, aspd=100)
+    dummy = _mk("閃避怪", flee=9999, max_hp=100000, atk=0)
+    r = simulate_fight(attacker, dummy, rng=random.Random(0), max_rounds=30)
+    hits = [e for e in r.events if getattr(e, "hit", False) and e.actor == "暴擊哥"]
+    assert len(hits) >= 25  # 幾乎每回合都打到
+
+
+def test_katar_crit_multiplier():
+    from server.combat.formulas import CRIT_MULTIPLIER
+    base = _mk("普通", crit=100, atk=100)
+    katar = _mk("拳刃", crit=100, atk=100, crit_mult=2.0)
+    dummy = lambda: _mk("木樁", flee=0, hit=0, atk=0, max_hp=1000000)
+    r1 = simulate_fight(base, dummy(), rng=random.Random(1), max_rounds=5)
+    r2 = simulate_fight(katar, dummy(), rng=random.Random(1), max_rounds=5)
+    d1 = sum(e.damage for e in r1.events if getattr(e, "damage", 0) and e.actor == "普通")
+    d2 = sum(e.damage for e in r2.events if getattr(e, "damage", 0) and e.actor == "拳刃")
+    assert d2 > d1 * 1.3  # 2.0 vs 1.4 → 明顯更高
+    assert CRIT_MULTIPLIER == 1.4

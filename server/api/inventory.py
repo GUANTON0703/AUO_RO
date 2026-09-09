@@ -69,6 +69,26 @@ def equip(character_id: int, body: EquipRequest, account_id: CurrentAccount):
             status_code=400, detail=f"Base Level 未達裝備需求（{eq.required_level}）"
         )
     with connection.transaction() as conn:
+        # 雙手武器與副手（盾）互斥
+        worn = {
+            r["equipped_slot"]: r["equipment_id"]
+            for r in conn.execute(
+                "SELECT equipped_slot, equipment_id FROM character_equipment "
+                "WHERE character_id = ? AND equipped_slot IS NOT NULL",
+                (character_id,),
+            ).fetchall()
+        }
+        if eq.slot == "offhand":
+            w = _content.equipment.get(worn.get("weapon"))
+            if w and w.two_handed:
+                raise HTTPException(status_code=400,
+                                    detail="裝備雙手武器時無法再裝副手")
+        if eq.slot == "weapon" and eq.two_handed and "offhand" in worn:
+            conn.execute(
+                "UPDATE character_equipment SET equipped_slot = NULL "
+                "WHERE character_id = ? AND equipped_slot = 'offhand'",
+                (character_id,),
+            )
         if eq.slot == "accessory":
             # 飾品有左右兩格：先塞空的那格，兩格都滿就換掉左格（accessory1）
             if inst["equipped_slot"] in ("accessory1", "accessory2"):

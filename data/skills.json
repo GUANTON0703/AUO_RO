@@ -2628,6 +2628,17 @@
           12,
           15
         ]
+      },
+      {
+        "type": "proc",
+        "effect": "extra_hit",
+        "chance_pct": [
+          40,
+          55,
+          70,
+          85,
+          100
+        ]
       }
     ],
     "idle_default": {

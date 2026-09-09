@@ -157,6 +157,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
                    and content.equipment[p.equipment_id].slot == "weapon"), None)
     attack_element = combat_mods["atk_element"] or (
         weapon.element if weapon else "neutral")
+    crit_mult = 2.0 if (weapon and weapon.weapon_type == "katar") else 1.4
 
     resolved = []
     for sid, lvl in snap.learned_skills.items():
@@ -184,6 +185,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         hit=max(0, derived["hit"]), flee=max(0, derived["flee"]),
         aspd=max(1, min(193, aspd)), crit=max(0, derived["crit"]),
         is_caster=(derived["matk"] > derived["atk"]),
+        crit_mult=crit_mult,
         soft_def=VIT // 3, soft_mdef=INT // 4,
         skills=resolved,
         attack_element=attack_element,

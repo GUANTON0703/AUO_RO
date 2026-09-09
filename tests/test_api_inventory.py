@@ -280,3 +280,20 @@ def test_assassin_can_use_slotted_katar():
     for kid in ("jur", "jur_3", "jur_4"):
         e = c.equipment[kid]
         assert set(e.job_ids) & anc, kid
+
+
+def test_two_handed_weapon_blocks_shield(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.set_job(ch["id"], "thief", 40)
+    db_helpers.set_base_level(ch["id"], 30)
+    db_helpers.give_equipment(ch["id"], "jur")          # 拳刃（two_handed）
+    db_helpers.give_equipment(ch["id"], "guard")        # 盾
+    insts = _equip_list(client, ch, h)
+    katar = next(i for i in insts if i["equipment_id"] == "jur")
+    shield = next(i for i in insts if i["equipment_id"] == "guard")
+    client.post(f"/api/characters/{ch['id']}/inventory/equip", headers=h,
+                json={"equipment_instance_id": katar["id"]})
+    r = client.post(f"/api/characters/{ch['id']}/inventory/equip", headers=h,
+                    json={"equipment_instance_id": shield["id"]})
+    assert r.status_code == 400 and "雙手" in r.json()["detail"]

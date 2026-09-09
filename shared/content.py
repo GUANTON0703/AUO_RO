@@ -131,6 +131,8 @@ class EquipmentDef(BaseModel):
     stats: dict = Field(default_factory=dict)
     element: str = "neutral"          # 武器屬性；防具留 neutral
     refinable: bool = True
+    weapon_type: str | None = None    # 武器類別：katar 等；None = 一般
+    two_handed: bool = False          # 雙手武器，不能同時裝副手（盾）
     card_slots: int = Field(default=0, ge=0, le=4)
     job_ids: list[str] = Field(default_factory=list)   # 空 = 全職可用
     required_level: int = Field(default=1, ge=1)

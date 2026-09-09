@@ -69,12 +69,14 @@ def _trigger_ok(c, trigger: str) -> bool:
 
 def _one_hit(attacker, defender, rng, events):
     """打一擊。回 True = 有命中。"""
-    hit = rng.random() < max(hit_chance(attacker.effective_hit, defender.effective_flee),
-                             attacker.min_hit_chance)
-    if not hit:
-        events.append(AttackEvent(attacker.name, defender.name, 0, False, False))
-        return False
+    # 爆擊必中：先擲爆擊，中了就無視 FLEE
     crit = rng.random() < crit_chance(attacker.effective_crit)
+    if not crit:
+        hit = rng.random() < max(hit_chance(attacker.effective_hit, defender.effective_flee),
+                                 attacker.min_hit_chance)
+        if not hit:
+            events.append(AttackEvent(attacker.name, defender.name, 0, False, False))
+            return False
     mult, resist, race = elements.damage_mods(attacker, defender, None)
     if attacker.is_caster:
         from server.combat.formulas import magic_damage
@@ -86,7 +88,7 @@ def _one_hit(attacker, defender, rng, events):
                               element_multiplier=mult, soft_def=defender.soft_def,
                               resist_pct=resist, race_pct=race)
     if crit:
-        dmg = round(dmg * CRIT_MULTIPLIER)
+        dmg = round(dmg * getattr(attacker, "crit_mult", CRIT_MULTIPLIER))
     defender.take_damage(dmg)
     events.append(AttackEvent(attacker.name, defender.name, dmg, crit, True))
     steal = attacker.procs.get("steal_loot", 0) if hasattr(attacker, "procs") else 0
