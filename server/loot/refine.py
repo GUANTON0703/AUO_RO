@@ -20,6 +20,10 @@ def refine_zeny_cost(current_refine: int) -> int:
     return (current_refine + 1) * 200
 
 
+def random_refine_zeny_cost(current_refine: int) -> int:
+    return refine_zeny_cost(current_refine) * 10
+
+
 def attempt_refine(current_refine: int, rng: random.Random) -> tuple[int, bool]:
     if current_refine >= REFINE_CAP:
         return current_refine, False
@@ -28,9 +32,15 @@ def attempt_refine(current_refine: int, rng: random.Random) -> tuple[int, bool]:
     return max(0, current_refine - 1), False
 
 
-def attempt_random_refine(current_refine: int, rng: random.Random) -> tuple[int, int]:
+def attempt_random_refine(current_refine: int,
+                          rng: random.Random) -> tuple[int, bool, int]:
+    """兩階段：先照普通成功率判定，失敗就降一級、增量 0；
+    成功再抽 +0/+1/+2/+3（10%/50%/35%/5%），封頂 +10。
+    回傳 (new_refine, success, increment)。"""
     if current_refine >= REFINE_CAP:
-        return current_refine, 0
+        return current_refine, False, 0
+    if rng.random() >= success_rate(current_refine):
+        return max(0, current_refine - 1), False, 0
     roll = rng.random()
     if roll < 0.10:
         increment = 0
@@ -41,7 +51,7 @@ def attempt_random_refine(current_refine: int, rng: random.Random) -> tuple[int,
     else:
         increment = 3
     new_refine = min(REFINE_CAP, current_refine + increment)
-    return new_refine, new_refine - current_refine
+    return new_refine, True, new_refine - current_refine
 
 
 REFINE_BONUS_PER_LEVEL = {"atk": 2, "matk": 2, "def": 1, "mdef": 1,

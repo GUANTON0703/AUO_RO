@@ -193,12 +193,13 @@ def test_refine_safe_level_succeeds(client, auth, db_helpers):
     assert inv["items"]["oridecon"] == 9
 
 
-def test_refine_random_mode_uses_increment_and_keeps_costs(client, auth, db_helpers, monkeypatch):
+def test_refine_random_mode_two_stage_and_10x_zeny(client, auth, db_helpers, monkeypatch):
     _, h, _ = auth
     ch = _char(client, h, db_helpers)
     db_helpers.give_equipment(ch["id"], "knife")
     db_helpers.give_item(ch["id"], "oridecon", 2)
-    db_helpers.set_zeny(ch["id"], 99999)
+    # knife 在 +0，普通費用 200；隨機模式應為 10 倍 = 2000
+    db_helpers.set_zeny(ch["id"], 2000)
     inst = _equip_list(client, ch, h)[0]
 
     class FixedRng:
@@ -207,9 +208,18 @@ def test_refine_random_mode_uses_increment_and_keeps_costs(client, auth, db_help
 
     import server.api.inventory as inventory_api
     monkeypatch.setattr(inventory_api.random, "Random", FixedRng)
+
+    # 只有 1999 → 隨機模式（10 倍 = 2000）應該不夠
+    db_helpers.set_zeny(ch["id"], 1999)
+    poor = client.post(f"/api/characters/{ch['id']}/inventory/refine", headers=h,
+                       json={"equipment_instance_id": inst["id"], "mode": "random"})
+    assert poor.status_code == 400 and "Zeny" in poor.json()["detail"]
+
+    # 補到 2000 → 剛好夠
+    db_helpers.set_zeny(ch["id"], 2000)
     r = client.post(f"/api/characters/{ch['id']}/inventory/refine", headers=h,
                     json={"equipment_instance_id": inst["id"], "mode": "random"})
-
+    # +0 成功率 1.0 → 第一段必過；第二段 roll 0.99 → 抽 +3
     assert r.status_code == 200
     assert r.json()["mode"] == "random"
     assert r.json()["increment"] == 3

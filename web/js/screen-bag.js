@@ -202,7 +202,8 @@
       this._body().querySelectorAll("[data-refine]").forEach((b) => {
         b.onclick = async () => {
           const choice = prompt(
-            "選擇精煉模式：\n1. 普通（成功率／失敗降級）\n2. 隨機（+0／+1／+2／+3）",
+            "選擇精煉模式：\n1. 普通（成功率／失敗降級）\n"
+            + "2. 隨機（10 倍 Zeny、同礦石；先照普通成功率判定，失敗一樣降級，判定成功才抽 +0～+3）",
             "1",
           );
           if (choice == null) return;

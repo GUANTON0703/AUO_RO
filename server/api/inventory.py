@@ -170,7 +170,9 @@ def refine(character_id: int, body: RefineRequest, account_id: CurrentAccount):
         current = r["refine"]
         if current >= refine_mod.REFINE_CAP:
             raise HTTPException(status_code=400, detail="已達精煉上限")
-        zeny_cost = refine_mod.refine_zeny_cost(current)
+        zeny_cost = (refine_mod.random_refine_zeny_cost(current)
+                     if body.mode == "random"
+                     else refine_mod.refine_zeny_cost(current))
         ore_row = conn.execute(
             "SELECT qty FROM character_items WHERE character_id = ? AND item_id = ?",
             (character_id, ore),
@@ -194,10 +196,9 @@ def refine(character_id: int, body: RefineRequest, account_id: CurrentAccount):
             (zeny_cost, character_id),
         )
         if body.mode == "random":
-            new_refine, increment = refine_mod.attempt_random_refine(
+            new_refine, ok, increment = refine_mod.attempt_random_refine(
                 current, random.Random()
             )
-            ok = True
         else:
             new_refine, ok = refine_mod.attempt_refine(current, random.Random())
             increment = new_refine - current
@@ -206,7 +207,12 @@ def refine(character_id: int, body: RefineRequest, account_id: CurrentAccount):
             (new_refine, inst["id"]),
         )
     if body.mode == "random":
-        message = f"隨機精煉抽中 +{increment}，{eq.name} +{new_refine}"
+        if not ok:
+            message = f"隨機精煉判定失敗，{eq.name} 降至 +{new_refine}"
+        elif increment == 0:
+            message = f"隨機精煉判定成功，但增量 +0，{eq.name} 維持 +{new_refine}"
+        else:
+            message = f"隨機精煉判定成功，抽中 +{increment}，{eq.name} +{new_refine}"
     else:
         message = (
             f"精煉成功，{eq.name} +{new_refine}"
