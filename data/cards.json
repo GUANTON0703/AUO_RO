@@ -117,5 +117,21 @@
   {"id": "orc_lord_card", "name": "獸人酋長卡片", "monster_id": "orc_lord", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 8}]},
   {"id": "stormy_knight_card", "name": "暴風雪騎士卡片", "monster_id": "stormy_knight", "slot": "garment", "drop_rate": 0.03, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 15}]},
   {"id": "pharaoh_card", "name": "法老王卡片", "monster_id": "pharaoh", "slot": "accessory", "drop_rate": 0.03, "effects": [{"type": "flat_stat", "stat": "mdef", "amount": 8}]},
-  {"id": "dark_lord_card", "name": "黑暗之王卡片", "monster_id": "dark_lord", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "element_resist", "element": "shadow", "pct": 20}]}
+  {"id": "dark_lord_card", "name": "黑暗之王卡片", "monster_id": "dark_lord", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "element_resist", "element": "shadow", "pct": 20}]},
+  {"id": "raydric_archer_card", "name": "雷德里克弓兵卡片", "monster_id": "raydric_archer", "slot": "garment", "drop_rate": 0.001, "effects": [{"type": "element_resist", "element": "shadow", "pct": 15}]},
+  {"id": "khalitzburg_card", "name": "卡利茲堡卡片", "monster_id": "khalitzburg", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 15}]},
+  {"id": "abysmal_knight_card", "name": "深淵騎士卡片", "monster_id": "abysmal_knight", "slot": "weapon", "drop_rate": 0.001, "effects": [{"type": "size_damage", "size": "large", "pct": 18}, {"type": "flat_stat", "stat": "atk", "amount": 5}]},
+  {"id": "evil_druid_card", "name": "邪骸德魯伊卡片", "monster_id": "evil_druid", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "mdef", "amount": 10}, {"type": "flat_stat", "stat": "int", "amount": 1}]},
+  {"id": "wraith_card", "name": "幽靈卡片", "monster_id": "wraith", "slot": "armor", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "undead", "pct": 15}]},
+  {"id": "evil_nymph_card", "name": "邪精靈卡片", "monster_id": "evil_nymph", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "max_sp", "amount": 60}, {"type": "flat_stat", "stat": "int", "amount": 2}]},
+  {"id": "hunter_fly_card", "name": "獵蠅卡片", "monster_id": "hunter_fly", "slot": "garment", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 12}]},
+  {"id": "clock_card", "name": "大時鐘卡片", "monster_id": "clock", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 12}, {"type": "flat_stat", "stat": "vit", "amount": 1}]},
+  {"id": "owl_baron_card", "name": "貓頭鷹男爵卡片", "monster_id": "owl_baron", "slot": "accessory", "drop_rate": 0.001, "effects": [{"type": "flat_stat", "stat": "int", "amount": 2}, {"type": "flat_stat", "stat": "dex", "amount": 1}]},
+  {"id": "owl_duke_card", "name": "貓頭鷹公爵卡片", "monster_id": "owl_duke", "slot": "armor", "drop_rate": 0.0012, "effects": [{"type": "percent_stat", "stat": "max_sp", "pct": 10}]},
+  {"id": "loli_ruri_card", "name": "蘿莉露莉卡片", "monster_id": "loli_ruri", "slot": "garment", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 250}]},
+  {"id": "quve_card", "name": "庫貝卡片", "monster_id": "quve", "slot": "shoes", "drop_rate": 0.0018, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 200}]},
+  {"id": "gibbet_card", "name": "吊首鬼卡片", "monster_id": "gibbet", "slot": "head", "drop_rate": 0.0016, "effects": [{"type": "flat_stat", "stat": "mdef", "amount": 8}]},
+  {"id": "disguise_card", "name": "變裝鬼卡片", "monster_id": "disguise", "slot": "shoes", "drop_rate": 0.0014, "effects": [{"type": "flat_stat", "stat": "agi", "amount": 2}]},
+  {"id": "nightmare_terror_card", "name": "夢魘魔卡片", "monster_id": "nightmare_terror", "slot": "armor", "drop_rate": 0.0014, "effects": [{"type": "element_resist", "element": "shadow", "pct": 20}]},
+  {"id": "clock_tower_manager_card", "name": "時計塔管理者卡片", "monster_id": "clock_tower_manager", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "formless", "pct": 20}]}
 ]

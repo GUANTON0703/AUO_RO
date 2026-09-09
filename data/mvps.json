@@ -589,5 +589,38 @@
       {"item_id": "dark_crystal", "rate": 0.3}
     ],
     "lore": "格拉斯神殿外苑徘徊的黑暗君王，將神殿的殘響化成致命魔力。"
+  },
+  {
+    "id": "clock_tower_manager",
+    "name": "時計塔管理者",
+    "level": 68,
+    "element": "neutral",
+    "race": "formless",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 34000,
+    "job_exp": 17000,
+    "cooldown_hours": 24,
+    "home_map_id": "clock_tower_b2f",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 25027,
+      "max_sp": 0,
+      "atk": 228,
+      "matk": 118,
+      "defense": 86,
+      "mdef": 20,
+      "hit": 104,
+      "flee": 73,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {"item_id": "clock_tower_manager_card", "rate": 0.03},
+      {"item_id": "gear_wheel", "rate": 0.3},
+      {"item_id": "oridecon", "rate": 0.2},
+      {"item_id": "elunium", "rate": 0.3}
+    ],
+    "lore": "掌管時計塔全部齒輪的機械魔像，停擺的時鐘在它腳邊堆成小山。"
   }
 ]

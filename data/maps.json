@@ -385,5 +385,68 @@
     "monster_ids": ["myst_case", "cruiser", "chepet", "christmas_cookie"],
     "mvp_id": "stormy_knight",
     "unlock_base_level": 48
+  },
+  {
+    "id": "gh_chivalry_1f",
+    "name": "格拉斯神殿 騎士團 1F",
+    "town": "aldebaran",
+    "level_range": [58, 68],
+    "monster_ids": ["raydric", "raydric_archer", "wraith", "gibbet"],
+    "mvp_id": null,
+    "unlock_base_level": 58
+  },
+  {
+    "id": "gh_chivalry_2f",
+    "name": "格拉斯神殿 騎士團 2F",
+    "town": "aldebaran",
+    "level_range": [64, 72],
+    "monster_ids": ["raydric_archer", "khalitzburg", "abysmal_knight", "evil_nymph"],
+    "mvp_id": "dark_lord",
+    "unlock_base_level": 62
+  },
+  {
+    "id": "gh_abbey",
+    "name": "格拉斯神殿 修道院",
+    "town": "aldebaran",
+    "level_range": [60, 68],
+    "monster_ids": ["evil_druid", "wraith", "evil_nymph", "hunter_fly"],
+    "mvp_id": null,
+    "unlock_base_level": 60
+  },
+  {
+    "id": "clock_tower_b1f",
+    "name": "時計塔地下 1F",
+    "town": "aldebaran",
+    "level_range": [62, 70],
+    "monster_ids": ["clock", "owl_duke", "owl_baron", "hunter_fly"],
+    "mvp_id": null,
+    "unlock_base_level": 62
+  },
+  {
+    "id": "clock_tower_b2f",
+    "name": "時計塔地下 2F",
+    "town": "aldebaran",
+    "level_range": [64, 72],
+    "monster_ids": ["clock", "owl_baron", "owl_duke", "abysmal_knight"],
+    "mvp_id": "clock_tower_manager",
+    "unlock_base_level": 65
+  },
+  {
+    "id": "nifflheim_street",
+    "name": "尼夫赫姆 街道",
+    "town": "aldebaran",
+    "level_range": [58, 68],
+    "monster_ids": ["quve", "gibbet", "nightmare_terror", "disguise"],
+    "mvp_id": null,
+    "unlock_base_level": 59
+  },
+  {
+    "id": "nifflheim_shrine",
+    "name": "尼夫赫姆 神殿",
+    "town": "aldebaran",
+    "level_range": [64, 72],
+    "monster_ids": ["loli_ruri", "disguise", "nightmare_terror", "evil_nymph"],
+    "mvp_id": null,
+    "unlock_base_level": 67
   }
 ]
