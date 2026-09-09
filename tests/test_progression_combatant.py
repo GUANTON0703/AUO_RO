@@ -119,3 +119,21 @@ def test_default_disabled_skill_excluded_unless_toggled_on():
                                           skill_toggles={"provoke": True}), c)
     assert "provoke" not in {s.skill_id for s in base.skills}
     assert "provoke" in {s.skill_id for s in forced.skills}
+
+
+def test_equipment_max_hp_sp_apply():
+    c = load_content()
+    bare = build_player_combatant(_snap(equipped=[]), c)
+    # curly_horn_helm = +600 HP, circlet = +20 SP
+    hp_gear = build_player_combatant(_snap(equipped=[EquippedPiece("curly_horn_helm")]), c)
+    sp_gear = build_player_combatant(_snap(equipped=[EquippedPiece("circlet")]), c)
+    assert hp_gear.max_hp >= bare.max_hp + 590
+    assert sp_gear.max_sp >= bare.max_sp + 18
+
+
+def test_stale_hp_clamped_to_new_max():
+    c = load_content()
+    # 帶著舊的高 hp，但沒穿加 HP 裝 → 應被夾到新 max_hp
+    cb = build_player_combatant(_snap(equipped=[], hp=999999, sp=999999), c)
+    assert cb.hp == cb.max_hp
+    assert cb.sp == cb.max_sp

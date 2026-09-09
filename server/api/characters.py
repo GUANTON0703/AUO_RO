@@ -112,8 +112,9 @@ def character_sheet(character_id: int, account_id: CurrentAccount):
         "aspd": c.aspd,
         "crit": c.crit,
         "is_caster": c.is_caster,
-        "hunt_hp": row["hunt_hp"] if row["hunt_hp"] is not None else c.max_hp,
-        "hunt_sp": row["hunt_sp"] if row["hunt_sp"] is not None else c.max_sp,
+        # 換裝後 max 可能變小，夾一下避免顯示超過上限（DB 值下次結算會自己修正）
+        "hunt_hp": min(row["hunt_hp"], c.max_hp) if row["hunt_hp"] is not None else c.max_hp,
+        "hunt_sp": min(row["hunt_sp"], c.max_sp) if row["hunt_sp"] is not None else c.max_sp,
     }
 
 

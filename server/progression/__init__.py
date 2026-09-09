@@ -128,8 +128,8 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     aspd = min(193, round(100 + AGI * 0.7 + DEX * 0.15 + eq.get("aspd", 0)
                           + passives.get("aspd", 0)))
     crit = round(LUK / 3) + eq.get("crit", 0) + passives.get("crit", 0)
-    max_hp += passives.get("max_hp", 0)
-    max_sp += passives.get("max_sp", 0)
+    max_hp += passives.get("max_hp", 0) + eq.get("max_hp", 0)
+    max_sp += passives.get("max_sp", 0) + eq.get("max_sp", 0)
 
     derived = {"max_hp": max_hp, "max_sp": max_sp, "atk": atk, "matk": matk,
                "defense": defense, "mdef": mdef, "hit": hit, "flee": flee,
@@ -176,6 +176,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         race_bonus=combat_mods["race"],
         size_bonus=combat_mods["size"],
         procs=_passive_procs(content, snap.learned_skills),
-        hp=snap.hp if snap.hp is not None else 0,
-        sp=snap.sp if snap.sp is not None else 0,
+        # 換裝後 max 可能變小，把續戰的 hp/sp 夾回上限
+        hp=min(snap.hp, derived["max_hp"]) if snap.hp is not None else 0,
+        sp=min(snap.sp, derived["max_sp"]) if snap.sp is not None else 0,
     )
