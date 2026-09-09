@@ -224,3 +224,23 @@ def test_inventory_rejects_other_account(client, auth, db_helpers, invite_code):
     t2 = client.post("/api/sessions", json={"username": "seconduser", "password": "password123"}).json()
     h2 = {"Authorization": f"Bearer {t2['token']}"}
     assert client.get(f"/api/characters/{ch['id']}/inventory", headers=h2).status_code == 404
+
+
+def test_refine_missing_ore_message_uses_item_name(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.give_equipment(ch["id"], "knife")
+    inst = _equip_list(client, ch, h)[0]
+    r = client.post(f"/api/characters/{ch['id']}/inventory/refine", headers=h,
+                    json={"equipment_instance_id": inst["id"]})
+    assert r.status_code == 400
+    assert "歐里德鋼" in r.json()["detail"]   # 不是 "oridecon"
+
+
+def test_assassin_can_use_slotted_katar():
+    from server.content import load_content
+    c = load_content()
+    anc = c.job_ancestry("assassin")
+    for kid in ("jur", "jur_3", "jur_4"):
+        e = c.equipment[kid]
+        assert set(e.job_ids) & anc, kid

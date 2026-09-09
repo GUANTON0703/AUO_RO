@@ -159,6 +159,8 @@ def refine(character_id: int, body: RefineRequest, account_id: CurrentAccount):
         raise HTTPException(status_code=400, detail="此裝備無法精煉")
 
     ore = refine_mod.refine_ore_for(eq.slot)
+    ore_item = _content.items.get(ore)
+    ore_name = ore_item.name if ore_item else ore
     with connection.transaction() as conn:
         r = conn.execute(
             "SELECT refine FROM character_equipment WHERE id = ?", (inst["id"],)
@@ -172,7 +174,8 @@ def refine(character_id: int, body: RefineRequest, account_id: CurrentAccount):
             (character_id, ore),
         ).fetchone()
         if not ore_row or ore_row["qty"] < 1:
-            raise HTTPException(status_code=400, detail=f"缺少精煉材料（{ore}）")
+            raise HTTPException(status_code=400,
+                                detail=f"缺少精煉材料：{ore_name}（怪物掉落）")
         zeny_row = conn.execute(
             "SELECT zeny FROM characters WHERE id = ?", (character_id,)
         ).fetchone()

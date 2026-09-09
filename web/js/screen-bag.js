@@ -119,16 +119,24 @@
             ? `<div class="sub" style="color:var(--muted)">目前穿：${esc(worn.join("、"))}</div>`
             : (!equipped && slotOf(inst.equipment_id)
               ? `<div class="sub" style="color:var(--muted)">目前這個部位沒穿東西</div>` : "");
+          const def = S.catalog?.equipment?.[inst.equipment_id];
+          const canRefine = def && def.refinable !== false && (inst.refine || 0) < 10;
+          const oreName = slotOf(inst.equipment_id) === "weapon" ? "歐里德鋼" : "艾魯凡";
+          const refCost = ((inst.refine || 0) + 1) * 200;
+          const refLine = canRefine
+            ? `<div class="sub" style="color:var(--muted)">精煉需：${oreName} ×1、Zeny ${refCost}（材料靠打怪掉）</div>`
+            : "";
           return `
         <div class="item" style="align-items:flex-start">
           <div>${esc(eqName(inst.equipment_id))}${inst.refine ? ` <span class="pill good">+${inst.refine}</span>` : ""}
             <div class="sub">${esc(gearDesc(inst.equipment_id) || "")}${slotZh}${cards ? `　卡：${esc(cards)}` : ""}</div>
             ${wornLine}
+            ${refLine}
             <div class="row tight" style="margin-top:6px">
               ${equipped
                 ? `<button class="btn small" data-unequip="${inst.equipped_slot}">卸下</button>`
                 : `<button class="btn small primary" data-equip="${inst.id}">裝備</button>`}
-              <button class="btn small" data-refine="${inst.id}">精煉</button>
+              ${canRefine ? `<button class="btn small" data-refine="${inst.id}">精煉</button>` : ""}
               <button class="btn small" data-socket="${inst.id}">鑲卡</button>
               ${equipped ? "" : `<button class="btn small" data-sell-eq="${inst.id}" data-name="${esc(eqName(inst.equipment_id))}">賣出</button>`}
             </div>

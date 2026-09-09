@@ -1352,6 +1352,7 @@
     "drops": [
       {"item_id": "fox_tail", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.12},
+      {"item_id": "jur_4", "rate": 0.012},
       {"item_id": "nine_tail_card", "rate": 0.0015}
     ],
     "is_mvp": false,
