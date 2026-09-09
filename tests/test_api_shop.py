@@ -121,6 +121,21 @@ def test_sell_equipment_without_npc_sell_still_pays(client, auth, db_helpers):
     assert client.get("/api/characters", headers=h).json()[0]["zeny"] > z0
 
 
+def test_sell_multiple_equipment_ids_credits_the_sum(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    for _ in range(3):
+        db_helpers.give_equipment(ch["id"], "knife")
+    insts = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()["equipment"]
+    z0 = client.get("/api/characters", headers=h).json()[0]["zeny"]
+    ids = [i["id"] for i in insts[:2]]
+    r = client.post("/api/shop/sell", headers=h, json={"equipment_instance_ids": ids})
+    assert r.status_code == 200 and r.json()["count"] == 2
+    assert client.get("/api/characters", headers=h).json()[0]["zeny"] == z0 + r.json()["gained"]
+    left = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()["equipment"]
+    assert len(left) == 1
+
+
 def test_sell_material_without_npc_sell_still_works(client, auth, db_helpers):
     _, h, _ = auth
     ch = _char(client, h, db_helpers)

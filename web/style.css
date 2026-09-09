@@ -80,6 +80,15 @@ input:focus,select:focus{outline:none; border-color:var(--accent)}
 .skill-tier[open] summary::before{content:"▾"}
 .skill-tier-count{color:var(--muted); font-size:.8rem; font-weight:400}
 .skill-tier-list{display:flex; flex-direction:column; gap:8px; padding:0 8px 8px}
+
+.bag-sec{overflow:hidden}
+.bag-sec > summary{display:flex; justify-content:space-between; align-items:center; gap:8px;
+  cursor:pointer; font-weight:600; list-style:none}
+.bag-sec > summary::-webkit-details-marker{display:none}
+.bag-sec > summary::before{content:"▸"; color:var(--muted); margin-right:4px}
+.bag-sec[open] > summary::before{content:"▾"}
+.bag-sec-count{color:var(--muted); font-size:.8rem; font-weight:400}
+.bag-sec-body{margin-top:10px}
 .skill-row.skill-locked{background:#35171b; border-color:#713238; color:#ffc7c3}
 .skill-row.skill-locked .sub{color:#d99591}
 .skill-row.skill-locked .pill{border-color:#713238; color:#ffaaa5}

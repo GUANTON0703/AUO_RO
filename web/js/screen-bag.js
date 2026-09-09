@@ -145,15 +145,30 @@
         </div>`;
         }).join("");
 
-      this._body().innerHTML = `
-        <div class="card"><h3>道具</h3>
-          <div class="list">${itemRows || `<p class="muted">背包沒有道具。</p>`}</div></div>
-        ${cardRows ? `<div class="card"><h3>卡片</h3><div class="list">${cardRows}</div></div>` : ""}
-        <div class="card"><h3>裝備</h3>
-          <div class="row" style="margin-bottom:8px">
-            <select id="bag-slot" style="flex:1">${slotOptions}</select>
-          </div>
-          <div class="list">${eqRows || `<p class="muted">${this._bagSlot ? "這個部位沒有裝備。" : "背包沒有裝備。"}</p>`}</div></div>`;
+      const open = this._open || (this._open = {});
+      const itemCount = Object.keys(items).filter((id) => !isCard(id)).length;
+      const eqCount = (inv.equipment || [])
+        .filter((inst) => !this._bagSlot || slotOf(inst.equipment_id) === this._bagSlot).length;
+      const sec = (key, title, count, inner) => `
+        <details class="card bag-sec" data-sec="${key}"${open[key] ? " open" : ""}>
+          <summary>${title}<span class="bag-sec-count">${count}</span></summary>
+          <div class="bag-sec-body">${inner}</div>
+        </details>`;
+
+      this._body().innerHTML =
+        sec("items", "道具", itemCount,
+          `<div class="list">${itemRows || `<p class="muted">背包沒有道具。</p>`}</div>`)
+        + sec("cards", "卡片", cardIds.length,
+          `<div class="list">${cardRows || `<p class="muted">背包沒有卡片。</p>`}</div>`)
+        + sec("eq", "裝備", eqCount,
+          `<div class="row" style="margin-bottom:8px">
+             <select id="bag-slot" style="flex:1">${slotOptions}</select>
+           </div>
+           <div class="list">${eqRows || `<p class="muted">${this._bagSlot ? "這個部位沒有裝備。" : "背包沒有裝備。"}</p>`}</div>`);
+
+      this._body().querySelectorAll("details[data-sec]").forEach((d) => {
+        d.ontoggle = () => { open[d.dataset.sec] = d.open; };
+      });
 
       const slotSel = this._body().querySelector("#bag-slot");
       if (slotSel) slotSel.onchange = () => { this._bagSlot = slotSel.value; this._drawBag(); };
@@ -175,11 +190,36 @@
       });
       this._body().querySelectorAll("[data-sell-eq]").forEach((b) => {
         b.onclick = async () => {
-          if (!confirm(`確定賣出「${b.dataset.name}」？賣掉就拿不回來了。`)) return;
+          const id = Number(b.dataset.sellEq);
+          const name = b.dataset.name;
+          const clicked = (inv.equipment || []).find((x) => x.id === id);
+          // 同 ID、未精煉、未鑲卡、不在身上的才算「同款」可批次賣
+          const plain = (x) => x.equipped_slot == null && !x.refine
+            && (!x.card_ids || x.card_ids.length === 0);
+          const same = clicked && plain(clicked)
+            ? (inv.equipment || []).filter((x) => x.equipment_id === clicked.equipment_id && plain(x))
+            : [];
+
+          let ids;
+          if (same.length > 1) {
+            const raw = prompt(
+              `你有 ${same.length} 件「${name}」（未精煉、未鑲卡）。\n要賣幾件？輸入 1～${same.length}，或 0 取消：`,
+              String(same.length),
+            );
+            if (raw == null) return;
+            const n = Math.floor(Number(raw));
+            if (!Number.isFinite(n) || n <= 0) return;
+            ids = same.slice(0, Math.min(n, same.length)).map((x) => x.id);
+          } else {
+            if (!confirm(`確定賣出「${name}」？賣掉就拿不回來了。`)) return;
+            ids = [id];
+          }
+
           b.disabled = true;
           try {
-            const r = await API.sell({ equipment_instance_id: Number(b.dataset.sellEq) });
-            App.toast(`賣了 ${b.dataset.name}${r && r.gained != null ? `（+${r.gained}z）` : ""}`);
+            const r = await API.sell({ equipment_instance_ids: ids });
+            const cnt = r && r.count ? r.count : ids.length;
+            App.toast(`賣了 ${name} ×${cnt}${r && r.gained != null ? `（+${r.gained}z）` : ""}`);
             await this._reloadHeader();
             reload();
           } catch (e) { App.toast(e.detail || "販售失敗", true); b.disabled = false; }

@@ -35,6 +35,7 @@ class SellRequest(BaseModel):
     item_id: str | None = None
     qty: int = Field(default=1, ge=1)
     equipment_instance_id: int | None = None
+    equipment_instance_ids: list[int] | None = None
 
 
 @router.get("")
@@ -98,26 +99,26 @@ def buy(body: BuyRequest, account_id: CurrentAccount):
 def sell(body: SellRequest, account_id: CurrentAccount):
     char = _current_character(account_id)
 
-    if body.equipment_instance_id is not None:
+    ids = body.equipment_instance_ids or (
+        [body.equipment_instance_id] if body.equipment_instance_id is not None else [])
+    if ids:
+        total = 0
         with connection.transaction() as conn:
-            inst = conn.execute(
-                "SELECT * FROM character_equipment WHERE id = ?",
-                (body.equipment_instance_id,),
-            ).fetchone()
-            if inst is None or inst["character_id"] != char["id"]:
-                raise HTTPException(status_code=404, detail="找不到裝備")
-            if inst["equipped_slot"] is not None:
-                raise HTTPException(status_code=400, detail="裝備中的道具無法賣出")
-            eq = _content.equipment.get(inst["equipment_id"])
-            price = _equip_sell_price(eq) if eq else 0
+            for iid in ids:
+                inst = conn.execute(
+                    "SELECT * FROM character_equipment WHERE id = ?", (iid,),
+                ).fetchone()
+                if inst is None or inst["character_id"] != char["id"]:
+                    raise HTTPException(status_code=404, detail="找不到裝備")
+                if inst["equipped_slot"] is not None:
+                    raise HTTPException(status_code=400, detail="裝備中的道具無法賣出")
+                eq = _content.equipment.get(inst["equipment_id"])
+                total += _equip_sell_price(eq) if eq else 0
+                conn.execute("DELETE FROM character_equipment WHERE id = ?", (iid,))
             conn.execute(
-                "DELETE FROM character_equipment WHERE id = ?",
-                (body.equipment_instance_id,),
+                "UPDATE characters SET zeny = zeny + ? WHERE id = ?", (total, char["id"])
             )
-            conn.execute(
-                "UPDATE characters SET zeny = zeny + ? WHERE id = ?", (price, char["id"])
-            )
-        return {"ok": True, "gained": price}
+        return {"ok": True, "gained": total, "count": len(ids)}
 
     if body.item_id is None:
         raise HTTPException(status_code=400, detail="需指定 item_id 或 equipment_instance_id")
