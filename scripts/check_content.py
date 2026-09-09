@@ -21,10 +21,10 @@ RACES = {"animal", "plant", "insect", "demon", "undead",
          "demihuman", "angel", "dragon", "formless", "fish"}
 SIZES = {"small", "medium", "large"}
 GEAR_SLOTS = {"weapon", "offhand", "head", "armor", "garment", "shoes", "accessory"}
-# 裝備 stats 用 def/mdef；卡片 flat/percent_stat 用 defense/mdef（對齊 derived key）
+# 裝備與卡片 stats 一律用 defense/mdef（對齊戰鬥引擎的 effective_* key）
 _COMMON = {"atk", "matk", "hit", "flee", "crit", "aspd",
            "max_hp", "max_sp", "str", "agi", "vit", "int", "dex", "luk"}
-EQUIP_STAT_KEYS = _COMMON | {"def", "mdef"}
+EQUIP_STAT_KEYS = _COMMON | {"defense", "mdef"}
 CARD_STAT_KEYS = _COMMON | {"defense", "mdef"}
 
 

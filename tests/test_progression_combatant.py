@@ -38,6 +38,19 @@ def test_card_flat_stat_applies():
     assert carded.max_hp > plain.max_hp
 
 
+def test_card_primary_stat_and_aspd_feed_derived():
+    """str 卡要推高 atk、aspd 卡要推高攻速（曾經因為卡片在衍生數值之後才套用而失效）。"""
+    c = load_content()
+    plain = build_player_combatant(
+        _snap(equipped=[EquippedPiece(equipment_id="knife")]), c)
+    str_card = build_player_combatant(
+        _snap(equipped=[EquippedPiece(equipment_id="knife", card_ids=["tarou_card"])]), c)
+    aspd_card = build_player_combatant(
+        _snap(equipped=[EquippedPiece(equipment_id="knife", card_ids=["locust_card"])]), c)
+    assert str_card.atk > plain.atk
+    assert aspd_card.aspd > plain.aspd
+
+
 def test_refined_equipment_adds_more_stats():
     c = load_content()
 

@@ -54,7 +54,7 @@ def attempt_random_refine(current_refine: int,
     return new_refine, True, new_refine - current_refine
 
 
-REFINE_BONUS_PER_LEVEL = {"atk": 2, "matk": 2, "def": 1, "mdef": 1,
+REFINE_BONUS_PER_LEVEL = {"atk": 2, "matk": 2, "defense": 1, "mdef": 1,
                           "max_hp": 15, "flee": 1, "hit": 1, "crit": 1}
 
 

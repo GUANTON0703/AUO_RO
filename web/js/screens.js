@@ -54,7 +54,7 @@ const SLOT_ORDER = [
   ["accessory1", "飾品（左）"], ["accessory2", "飾品（右）"],
 ];
 const STAT_ZH = { str: "力量", agi: "敏捷", vit: "體質", int: "智力", dex: "靈巧",
-  luk: "幸運", atk: "攻擊", matk: "魔攻", def: "防禦", mdef: "魔防", hit: "命中",
+  luk: "幸運", atk: "攻擊", matk: "魔攻", def: "防禦", defense: "防禦", mdef: "魔防", hit: "命中",
   flee: "迴避", crit: "爆擊", aspd: "攻速", max_hp: "HP上限", max_sp: "SP上限",
   defense: "防禦", magic_defense: "魔防", attack: "攻擊", magic_attack: "魔攻",
   hp: "HP上限", sp: "SP上限", accuracy: "命中", evasion: "迴避", critical: "爆擊" };

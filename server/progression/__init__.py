@@ -38,9 +38,24 @@ def _sum_equipment_stats(content, pieces: list) -> dict:
     return acc
 
 
+def _card_flat_stats(content, pieces: list) -> dict:
+    """卡片的 flat_stat 貢獻，回傳跟裝備一樣的扁平 stat 池
+    （str/agi/…/atk/defense/aspd/crit/max_hp…），在 STR→衍生數值計算之前併進去。"""
+    acc: dict = {}
+    for piece in pieces:
+        for cid in piece.card_ids:
+            card = content.cards.get(cid)
+            if not card:
+                continue
+            for eff in card.effects:
+                if eff.get("type") == "flat_stat":
+                    acc[eff["stat"]] = acc.get(eff["stat"], 0) + eff["amount"]
+    return acc
+
+
 def _apply_card_effects(content, pieces: list, derived: dict) -> dict:
-    """把卡片效果套進 derived（數值），並回傳戰鬥用的 {resist, race, atk_element}。
-    附魔卡（weapon_element）只有鑲在武器上才算。"""
+    """percent_stat 套進已算好的 derived，並回傳戰鬥用的 {resist, race, size, atk_element}。
+    flat_stat 已在 _card_flat_stats 處理；附魔卡（weapon_element）只有鑲在武器上才算。"""
     combat = {"resist": {}, "race": {}, "size": {}, "atk_element": None}
     for piece in pieces:
         eq = content.equipment.get(piece.equipment_id)
@@ -51,9 +66,7 @@ def _apply_card_effects(content, pieces: list, derived: dict) -> dict:
                 continue
             for eff in card.effects:
                 t = eff.get("type")
-                if t == "flat_stat":
-                    derived[eff["stat"]] = derived.get(eff["stat"], 0) + eff["amount"]
-                elif t == "percent_stat":
+                if t == "percent_stat":
                     base = derived.get(eff["stat"], 0)
                     derived[eff["stat"]] = round(base * (1 + eff["pct"] / 100))
                 elif t == "element_resist":
@@ -106,6 +119,8 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     job = content.get_job(snap.job_id)
     s = snap.stats
     eq = _sum_equipment_stats(content, snap.equipped)
+    for k, v in _card_flat_stats(content, snap.equipped).items():
+        eq[k] = eq.get(k, 0) + v
     STR, AGI, VIT, INT, DEX, LUK = (
         s["str"] + eq.get("str", 0), s["agi"] + eq.get("agi", 0),
         s["vit"] + eq.get("vit", 0), s["int"] + eq.get("int", 0),
@@ -121,7 +136,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
                  + passives.get("atk", 0)) * (1 + lv / 50))
     matk = round((INT + (INT // 7) ** 2 + eq.get("matk", 0)
                   + passives.get("matk", 0)) * (1 + lv / 50))
-    defense = min(95, eq.get("def", 0) + VIT // 2 + passives.get("defense", 0))
+    defense = min(95, eq.get("defense", 0) + VIT // 2 + passives.get("defense", 0))
     mdef = min(95, eq.get("mdef", 0) + INT // 2 + passives.get("mdef", 0))
     hit = snap.base_level + DEX + eq.get("hit", 0) + passives.get("hit", 0)
     flee = snap.base_level + AGI + eq.get("flee", 0) + passives.get("flee", 0)
