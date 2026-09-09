@@ -31,6 +31,12 @@ class ChallengeRequest(BaseModel):
 def list_mvp(account_id: CurrentAccount):
     row = _current_character(account_id)
     out = []
+    def _drop_name(item_id: str) -> str:
+        for pool in (_content.items, _content.equipment, _content.cards):
+            if item_id in pool:
+                return pool[item_id].name
+        return item_id
+
     for m in _content.mvps.values():
         home = _content.maps.get(m.home_map_id)
         out.append({
@@ -42,6 +48,11 @@ def list_mvp(account_id: CurrentAccount):
             "available": mvp_repo.is_available(row["id"], m.id),
             "seconds_remaining": mvp_repo.seconds_remaining(row["id"], m.id),
             "cooldown_minutes": round(_MVP_COOLDOWN_HOURS * 60),
+            "drops": [
+                {"item_id": d.item_id, "name": _drop_name(d.item_id),
+                 "rate": d.rate}
+                for d in m.drops
+            ],
         })
     return out
 

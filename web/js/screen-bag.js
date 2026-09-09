@@ -110,6 +110,8 @@
 
       const eqRows = (inv.equipment || [])
         .filter((inst) => !this._bagSlot || slotOf(inst.equipment_id) === this._bagSlot)
+        .slice()
+        .sort((a, b) => (b.equipped_slot != null) - (a.equipped_slot != null))
         .map((inst) => {
           const equipped = inst.equipped_slot != null;
           const cards = (inst.card_ids || []).map((c) => itemName(c)).join("、");
@@ -240,36 +242,9 @@
         };
       });
       this._body().querySelectorAll("[data-refine]").forEach((b) => {
-        b.onclick = async () => {
-          const choice = prompt(
-            "選擇精煉模式：\n1. 普通（成功率／失敗降級）\n"
-            + "2. 隨機（10 倍 Zeny、同礦石；先照普通成功率判定，失敗一樣降級，判定成功才抽 +0～+3）",
-            "1",
-          );
-          if (choice == null) return;
-          const mode = choice.trim() === "2" ? "random" :
-            (choice.trim() === "1" ? "normal" : null);
-          if (!mode) { App.toast("模式不對", true); return; }
-          const times = num("連續精煉幾次？（成功或失敗都算一次，遇到 +10、缺料、Zeny 不足會自動停）", 1);
-          if (times == null) return;
-          b.disabled = true;
-          let last = null;
-          for (let i = 0; i < times; i++) {
-            try {
-              const r = await API.refine(S.char.id, b.dataset.refine, mode);
-              last = r;
-              if (r.refine >= 10) break;
-            } catch (e) {
-              App.toast(e.detail || "精煉中止", true);
-              break;
-            }
-          }
-          if (last) {
-            App.toast(last.message || (last.success ? `精煉 +${last.refine}` : "精煉失敗"),
-                      !last.success);
-          }
-          await this._reloadHeader();
-          reload();
+        b.onclick = () => {
+          const inst = (inv.equipment || []).find((x) => x.id === Number(b.dataset.refine));
+          if (inst) this._openRefine(inst);
         };
       });
       this._body().querySelectorAll("[data-socket]").forEach((b) => {
@@ -299,6 +274,67 @@
       const idx = Math.floor(Number(pick)) - 1;
       if (idx < 0 || idx >= cards.length) { App.toast("編號不對", true); return null; }
       return cards[idx];
+    },
+
+    // ---------- 精煉小視窗 ----------
+    _openRefine(inst) {
+      this._refLog = [];
+      this._refBlocked = false;
+      this._drawRefine(inst.id);
+    },
+
+    async _drawRefine(instId) {
+      let inv;
+      try { inv = await API.inventory(S.char.id); }
+      catch (e) { this._drawBag(); return; }
+      const inst = (inv.equipment || []).find((x) => x.id === instId);
+      const def = inst && S.catalog?.equipment?.[inst.equipment_id];
+      if (!inst || !def) { this._drawBag(); return; }
+      const isWeapon = def.slot === "weapon";
+      const oreName = isWeapon ? "神之金屬" : "鋁";
+      const oreHave = (inv.items || {})[isWeapon ? "oridecon" : "elunium"] || 0;
+      const cur = inst.refine || 0;
+      const normalZeny = (cur + 1) * 200;
+      const maxed = cur >= 10;
+      const disabled = maxed || this._refBlocked;
+
+      this._body().innerHTML = `
+        <div class="card">
+          <div class="section-title"><h3>精煉 ${esc(eqName(inst.equipment_id))}</h3>
+            <span class="pill good">+${cur}</span></div>
+          <div class="sub">材料：${oreName} ×1（持有 ${oreHave}）　Zeny ${S.char.zeny}</div>
+          <div class="row tight" style="margin-top:10px">
+            <button class="btn small ${disabled ? "" : "primary"}" id="ref-normal" ${disabled ? "disabled" : ""}>普通（Zeny ${normalZeny}）</button>
+            <button class="btn small" id="ref-random" ${disabled ? "disabled" : ""}>隨機（Zeny ${normalZeny * 10}）</button>
+          </div>
+          ${maxed ? `<p class="pill good" style="margin-top:8px">已達 +10</p>` : ""}
+          ${this._refBlocked ? `<p class="pill bad" style="margin-top:8px">材料或 Zeny 不足，補充後再回來</p>` : ""}
+          <div class="log" style="height:150px;margin-top:10px">${
+            (this._refLog || []).slice(-12).join("\n")
+            || "<span class='dim'>選一種模式開始精煉，結果會列在這裡。</span>"}</div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn ghost small" id="ref-back">返回背包</button>
+          </div>
+        </div>`;
+
+      this._body().querySelector("#ref-back").onclick = () => { this._drawBag(); };
+      const attempt = async (mode) => {
+        this._body().querySelectorAll("#ref-normal,#ref-random").forEach((x) => (x.disabled = true));
+        try {
+          const r = await API.refine(S.char.id, instId, mode);
+          this._refLog.push(`<span class="${r.success ? "hit" : "crit"}">${
+            esc(r.message || (r.success ? `成功 +${r.refine}` : `失敗 → +${r.refine}`))}</span>`);
+          await this._reloadHeader();
+        } catch (e) {
+          this._refLog.push(`<span class="crit">${esc(e.detail || "精煉中止")}</span>`);
+          this._refBlocked = true;
+        }
+        this._drawRefine(instId);
+      };
+      const nb = this._body().querySelector("#ref-normal");
+      const rb = this._body().querySelector("#ref-random");
+      if (nb && !disabled) nb.onclick = () => attempt("normal");
+      if (rb && !disabled) rb.onclick = () => attempt("random");
     },
 
     // ---------- 倉庫 ----------

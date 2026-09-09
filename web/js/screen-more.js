@@ -158,8 +158,18 @@
           const cd = !m.available;
           const secs = m.seconds_remaining || 0;
           const wait = cd ? `冷卻中 ${Math.ceil(secs / 60)} 分` : "可挑戰";
-          return `<div class="item"><div>${esc(m.name)}
-            <div class="sub">Lv ${m.level ?? "?"}・${esc(m.home_map_name || "")}・${wait}</div></div>
+          const drops = (m.drops || [])
+            .filter((d) => d.item_id !== `${m.id}_card`)
+            .slice(0, 6)
+            .map((d) => esc(d.name)).join("、");
+          const cardName = (m.drops || []).find((d) => d.item_id === `${m.id}_card`);
+          const dropLine = (drops || cardName)
+            ? `<div class="sub" style="color:var(--muted)">掉落：${
+                cardName ? esc(cardName.name) + (drops ? "、" : "") : ""}${drops}</div>`
+            : "";
+          return `<div class="item" style="align-items:flex-start"><div>${esc(m.name)}
+            <div class="sub">Lv ${m.level ?? "?"}・${esc(m.home_map_name || "")}・${wait}</div>
+            ${dropLine}</div>
             <button class="btn small" data-mvp="${esc(m.id)}"${cd ? " disabled" : ""}>挑戰</button></div>`;
         }).join("") || "<p class='muted'>沒有 MVP</p>";
         box.querySelectorAll("[data-mvp]").forEach((b) => {
