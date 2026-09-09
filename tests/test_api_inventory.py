@@ -234,7 +234,7 @@ def test_refine_missing_ore_message_uses_item_name(client, auth, db_helpers):
     r = client.post(f"/api/characters/{ch['id']}/inventory/refine", headers=h,
                     json={"equipment_instance_id": inst["id"]})
     assert r.status_code == 400
-    assert "歐里德鋼" in r.json()["detail"]   # 不是 "oridecon"
+    assert "神之金屬" in r.json()["detail"]   # 台版官方名，不是 "oridecon"
 
 
 def test_assassin_can_use_slotted_katar():

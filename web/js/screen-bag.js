@@ -121,7 +121,7 @@
               ? `<div class="sub" style="color:var(--muted)">目前這個部位沒穿東西</div>` : "");
           const def = S.catalog?.equipment?.[inst.equipment_id];
           const canRefine = def && def.refinable !== false && (inst.refine || 0) < 10;
-          const oreName = slotOf(inst.equipment_id) === "weapon" ? "歐里德鋼" : "艾魯凡";
+          const oreName = slotOf(inst.equipment_id) === "weapon" ? "神之金屬" : "鋁";
           const refCost = ((inst.refine || 0) + 1) * 200;
           const refLine = canRefine
             ? `<div class="sub" style="color:var(--muted)">精煉需：${oreName} ×1、Zeny ${refCost}（材料靠打怪掉）</div>`
