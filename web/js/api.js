@@ -128,6 +128,22 @@ const API = (() => {
       put("/admin/settings/multipliers", { experience, drop, zeny }),
     adminSetHunt: (settle_floor_seconds, huntable_win_rate) =>
       put("/admin/settings/hunt", { settle_floor_seconds, huntable_win_rate }),
+    adminDropRates: (item_id, source_id) => {
+      const query = [];
+      if (item_id) query.push("item_id=" + encodeURIComponent(item_id));
+      if (source_id) query.push("source_id=" + encodeURIComponent(source_id));
+      return get("/admin/drop-rates" + (query.length ? "?" + query.join("&") : ""));
+    },
+    adminSetDropRate: (item_id, rate, source_id) => put("/admin/drop-rates", {
+      ...(source_id ? { source_id } : {}),
+      item_id,
+      rate,
+    }),
+    adminDeleteDropRate: (item_id, source_id) => {
+      const query = ["item_id=" + encodeURIComponent(item_id)];
+      if (source_id) query.push("source_id=" + encodeURIComponent(source_id));
+      return del("/admin/drop-rates?" + query.join("&"));
+    },
     adminMoney: (cid, amount) => post(`/admin/characters/${cid}/money`, { amount }),
     adminExperience: (cid, base_exp, job_exp) =>
       post(`/admin/characters/${cid}/experience`, { base_exp, job_exp }),

@@ -6,6 +6,37 @@
     return Math.max(90, Math.ceil(floor / lines));
   }
 
+  function searchCatalog(catalog, query) {
+    const q = String(query ?? "").trim().toLowerCase();
+    const collect = (groups) => groups.flatMap(([kind, entries]) =>
+      Object.values(entries || {})
+        .filter((entry) => {
+          const id = String(entry.id || "");
+          const name = String(entry.name || id);
+          return !q || id.toLowerCase().includes(q) || name.toLowerCase().includes(q);
+        })
+        .map((entry) => ({ id: entry.id, name: entry.name || entry.id, kind }))
+    ).sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id));
+    return {
+      sources: collect([
+        ["monster", catalog?.monsters],
+        ["mvp", catalog?.mvps],
+      ]),
+      items: collect([
+        ["equipment", catalog?.equipment],
+        ["card", catalog?.cards],
+      ]),
+    };
+  }
+
+  function isValidRate(value) {
+    if (value == null || String(value).trim() === "") return false;
+    const rate = Number(value);
+    return Number.isFinite(rate) && rate >= 0 && rate <= 1;
+  }
+
+  window.RODropRateView = { searchCatalog, isValidRate };
+
   window.ROFightView = { playbackDelayMs };
 
   function fightLogLines(events) {
@@ -325,6 +356,21 @@
           <input id="gm-ann" placeholder="留空 = 清除公告" maxlength="500" style="flex:1">
           <button class="btn small" id="gm-ann-save">發布</button>
         </div>
+        <div class="section-title" style="margin-top:10px"><span class="k">裝備 / 卡片掉落率</span></div>
+        <div class="row">
+          <input id="gm-drop-source-search" placeholder="搜尋怪物 / Boss" style="flex:1">
+          <input id="gm-drop-item-search" placeholder="搜尋裝備 / 卡片" style="flex:1">
+        </div>
+        <div class="row" style="margin-top:6px">
+          <select id="gm-drop-source" style="flex:1"></select>
+          <select id="gm-drop-item" style="flex:1"></select>
+        </div>
+        <div id="gm-drop-rate-status" style="margin-top:6px"><p class="muted">選擇來源與物品後載入有效率</p></div>
+        <div class="row" style="margin-top:6px">
+          <input id="gm-drop-rate" type="number" min="0" max="1" step="0.0001" placeholder="有效率 0..1" style="flex:1">
+          <button class="btn small" id="gm-drop-save">設定</button>
+          <button class="btn small ghost" id="gm-drop-clear">清除覆寫</button>
+        </div>
         <div class="section-title" style="margin-top:10px"><span class="k">線上玩家</span>
           <button class="btn small ghost" id="gm-online-refresh">刷新</button></div>
         <div class="list" id="gm-online"></div>
@@ -390,6 +436,109 @@
           App.toast(r.text ? "公告已發布" : "公告已清除");
         } catch (e) { App.toast(e.detail || "失敗", true); }
       };
+
+      const dropView = window.RODropRateView;
+      const dropSourceSearch = document.querySelector("#gm-drop-source-search");
+      const dropItemSearch = document.querySelector("#gm-drop-item-search");
+      const dropSource = document.querySelector("#gm-drop-source");
+      const dropItem = document.querySelector("#gm-drop-item");
+      const dropRate = document.querySelector("#gm-drop-rate");
+      const dropStatus = document.querySelector("#gm-drop-rate-status");
+      const dropClear = document.querySelector("#gm-drop-clear");
+      let dropRateData = null;
+      let dropRateRequest = 0;
+
+      const kindLabel = { monster: "怪物", mvp: "Boss", equipment: "裝備", card: "卡片" };
+      const formatRate = (value) => {
+        if (value == null) return "未設定";
+        const rate = Number(value);
+        const pct = Number.isInteger(rate * 100)
+          ? String(rate * 100)
+          : (rate * 100).toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+        return `${rate}（${pct}%）`;
+      };
+      const selectedName = (group, id) => S.catalog?.[group]?.[id]?.name || id;
+      const sourceName = (id) => selectedName(S.catalog?.mvps?.[id] ? "mvps" : "monsters", id);
+
+      const renderDropOptions = () => {
+        const sourceId = dropSource.value;
+        const itemId = dropItem.value;
+        const matches = dropView.searchCatalog(S.catalog, dropSourceSearch.value);
+        dropSource.innerHTML = `<option value="">全域（不指定來源）</option>` +
+          matches.sources.map((x) => `<option value="${esc(x.id)}">${esc(x.name)}（${kindLabel[x.kind]}）</option>`).join("");
+        if (matches.sources.some((x) => x.id === sourceId)) dropSource.value = sourceId;
+        const itemMatches = dropView.searchCatalog(S.catalog, dropItemSearch.value);
+        dropItem.innerHTML = itemMatches.items.map((x) =>
+          `<option value="${esc(x.id)}">${esc(x.name)}（${kindLabel[x.kind]}）</option>`).join("");
+        if (itemMatches.items.some((x) => x.id === itemId)) dropItem.value = itemId;
+      };
+      const renderDropRate = (data) => {
+        if (!data) {
+          dropStatus.innerHTML = `<p class="muted">${dropItem.value ? "載入中…" : "找不到符合的裝備或卡片"}</p>`;
+          dropClear.disabled = true;
+          return;
+        }
+        const source = dropSource.value;
+        const sourceText = source ? `${esc(sourceName(source))}（${esc(source)}）` : "全域（所有來源）";
+        dropStatus.innerHTML = `
+          <div class="kv"><span class="k">來源</span><span>${sourceText}</span></div>
+          <div class="kv"><span class="k">物品</span><span>${esc(selectedName(dropItem.value && S.catalog?.cards?.[dropItem.value] ? "cards" : "equipment", dropItem.value))}</span></div>
+          <div class="kv"><span class="k">目前有效率</span><span>${formatRate(data.effective_rate)}</span></div>
+          <div class="sub">內容基準 ${formatRate(data.content_rate)} ・ 全域覆寫 ${formatRate(data.global_rate)} ・ 來源覆寫 ${formatRate(data.source_rate)}</div>`;
+        const override = source ? data.source_rate : data.global_rate;
+        dropRate.value = override == null ? (data.effective_rate ?? "") : override;
+        dropClear.disabled = override == null;
+      };
+      const loadDropRate = async () => {
+        const itemId = dropItem.value;
+        const sourceId = dropSource.value || null;
+        const request = ++dropRateRequest;
+        dropRateData = null;
+        renderDropRate(null);
+        if (!itemId) return;
+        try {
+          const data = await API.adminDropRates(itemId, sourceId);
+          if (request !== dropRateRequest) return;
+          dropRateData = data;
+          renderDropRate(data);
+        } catch (e) {
+          if (request !== dropRateRequest) return;
+          dropStatus.innerHTML = `<p class="muted">${esc(e.detail || "載入失敗")}</p>`;
+          dropClear.disabled = true;
+        }
+      };
+
+      dropSourceSearch.oninput = () => { renderDropOptions(); loadDropRate(); };
+      dropItemSearch.oninput = () => { renderDropOptions(); loadDropRate(); };
+      dropSource.onchange = loadDropRate;
+      dropItem.onchange = loadDropRate;
+      document.querySelector("#gm-drop-save").onclick = async () => {
+        const itemId = dropItem.value;
+        const sourceId = dropSource.value || null;
+        if (!itemId) { App.toast("請先選擇裝備或卡片", true); return; }
+        if (!dropView.isValidRate(dropRate.value)) {
+          App.toast("掉落率必須是 0 到 1", true);
+          return;
+        }
+        try {
+          await API.adminSetDropRate(itemId, Number(dropRate.value), sourceId);
+          App.toast("掉落率已設定");
+          await loadDropRate();
+        } catch (e) { App.toast(e.detail || "設定失敗", true); }
+      };
+      dropClear.onclick = async () => {
+        const itemId = dropItem.value;
+        const sourceId = dropSource.value || null;
+        const override = sourceId ? dropRateData?.source_rate : dropRateData?.global_rate;
+        if (!itemId || override == null) { App.toast("目前沒有可清除的覆寫", true); return; }
+        try {
+          await API.adminDeleteDropRate(itemId, sourceId);
+          App.toast("已清除掉落率覆寫");
+          await loadDropRate();
+        } catch (e) { App.toast(e.detail || "清除失敗", true); }
+      };
+      renderDropOptions();
+      await loadDropRate();
 
       await showSettings();
       await showOnline();
