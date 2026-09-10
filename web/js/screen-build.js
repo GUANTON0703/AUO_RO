@@ -253,7 +253,9 @@
           .map(([rid, rlv]) => `${skillName(rid)} Lv${rlv}`).join("、");
         const cost = sk.kind === "active" && (sk.sp_cost || []).length
           ? `　SP ${sk.sp_cost[Math.min(Math.max(1, lv), sk.sp_cost.length) - 1]}` : "";
-        const btn = `<button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}"
+        const btn = maxed
+          ? `<span class="pill good">已滿級</span>`
+          : `<button class="btn small" data-skill="${sk.id}" data-next="${lv + 1}"
               ${learnState.disabled ? "disabled" : ""}>學 +1</button>`;
         const idleCtl = active ? `
               <div class="sub" style="margin-top:4px">

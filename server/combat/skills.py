@@ -65,7 +65,7 @@ def _physical_skill(caster, target, skill, eff, rng):
         landed += 1
         dmg = physical_damage(round(caster.effective_atk * power), target.effective_defense,
                               element_multiplier=mult, soft_def=target.soft_def,
-                              resist_pct=resist, race_pct=race)
+                              resist_pct=resist, race_pct=race, rng=rng)
         if crit:
             dmg = round(dmg * getattr(caster, "crit_mult", CRIT_MULTIPLIER))
         target.take_damage(dmg)
@@ -85,7 +85,7 @@ def _magic_skill(caster, target, skill, eff, rng):
     for _ in range(hits):
         dmg = magic_damage(round(caster.effective_matk * power), target.effective_mdef,
                            element_multiplier=mult, soft_mdef=target.soft_mdef,
-                           resist_pct=resist, race_pct=race)
+                           resist_pct=resist, race_pct=race, rng=rng)
         target.take_damage(dmg)
         total += dmg
     return [SkillEvent(actor=caster.name, target=target.name, skill_id=skill.skill_id,

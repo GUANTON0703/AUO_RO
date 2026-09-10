@@ -21,18 +21,25 @@ def _dmg_reduction(defense: int) -> float:
     return d / (d + _DEF_K)
 
 
+def _variance(rng) -> float:
+    """每擊 ±12% 的隨機浮動（原版武器攻擊 min~max 的簡化）。"""
+    return rng.uniform(0.88, 1.12) if rng is not None else 1.0
+
+
 def physical_damage(atk: int, target_defense: int, element_multiplier: float = 1.0,
-                    soft_def: int = 0, resist_pct: int = 0, race_pct: int = 0) -> int:
+                    soft_def: int = 0, resist_pct: int = 0, race_pct: int = 0,
+                    rng=None) -> int:
     raw = _mods(atk * (1 - _dmg_reduction(target_defense)),
                 element_multiplier, resist_pct, race_pct)
-    return max(1, round(raw) - max(0, soft_def))
+    return max(1, round(raw * _variance(rng)) - max(0, soft_def))
 
 
 def magic_damage(matk: int, target_mdef: int, element_multiplier: float = 1.0,
-                 soft_mdef: int = 0, resist_pct: int = 0, race_pct: int = 0) -> int:
+                 soft_mdef: int = 0, resist_pct: int = 0, race_pct: int = 0,
+                 rng=None) -> int:
     raw = _mods(matk * (1 - _dmg_reduction(target_mdef)),
                 element_multiplier, resist_pct, race_pct)
-    return max(1, round(raw) - max(0, soft_mdef))
+    return max(1, round(raw * _variance(rng)) - max(0, soft_mdef))
 
 
 def hit_chance(attacker_hit: int, target_flee: int) -> float:

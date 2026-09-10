@@ -157,7 +157,12 @@
         box.innerHTML = list.map((m) => {
           const cd = !m.available;
           const secs = m.seconds_remaining || 0;
-          const wait = cd ? `冷卻中 ${Math.ceil(secs / 60)} 分` : "可挑戰";
+          const ago = (s) => s < 60 ? `${s} 秒前`
+            : s < 3600 ? `${Math.round(s / 60)} 分前` : `${Math.round(s / 3600)} 小時前`;
+          const wait = cd
+            ? `${Math.ceil(secs / 60)} 分後復活${m.last_killer
+                ? `（${ago(m.killed_ago || 0)}被 ${esc(m.last_killer)} 擊殺）` : ""}`
+            : "可挑戰";
           // MVP 挑戰掉落率是內容值的 3 倍（上限 100%），顯示實際機率
           const pct = (r) => {
             const e = Math.min(1, r * 3);

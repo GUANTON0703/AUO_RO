@@ -131,6 +131,20 @@ def _migration_6(conn: sqlite3.Connection) -> None:
     _add_col(conn, "characters", "is_rebirth", "INTEGER NOT NULL DEFAULT 0")
 
 
+def _migration_8(conn: sqlite3.Connection) -> None:
+    """MVP 改全服共同冷卻：記最後擊殺者與時間。"""
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS mvp_kills (
+            mvp_id         TEXT PRIMARY KEY,
+            killed_by_name TEXT NOT NULL,
+            killed_at      TEXT NOT NULL,
+            available_at   TEXT NOT NULL
+        )
+        """
+    )
+
+
 def _migration_7(conn: sqlite3.Connection) -> None:
     """刺客技能對齊原版：移除自訂的 sonic_acceleration，技能點退回（carried +N）。"""
     import json as _json
@@ -155,6 +169,7 @@ _MIGRATIONS: list[tuple[int, "callable"]] = [
     (5, _migration_5),
     (6, _migration_6),
     (7, _migration_7),
+    (8, _migration_8),
 ]
 
 

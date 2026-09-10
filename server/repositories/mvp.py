@@ -50,6 +50,43 @@ def set_cooldown(character_id: int, mvp_id: str, hours: float) -> None:
         )
 
 
+def global_status(mvp_id: str) -> dict | None:
+    """全服共同冷卻。回 None = 可挑戰；否則 {seconds_remaining, killer, killed_ago}。"""
+    with connection.get_connection() as conn:
+        row = conn.execute(
+            "SELECT killed_by_name, killed_at, available_at FROM mvp_kills WHERE mvp_id = ?",
+            (mvp_id,),
+        ).fetchone()
+    if not row:
+        return None
+    now = _now()
+    remain = round((_parse(row["available_at"]) - now).total_seconds())
+    if remain <= 0:
+        return None
+    return {
+        "seconds_remaining": remain,
+        "killer": row["killed_by_name"],
+        "killed_ago": round((now - _parse(row["killed_at"])).total_seconds()),
+    }
+
+
+def set_global_kill(mvp_id: str, killer_name: str, hours: float) -> None:
+    now = _now()
+    with connection.get_connection() as conn:
+        conn.execute(
+            """
+            INSERT INTO mvp_kills (mvp_id, killed_by_name, killed_at, available_at)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(mvp_id) DO UPDATE SET
+                killed_by_name = excluded.killed_by_name,
+                killed_at = excluded.killed_at,
+                available_at = excluded.available_at
+            """,
+            (mvp_id, killer_name, now.isoformat(),
+             (now + timedelta(hours=hours)).isoformat()),
+        )
+
+
 def all_cooldowns(character_id: int) -> dict[str, int]:
     with connection.get_connection() as conn:
         rows = conn.execute(

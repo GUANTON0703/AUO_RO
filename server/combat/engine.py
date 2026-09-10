@@ -92,11 +92,11 @@ def _one_hit(attacker, defender, rng, events):
         from server.combat.formulas import magic_damage
         dmg = magic_damage(attacker.effective_matk, defender.effective_mdef,
                            element_multiplier=mult, soft_mdef=defender.soft_mdef,
-                           resist_pct=resist, race_pct=race)
+                           resist_pct=resist, race_pct=race, rng=rng)
     else:
         dmg = physical_damage(attacker.effective_atk, defender.effective_defense,
                               element_multiplier=mult, soft_def=defender.soft_def,
-                              resist_pct=resist, race_pct=race)
+                              resist_pct=resist, race_pct=race, rng=rng)
     if crit:
         dmg = round(dmg * getattr(attacker, "crit_mult", CRIT_MULTIPLIER))
     defender.take_damage(dmg)

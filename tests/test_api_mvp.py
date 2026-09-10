@@ -20,8 +20,13 @@ def test_list_mvp_includes_mid_late_roster(client, auth):
 def test_challenge_sets_cooldown(client, auth, db_helpers):
     _, h, _ = auth
     ch = client.post("/api/characters", headers=h, json={"name": "王殺2"}).json()
-    db_helpers.set_base_level(ch["id"], 16)
-    db_helpers.set_stats(ch["id"], {"str": 40, "agi": 12, "vit": 20, "int": 5, "dex": 18, "luk": 8})
+    db_helpers.set_base_level(ch["id"], 45)
+    db_helpers.set_stats(ch["id"], {"str": 60, "agi": 25, "vit": 40, "int": 5, "dex": 40, "luk": 15})
+    db_helpers.give_equipment(ch["id"], "bastard_sword_3")
+    db_helpers.give_equipment(ch["id"], "full_plate_1")
+    for _inst in client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()["equipment"]:
+        client.post(f"/api/characters/{ch['id']}/inventory/equip", headers=h,
+                    json={"equipment_instance_id": _inst["id"]})
     r = client.post("/api/mvp/challenge", headers=h, json={"mvp_id": "angel_poring"})
     assert r.status_code == 200
     assert r.json()["outcome"] in ("win", "loss", "fled")
@@ -56,8 +61,13 @@ def test_mvp_challenge_ignores_hunt_skill_toggles(client, auth, db_helpers):
 def test_challenge_cooldown_is_20_minutes(client, auth, db_helpers):
     _, h, _ = auth
     ch = client.post("/api/characters", headers=h, json={"name": "王殺CD"}).json()
-    db_helpers.set_base_level(ch["id"], 16)
-    db_helpers.set_stats(ch["id"], {"str": 40, "agi": 12, "vit": 20, "int": 5, "dex": 18, "luk": 8})
+    db_helpers.set_base_level(ch["id"], 45)
+    db_helpers.set_stats(ch["id"], {"str": 60, "agi": 25, "vit": 40, "int": 5, "dex": 40, "luk": 15})
+    db_helpers.give_equipment(ch["id"], "bastard_sword_3")
+    db_helpers.give_equipment(ch["id"], "full_plate_1")
+    for _inst in client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()["equipment"]:
+        client.post(f"/api/characters/{ch['id']}/inventory/equip", headers=h,
+                    json={"equipment_instance_id": _inst["id"]})
     client.post("/api/mvp/challenge", headers=h, json={"mvp_id": "angel_poring"})
     row = next(m for m in client.get("/api/mvp", headers=h).json() if m["id"] == "angel_poring")
     assert row["cooldown_minutes"] == 20

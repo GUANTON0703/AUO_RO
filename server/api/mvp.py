@@ -41,14 +41,17 @@ def list_mvp(account_id: CurrentAccount):
 
     for m in _content.mvps.values():
         home = _content.maps.get(m.home_map_id)
+        gs = mvp_repo.global_status(m.id)
         out.append({
             "id": m.id,
             "name": m.name,
             "level": m.level,
             "home_map_id": m.home_map_id,
             "home_map_name": home.name if home else m.home_map_id,
-            "available": mvp_repo.is_available(row["id"], m.id),
-            "seconds_remaining": mvp_repo.seconds_remaining(row["id"], m.id),
+            "available": gs is None,
+            "seconds_remaining": gs["seconds_remaining"] if gs else 0,
+            "last_killer": gs["killer"] if gs else None,
+            "killed_ago": gs["killed_ago"] if gs else None,
             "cooldown_minutes": round(_MVP_COOLDOWN_HOURS * 60),
             "drops": [
                 {"item_id": d.item_id, "name": _drop_name(d.item_id),
@@ -65,8 +68,12 @@ def challenge(body: ChallengeRequest, account_id: CurrentAccount):
     mvp = _content.mvps.get(body.mvp_id)
     if mvp is None:
         raise HTTPException(status_code=404, detail="MVP 不存在")
-    if not mvp_repo.is_available(row["id"], mvp.id):
-        raise HTTPException(status_code=400, detail="冷卻中")
+    gs = mvp_repo.global_status(mvp.id)
+    if gs is not None:
+        mins = round(gs["seconds_remaining"] / 60)
+        raise HTTPException(
+            status_code=400,
+            detail=f"冷卻中（{mins} 分後復活，上次由 {gs['killer']} 擊殺）")
 
     job = _content.get_job(row["job_id"])
     player = build_player_combatant(_snapshot(row, apply_prefs=False), _content)
@@ -116,7 +123,9 @@ def challenge(body: ChallengeRequest, account_id: CurrentAccount):
             job_level=row["job_level"], job_exp=row["job_exp"], zeny_delta=0,
         )
 
-    mvp_repo.set_cooldown(row["id"], mvp.id, _MVP_COOLDOWN_HOURS)
+    # 只有擊殺才進全服冷卻；打輸 / 撤退不鎖，其他人（或自己）還能再挑戰
+    if result.outcome == "win":
+        mvp_repo.set_global_kill(mvp.id, row["name"], _MVP_COOLDOWN_HOURS)
 
     fresh = characters_repo.get_character(row["id"])
     return {
