@@ -18,9 +18,10 @@ def baseline(level: int, role: MonsterRole) -> CombatStats:
     hp_base = 40 + 20 * level + 0.9 * level**2
     atk_base = 5 + 1.6 * level
     def_base = 0.6 * level
-    # 命中要跟得上玩家 FLEE（= base_level + AGI + 裝備）。原本 level+1 讓任何
-    # 有練 AGI 的角色都能對中高階怪 100% 迴避，太誇張。
-    hit_base = round(level * 1.4) + 10
+    # 命中要跟得上玩家 FLEE（= base_level + AGI + LUK/5 + 裝備 + 常駐 buff）。
+    # 原版怪命中本來就很高（Owl Duke lv68 HIT 226）；這裡取 1.7×level 讓
+    # 中等 AGI 角色被打到約一半、專精迴避流仍能閃掉大半。
+    hit_base = round(level * 1.7) + 12
     flee_base = level + 5
     matk_base = 3 + 1.2 * level
     mdef_base = 0.3 * level
