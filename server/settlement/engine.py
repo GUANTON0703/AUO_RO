@@ -5,6 +5,7 @@ from dataclasses import dataclass, field, replace
 
 from server.combat.combatant import Combatant
 from server.combat.engine import simulate_fight
+from server.combat.events import HealEvent
 from server.settlement.config import HuntConfig
 from server.settlement.drops import roll_drops
 from server.settlement.economy import zeny_per_kill
@@ -242,10 +243,17 @@ def _settle_literal(player, monster, elapsed_seconds, effective, time_per_kill,
 
         # 場間補 SP：SP 低於門檻且有 SP 藥水才補。SP 見底不致命，不撤退。
         if p.sp < threshold_sp and sp_potion_restore > 0:
+            restored = 0
             while sp_potions_left > 0 and p.sp < threshold_sp:
+                before = p.sp
                 p.restore_sp(sp_potion_restore)
+                restored += p.sp - before
                 sp_potions_left -= 1
                 sp_potions_used += 1
+            if restored > 0:
+                combat_events.append(
+                    HealEvent(actor=p.name, target=p.name, amount=restored,
+                              source="sp_potion"))
 
         foe = Combatant.from_monster(monster)
         p.statuses = [s for s in p.statuses if s.kind != "dot"]

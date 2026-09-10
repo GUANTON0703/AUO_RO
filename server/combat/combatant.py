@@ -42,6 +42,8 @@ class Combatant:
     crit: int
     is_caster: bool = False
     crit_mult: float = 1.4        # 爆擊傷害倍率（拳刃 = 2.0）
+    cast_delay: int = 1          # 施法後延遲：放完主動技能後要普攻幾回合才能再放（高 DEX = 0）
+    _cast_lock: int = 0
     min_hit_chance: float = 0.0   # 物理命中率下限（Boss 用，讓高 FLEE 玩家仍會被打到）
     soft_def: int = 0     # 平減物理傷害（Pre-Renewal VIT 軟防）
     soft_mdef: int = 0    # 平減魔法傷害

@@ -170,6 +170,8 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     aspd = min(193, round(base_aspd + AGI * 0.55 + DEX * 0.12 + eq.get("aspd", 0)
                           + passives.get("aspd", 0)))
     crit = round(LUK * 0.3 * crit_rate_mult) + eq.get("crit", 0) + passives.get("crit", 0)
+    # 施法後延遲：DEX 高 = 可連續放招（原版高 DEX 幾乎無延遲）
+    cast_delay = 0 if DEX >= 100 else (1 if DEX >= 45 else 2)
     max_hp += passives.get("max_hp", 0) + eq.get("max_hp", 0)
     max_sp += passives.get("max_sp", 0) + eq.get("max_sp", 0)
 
@@ -210,6 +212,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         aspd=max(1, min(193, aspd)), crit=max(0, derived["crit"]),
         is_caster=(derived["matk"] > derived["atk"]),
         crit_mult=crit_mult,
+        cast_delay=cast_delay,
         soft_def=VIT // 3, soft_mdef=INT // 4,
         skills=resolved,
         attack_element=attack_element,

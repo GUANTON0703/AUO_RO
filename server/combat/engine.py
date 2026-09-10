@@ -122,11 +122,19 @@ def _auto_attack(attacker, defender, rng, events):
 def _take_turn(actor, foe, rng, events, min_sp_frac: float = 0.0):
     if actor.stunned:
         return
+    # 施法後延遲：上一招還在硬直 → 這回合只能普攻
+    if getattr(actor, "_cast_lock", 0) > 0:
+        actor._cast_lock -= 1
+        _auto_attack(actor, foe, rng, events)
+        return
     skill = _pick_skill(actor, min_sp_frac)
     if skill and actor.spend_sp(skill.sp_cost):
         # cast_skill 內部按 effect 型別分流：heal_hp/buff 作用在 actor，其餘作用在 foe
         events += cast_skill(actor, foe, skill, rng)
         skill._cd_left = skill.cooldown_rounds
+        # buff / 補血技能不吃施法後延遲（不然開場先普攻很怪）
+        if any(e.get("type") in ("physical_hit", "magic_hit", "aoe") for e in skill.effects):
+            actor._cast_lock = getattr(actor, "cast_delay", 0)
     else:
         _auto_attack(actor, foe, rng, events)
 
