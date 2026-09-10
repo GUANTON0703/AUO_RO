@@ -141,7 +141,7 @@ function combatLogLines(events, opts) {
              && list[j].actor === e.actor && list[j].target === e.target) {
         const a = list[j];
         if (!a.hit) nums.push(`<span class="dim">MISS</span>`);
-        else if (a.crit) nums.push(`${a.damage}爆`);
+        else if (a.crit) nums.push(`<span class="crit-hit">${a.damage}爆</span>`);
         else nums.push(`${a.damage}`);
         j++;
       }
