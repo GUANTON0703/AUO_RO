@@ -15,7 +15,8 @@ def test_base_level_cap_is_99():
 def test_job_level_cap_by_tier():
     assert job_level_cap("novice") == 10
     assert job_level_cap("first") == 50
-    assert job_level_cap("second") == 70
+    assert job_level_cap("second") == 50
+    assert job_level_cap("third") == 70
 
 
 def test_apply_base_exp_single_levelup():

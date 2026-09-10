@@ -1,5 +1,5 @@
 BASE_LEVEL_CAP = 99
-_JOB_CAP = {"novice": 10, "first": 50, "second": 70}
+_JOB_CAP = {"novice": 10, "first": 50, "second": 50, "third": 70}
 
 
 def job_level_cap(tier: str) -> int:
@@ -12,7 +12,7 @@ def base_exp_for_next(level: int) -> int:
 
 
 def job_exp_for_next(job_level: int, tier: str) -> int:
-    mult = {"novice": 0.6, "first": 1.0, "second": 1.8}[tier]
+    mult = {"novice": 0.6, "first": 1.0, "second": 1.8, "third": 2.6}[tier]
     return round((20 * job_level**2.2 + 30 * job_level + 20) * mult)
 
 

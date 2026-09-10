@@ -1404,16 +1404,16 @@
         "type": "buff",
         "stats": {
           "flee": [
-            20,
-            22,
-            24,
-            27,
-            29,
-            31,
-            33,
-            36,
-            38,
-            40
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
           ]
         },
         "duration_s": 30
@@ -1450,15 +1450,15 @@
         "stat": "flee",
         "amount": [
           3,
-          4,
           6,
-          7,
-          8,
-          10,
-          11,
+          9,
           12,
-          14,
-          15
+          15,
+          18,
+          21,
+          24,
+          27,
+          30
         ]
       }
     ],
@@ -2979,8 +2979,42 @@
     "requires": {}
   },
   {
-    "id": "dual_wield",
-    "name": "左右手修練",
+    "id": "right_hand_mastery",
+    "name": "右手修練",
+    "job_id": "assassin",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "atk",
+        "amount": [
+          4,
+          8,
+          12,
+          16,
+          20
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {}
+  },
+  {
+    "id": "left_hand_mastery",
+    "name": "左手修練",
     "job_id": "assassin",
     "kind": "passive",
     "max_level": 5,
@@ -3005,17 +3039,6 @@
         ]
       },
       {
-        "type": "passive_stat",
-        "stat": "aspd",
-        "amount": [
-          4,
-          8,
-          12,
-          16,
-          20
-        ]
-      },
-      {
         "type": "proc",
         "effect": "extra_hit",
         "chance_pct": [
@@ -3032,7 +3055,9 @@
       "trigger": "passive",
       "priority": 0
     },
-    "requires": {}
+    "requires": {
+      "right_hand_mastery": 1
+    }
   },
   {
     "id": "enchant_poison",
@@ -3100,9 +3125,9 @@
       }
     ],
     "idle_default": {
-      "enabled": false,
-      "trigger": "hp_below_30",
-      "priority": 2
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
     },
     "requires": {
       "hiding": 1
@@ -3742,7 +3767,7 @@
         "type": "buff",
         "stats": {
           "flee": [
-            15
+            6
           ]
         },
         "duration_s": 10

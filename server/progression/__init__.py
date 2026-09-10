@@ -11,7 +11,7 @@ WEAPON_PROFILE = {
     "axe":     ("str", 116, 1.0),
     "mace":    ("str", 120, 1.0),
     "twohand": ("str", 108, 1.0),
-    "katar":   ("str", 130, 1.6),   # 拳刃爆擊率提高（刺客爆擊流核心）
+    "katar":   ("str", 130, 2.0),   # 拳刃爆擊率翻倍（刺客爆擊流核心）
     "bow":     ("dex", 122, 1.0),
     "staff":   ("str", 112, 1.0),   # 法師靠 MATK，物理攻擊本來就低
 }
@@ -227,7 +227,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     mdef = min(120, eq.get("mdef", 0) + INT // 3 + passives.get("mdef", 0))
     hit = snap.base_level + DEX + LUK // 3 + eq.get("hit", 0) + passives.get("hit", 0)
     flee = snap.base_level + AGI + LUK // 5 + eq.get("flee", 0) + passives.get("flee", 0)
-    aspd = min(193, round(base_aspd + AGI * 0.55 + DEX * 0.12 + eq.get("aspd", 0)
+    aspd = min(193, round(base_aspd + AGI * 0.7 + DEX * 0.12 + eq.get("aspd", 0)
                           + passives.get("aspd", 0)))
     crit = round(LUK * 0.3 * crit_rate_mult) + eq.get("crit", 0) + passives.get("crit", 0)
     # 施法後延遲：DEX 高 = 可連續放招（原版高 DEX 幾乎無延遲）
