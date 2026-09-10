@@ -13,6 +13,7 @@
     ["novice", "新手技能"],
     ["first", "一轉技能"],
     ["second", "二轉技能"],
+    ["third", "轉生二轉技能"],
   ];
 
   // 技能分區只讀 jobs 的 tier；技能本身仍由 catalog.skills 提供。

@@ -67,12 +67,11 @@
 
   Screens.more = {
     async mount() {
+      this._lastFight = null;
       view().innerHTML = `
         <div class="card">
           <h3>MVP 挑戰</h3>
           <div class="list" id="mvp-list"><div class="spinner">載入中…</div></div>
-          <div class="log" id="mvp-log" hidden></div>
-          <div id="mvp-result"></div>
         </div>
 
         <div class="card">
@@ -107,9 +106,10 @@
       this._fighting = false;
     },
 
-    // 把戰鬥訊息一則一則吐進 log；播完（或提前結束）呼叫 done()
-    _playFight(lines, done) {
-      const log = document.querySelector("#mvp-log");
+    // 把戰鬥訊息一則一則吐進該 MVP 下的 log；播完（或提前結束）呼叫 done()
+    _playFight(lines, done, logSel) {
+      this._fightLogSel = logSel;
+      const log = document.querySelector(logSel);
       if (!log) { this._fighting = false; done(); return; }
       log.hidden = false;
       log.innerHTML = "";
@@ -123,7 +123,7 @@
         this._fighting = false;
         document.removeEventListener("visibilitychange", onHide);
         if (this._fightTimer) { clearTimeout(this._fightTimer); this._fightTimer = null; }
-        const el = document.querySelector("#mvp-log");
+        const el = document.querySelector(this._fightLogSel);
         if (settle && el) {
           el.innerHTML = lines.join("\n");
           el.scrollTop = el.scrollHeight;
@@ -136,7 +136,7 @@
       document.addEventListener("visibilitychange", onHide);
 
       const tick = () => {
-        const el = document.querySelector("#mvp-log");
+        const el = document.querySelector(this._fightLogSel);
         if (!el) { end(false); return; }
         if (document.hidden) { end(true); return; }
         el.innerHTML = lines.slice(0, i + 1).join("\n");
@@ -177,10 +177,14 @@
           const dropLine = drops
             ? `<div class="sub" style="color:var(--muted)">掉落：${drops}</div>
                <div class="sub" id="dd-mvp-${esc(m.id)}" hidden style="color:var(--muted)"></div>` : "";
-          return `<div class="item" style="align-items:flex-start"><div>${esc(m.name)}
-            <div class="sub">Lv ${m.level ?? "?"}・${esc(m.home_map_name || "")}・${wait}</div>
-            ${dropLine}</div>
-            <button class="btn small" data-mvp="${esc(m.id)}"${cd ? " disabled" : ""}>挑戰</button></div>`;
+          return `<div class="mvp-row">
+            <div class="item${cd ? " mvp-dead" : ""}" style="align-items:flex-start"><div>${esc(m.name)}
+              <div class="sub">Lv ${m.level ?? "?"}・${esc(m.home_map_name || "")}・${wait}</div>
+              ${dropLine}</div>
+              <button class="btn small" data-mvp="${esc(m.id)}"${cd ? " disabled" : ""}>挑戰</button></div>
+            <div class="log mvp-fight" id="fight-${esc(m.id)}" hidden></div>
+            <div id="result-${esc(m.id)}"></div>
+          </div>`;
         }).join("") || "<p class='muted'>沒有 MVP</p>";
         box.querySelectorAll(".droplink").forEach((el) => {
           el.onclick = () => {
@@ -200,6 +204,14 @@
         box.querySelectorAll("[data-mvp]").forEach((b) => {
           b.onclick = () => this._challenge(b.dataset.mvp, b);
         });
+        // 剛打完的那場，把記錄跟結果貼回該 MVP 下面
+        const lf = this._lastFight;
+        if (lf) {
+          const flog = box.querySelector(`#fight-${lf.id}`);
+          const fres = box.querySelector(`#result-${lf.id}`);
+          if (flog) { flog.hidden = false; flog.innerHTML = lf.lines.join("\n"); }
+          if (fres) fres.innerHTML = lf.resultHtml;
+        }
       } catch (e) { box.innerHTML = `<p class="muted">${esc(e.detail || "載入失敗")}</p>`; }
     },
 
@@ -209,8 +221,8 @@
       this._fighting = true;
       const gen = (this._fightGen || 0);
       document.querySelectorAll("#mvp-list [data-mvp]").forEach((b) => { b.disabled = true; });
-      const res = document.querySelector("#mvp-result");
-      res.innerHTML = "";
+      const res = document.querySelector(`#result-${id}`);
+      if (res) res.innerHTML = "";
       let r;
       try {
         r = await API.challengeMvp(id);
@@ -236,11 +248,14 @@
         } else {
           line += `全身而退，無損失`;
         }
-        const box = document.querySelector("#mvp-result");
-        if (box) box.innerHTML = `<p style="margin-top:8px">${line}</p>`;
+        const resultHtml = `<p style="margin-top:8px">${line}</p>`;
+        const box = document.querySelector(`#result-${id}`);
+        if (box) box.innerHTML = resultHtml;
+        // 記著這場結果，_loadMvp 重繪清單後再貼回同一隻 MVP 下面
+        this._lastFight = { id, lines, resultHtml };
         await App.refreshChar();
         await this._loadMvp();
-      });
+      }, `#fight-${id}`);
     },
 
     // ---------- 交易 ----------

@@ -68,6 +68,10 @@ input:focus,select:focus{outline:none; border-color:var(--accent)}
 .log .atk-foe{color:var(--bad)}
 .log .crit-hit{color:#ff9f2e; font-weight:600}
 
+.mvp-row{margin-bottom:8px}
+.item.mvp-dead{border-color:var(--bad); opacity:.8}
+.mvp-fight{height:150px; margin-top:6px}
+
 .list{display:flex; flex-direction:column; gap:8px}
 .item{display:flex; justify-content:space-between; align-items:center; gap:8px;
   background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 12px}

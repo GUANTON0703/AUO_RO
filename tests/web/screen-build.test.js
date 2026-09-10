@@ -38,6 +38,7 @@ test("groups visible skills into novice, first, and second tier sections", () =>
       { tier: "novice", label: "新手技能", open: false, skills: [skills[1]] },
       { tier: "first", label: "一轉技能", open: false, skills: [skills[0]] },
       { tier: "second", label: "二轉技能", open: true, skills: [skills[2]] },
+      { tier: "third", label: "轉生二轉技能", open: false, skills: [] },
     ],
   );
 });
