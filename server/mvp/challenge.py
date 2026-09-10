@@ -26,6 +26,8 @@ class ChallengeResult:
     exp_penalty: int = 0
     drops: dict = field(default_factory=dict)
     events: list = field(default_factory=list)
+    potions_used: int = 0
+    sp_potions_used: int = 0
 
 
 def _event_dict(e) -> dict:
@@ -70,11 +72,19 @@ def apply_boss_kit(foe: Combatant) -> None:
 
 
 def challenge_mvp(player: Combatant, mvp, cfg: ChallengeConfig, rng: random.Random,
-                  player_base_level: int = 1) -> ChallengeResult:
+                  player_base_level: int = 1, *, potions: int = 0,
+                  potion_heal: int = 0, potion_hp_frac: float = 0.5,
+                  sp_potions: int = 0, sp_potion_restore: int = 0,
+                  sp_potion_frac: float = 0.3) -> ChallengeResult:
     foe = Combatant.from_monster(mvp)
     apply_boss_kit(foe)
     fight = simulate_fight(player, foe, rng, max_rounds=400,
-                           flee_hp_frac=cfg.flee_hp_frac)
+                           flee_hp_frac=cfg.flee_hp_frac,
+                           a_potions=potions, a_potion_heal=potion_heal,
+                           a_potion_hp_frac=potion_hp_frac,
+                           a_sp_potions=sp_potions,
+                           a_sp_potion_restore=sp_potion_restore,
+                           a_sp_potion_frac=sp_potion_frac)
 
     if fight.winner == player.name:
         outcome = "win"
@@ -85,7 +95,9 @@ def challenge_mvp(player: Combatant, mvp, cfg: ChallengeConfig, rng: random.Rand
 
     events = [_event_dict(e) for e in fight.events]
 
-    result = ChallengeResult(outcome=outcome, rounds=fight.rounds, events=events)
+    result = ChallengeResult(outcome=outcome, rounds=fight.rounds, events=events,
+                             potions_used=fight.potions_used,
+                             sp_potions_used=fight.sp_potions_used)
 
     if outcome == "win":
         drops: dict = {}

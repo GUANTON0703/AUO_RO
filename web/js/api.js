@@ -83,6 +83,9 @@ const API = (() => {
     socket: (cid, eqInstanceId, cardItemId) =>
       post(`/characters/${cid}/inventory/socket`,
            { equipment_instance_id: eqInstanceId, card_item_id: cardItemId }),
+    uncard: (cid, eqInstanceId, cardIndex) =>
+      post(`/characters/${cid}/inventory/uncard`,
+           { equipment_instance_id: eqInstanceId, card_index: cardIndex }),
 
     // shop / storage
     shop: () => get("/shop"),

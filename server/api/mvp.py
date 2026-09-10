@@ -12,7 +12,9 @@ from server.repositories import characters as characters_repo
 from server.repositories import inventory
 from server.repositories import mvp as mvp_repo
 
-from server.api.hunt import _current_character, _snapshot
+from server.api.hunt import (
+    _current_character, _load_strategy, _pick_potion, _pick_sp_potion, _snapshot,
+)
 
 router = APIRouter(prefix="/api/mvp", tags=["mvp"])
 
@@ -73,8 +75,30 @@ def challenge(body: ChallengeRequest, account_id: CurrentAccount):
     if body.flee_hp_frac is not None:
         cfg.flee_hp_frac = max(0.0, min(0.9, body.flee_hp_frac))
 
+    # 挑戰時也能照掛機的自動補品設定喝水
+    strat = _load_strategy(row["id"])
+    lv = row["base_level"]
+    hp_id, hp_heal, hp_cnt = (
+        _pick_potion(row["id"], strat.potion_item_id, lv)
+        if strat.auto_potion else (None, 0, 0))
+    sp_id, sp_restore, sp_cnt = (
+        _pick_sp_potion(row["id"], strat.sp_potion_item_id, lv)
+        if strat.auto_sp_potion else (None, 0, 0))
+    if hp_id and hp_id == sp_id:
+        share = (hp_cnt + 1) // 2
+        hp_cnt, sp_cnt = hp_cnt - share, share
+
     rng = random.Random()
-    result = challenge_mvp(player, mvp, cfg, rng, player_base_level=row["base_level"])
+    result = challenge_mvp(
+        player, mvp, cfg, rng, player_base_level=lv,
+        potions=hp_cnt, potion_heal=hp_heal, potion_hp_frac=strat.potion_hp_pct,
+        sp_potions=sp_cnt, sp_potion_restore=sp_restore,
+        sp_potion_frac=strat.sp_potion_pct,
+    )
+    if result.potions_used and hp_id:
+        inventory.consume_item(row["id"], hp_id, result.potions_used)
+    if result.sp_potions_used and sp_id:
+        inventory.consume_item(row["id"], sp_id, result.sp_potions_used)
 
     if result.outcome == "win":
         inventory.apply_drops(row["id"], result.drops)

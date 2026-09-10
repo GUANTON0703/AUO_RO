@@ -3,7 +3,7 @@ import random
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from server.auth.dependencies import CurrentAccount
 from server.content import load_content
@@ -42,6 +42,15 @@ class UnequipRequest(BaseModel):
 class SocketRequest(BaseModel):
     equipment_instance_id: int
     card_item_id: str
+
+
+class UncardRequest(BaseModel):
+    equipment_instance_id: int
+    card_index: int = Field(ge=0)
+
+
+UNCARD_ZENY = 20000
+UNCARD_SUCCESS = 0.6
 
 
 class RefineRequest(BaseModel):
@@ -168,6 +177,49 @@ def socket(character_id: int, body: SocketRequest, account_id: CurrentAccount):
             (json.dumps(card_ids), inst["id"]),
         )
     return inventory.list_inventory(character_id)
+
+
+@router.post("/{character_id}/inventory/uncard")
+def uncard(character_id: int, body: UncardRequest, account_id: CurrentAccount):
+    """卸下一張卡：20000z、60% 成功。成功 → 卡片回背包、裝備留下其他卡；
+    失敗 → 只扣錢，卡片與裝備都不動。"""
+    _owned(character_id, account_id)
+    inst = _instance(character_id, body.equipment_instance_id)
+    with connection.transaction() as conn:
+        r = conn.execute(
+            "SELECT card_ids FROM character_equipment WHERE id = ?", (inst["id"],)
+        ).fetchone()
+        card_ids = json.loads(r["card_ids"])
+        if body.card_index >= len(card_ids):
+            raise HTTPException(status_code=400, detail="沒有這張卡")
+        zeny = conn.execute(
+            "SELECT zeny FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()["zeny"]
+        if zeny < UNCARD_ZENY:
+            raise HTTPException(status_code=400, detail="Zeny 不足（需 20000）")
+        conn.execute("UPDATE characters SET zeny = zeny - ? WHERE id = ?",
+                     (UNCARD_ZENY, character_id))
+        success = random.Random().random() < UNCARD_SUCCESS
+        card_id = card_ids[body.card_index]
+        if success:
+            card_ids.pop(body.card_index)
+            conn.execute(
+                "UPDATE character_equipment SET card_ids = ? WHERE id = ?",
+                (json.dumps(card_ids), inst["id"]),
+            )
+            conn.execute(
+                "INSERT INTO character_items (character_id, item_id, qty) VALUES (?, ?, 1) "
+                "ON CONFLICT(character_id, item_id) DO UPDATE SET qty = qty + 1",
+                (character_id, card_id),
+            )
+    return {
+        "success": success,
+        "card_id": card_id,
+        "message": (f"成功取出 {_content.cards[card_id].name}"
+                    if success and card_id in _content.cards
+                    else "取卡失敗，只損失 20000z"),
+        **inventory.list_inventory(character_id),
+    }
 
 
 @router.post("/{character_id}/inventory/refine")

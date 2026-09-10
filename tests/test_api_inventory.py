@@ -297,3 +297,42 @@ def test_two_handed_weapon_blocks_shield(client, auth, db_helpers):
     r = client.post(f"/api/characters/{ch['id']}/inventory/equip", headers=h,
                     json={"equipment_instance_id": shield["id"]})
     assert r.status_code == 400 and "雙手" in r.json()["detail"]
+
+
+def test_uncard_success_returns_card_keeps_equipment(client, auth, db_helpers, monkeypatch):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.give_equipment(ch["id"], "cotton_shirt")
+    db_helpers.give_item(ch["id"], "poring_card", 1)
+    db_helpers.set_zeny(ch["id"], 50000)
+    inst = _equip_list(client, ch, h)[0]
+    client.post(f"/api/characters/{ch['id']}/inventory/socket", headers=h,
+                json={"equipment_instance_id": inst["id"], "card_item_id": "poring_card"})
+
+    import server.api.inventory as inv_api
+    monkeypatch.setattr(inv_api.random, "Random", lambda: type("R", (), {"random": lambda s: 0.0})())
+    r = client.post(f"/api/characters/{ch['id']}/inventory/uncard", headers=h,
+                    json={"equipment_instance_id": inst["id"], "card_index": 0})
+    assert r.status_code == 200 and r.json()["success"] is True
+    eq = _equip_list(client, ch, h)[0]
+    assert eq["card_ids"] == []
+    invn = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert invn["items"].get("poring_card") == 1
+
+
+def test_uncard_failure_only_costs_zeny(client, auth, db_helpers, monkeypatch):
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    db_helpers.give_equipment(ch["id"], "cotton_shirt")
+    db_helpers.give_item(ch["id"], "poring_card", 1)
+    db_helpers.set_zeny(ch["id"], 50000)
+    inst = _equip_list(client, ch, h)[0]
+    client.post(f"/api/characters/{ch['id']}/inventory/socket", headers=h,
+                json={"equipment_instance_id": inst["id"], "card_item_id": "poring_card"})
+
+    import server.api.inventory as inv_api
+    monkeypatch.setattr(inv_api.random, "Random", lambda: type("R", (), {"random": lambda s: 0.99})())
+    r = client.post(f"/api/characters/{ch['id']}/inventory/uncard", headers=h,
+                    json={"equipment_instance_id": inst["id"], "card_index": 0})
+    assert r.status_code == 200 and r.json()["success"] is False
+    assert _equip_list(client, ch, h)[0]["card_ids"] == ["poring_card"]

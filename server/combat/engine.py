@@ -102,11 +102,9 @@ def _one_hit(attacker, defender, rng, events):
             and not any(s.name == "poison" for s in defender.statuses):
         from server.combat.status import Status, apply_status
         per_tick = round(defender.max_hp * 0.012) + 8
+        # 不另外報一行「中毒」；每回合的 DotEvent「受到 中毒 N」就是視覺回饋
         apply_status(defender, Status(kind="dot", name="poison", duration=4,
                                       magnitude=per_tick))
-        from server.combat.events import SkillEvent
-        events.append(SkillEvent(actor="", target=defender.name,
-                                 skill_id="poison", skill_name="中毒"))
     return True
 
 

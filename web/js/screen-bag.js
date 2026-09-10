@@ -141,6 +141,7 @@
                 : `<button class="btn small primary" data-equip="${inst.id}">裝備</button>`}
               ${canRefine ? `<button class="btn small" data-refine="${inst.id}">精煉</button>` : ""}
               ${freeSockets > 0 ? `<button class="btn small" data-socket="${inst.id}" data-eqslot="${slotOf(inst.equipment_id)}">鑲卡</button>` : ""}
+              ${(inst.card_ids || []).length ? `<button class="btn small" data-uncard="${inst.id}">卸卡</button>` : ""}
               ${equipped ? "" : `<button class="btn small" data-sell-eq="${inst.id}" data-name="${esc(eqName(inst.equipment_id))}">賣出</button>`}
             </div>
           </div>
@@ -247,6 +248,29 @@
           if (inst) this._openRefine(inst);
         };
       });
+      this._body().querySelectorAll("[data-uncard]").forEach((b) => {
+        b.onclick = async () => {
+          const inst = (inv.equipment || []).find((x) => x.id === Number(b.dataset.uncard));
+          const cards = (inst && inst.card_ids) || [];
+          if (!cards.length) return;
+          let idx = 0;
+          if (cards.length > 1) {
+            const list = cards.map((c, i) => `${i + 1}. ${itemName(c)}`).join("\n");
+            const pick = prompt(`要卸哪張卡？輸入編號：\n${list}`, "1");
+            if (pick == null) return;
+            idx = Math.floor(Number(pick)) - 1;
+            if (idx < 0 || idx >= cards.length) { App.toast("編號不對", true); return; }
+          }
+          if (!confirm(`花 20000z 取出「${itemName(cards[idx])}」？\n60% 成功；失敗只損失 20000z，卡片和裝備都留著。`)) return;
+          b.disabled = true;
+          try {
+            const r = await API.uncard(S.char.id, Number(b.dataset.uncard), idx);
+            App.toast(r.message || (r.success ? "取卡成功" : "取卡失敗"), !r.success);
+            await this._reloadHeader();
+            reload();
+          } catch (e) { App.toast(e.detail || "卸卡失敗", true); b.disabled = false; }
+        };
+      });
       this._body().querySelectorAll("[data-socket]").forEach((b) => {
         b.onclick = async () => {
           const cardId = this._pickCard(inv.items || {}, b.dataset.eqslot);
@@ -298,11 +322,20 @@
       const maxed = cur >= 10;
       const disabled = maxed || this._refBlocked;
 
+      const REF_PER_LV = { atk: 2, matk: 2, defense: 1, mdef: 1, max_hp: 15, flee: 1, hit: 1, crit: 1 };
+      const bonusAt = (r) => Object.keys(def.stats || {})
+        .filter((k) => REF_PER_LV[k])
+        .map((k) => `${STAT_ZH[k] || k} +${REF_PER_LV[k] * r}`).join("、");
+      const curBonus = cur > 0 ? bonusAt(cur) : "";
+      const nextBonus = maxed ? "" : bonusAt(cur + 1);
+
       this._body().innerHTML = `
         <div class="card">
           <div class="section-title"><h3>精煉 ${esc(eqName(inst.equipment_id))}</h3>
             <span class="pill good">+${cur}</span></div>
           <div class="sub">材料：${oreName} ×1（持有 ${oreHave}）　Zeny ${S.char.zeny}</div>
+          ${curBonus ? `<div class="sub" style="color:var(--good)">目前精煉加成：${curBonus}</div>` : ""}
+          ${nextBonus ? `<div class="sub" style="color:var(--muted)">升到 +${cur + 1}：${nextBonus}</div>` : ""}
           <div class="row tight" style="margin-top:10px">
             <button class="btn small ${disabled ? "" : "primary"}" id="ref-normal" ${disabled ? "disabled" : ""}>普通（Zeny ${normalZeny}）</button>
             <button class="btn small" id="ref-random" ${disabled ? "disabled" : ""}>隨機（Zeny ${normalZeny * 10}）</button>
