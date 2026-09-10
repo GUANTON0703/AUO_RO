@@ -115,6 +115,28 @@ def _passive_procs(content, learned: dict) -> dict:
     return out
 
 
+def _maintained_buffs(content, learned: dict, toggles: dict) -> dict:
+    """掛機時「維持型」自我 buff（trigger=sp_available 的 buff 技）當成常駐，
+    直接折進數值 → 不用每場重放、不耗 SP、記錄也不會洗一排施放訊息。"""
+    bonus: dict = {}
+    for sid, lvl in learned.items():
+        sk = content.skills.get(sid)
+        if not sk or sk.kind != "active":
+            continue
+        idle = sk.idle_default or {}
+        if idle.get("trigger") != "sp_available":
+            continue
+        if not toggles.get(sid, idle.get("enabled", True)):
+            continue
+        for eff in sk.effects:
+            if eff.get("type") != "buff":
+                continue
+            for stat, seq in eff.get("stats", {}).items():
+                val = seq[min(lvl, len(seq)) - 1] if isinstance(seq, list) else seq
+                bonus[stat] = bonus.get(stat, 0) + val
+    return bonus
+
+
 def _passive_stat_bonus(content, learned: dict) -> dict:
     bonus: dict = {}
     for sid, lvl in learned.items():
@@ -135,12 +157,22 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     eq = _sum_equipment_stats(content, snap.equipped)
     for k, v in _card_flat_stats(content, snap.equipped).items():
         eq[k] = eq.get(k, 0) + v
+    mbuff = _maintained_buffs(content, snap.learned_skills, snap.skill_toggles)
+    # 維持型 buff 加的基礎屬性（str/agi/…）先併進 eq，才會傳進 STR/AGI/… 的計算
+    for k in ("str", "agi", "vit", "int", "dex", "luk"):
+        if mbuff.get(k):
+            eq[k] = eq.get(k, 0) + mbuff[k]
     STR, AGI, VIT, INT, DEX, LUK = (
         s["str"] + eq.get("str", 0), s["agi"] + eq.get("agi", 0),
         s["vit"] + eq.get("vit", 0), s["int"] + eq.get("int", 0),
         s["dex"] + eq.get("dex", 0), s["luk"] + eq.get("luk", 0))
 
     passives = _passive_stat_bonus(content, snap.learned_skills)
+    # 維持型 buff 的衍生數值加成（atk/aspd/flee/…）併進 passives 池；
+    # 基礎屬性（str/agi/…）已在上面併進 eq
+    for k, v in mbuff.items():
+        if k not in ("str", "agi", "vit", "int", "dex", "luk"):
+            passives[k] = passives.get(k, 0) + v
 
     # HP/SP 隨等級加速成長（配合怪物 HP 公式的 level² 項），玩家才打得動同級怪
     lv = snap.base_level
@@ -193,6 +225,10 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         idle = sk.idle_default or {}
         if not snap.skill_toggles.get(sid, idle.get("enabled", True)):
             continue   # 玩家關掉的、或預設就不掛機放的技能
+        # 純維持型 buff 已折進數值常駐 → 不進戰鬥技能清單，不會每場重放
+        if (idle.get("trigger") == "sp_available"
+                and all(e.get("type") == "buff" for e in sk.effects)):
+            continue
         sp_cost = sk.sp_cost[min(lvl, len(sk.sp_cost)) - 1] if sk.sp_cost else 0
         priority = idle.get("priority", 1)
         if sid == snap.primary_skill_id:
