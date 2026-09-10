@@ -53,7 +53,9 @@ const SLOT_ORDER = [
   ["garment", "披肩"], ["shoes", "鞋子"],
   ["accessory1", "飾品（左）"], ["accessory2", "飾品（右）"],
 ];
-const STATUS_ZH = { poison: "中毒", bleed: "流血", burn: "灼燒", stun: "暈眩" };
+const STATUS_ZH = { poison: "中毒", bleed: "流血", burn: "灼燒", stun: "暈眩",
+  freeze: "冰凍", stone: "石化", sleep: "睡眠", silence: "沉默", blind: "黑暗",
+  curse: "詛咒", blind_flee: "黑暗", curse_crit: "詛咒" };
 const STAT_ZH = { str: "力量", agi: "敏捷", vit: "體質", int: "智力", dex: "靈巧",
   luk: "幸運", atk: "攻擊", matk: "魔攻", def: "防禦", defense: "防禦", mdef: "魔防", hit: "命中",
   flee: "迴避", crit: "爆擊", aspd: "攻速", max_hp: "HP上限", max_sp: "SP上限",
@@ -122,6 +124,21 @@ function effectText(e) {
   if (e.type === "on_hit_proc") return `攻擊 ${e.chance_pct}% 機率${PROC_ZH[e.effect] || e.effect}`;
   if (e.type === "weapon_element" || e.type === "element_endow")
     return `武器附${ELEM_ZH[e.element] || e.element}屬性`;
+  if (e.type === "armor_element") return `防具轉${ELEM_ZH[e.element] || e.element}屬性`;
+  if (e.type === "on_hit_proc")
+    return `攻擊 ${e.chance_pct}% 機率使目標${STATUS_ZH[e.effect] || e.effect}`;
+  if (e.type === "life_leech") return `攻擊吸取 ${e.pct}% 傷害為 HP`;
+  if (e.type === "sp_leech") return `攻擊吸取 ${e.pct}% 傷害為 SP`;
+  if (e.type === "reflect_damage") return `受擊反彈 ${e.pct}% 傷害`;
+  if (e.type === "status_immune") return `免疫${STATUS_ZH[e.status] || e.status}`;
+  if (e.type === "perfect_dodge") return `完全迴避 +${e.amount ?? e.pct}`;
+  if (e.type === "on_kill_recover") {
+    const p = [];
+    if (e.hp_pct) p.push(`HP ${e.hp_pct}%`);
+    if (e.sp_pct) p.push(`SP ${e.sp_pct}%`);
+    return `擊殺後回復 ${p.join("、")}`;
+  }
+  if (e.type === "autocast") return `攻擊 ${e.chance_pct || 5}% 機率自動施放技能`;
   return e.type;
 }
 
@@ -166,7 +183,9 @@ function combatLogLines(events, opts) {
       out.push(`<span class="dim">${esc(e.actor || "")} 撤退${hp}${why}</span>`);
     } else if (e.kind === "status_expired") {
       const st = (e.status || "").replace(/_mod$/, "");
-      out.push(`<span class="dim">  ${esc(e.target)} 的 ${esc(STAT_ZH[st] || st)} 加成結束</span>`);
+      const zh = STATUS_ZH[st] || STAT_ZH[st] || st;
+      const verb = STATUS_ZH[st] ? "解除" : "加成結束";
+      out.push(`<span class="dim">  ${esc(e.target)} 的 ${esc(zh)} ${verb}</span>`);
     } else if (e.kind === "status_applied") {
       out.push(`<span class="dim">  ${esc(e.target)} 陷入 ${esc(STATUS_ZH[e.status] || e.status)}</span>`);
     } else if (e.kind === "dot") {

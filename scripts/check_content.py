@@ -13,8 +13,12 @@ DATA = Path(__file__).resolve().parent.parent / "data"
 
 CARD_EFFECT_TYPES = {
     "flat_stat", "percent_stat", "element_resist", "race_damage",
-    "size_damage", "weapon_element", "on_hit_proc",   # on_hit_proc 目前戰鬥不套用（保留）
+    "size_damage", "weapon_element", "armor_element", "on_hit_proc",
+    "life_leech", "sp_leech", "reflect_damage", "status_immune",
+    "perfect_dodge", "on_kill_recover", "autocast",
 }
+AILMENTS = {"stun", "freeze", "stone", "sleep", "silence", "blind",
+            "curse", "bleed", "poison"}
 ELEMENTS = {"neutral", "water", "earth", "fire", "wind",
             "poison", "holy", "shadow", "ghost", "undead"}
 RACES = {"animal", "plant", "insect", "demon", "undead",

@@ -70,7 +70,9 @@ def _card_flat_stats(content, pieces: list) -> dict:
 def _apply_card_effects(content, pieces: list, derived: dict) -> dict:
     """percent_stat 套進已算好的 derived，並回傳戰鬥用的 {resist, race, size, atk_element}。
     flat_stat 已在 _card_flat_stats 處理；附魔卡（weapon_element）只有鑲在武器上才算。"""
-    combat = {"resist": {}, "race": {}, "size": {}, "atk_element": None}
+    combat = {"resist": {}, "race": {}, "size": {}, "atk_element": None,
+              "def_element": None, "procs": {}, "immunities": set(),
+              "perfect_dodge": 0, "on_kill": {}, "autocast": []}
     for piece in pieces:
         eq = content.equipment.get(piece.equipment_id)
         slot = eq.slot if eq else None
@@ -94,7 +96,31 @@ def _apply_card_effects(content, pieces: list, derived: dict) -> dict:
                         combat["size"].get(eff["size"], 0) + eff["pct"])
                 elif t == "weapon_element" and slot == "weapon":
                     combat["atk_element"] = eff["element"]
-                # on_hit_proc：走技能路線的 proc，卡片 proc 暫不支援
+                elif t == "armor_element":
+                    combat["def_element"] = eff["element"]
+                elif t == "on_hit_proc":
+                    combat["procs"][eff["effect"]] = max(
+                        combat["procs"].get(eff["effect"], 0), eff.get("chance_pct", 0))
+                elif t in ("life_leech", "sp_leech"):
+                    combat["procs"][t] = combat["procs"].get(t, 0) + eff.get("pct", 0)
+                elif t == "reflect_damage":
+                    combat["procs"]["reflect"] = combat["procs"].get("reflect", 0) + eff.get("pct", 0)
+                elif t == "status_immune":
+                    combat["immunities"].add(eff["status"])
+                elif t == "perfect_dodge":
+                    combat["perfect_dodge"] += eff.get("amount", eff.get("pct", 0))
+                elif t == "on_kill_recover":
+                    for k in ("hp_pct", "sp_pct"):
+                        if eff.get(k):
+                            combat["on_kill"][k] = combat["on_kill"].get(k, 0) + eff[k]
+                elif t == "autocast":
+                    sk = content.skills.get(eff["skill_id"])
+                    if sk:
+                        combat["autocast"].append({
+                            "skill_id": sk.id, "name": sk.name,
+                            "effects": sk.effects,
+                            "chance_pct": eff.get("chance_pct", 5),
+                            "level": eff.get("level", 1)})
     return combat
 
 
@@ -252,10 +278,15 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         soft_def=VIT // 3, soft_mdef=INT // 4,
         skills=resolved,
         attack_element=attack_element,
+        element=combat_mods["def_element"] or "neutral",
         element_resist=combat_mods["resist"],
         race_bonus=combat_mods["race"],
         size_bonus=combat_mods["size"],
-        procs=_passive_procs(content, snap.learned_skills),
+        procs={**_passive_procs(content, snap.learned_skills), **combat_mods["procs"]},
+        immunities=combat_mods["immunities"],
+        perfect_dodge=combat_mods["perfect_dodge"],
+        on_kill=combat_mods["on_kill"],
+        autocast=combat_mods["autocast"],
         # 換裝後 max 可能變小，把續戰的 hp/sp 夾回上限
         hp=min(snap.hp, derived["max_hp"]) if snap.hp is not None else 0,
         sp=min(snap.sp, derived["max_sp"]) if snap.sp is not None else 0,

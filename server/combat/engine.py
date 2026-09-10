@@ -67,8 +67,18 @@ def _trigger_ok(c, trigger: str) -> bool:
     return False
 
 
+_AILMENT_PROCS = ("stun", "freeze", "stone", "sleep", "silence", "blind",
+                  "curse", "bleed", "poison")
+
+
 def _one_hit(attacker, defender, rng, events):
     """打一擊。回 True = 有命中。"""
+    ap = attacker.procs if hasattr(attacker, "procs") else {}
+    dp = defender.procs if hasattr(defender, "procs") else {}
+    # 完全迴避：無視命中計算
+    if getattr(defender, "perfect_dodge", 0) and rng.random() < defender.perfect_dodge / 100:
+        events.append(AttackEvent(attacker.name, defender.name, 0, False, False))
+        return False
     # 爆擊必中：先擲爆擊，中了就無視 FLEE
     crit = rng.random() < crit_chance(attacker.effective_crit)
     if not crit:
@@ -91,21 +101,46 @@ def _one_hit(attacker, defender, rng, events):
         dmg = round(dmg * getattr(attacker, "crit_mult", CRIT_MULTIPLIER))
     defender.take_damage(dmg)
     events.append(AttackEvent(attacker.name, defender.name, dmg, crit, True))
-    steal = attacker.procs.get("steal_loot", 0) if hasattr(attacker, "procs") else 0
+
+    # 吸血 / 吸魔
+    if ap.get("life_leech") and dmg > 0:
+        attacker.heal(round(dmg * ap["life_leech"] / 100))
+    if ap.get("sp_leech") and dmg > 0:
+        attacker.restore_sp(round(dmg * ap["sp_leech"] / 100))
+    # 傷害反彈：防守方把一部分傷害彈回攻擊方
+    if dp.get("reflect") and dmg > 0:
+        rdmg = round(dmg * dp["reflect"] / 100)
+        if rdmg > 0:
+            attacker.take_damage(rdmg)
+            events.append(AttackEvent(defender.name, attacker.name, rdmg, False, True))
+
+    steal = ap.get("steal_loot", 0)
     if steal and not any(getattr(e, "skill_id", "") == "steal" for e in events) \
             and rng.random() < steal / 100:
         from server.combat.events import SkillEvent
         events.append(SkillEvent(actor=attacker.name, target=defender.name,
                                  skill_id="steal", skill_name="偷竊"))
-    poison = attacker.procs.get("poison", 0) if hasattr(attacker, "procs") else 0
-    if poison and rng.random() < poison / 100 \
-            and not any(s.name == "poison" for s in defender.statuses):
-        from server.combat.status import Status, apply_status
-        per_tick = round(defender.max_hp * 0.012) + 8
-        # 不另外報一行「中毒」；每回合的 DotEvent「受到 中毒 N」就是視覺回饋
-        apply_status(defender, Status(kind="dot", name="poison", duration=4,
-                                      magnitude=per_tick))
+    # 攻擊時附加異常狀態（卡片 on_hit_proc、附毒術…）
+    for name in _AILMENT_PROCS:
+        ch = ap.get(name, 0)
+        if ch and rng.random() < ch / 100 \
+                and not any(s.name == name for s in defender.statuses):
+            from server.combat.ailments import apply_ailment
+            apply_ailment(defender, name, rng, events)
+    # 攻擊時自動施放技能（老楊柳那種卡）
+    for ac in getattr(attacker, "autocast", []):
+        if rng.random() < ac.get("chance_pct", 0) / 100:
+            _autocast(attacker, defender, ac, rng, events)
     return True
+
+
+def _autocast(caster, target, ac, rng, events):
+    from server.combat.combatant import ResolvedSkill
+    from server.combat.skills import cast_skill
+    events += cast_skill(caster, target, ResolvedSkill(
+        skill_id=ac.get("skill_id", "autocast"), name=ac.get("name", "自動施放"),
+        level=ac.get("level", 1), kind="active", sp_cost=0, cooldown_rounds=0,
+        effects=ac.get("effects", []), trigger="every_turn", priority=1), rng)
 
 
 def _auto_attack(attacker, defender, rng, events):
@@ -122,9 +157,10 @@ def _auto_attack(attacker, defender, rng, events):
 def _take_turn(actor, foe, rng, events, min_sp_frac: float = 0.0):
     if actor.stunned:
         return
-    # 施法後延遲：上一招還在硬直 → 這回合只能普攻
-    if getattr(actor, "_cast_lock", 0) > 0:
-        actor._cast_lock -= 1
+    # 施法後延遲、或被沉默 → 這回合只能普攻
+    if getattr(actor, "_cast_lock", 0) > 0 or actor.silenced:
+        if getattr(actor, "_cast_lock", 0) > 0:
+            actor._cast_lock -= 1
         _auto_attack(actor, foe, rng, events)
         return
     skill = _pick_skill(actor, min_sp_frac)
@@ -207,6 +243,11 @@ def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAUL
                            potions_used, sp_potions_used, _stole(events))
     winner, loser = (a, b) if a.alive else (b, a)
     events.append(KillEvent(actor=winner.name, target=loser.name))
+    ok = getattr(winner, "on_kill", None) or {}
+    if ok.get("hp_pct"):
+        winner.heal(round(winner.max_hp * ok["hp_pct"] / 100))
+    if ok.get("sp_pct"):
+        winner.restore_sp(round(winner.max_sp * ok["sp_pct"] / 100))
     return FightResult(winner.name, loser.name, "win", rounds, winner.hp,
                        loser.hp, events, potions_used, sp_potions_used, _stole(events))
 

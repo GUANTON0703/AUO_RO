@@ -162,3 +162,36 @@ def test_bow_atk_scales_with_dex_not_str():
             learned_skills={}, equipped=[EquippedPiece("hunter_bow", 0, [])]), c)
 
     assert archer(dex=60, str_=10).atk > archer(dex=10, str_=60).atk
+
+
+def test_card_special_effects_wire_into_combatant():
+    c = load_content()
+
+    def sin(cards):
+        return build_player_combatant(CharacterSnapshot(
+            name="P", job_id="assassin", base_level=60, job_level=50,
+            stats={"str": 50, "agi": 60, "vit": 30, "int": 5, "dex": 40, "luk": 30},
+            learned_skills={},
+            equipped=[EquippedPiece("jur_3", 5, cards.get("w", [])),
+                      EquippedPiece("full_plate_1", 5, cards.get("a", [])),
+                      EquippedPiece("bee_wing_mantle", 5, cards.get("g", []))]), c)
+
+    assert sin({"a": ["ghostring_card"]}).element == "ghost"
+    assert "freeze" in sin({"a": ["marc_card"]}).immunities
+    assert sin({"g": ["hunter_fly_card"]}).procs.get("life_leech") == 3
+    assert sin({"w": ["zenorc_card"]}).procs.get("poison") == 10
+    assert sin({"g": ["whisper_card"]}).perfect_dodge == 3
+
+
+def test_on_hit_poison_card_applies_dot():
+    import random
+    from server.combat import simulate_fight
+    from server.combat.combatant import Combatant
+    c = load_content()
+    p = build_player_combatant(CharacterSnapshot(
+        name="P", job_id="assassin", base_level=60, job_level=50,
+        stats={"str": 50, "agi": 60, "vit": 30, "int": 5, "dex": 40, "luk": 20},
+        learned_skills={}, equipped=[EquippedPiece("jur_3", 5, ["zenorc_card"])]), c)
+    r = simulate_fight(p, Combatant.from_monster(c.get_monster("raydric")),
+                       random.Random(1), max_rounds=100)
+    assert any(e.kind == "dot" for e in r.events)

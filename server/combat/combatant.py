@@ -59,6 +59,10 @@ class Combatant:
     race_bonus: dict = field(default_factory=dict)      # {race: 加傷%}
     size_bonus: dict = field(default_factory=dict)      # {size: 加傷%}
     procs: dict = field(default_factory=dict)           # 被動觸發 {effect: 機率%}
+    immunities: set = field(default_factory=set)        # 免疫的異常狀態 {"freeze",...}
+    perfect_dodge: int = 0                              # 完全迴避 %（無視命中計算）
+    on_kill: dict = field(default_factory=dict)         # 擊殺回復 {"hp_pct":5,"sp_pct":3}
+    autocast: list = field(default_factory=list)        # [{skill_id,chance_pct,level}]
 
     def __post_init__(self):
         if self.hp == 0:
@@ -108,7 +112,11 @@ class Combatant:
 
     @property
     def stunned(self) -> bool:
-        return any(s.kind == "stun" for s in self.statuses)
+        return any(s.kind in ("stun", "disable") for s in self.statuses)
+
+    @property
+    def silenced(self) -> bool:
+        return any(s.kind == "silence" for s in self.statuses)
 
     def take_damage(self, amount: int) -> None:
         self.hp = max(0, self.hp - max(0, amount))
