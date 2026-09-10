@@ -158,20 +158,40 @@
           const cd = !m.available;
           const secs = m.seconds_remaining || 0;
           const wait = cd ? `冷卻中 ${Math.ceil(secs / 60)} 分` : "可挑戰";
+          // MVP 挑戰掉落率是內容值的 3 倍（上限 100%），顯示實際機率
+          const pct = (r) => {
+            const e = Math.min(1, r * 3);
+            return e >= 0.1 ? Math.round(e * 100) + "%"
+              : e >= 0.001 ? (e * 100).toFixed(1) + "%" : (e * 100).toFixed(2) + "%";
+          };
           const drops = (m.drops || [])
-            .filter((d) => d.item_id !== `${m.id}_card`)
-            .slice(0, 6)
-            .map((d) => esc(d.name)).join("、");
-          const cardName = (m.drops || []).find((d) => d.item_id === `${m.id}_card`);
-          const dropLine = (drops || cardName)
-            ? `<div class="sub" style="color:var(--muted)">掉落：${
-                cardName ? esc(cardName.name) + (drops ? "、" : "") : ""}${drops}</div>`
-            : "";
+            .sort((a, b) => (a.item_id === `${m.id}_card` ? -1 : 0))
+            .map((d) => `<span class="droplink" data-drop="${esc(d.item_id)}" data-owner="mvp-${esc(m.id)}"
+              style="color:var(--accent);cursor:pointer;text-decoration:underline">${
+              esc(d.name)} ${pct(d.rate)}</span>`).join("　");
+          const dropLine = drops
+            ? `<div class="sub" style="color:var(--muted)">掉落：${drops}</div>
+               <div class="sub" id="dd-mvp-${esc(m.id)}" hidden style="color:var(--muted)"></div>` : "";
           return `<div class="item" style="align-items:flex-start"><div>${esc(m.name)}
             <div class="sub">Lv ${m.level ?? "?"}・${esc(m.home_map_name || "")}・${wait}</div>
             ${dropLine}</div>
             <button class="btn small" data-mvp="${esc(m.id)}"${cd ? " disabled" : ""}>挑戰</button></div>`;
         }).join("") || "<p class='muted'>沒有 MVP</p>";
+        box.querySelectorAll(".droplink").forEach((el) => {
+          el.onclick = () => {
+            const dd = box.querySelector("#dd-" + el.dataset.owner);
+            if (!dd) return;
+            const txt = `${itemName(el.dataset.drop)}：${
+              gearDesc(el.dataset.drop) || itemDesc(el.dataset.drop) || "（無額外資料）"}`;
+            if (!dd.hidden && dd.dataset.showing === el.dataset.drop) {
+              dd.hidden = true;
+            } else {
+              dd.textContent = txt;
+              dd.dataset.showing = el.dataset.drop;
+              dd.hidden = false;
+            }
+          };
+        });
         box.querySelectorAll("[data-mvp]").forEach((b) => {
           b.onclick = () => this._challenge(b.dataset.mvp, b);
         });
