@@ -20,6 +20,11 @@ router = APIRouter(prefix="/api/mvp", tags=["mvp"])
 
 _content = load_content()
 
+_REGION_ZH = {
+    "prontera": "普隆德拉", "morroc": "摩洛克", "payon": "拜楊",
+    "geffen": "蓋菲恩", "aldebaran": "阿爾迪巴朗", "nifflheim": "尼芙海姆",
+}
+
 # 所有 MVP 統一冷卻 20 分鐘（蓋過 mvps.json 各自的 cooldown_hours）
 _MVP_COOLDOWN_HOURS = 20 / 60
 
@@ -41,6 +46,7 @@ def list_mvp(account_id: CurrentAccount):
 
     for m in _content.mvps.values():
         home = _content.maps.get(m.home_map_id)
+        town = getattr(home, "town", None) if home else None
         gs = mvp_repo.global_status(m.id)
         out.append({
             "id": m.id,
@@ -48,6 +54,8 @@ def list_mvp(account_id: CurrentAccount):
             "level": m.level,
             "home_map_id": m.home_map_id,
             "home_map_name": home.name if home else m.home_map_id,
+            "region": town or "other",
+            "region_name": _REGION_ZH.get(town, "其他"),
             "available": gs is None,
             "seconds_remaining": gs["seconds_remaining"] if gs else 0,
             "last_killer": gs["killer"] if gs else None,

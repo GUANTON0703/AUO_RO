@@ -69,6 +69,10 @@ input:focus,select:focus{outline:none; border-color:var(--accent)}
 .log .crit-hit{color:#ff9f2e; font-weight:600}
 
 .mvp-row{margin-bottom:8px}
+.mvp-region-hd{cursor:pointer; user-select:none; font-weight:600; padding:8px 4px;
+  margin-top:6px; border-bottom:1px solid var(--line)}
+.mvp-region-hd .muted{font-weight:400; font-size:.8rem}
+.mvp-region-body{display:flex; flex-direction:column; gap:8px; padding-top:8px}
 .item.mvp-dead{border-color:var(--bad); opacity:.8}
 .mvp-fight{height:150px; margin-top:6px}
 

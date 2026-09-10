@@ -154,7 +154,21 @@
       if (!box) return;
       try {
         const list = await API.listMvp();
-        box.innerHTML = list.map((m) => {
+        const closed = this._mvpRegionClosed || (this._mvpRegionClosed = new Set());
+        const regions = [];
+        const byRegion = new Map();
+        for (const m of list) {
+          const key = m.region || "other";
+          if (!byRegion.has(key)) {
+            byRegion.set(key, { name: m.region_name || "其他", rows: [], minLv: 999 });
+            regions.push(key);
+          }
+          const g = byRegion.get(key);
+          g.rows.push(m);
+          g.minLv = Math.min(g.minLv, m.level ?? 999);
+        }
+        regions.sort((a, b) => byRegion.get(a).minLv - byRegion.get(b).minLv);
+        const rowHtml = (m) => {
           const cd = !m.available;
           const secs = m.seconds_remaining || 0;
           const ago = (s) => s < 60 ? `${s} 秒前`
@@ -185,7 +199,26 @@
             <div class="log mvp-fight" id="fight-${esc(m.id)}" hidden></div>
             <div id="result-${esc(m.id)}"></div>
           </div>`;
+        };
+        box.innerHTML = regions.map((key) => {
+          const g = byRegion.get(key);
+          const isClosed = closed.has(key);
+          const rows = g.rows.slice().sort((a, b) => (a.level ?? 0) - (b.level ?? 0));
+          return `<div class="mvp-region-hd" data-region="${esc(key)}">
+              <span class="arw">${isClosed ? "▸" : "▾"}</span> ${esc(g.name)}
+              <span class="muted">（${rows.length}・Lv ${g.minLv}+）</span></div>
+            <div class="mvp-region-body"${isClosed ? " hidden" : ""}>${rows.map(rowHtml).join("")}</div>`;
         }).join("") || "<p class='muted'>沒有 MVP</p>";
+        box.querySelectorAll(".mvp-region-hd").forEach((hd) => {
+          hd.onclick = () => {
+            const k = hd.dataset.region;
+            if (closed.has(k)) closed.delete(k); else closed.add(k);
+            const body = hd.nextElementSibling;
+            if (body) body.hidden = closed.has(k);
+            const arw = hd.querySelector(".arw");
+            if (arw) arw.textContent = closed.has(k) ? "▸" : "▾";
+          };
+        });
         box.querySelectorAll(".droplink").forEach((el) => {
           el.onclick = () => {
             const dd = box.querySelector("#dd-" + el.dataset.owner);
@@ -235,7 +268,8 @@
       }
       if (gen !== (this._fightGen || 0)) return;   // 已離開 More 畫面，丟棄結果
       this._fightRounds = r.rounds || 0;
-      this._playFight(fightLogLines(r.events), async () => {
+      const lines = fightLogLines(r.events);
+      this._playFight(lines, async () => {
         const label = { win: "勝利", loss: "戰敗", fled: "撤退" }[r.outcome] || r.outcome;
         const cls = r.outcome === "win" ? "good" : r.outcome === "loss" ? "bad" : "warn";
         let line = `<span class="pill ${cls}">${label}</span> `;
