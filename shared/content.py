@@ -134,6 +134,7 @@ class EquipmentDef(BaseModel):
     weapon_type: str | None = None    # 武器類別：katar 等；None = 一般
     two_handed: bool = False          # 雙手武器，不能同時裝副手（盾）
     card_slots: int = Field(default=0, ge=0, le=4)
+    effects: list[dict] = Field(default_factory=list)  # MVP 神裝內建效果（同卡片格式）
     job_ids: list[str] = Field(default_factory=list)   # 空 = 全職可用
     required_level: int = Field(default=1, ge=1)
     npc_buy: int | None = None    # NPC 售價（None = NPC 不賣）

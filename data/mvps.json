@@ -1027,6 +1027,10 @@
         "rate": 0.02
       },
       {
+        "item_id": "phreeoni_talisman",
+        "rate": 0.16
+      },
+      {
         "item_id": "elunium",
         "rate": 0.4
       },
@@ -1066,6 +1070,10 @@
       {
         "item_id": "eddga_card",
         "rate": 0.02
+      },
+      {
+        "item_id": "eddga_tights",
+        "rate": 0.18
       },
       {
         "item_id": "coal",
@@ -1150,6 +1158,10 @@
         "rate": 0.02
       },
       {
+        "item_id": "orc_hero_helm",
+        "rate": 0.18
+      },
+      {
         "item_id": "oridecon",
         "rate": 0.4
       },
@@ -1232,6 +1244,10 @@
         "rate": 0.02
       },
       {
+        "item_id": "sword_of_the_sun",
+        "rate": 0.15
+      },
+      {
         "item_id": "elunium",
         "rate": 0.4
       },
@@ -1271,6 +1287,10 @@
       {
         "item_id": "baphomet_card",
         "rate": 0.02
+      },
+      {
+        "item_id": "baphomet_trident",
+        "rate": 0.15
       },
       {
         "item_id": "oridecon",
@@ -1314,6 +1334,10 @@
         "rate": 0.02
       },
       {
+        "item_id": "death_cloak",
+        "rate": 0.15
+      },
+      {
         "item_id": "cursed_ruby",
         "rate": 0.4
       },
@@ -1353,6 +1377,10 @@
       {
         "item_id": "tao_gunka_card",
         "rate": 0.02
+      },
+      {
+        "item_id": "tao_greatsword",
+        "rate": 0.12
       },
       {
         "item_id": "elunium",
@@ -1396,6 +1424,10 @@
         "rate": 0.02
       },
       {
+        "item_id": "infiltrator",
+        "rate": 0.13
+      },
+      {
         "item_id": "elunium",
         "rate": 0.4
       },
@@ -1437,6 +1469,10 @@
         "rate": 0.02
       },
       {
+        "item_id": "ice_falchion",
+        "rate": 0.14
+      },
+      {
         "item_id": "oridecon",
         "rate": 0.4
       },
@@ -1476,6 +1512,10 @@
       {
         "item_id": "gloom_under_night_card",
         "rate": 0.02
+      },
+      {
+        "item_id": "nightmare_katar",
+        "rate": 0.13
       },
       {
         "item_id": "elunium",

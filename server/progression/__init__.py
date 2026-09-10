@@ -57,13 +57,15 @@ def _card_flat_stats(content, pieces: list) -> dict:
     （str/agi/…/atk/defense/aspd/crit/max_hp…），在 STR→衍生數值計算之前併進去。"""
     acc: dict = {}
     for piece in pieces:
+        eq = content.equipment.get(piece.equipment_id)
+        srcs = list(eq.effects) if eq else []
         for cid in piece.card_ids:
             card = content.cards.get(cid)
-            if not card:
-                continue
-            for eff in card.effects:
-                if eff.get("type") == "flat_stat":
-                    acc[eff["stat"]] = acc.get(eff["stat"], 0) + eff["amount"]
+            if card:
+                srcs.extend(card.effects)
+        for eff in srcs:
+            if eff.get("type") == "flat_stat":
+                acc[eff["stat"]] = acc.get(eff["stat"], 0) + eff["amount"]
     return acc
 
 
@@ -76,11 +78,8 @@ def _apply_card_effects(content, pieces: list, derived: dict) -> dict:
     for piece in pieces:
         eq = content.equipment.get(piece.equipment_id)
         slot = eq.slot if eq else None
-        for cid in piece.card_ids:
-            card = content.cards.get(cid)
-            if not card:
-                continue
-            for eff in card.effects:
+
+        def _apply(eff):
                 t = eff.get("type")
                 if t == "percent_stat":
                     base = derived.get(eff["stat"], 0)
@@ -121,6 +120,15 @@ def _apply_card_effects(content, pieces: list, derived: dict) -> dict:
                             "effects": sk.effects,
                             "chance_pct": eff.get("chance_pct", 5),
                             "level": eff.get("level", 1)})
+
+        # 裝備本身帶的效果（MVP 神裝）先套，再套鑲在上面的卡片
+        for eff in (eq.effects if eq else []):
+            _apply(eff)
+        for cid in piece.card_ids:
+            card = content.cards.get(cid)
+            if card:
+                for eff in card.effects:
+                    _apply(eff)
     return combat
 
 

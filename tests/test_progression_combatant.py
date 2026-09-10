@@ -183,6 +183,21 @@ def test_card_special_effects_wire_into_combatant():
     assert sin({"g": ["whisper_card"]}).perfect_dodge == 3
 
 
+def test_mvp_gear_builtin_effects_wire_into_combatant():
+    """MVP 神裝自帶的 effects（不是鑲卡）也要生效。"""
+    c = load_content()
+
+    def hero(weapon):
+        return build_player_combatant(CharacterSnapshot(
+            name="P", job_id="knight", base_level=80, job_level=50,
+            stats={"str": 70, "agi": 30, "vit": 60, "int": 5, "dex": 50, "luk": 10},
+            learned_skills={}, equipped=[EquippedPiece(weapon, 0, [])]), c)
+
+    assert hero("sword_of_the_sun").attack_element == "fire"
+    assert hero("sword_of_the_sun").race_bonus.get("undead") == 30
+    assert hero("baphomet_trident").procs.get("extra_hit") == 10
+
+
 def test_on_hit_poison_card_applies_dot():
     import random
     from server.combat import simulate_fight

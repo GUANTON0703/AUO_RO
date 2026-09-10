@@ -222,6 +222,9 @@ function gearDesc(id) {
     const st = Object.entries(eq.stats || {}).map(([k, v]) =>
       `${STAT_ZH[k] || k} ${v > 0 ? "+" : ""}${v}`);
     if (st.length) parts.push(st.join(" "));
+    if (eq.element && eq.element !== "neutral") parts.push(`${ELEM_ZH[eq.element] || eq.element}屬`);
+    const efx = (eq.effects || []).map(effectText).filter(Boolean).join("、");
+    if (efx) parts.push(efx);
     if (eq.required_level > 1) parts.push(`需 Lv ${eq.required_level}`);
     const jobs = eq.job_ids || [];
     parts.push(jobs.length ? "限 " + jobs.map(jobName).join("/") : "全職業");
