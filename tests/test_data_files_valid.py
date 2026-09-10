@@ -139,7 +139,7 @@ def test_mvp_beatable_by_geared_same_level_player():
         r = simulate_fight(hero, Combatant.from_monster(mvp), rng=random.Random(0),
                            max_rounds=300)
         assert r.winner == hero.name, f"{mvp.name} 同級養好的劍士打不贏"
-        assert 10 <= r.rounds <= 250, f"{mvp.name} 戰鬥 {r.rounds} 回合，不在合理範圍"
+        assert 5 <= r.rounds <= 250, f"{mvp.name} 戰鬥 {r.rounds} 回合，不在合理範圍"
 
 
 def test_starter_weapon_per_job_buyable():

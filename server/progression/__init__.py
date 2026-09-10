@@ -3,6 +3,20 @@ from dataclasses import dataclass, field
 from server.combat.combatant import Combatant, ResolvedSkill
 from server.loot import refine as refine_mod
 
+# 武器類別 → (攻擊主屬性, 基礎攻速, 爆擊率倍率)。對齊 Pre-Renewal RO 的手感：
+# 短劍/拳刃最快、雙手武器最慢、弓吃 DEX、法杖走 MATK。
+WEAPON_PROFILE = {
+    "dagger":  ("str", 135, 1.0),
+    "sword":   ("str", 125, 1.0),
+    "axe":     ("str", 116, 1.0),
+    "mace":    ("str", 120, 1.0),
+    "twohand": ("str", 108, 1.0),
+    "katar":   ("str", 130, 1.6),   # 拳刃爆擊率提高（刺客爆擊流核心）
+    "bow":     ("dex", 122, 1.0),
+    "staff":   ("str", 112, 1.0),   # 法師靠 MATK，物理攻擊本來就低
+}
+_DEFAULT_WEAPON = ("str", 118, 1.0)
+
 
 @dataclass
 class EquippedPiece:
@@ -135,22 +149,27 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     weapon = next((content.equipment.get(p.equipment_id) for p in snap.equipped
                    if content.equipment.get(p.equipment_id)
                    and content.equipment[p.equipment_id].slot == "weapon"), None)
-    # 弓的傷害主屬性是 DEX（原版 RO），近戰是 STR
-    if weapon and weapon.weapon_type == "bow":
-        atk_main, atk_sub = DEX, STR
-    else:
-        atk_main, atk_sub = STR, DEX
+    wt = weapon.weapon_type if weapon else None
+    atk_stat, base_aspd, crit_rate_mult = WEAPON_PROFILE.get(wt, _DEFAULT_WEAPON)
+    # 攻擊主屬性照武器類型（原版 RO：近戰 STR、弓 DEX、法杖走 MATK）
+    _pool = {"str": STR, "dex": DEX}
+    atk_main = _pool.get(atk_stat, STR)
+    atk_sub = DEX if atk_stat == "str" else STR
+    # 原版：武器攻擊 × (1 + 主屬性/200)，其他攻擊來源（卡片/飾品）不吃這個加成
+    weapon_atk = weapon.stats.get("atk", 0) if weapon else 0
+    scaled_weapon = weapon_atk * (1 + atk_main / 200)
     atk = round((atk_main + (atk_main // 10) ** 2 + atk_sub // 5 + LUK // 5
-                 + eq.get("atk", 0) + passives.get("atk", 0)) * (1 + lv / 50))
+                 + scaled_weapon + (eq.get("atk", 0) - weapon_atk)
+                 + passives.get("atk", 0)) * (1 + lv / 50))
     matk = round((INT + (INT // 7) ** 2 + eq.get("matk", 0)
                   + passives.get("matk", 0)) * (1 + lv / 50))
     defense = min(400, eq.get("defense", 0) + VIT // 2 + passives.get("defense", 0))
     mdef = min(400, eq.get("mdef", 0) + INT // 2 + passives.get("mdef", 0))
-    hit = snap.base_level + DEX + eq.get("hit", 0) + passives.get("hit", 0)
-    flee = snap.base_level + AGI + eq.get("flee", 0) + passives.get("flee", 0)
-    aspd = min(193, round(100 + AGI * 0.7 + DEX * 0.15 + eq.get("aspd", 0)
+    hit = snap.base_level + DEX + LUK // 3 + eq.get("hit", 0) + passives.get("hit", 0)
+    flee = snap.base_level + AGI + LUK // 5 + eq.get("flee", 0) + passives.get("flee", 0)
+    aspd = min(193, round(base_aspd + AGI * 0.55 + DEX * 0.12 + eq.get("aspd", 0)
                           + passives.get("aspd", 0)))
-    crit = round(LUK / 3) + eq.get("crit", 0) + passives.get("crit", 0)
+    crit = round(LUK * 0.3 * crit_rate_mult) + eq.get("crit", 0) + passives.get("crit", 0)
     max_hp += passives.get("max_hp", 0) + eq.get("max_hp", 0)
     max_sp += passives.get("max_sp", 0) + eq.get("max_sp", 0)
 
@@ -162,7 +181,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     # 攻擊屬性：武器本身屬性 → 附魔卡覆蓋
     attack_element = combat_mods["atk_element"] or (
         weapon.element if weapon else "neutral")
-    crit_mult = 1.75 if (weapon and weapon.weapon_type == "katar") else 1.4
+    crit_mult = 1.6 if (weapon and weapon.weapon_type == "katar") else 1.4
 
     resolved = []
     for sid, lvl in snap.learned_skills.items():

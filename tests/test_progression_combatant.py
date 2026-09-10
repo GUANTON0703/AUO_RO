@@ -17,8 +17,8 @@ def test_derived_stats_from_primary():
     assert cb.name == "測試"
     assert cb.max_hp > 40
     assert cb.atk >= 30
-    assert cb.hit == 15 + 18
-    assert cb.flee == 15 + 15
+    assert cb.hit == 15 + 18 + 8 // 3  # base + DEX + LUK//3
+    assert cb.flee == 15 + 15 + 8 // 5  # base + AGI + LUK//5
     assert 100 <= cb.aspd <= 193
 
 
