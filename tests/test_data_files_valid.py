@@ -130,7 +130,7 @@ def test_mvp_beatable_by_geared_same_level_player():
             name="P", job_id="swordman", base_level=lv, job_level=min(lv, 50),
             stats={"str": lv + 25, "agi": lv // 2, "vit": lv + 2,
                    "int": 5, "dex": lv + 5, "luk": lv // 3},
-            learned_skills={"bash": 5, "sword_mastery": 5,
+            learned_skills={"bash": 10, "sword_mastery": 10,
                             "bowling_bash": 5, "twohand_quicken": 5},
             equipped=[EquippedPiece(weapon, 5, weapon_cards),
                       EquippedPiece(armor, 5, []),
