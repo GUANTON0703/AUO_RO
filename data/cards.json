@@ -163,5 +163,17 @@
   {"id": "maero_of_thanatos_card", "name": "塔納托斯的憤怒卡片", "monster_id": "maero_of_thanatos", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "demon", "pct": 22}]},
   {"id": "apocalypse_card", "name": "阿波卡利普斯卡片", "monster_id": "apocalypse", "slot": "weapon", "drop_rate": 0.03, "effects": [{"type": "race_damage", "race": "formless", "pct": 22}]},
   {"id": "valkyrie_randgris_card", "name": "女武神蘭德古利斯卡片", "monster_id": "valkyrie_randgris", "slot": "armor", "drop_rate": 0.03, "effects": [{"type": "element_resist", "element": "holy", "pct": 20}]},
-  {"id": "hyegun_card", "name": "犬妖卡片", "monster_id": "hyegun", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "str", "amount": 3}]}
+  {"id": "hyegun_card", "name": "犬妖卡片", "monster_id": "hyegun", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "str", "amount": 3}]},
+  {"id": "phreeoni_card", "name": "皮里恩卡片", "monster_id": "phreeoni", "slot": "accessory", "drop_rate": 0.02, "effects": [{"type": "flat_stat", "stat": "hit", "amount": 25}]},
+  {"id": "eddga_card", "name": "艾多加卡片", "monster_id": "eddga", "slot": "shoes", "drop_rate": 0.02, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 25}]},
+  {"id": "maya_card", "name": "瑪雅卡片", "monster_id": "maya", "slot": "armor", "drop_rate": 0.02, "effects": [{"type": "reflect_damage", "pct": 25}, {"type": "flat_stat", "stat": "mdef", "amount": 6}]},
+  {"id": "orc_hero_card", "name": "奧克英雄卡片", "monster_id": "orc_hero", "slot": "head", "drop_rate": 0.02, "effects": [{"type": "status_immune", "status": "stun"}, {"type": "flat_stat", "stat": "vit", "amount": 3}]},
+  {"id": "mistress_card", "name": "米斯特雷斯卡片", "monster_id": "mistress", "slot": "accessory", "drop_rate": 0.02, "effects": [{"type": "percent_stat", "stat": "max_sp", "pct": 10}, {"type": "flat_stat", "stat": "matk", "amount": 5}]},
+  {"id": "osiris_card", "name": "奧西里斯卡片", "monster_id": "osiris", "slot": "accessory", "drop_rate": 0.02, "effects": [{"type": "on_kill_recover", "hp_pct": 12}, {"type": "status_immune", "status": "curse"}]},
+  {"id": "baphomet_card", "name": "巴風特卡片", "monster_id": "baphomet", "slot": "weapon", "drop_rate": 0.02, "effects": [{"type": "flat_stat", "stat": "atk", "amount": 20}, {"type": "on_hit_proc", "effect": "extra_hit", "chance_pct": 20}]},
+  {"id": "lord_of_death_card", "name": "死亡之王卡片", "monster_id": "lord_of_death", "slot": "weapon", "drop_rate": 0.02, "effects": [{"type": "on_hit_proc", "effect": "stun", "chance_pct": 5}, {"type": "on_hit_proc", "effect": "curse", "chance_pct": 5}]},
+  {"id": "tao_gunka_card", "name": "道貢卡卡片", "monster_id": "tao_gunka", "slot": "armor", "drop_rate": 0.02, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 50}, {"type": "percent_stat", "stat": "defense", "pct": -50}, {"type": "percent_stat", "stat": "mdef", "pct": -50}]},
+  {"id": "rsx_0806_card", "name": "RSX-0806卡片", "monster_id": "rsx_0806", "slot": "armor", "drop_rate": 0.02, "effects": [{"type": "status_immune", "status": "stun"}, {"type": "flat_stat", "stat": "defense", "amount": 8}]},
+  {"id": "detardeurus_card", "name": "化石雷龍卡片", "monster_id": "detardeurus", "slot": "armor", "drop_rate": 0.02, "effects": [{"type": "element_resist", "element": "fire", "pct": 30}, {"type": "status_immune", "status": "freeze"}]},
+  {"id": "gloom_under_night_card", "name": "冥岩龍卡片", "monster_id": "gloom_under_night", "slot": "weapon", "drop_rate": 0.02, "effects": [{"type": "race_damage", "race": "angel", "pct": 30}, {"type": "race_damage", "race": "demon", "pct": 30}]}
 ]

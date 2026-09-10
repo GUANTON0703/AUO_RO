@@ -995,5 +995,497 @@
       }
     ],
     "lore": "奧丁神殿內殿的守護女武神，聖翼展開時連空氣都被淨化。"
+  },
+  {
+    "id": "phreeoni",
+    "name": "皮里恩",
+    "level": 48,
+    "element": "neutral",
+    "race": "animal",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 13000,
+    "job_exp": 6500,
+    "cooldown_hours": 8,
+    "home_map_id": "morroc_field",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 6645,
+      "max_sp": 0,
+      "atk": 92,
+      "matk": 57,
+      "defense": 55,
+      "mdef": 14,
+      "hit": 141,
+      "flee": 53,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "phreeoni_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "elunium",
+        "rate": 0.4
+      },
+      {
+        "item_id": "oridecon",
+        "rate": 0.3
+      }
+    ],
+    "lore": "潛藏在沙漠邊境的巨獸，用長舌捲食任何靠近的冒險者。"
+  },
+  {
+    "id": "eddga",
+    "name": "艾多加",
+    "level": 50,
+    "element": "fire",
+    "race": "animal",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 15000,
+    "job_exp": 7500,
+    "cooldown_hours": 8,
+    "home_map_id": "goblin_forest",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 7130,
+      "max_sp": 0,
+      "atk": 97,
+      "matk": 59,
+      "defense": 58,
+      "mdef": 15,
+      "hit": 146,
+      "flee": 55,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "eddga_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "coal",
+        "rate": 0.4
+      },
+      {
+        "item_id": "elunium",
+        "rate": 0.3
+      }
+    ],
+    "lore": "火紋斑斕的猛虎，據說牠的毛皮永遠帶著餘燼的溫度。"
+  },
+  {
+    "id": "maya",
+    "name": "瑪雅",
+    "level": 52,
+    "element": "earth",
+    "race": "insect",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 16500,
+    "job_exp": 8250,
+    "cooldown_hours": 8,
+    "home_map_id": "ant_hell_3f",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 7632,
+      "max_sp": 0,
+      "atk": 102,
+      "matk": 62,
+      "defense": 60,
+      "mdef": 16,
+      "hit": 150,
+      "flee": 57,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "maya_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "elunium",
+        "rate": 0.4
+      },
+      {
+        "item_id": "oridecon",
+        "rate": 0.3
+      }
+    ],
+    "lore": "蟻獄最深處的巨型女王蜂，甲殼堅硬得能彈開刀刃。"
+  },
+  {
+    "id": "orc_hero",
+    "name": "奧克英雄",
+    "level": 52,
+    "element": "earth",
+    "race": "demihuman",
+    "size": "medium",
+    "role": "boss",
+    "base_exp": 16500,
+    "job_exp": 8250,
+    "cooldown_hours": 8,
+    "home_map_id": "orc_dungeon",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 7632,
+      "max_sp": 0,
+      "atk": 102,
+      "matk": 62,
+      "defense": 60,
+      "mdef": 16,
+      "hit": 150,
+      "flee": 57,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "orc_hero_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "oridecon",
+        "rate": 0.4
+      },
+      {
+        "item_id": "elunium",
+        "rate": 0.3
+      }
+    ],
+    "lore": "獨眼的獸人戰士，是整個部落公認最強的勇者。"
+  },
+  {
+    "id": "mistress",
+    "name": "米斯特雷斯",
+    "level": 53,
+    "element": "wind",
+    "race": "insect",
+    "size": "small",
+    "role": "boss",
+    "base_exp": 17000,
+    "job_exp": 8500,
+    "cooldown_hours": 8,
+    "home_map_id": "ant_hell_2f",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 7889,
+      "max_sp": 0,
+      "atk": 104,
+      "matk": 62,
+      "defense": 61,
+      "mdef": 16,
+      "hit": 153,
+      "flee": 58,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "mistress_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "royal_jelly",
+        "rate": 0.4
+      },
+      {
+        "item_id": "elunium",
+        "rate": 0.3
+      }
+    ],
+    "lore": "頭戴王冠的蜂群主宰，身邊永遠環繞著護衛的工蜂。"
+  },
+  {
+    "id": "osiris",
+    "name": "奧西里斯",
+    "level": 68,
+    "element": "undead",
+    "race": "undead",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 34000,
+    "job_exp": 17000,
+    "cooldown_hours": 8,
+    "home_map_id": "pyramid_b1",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 12259,
+      "max_sp": 0,
+      "atk": 143,
+      "matk": 79,
+      "defense": 79,
+      "mdef": 20,
+      "hit": 192,
+      "flee": 73,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "osiris_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "elunium",
+        "rate": 0.4
+      },
+      {
+        "item_id": "oridecon",
+        "rate": 0.3
+      }
+    ],
+    "lore": "金字塔深處甦醒的冥界之王，凝視祂的人都會被詛咒纏身。"
+  },
+  {
+    "id": "baphomet",
+    "name": "巴風特",
+    "level": 81,
+    "element": "shadow",
+    "race": "demon",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 50000,
+    "job_exp": 25000,
+    "cooldown_hours": 8,
+    "home_map_id": "gh_abbey",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 16819,
+      "max_sp": 0,
+      "atk": 181,
+      "matk": 94,
+      "defense": 94,
+      "mdef": 24,
+      "hit": 225,
+      "flee": 86,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "baphomet_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "oridecon",
+        "rate": 0.4
+      },
+      {
+        "item_id": "cursed_ruby",
+        "rate": 0.3
+      }
+    ],
+    "lore": "揮舞巨大鐮刀的魔王，格拉斯特修道院的鐘聲再也喚不回祂的理智。"
+  },
+  {
+    "id": "lord_of_death",
+    "name": "死亡之王",
+    "level": 86,
+    "element": "undead",
+    "race": "demon",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 65000,
+    "job_exp": 32500,
+    "cooldown_hours": 8,
+    "home_map_id": "nifflheim_shrine",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 18765,
+      "max_sp": 0,
+      "atk": 196,
+      "matk": 100,
+      "defense": 99,
+      "mdef": 26,
+      "hit": 237,
+      "flee": 91,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "lord_of_death_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "cursed_ruby",
+        "rate": 0.4
+      },
+      {
+        "item_id": "oridecon",
+        "rate": 0.3
+      }
+    ],
+    "lore": "徘徊在死者之國神殿的收魂者，祂的鐮刀一揮便帶走生機。"
+  },
+  {
+    "id": "tao_gunka",
+    "name": "道貢卡",
+    "level": 90,
+    "element": "earth",
+    "race": "demon",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 81000,
+    "job_exp": 40500,
+    "cooldown_hours": 8,
+    "home_map_id": "turtle_island_field",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 20398,
+      "max_sp": 0,
+      "atk": 208,
+      "matk": 104,
+      "defense": 104,
+      "mdef": 27,
+      "hit": 248,
+      "flee": 95,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "tao_gunka_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "elunium",
+        "rate": 0.4
+      },
+      {
+        "item_id": "oridecon",
+        "rate": 0.3
+      }
+    ],
+    "lore": "龜之島上體型如小山的魔物，血肉之厚讓一切防備都顯得多餘。"
+  },
+  {
+    "id": "rsx_0806",
+    "name": "RSX-0806",
+    "level": 90,
+    "element": "earth",
+    "race": "formless",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 81000,
+    "job_exp": 40500,
+    "cooldown_hours": 8,
+    "home_map_id": "juperos_1f",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 20398,
+      "max_sp": 0,
+      "atk": 208,
+      "matk": 104,
+      "defense": 104,
+      "mdef": 27,
+      "hit": 248,
+      "flee": 95,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "rsx_0806_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "elunium",
+        "rate": 0.4
+      },
+      {
+        "item_id": "oridecon",
+        "rate": 0.3
+      }
+    ],
+    "lore": "朱佩羅斯遺跡中仍在運作的古代守衛機械，撞擊聲響徹整座金屬迷宮。"
+  },
+  {
+    "id": "detardeurus",
+    "name": "化石雷龍",
+    "level": 92,
+    "element": "fire",
+    "race": "dragon",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 83000,
+    "job_exp": 41500,
+    "cooldown_hours": 8,
+    "home_map_id": "ice_dungeon_2f",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 21240,
+      "max_sp": 0,
+      "atk": 215,
+      "matk": 107,
+      "defense": 106,
+      "mdef": 28,
+      "hit": 252,
+      "flee": 97,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "detardeurus_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "oridecon",
+        "rate": 0.4
+      },
+      {
+        "item_id": "elunium",
+        "rate": 0.3
+      }
+    ],
+    "lore": "冰洞深處凍結千年的古龍，吐息裡仍殘留著岩漿般的高熱。"
+  },
+  {
+    "id": "gloom_under_night",
+    "name": "冥岩龍",
+    "level": 95,
+    "element": "shadow",
+    "race": "demon",
+    "size": "large",
+    "role": "boss",
+    "base_exp": 85000,
+    "job_exp": 42500,
+    "cooldown_hours": 8,
+    "home_map_id": "odin_temple_1f",
+    "is_mvp": true,
+    "stats": {
+      "max_hp": 22534,
+      "max_sp": 0,
+      "atk": 225,
+      "matk": 110,
+      "defense": 110,
+      "mdef": 28,
+      "hit": 261,
+      "flee": 100,
+      "aspd": 110,
+      "crit": 5
+    },
+    "drops": [
+      {
+        "item_id": "gloom_under_night_card",
+        "rate": 0.02
+      },
+      {
+        "item_id": "elunium",
+        "rate": 0.4
+      },
+      {
+        "item_id": "oridecon",
+        "rate": 0.3
+      }
+    ],
+    "lore": "只在無月之夜現身的聖域守護者，對天使與惡魔一視同仁地降下制裁。"
   }
 ]

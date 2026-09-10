@@ -77,7 +77,7 @@
     "town": "morroc",
     "level_range": [15, 35],
     "monster_ids": ["desert_condor", "desert_wolf", "peco_peco", "metaller", "sand_man"],
-    "mvp_id": null,
+    "mvp_id": "phreeoni",
     "unlock_base_level": 14
   },
   {
@@ -95,7 +95,7 @@
     "town": "morroc",
     "level_range": [20, 36],
     "monster_ids": ["andre", "piere", "deniro", "sand_man"],
-    "mvp_id": null,
+    "mvp_id": "mistress",
     "unlock_base_level": 22
   },
   {
@@ -176,7 +176,7 @@
     "town": "geffen",
     "level_range": [28, 44],
     "monster_ids": ["goblin", "goblin_archer", "hound", "savage"],
-    "mvp_id": null,
+    "mvp_id": "eddga",
     "unlock_base_level": 28
   },
   {
@@ -185,7 +185,7 @@
     "town": "geffen",
     "level_range": [32, 50],
     "monster_ids": ["orc_zombie", "orc_skeleton", "high_orc", "orc_warrior"],
-    "mvp_id": null,
+    "mvp_id": "orc_hero",
     "unlock_base_level": 32
   },
   {
@@ -257,7 +257,7 @@
     "town": "morroc",
     "level_range": [26, 42],
     "monster_ids": ["soldier_ant", "maya_purple", "andre", "deniro"],
-    "mvp_id": null,
+    "mvp_id": "maya",
     "unlock_base_level": 26
   },
   {
@@ -275,7 +275,7 @@
     "town": "morroc",
     "level_range": [48, 60],
     "monster_ids": ["minorous", "ancient_mummy", "anubis", "side_winder"],
-    "mvp_id": null,
+    "mvp_id": "osiris",
     "unlock_base_level": 48
   },
   {
@@ -410,7 +410,7 @@
     "town": "aldebaran",
     "level_range": [60, 68],
     "monster_ids": ["evil_druid", "wraith", "evil_nymph", "hunter_fly"],
-    "mvp_id": null,
+    "mvp_id": "baphomet",
     "unlock_base_level": 60
   },
   {
@@ -446,7 +446,7 @@
     "town": "nifflheim",
     "level_range": [64, 72],
     "monster_ids": ["loli_ruri", "disguise", "nightmare_terror", "evil_nymph"],
-    "mvp_id": null,
+    "mvp_id": "lord_of_death",
     "unlock_base_level": 67
   },
   {
@@ -455,7 +455,7 @@
     "town": "aldebaran",
     "level_range": [72, 80],
     "monster_ids": ["assaulter", "solider", "freezer", "heater"],
-    "mvp_id": null,
+    "mvp_id": "tao_gunka",
     "unlock_base_level": 72
   },
   {
@@ -482,7 +482,7 @@
     "town": "aldebaran",
     "level_range": [78, 85],
     "monster_ids": ["snowier", "gazeti", "ice_titan"],
-    "mvp_id": null,
+    "mvp_id": "detardeurus",
     "unlock_base_level": 78
   },
   {
@@ -527,7 +527,7 @@
     "town": "aldebaran",
     "level_range": [83, 91],
     "monster_ids": ["archdam", "venatu", "dimik"],
-    "mvp_id": null,
+    "mvp_id": "rsx_0806",
     "unlock_base_level": 85
   },
   {
@@ -545,7 +545,7 @@
     "town": "aldebaran",
     "level_range": [85, 93],
     "monster_ids": ["frus", "horn_scaraba", "skogul"],
-    "mvp_id": null,
+    "mvp_id": "gloom_under_night",
     "unlock_base_level": 87
   },
   {
