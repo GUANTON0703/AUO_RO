@@ -132,8 +132,16 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     lv = snap.base_level
     max_hp = round((40 + lv * job.hp_per_level * (1.5 + lv / 12)) * (1 + VIT / 60))
     max_sp = round((11 + lv * job.sp_per_level * (1.2 + lv / 25)) * (1 + INT / 80))
-    atk = round((STR + (STR // 10) ** 2 + DEX // 5 + LUK // 5 + eq.get("atk", 0)
-                 + passives.get("atk", 0)) * (1 + lv / 50))
+    weapon = next((content.equipment.get(p.equipment_id) for p in snap.equipped
+                   if content.equipment.get(p.equipment_id)
+                   and content.equipment[p.equipment_id].slot == "weapon"), None)
+    # 弓的傷害主屬性是 DEX（原版 RO），近戰是 STR
+    if weapon and weapon.weapon_type == "bow":
+        atk_main, atk_sub = DEX, STR
+    else:
+        atk_main, atk_sub = STR, DEX
+    atk = round((atk_main + (atk_main // 10) ** 2 + atk_sub // 5 + LUK // 5
+                 + eq.get("atk", 0) + passives.get("atk", 0)) * (1 + lv / 50))
     matk = round((INT + (INT // 7) ** 2 + eq.get("matk", 0)
                   + passives.get("matk", 0)) * (1 + lv / 50))
     defense = min(400, eq.get("defense", 0) + VIT // 2 + passives.get("defense", 0))
@@ -152,9 +160,6 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     combat_mods = _apply_card_effects(content, snap.equipped, derived)
 
     # 攻擊屬性：武器本身屬性 → 附魔卡覆蓋
-    weapon = next((content.equipment.get(p.equipment_id) for p in snap.equipped
-                   if content.equipment.get(p.equipment_id)
-                   and content.equipment[p.equipment_id].slot == "weapon"), None)
     attack_element = combat_mods["atk_element"] or (
         weapon.element if weapon else "neutral")
     crit_mult = 1.75 if (weapon and weapon.weapon_type == "katar") else 1.4

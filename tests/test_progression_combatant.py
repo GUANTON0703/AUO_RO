@@ -150,3 +150,15 @@ def test_stale_hp_clamped_to_new_max():
     cb = build_player_combatant(_snap(equipped=[], hp=999999, sp=999999), c)
     assert cb.hp == cb.max_hp
     assert cb.sp == cb.max_sp
+
+
+def test_bow_atk_scales_with_dex_not_str():
+    c = load_content()
+
+    def archer(dex, str_):
+        return build_player_combatant(CharacterSnapshot(
+            name="弓", job_id="archer", base_level=40, job_level=40,
+            stats={"str": str_, "agi": 20, "vit": 20, "int": 5, "dex": dex, "luk": 8},
+            learned_skills={}, equipped=[EquippedPiece("hunter_bow", 0, [])]), c)
+
+    assert archer(dex=60, str_=10).atk > archer(dex=10, str_=60).atk
