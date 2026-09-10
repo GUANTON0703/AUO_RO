@@ -200,10 +200,10 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         if k not in ("str", "agi", "vit", "int", "dex", "luk"):
             passives[k] = passives.get(k, 0) + v
 
-    # HP/SP 隨等級加速成長（配合怪物 HP 公式的 level² 項），玩家才打得動同級怪
+    # HP/SP：Pre-Renewal 尺度（lv99 騎士約 7500，不是 10000+）
     lv = snap.base_level
-    max_hp = round((40 + lv * job.hp_per_level * (1.5 + lv / 12)) * (1 + VIT / 60))
-    max_sp = round((11 + lv * job.sp_per_level * (1.2 + lv / 25)) * (1 + INT / 80))
+    max_hp = round((40 + lv * job.hp_per_level * (0.8 + lv / 32)) * (1 + VIT / 100))
+    max_sp = round((11 + lv * job.sp_per_level * (1.0 + lv / 32)) * (1 + INT / 80))
     weapon = next((content.equipment.get(p.equipment_id) for p in snap.equipped
                    if content.equipment.get(p.equipment_id)
                    and content.equipment[p.equipment_id].slot == "weapon"), None)
@@ -213,16 +213,18 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     _pool = {"str": STR, "dex": DEX}
     atk_main = _pool.get(atk_stat, STR)
     atk_sub = DEX if atk_stat == "str" else STR
-    # 原版：武器攻擊 × (1 + 主屬性/200)，其他攻擊來源（卡片/飾品）不吃這個加成
+    # Pre-Renewal 小數值：狀態 ATK 是加法小數，武器攻擊被主屬性放大。
+    # 拿掉了舊的 ×(1+lv/50) 全域倍率與 (STR//10)² 項。
     weapon_atk = weapon.stats.get("atk", 0) if weapon else 0
-    scaled_weapon = weapon_atk * (1 + atk_main / 200)
-    atk = round((atk_main + (atk_main // 10) ** 2 + atk_sub // 5 + LUK // 5
-                 + scaled_weapon + (eq.get("atk", 0) - weapon_atk)
-                 + passives.get("atk", 0)) * (1 + lv / 50))
-    matk = round((INT + (INT // 7) ** 2 + eq.get("matk", 0)
-                  + passives.get("matk", 0)) * (1 + lv / 50))
-    defense = min(400, eq.get("defense", 0) + VIT // 2 + passives.get("defense", 0))
-    mdef = min(400, eq.get("mdef", 0) + INT // 2 + passives.get("mdef", 0))
+    scaled_weapon = weapon_atk * (1 + atk_main / 150)
+    atk = round(atk_main + atk_sub // 5 + LUK // 5
+                + scaled_weapon + (eq.get("atk", 0) - weapon_atk)
+                + passives.get("atk", 0))
+    weapon_matk = weapon.stats.get("matk", 0) if weapon else 0
+    matk = round(INT + (INT // 8) ** 2 + eq.get("matk", 0)
+                 + passives.get("matk", 0))
+    defense = min(120, eq.get("defense", 0) + VIT // 2 + passives.get("defense", 0))
+    mdef = min(120, eq.get("mdef", 0) + INT // 3 + passives.get("mdef", 0))
     hit = snap.base_level + DEX + LUK // 3 + eq.get("hit", 0) + passives.get("hit", 0)
     flee = snap.base_level + AGI + LUK // 5 + eq.get("flee", 0) + passives.get("flee", 0)
     aspd = min(193, round(base_aspd + AGI * 0.55 + DEX * 0.12 + eq.get("aspd", 0)
@@ -269,7 +271,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     return Combatant(
         name=snap.name, max_hp=derived["max_hp"], max_sp=derived["max_sp"],
         atk=max(0, derived["atk"]), matk=max(0, derived["matk"]),
-        defense=max(0, min(400, derived["defense"])), mdef=max(0, min(400, derived["mdef"])),
+        defense=max(0, min(120, derived["defense"])), mdef=max(0, min(120, derived["mdef"])),
         hit=max(0, derived["hit"]), flee=max(0, derived["flee"]),
         aspd=max(1, min(193, aspd)), crit=max(0, derived["crit"]),
         is_caster=(derived["matk"] > derived["atk"]),

@@ -7,7 +7,7 @@ from server.content.monster_stats import baseline
 
 def test_lv1_glass_is_poring_ish():
     s = baseline(level=1, role="glass")
-    assert 40 <= s.max_hp <= 60
+    assert 30 <= s.max_hp <= 60
     assert 5 <= s.atk <= 14
     assert s.defense == 0
 

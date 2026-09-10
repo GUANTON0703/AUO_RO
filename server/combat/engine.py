@@ -94,8 +94,11 @@ def _one_hit(attacker, defender, rng, events):
                            element_multiplier=mult, soft_mdef=defender.soft_mdef,
                            resist_pct=resist, race_pct=race, rng=rng)
     else:
-        dmg = physical_damage(attacker.effective_atk, defender.effective_defense,
-                              element_multiplier=mult, soft_def=defender.soft_def,
+        # 經典 RO：爆擊無視目標 DEF（硬防與軟防都跳過）
+        tdef = 0 if crit else defender.effective_defense
+        tsoft = 0 if crit else defender.soft_def
+        dmg = physical_damage(attacker.effective_atk, tdef,
+                              element_multiplier=mult, soft_def=tsoft,
                               resist_pct=resist, race_pct=race, rng=rng)
     if crit:
         dmg = round(dmg * getattr(attacker, "crit_mult", CRIT_MULTIPLIER))

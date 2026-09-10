@@ -48,7 +48,7 @@
     "role": "tank",
     "base_exp": 3,
     "job_exp": 2,
-    "stats": {"max_hp": 150, "max_sp": 0, "atk": 0, "matk": 0, "defense": 22, "mdef": 1, "hit": 0, "flee": 0, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 121, "max_sp": 0, "atk": 0, "matk": 0, "defense": 22, "mdef": 1, "hit": 0, "flee": 0, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fluff", "rate": 0.55},
       {"item_id": "jellopy", "rate": 0.3},
@@ -835,7 +835,7 @@
     "role": "glass",
     "base_exp": 173,
     "job_exp": 86,
-    "stats": {"max_hp": 413, "max_sp": 0, "atk": 55, "matk": 22, "defense": 0, "mdef": 5, "hit": 39, "flee": 25, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 297, "max_sp": 0, "atk": 53, "matk": 22, "defense": 0, "mdef": 5, "hit": 39, "flee": 25, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fluff", "rate": 0.4},
       {"item_id": "talon", "rate": 0.2}
@@ -853,7 +853,7 @@
     "role": "glass",
     "base_exp": 189,
     "job_exp": 94,
-    "stats": {"max_hp": 448, "max_sp": 0, "atk": 59, "matk": 23, "defense": 0, "mdef": 5, "hit": 41, "flee": 26, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 323, "max_sp": 0, "atk": 56, "matk": 23, "defense": 0, "mdef": 5, "hit": 41, "flee": 26, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "feather", "rate": 0.5},
       {"item_id": "talon", "rate": 0.3},
@@ -872,7 +872,7 @@
     "role": "glass",
     "base_exp": 205,
     "job_exp": 102,
-    "stats": {"max_hp": 484, "max_sp": 0, "atk": 63, "matk": 25, "defense": 0, "mdef": 5, "hit": 43, "flee": 28, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 349, "max_sp": 0, "atk": 60, "matk": 25, "defense": 0, "mdef": 5, "hit": 43, "flee": 28, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "honey", "rate": 0.4},
       {"item_id": "clover", "rate": 0.25}
@@ -890,7 +890,7 @@
     "role": "normal",
     "base_exp": 240,
     "job_exp": 120,
-    "stats": {"max_hp": 800, "max_sp": 0, "atk": 54, "matk": 27, "defense": 6, "mdef": 6, "hit": 46, "flee": 25, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 580, "max_sp": 0, "atk": 51, "matk": 27, "defense": 6, "mdef": 6, "hit": 46, "flee": 25, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ant_jaw", "rate": 0.4},
       {"item_id": "jellopy", "rate": 0.3}
@@ -908,7 +908,7 @@
     "role": "tank",
     "base_exp": 305,
     "job_exp": 152,
-    "stats": {"max_hp": 1440, "max_sp": 0, "atk": 43, "matk": 27, "defense": 18, "mdef": 6, "hit": 46, "flee": 18, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1044, "max_sp": 0, "atk": 41, "matk": 27, "defense": 16, "mdef": 6, "hit": 46, "flee": 18, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.5},
       {"item_id": "sticky_mucus", "rate": 0.3},
@@ -927,7 +927,7 @@
     "role": "normal",
     "base_exp": 258,
     "job_exp": 129,
-    "stats": {"max_hp": 857, "max_sp": 0, "atk": 57, "matk": 28, "defense": 6, "mdef": 6, "hit": 48, "flee": 26, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 623, "max_sp": 0, "atk": 54, "matk": 28, "defense": 6, "mdef": 6, "hit": 48, "flee": 26, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "skel_bone", "rate": 0.5},
       {"item_id": "jellopy", "rate": 0.3},
@@ -946,7 +946,7 @@
     "role": "normal",
     "base_exp": 277,
     "job_exp": 138,
-    "stats": {"max_hp": 916, "max_sp": 0, "atk": 60, "matk": 29, "defense": 7, "mdef": 7, "hit": 49, "flee": 27, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 667, "max_sp": 0, "atk": 56, "matk": 29, "defense": 6, "mdef": 7, "hit": 49, "flee": 27, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ant_jaw", "rate": 0.4},
       {"item_id": "clover", "rate": 0.2}
@@ -964,7 +964,7 @@
     "role": "normal",
     "base_exp": 297,
     "job_exp": 148,
-    "stats": {"max_hp": 976, "max_sp": 0, "atk": 63, "matk": 31, "defense": 7, "mdef": 7, "hit": 51, "flee": 28, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 713, "max_sp": 0, "atk": 59, "matk": 31, "defense": 6, "mdef": 7, "hit": 51, "flee": 28, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ant_jaw", "rate": 0.4},
       {"item_id": "sticky_mucus", "rate": 0.25}
@@ -982,7 +982,7 @@
     "role": "normal",
     "base_exp": 381,
     "job_exp": 190,
-    "stats": {"max_hp": 1236, "max_sp": 0, "atk": 76, "matk": 35, "defense": 8, "mdef": 8, "hit": 58, "flee": 32, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 911, "max_sp": 0, "atk": 70, "matk": 35, "defense": 7, "mdef": 8, "hit": 58, "flee": 32, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "iron_ore", "rate": 0.35},
       {"item_id": "sticky_mucus", "rate": 0.3},
@@ -1001,7 +1001,7 @@
     "role": "normal",
     "base_exp": 240,
     "job_exp": 120,
-    "stats": {"max_hp": 800, "max_sp": 0, "atk": 54, "matk": 27, "defense": 6, "mdef": 6, "hit": 46, "flee": 25, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 580, "max_sp": 0, "atk": 51, "matk": 27, "defense": 6, "mdef": 6, "hit": 46, "flee": 25, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "feather", "rate": 0.4},
       {"item_id": "jellopy", "rate": 0.3},
@@ -1020,7 +1020,7 @@
     "role": "glass",
     "base_exp": 450,
     "job_exp": 225,
-    "stats": {"max_hp": 1015, "max_sp": 0, "atk": 113, "matk": 39, "defense": 0, "mdef": 9, "hit": 63, "flee": 42, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 752, "max_sp": 0, "atk": 102, "matk": 39, "defense": 0, "mdef": 9, "hit": 63, "flee": 42, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fluff", "rate": 0.35},
       {"item_id": "clover", "rate": 0.2},
@@ -1039,7 +1039,7 @@
     "role": "tank",
     "base_exp": 602,
     "job_exp": 301,
-    "stats": {"max_hp": 2745, "max_sp": 0, "atk": 73, "matk": 40, "defense": 28, "mdef": 9, "hit": 65, "flee": 25, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2039, "max_sp": 0, "atk": 65, "matk": 40, "defense": 26, "mdef": 9, "hit": 65, "flee": 25, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "iron_ore", "rate": 0.4},
       {"item_id": "jellopy", "rate": 0.3},
@@ -1058,7 +1058,7 @@
     "role": "normal",
     "base_exp": 605,
     "job_exp": 302,
-    "stats": {"max_hp": 1926, "max_sp": 0, "atk": 110, "matk": 46, "defense": 11, "mdef": 11, "hit": 73, "flee": 41, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1444, "max_sp": 0, "atk": 96, "matk": 46, "defense": 10, "mdef": 11, "hit": 73, "flee": 41, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.1},
@@ -1077,7 +1077,7 @@
     "role": "normal",
     "base_exp": 690,
     "job_exp": 345,
-    "stats": {"max_hp": 2846, "max_sp": 0, "atk": 122, "matk": 50, "defense": 12, "mdef": 12, "hit": 78, "flee": 44, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2144, "max_sp": 0, "atk": 106, "matk": 50, "defense": 11, "mdef": 12, "hit": 78, "flee": 44, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.45},
       {"item_id": "cursed_ruby", "rate": 0.1},
@@ -1097,7 +1097,7 @@
     "role": "tank",
     "base_exp": 992,
     "job_exp": 496,
-    "stats": {"max_hp": 5775, "max_sp": 0, "atk": 108, "matk": 53, "defense": 38, "mdef": 13, "hit": 83, "flee": 33, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4369, "max_sp": 0, "atk": 92, "matk": 53, "defense": 35, "mdef": 13, "hit": 83, "flee": 33, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "cursed_ruby", "rate": 0.15},
       {"item_id": "oridecon", "rate": 0.1},
@@ -1117,7 +1117,7 @@
     "role": "glass",
     "base_exp": 115,
     "job_exp": 58,
-    "stats": {"max_hp": 287, "max_sp": 0, "atk": 41, "matk": 17, "defense": 0, "mdef": 4, "hit": 32, "flee": 20, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 204, "max_sp": 0, "atk": 41, "matk": 17, "defense": 0, "mdef": 4, "hit": 32, "flee": 20, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fluff", "rate": 0.45},
       {"item_id": "clover", "rate": 0.3}
@@ -1135,7 +1135,7 @@
     "role": "normal",
     "base_exp": 173,
     "job_exp": 86,
-    "stats": {"max_hp": 590, "max_sp": 0, "atk": 42, "matk": 22, "defense": 5, "mdef": 5, "hit": 39, "flee": 21, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 424, "max_sp": 0, "atk": 41, "matk": 22, "defense": 4, "mdef": 5, "hit": 39, "flee": 21, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "mushroom_spore", "rate": 0.5},
       {"item_id": "sticky_mucus", "rate": 0.25}
@@ -1153,7 +1153,7 @@
     "role": "normal",
     "base_exp": 205,
     "job_exp": 102,
-    "stats": {"max_hp": 692, "max_sp": 0, "atk": 48, "matk": 25, "defense": 5, "mdef": 5, "hit": 43, "flee": 23, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 499, "max_sp": 0, "atk": 46, "matk": 25, "defense": 5, "mdef": 5, "hit": 43, "flee": 23, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "snake_skin", "rate": 0.45},
       {"item_id": "jellopy", "rate": 0.3}
@@ -1171,7 +1171,7 @@
     "role": "glass",
     "base_exp": 277,
     "job_exp": 138,
-    "stats": {"max_hp": 641, "max_sp": 0, "atk": 78, "matk": 29, "defense": 0, "mdef": 7, "hit": 49, "flee": 32, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 467, "max_sp": 0, "atk": 73, "matk": 29, "defense": 0, "mdef": 7, "hit": 49, "flee": 32, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "sticky_mucus", "rate": 0.4},
       {"item_id": "jellopy", "rate": 0.3},
@@ -1190,7 +1190,7 @@
     "role": "normal",
     "base_exp": 403,
     "job_exp": 202,
-    "stats": {"max_hp": 1306, "max_sp": 0, "atk": 80, "matk": 37, "defense": 8, "mdef": 8, "hit": 60, "flee": 33, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 964, "max_sp": 0, "atk": 73, "matk": 37, "defense": 8, "mdef": 8, "hit": 60, "flee": 33, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "trunk", "rate": 0.45},
       {"item_id": "clover", "rate": 0.25},
@@ -1209,7 +1209,7 @@
     "role": "normal",
     "base_exp": 450,
     "job_exp": 225,
-    "stats": {"max_hp": 1812, "max_sp": 0, "atk": 87, "matk": 39, "defense": 9, "mdef": 9, "hit": 63, "flee": 35, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1344, "max_sp": 0, "atk": 78, "matk": 39, "defense": 8, "mdef": 9, "hit": 63, "flee": 35, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.45},
       {"item_id": "rosary", "rate": 0.15},
@@ -1229,7 +1229,7 @@
     "role": "normal",
     "base_exp": 499,
     "job_exp": 250,
-    "stats": {"max_hp": 2002, "max_sp": 0, "atk": 94, "matk": 41, "defense": 10, "mdef": 10, "hit": 66, "flee": 37, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1490, "max_sp": 0, "atk": 84, "matk": 41, "defense": 9, "mdef": 10, "hit": 66, "flee": 37, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "skel_bone", "rate": 0.5},
       {"item_id": "oridecon", "rate": 0.06},
@@ -1249,7 +1249,7 @@
     "role": "normal",
     "base_exp": 578,
     "job_exp": 289,
-    "stats": {"max_hp": 1842, "max_sp": 0, "atk": 106, "matk": 45, "defense": 10, "mdef": 10, "hit": 72, "flee": 40, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1379, "max_sp": 0, "atk": 93, "matk": 45, "defense": 10, "mdef": 10, "hit": 72, "flee": 40, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "rosary", "rate": 0.2},
       {"item_id": "oridecon", "rate": 0.08},
@@ -1269,7 +1269,7 @@
     "role": "glass",
     "base_exp": 661,
     "job_exp": 330,
-    "stats": {"max_hp": 1470, "max_sp": 0, "atk": 153, "matk": 49, "defense": 0, "mdef": 11, "hit": 77, "flee": 52, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1105, "max_sp": 0, "atk": 133, "matk": 49, "defense": 0, "mdef": 11, "hit": 77, "flee": 52, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "skel_bone", "rate": 0.45},
       {"item_id": "feather", "rate": 0.3},
@@ -1290,7 +1290,7 @@
     "role": "tank",
     "base_exp": 914,
     "job_exp": 457,
-    "stats": {"max_hp": 5335, "max_sp": 0, "atk": 101, "matk": 51, "defense": 36, "mdef": 12, "hit": 80, "flee": 31, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4025, "max_sp": 0, "atk": 87, "matk": 51, "defense": 33, "mdef": 12, "hit": 80, "flee": 31, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "horrendous_mouth", "rate": 0.35},
       {"item_id": "decayed_nail", "rate": 0.4},
@@ -1309,7 +1309,7 @@
     "role": "normal",
     "base_exp": 813,
     "job_exp": 406,
-    "stats": {"max_hp": 2564, "max_sp": 0, "atk": 139, "matk": 55, "defense": 13, "mdef": 13, "hit": 85, "flee": 48, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1943, "max_sp": 0, "atk": 119, "matk": 55, "defense": 12, "mdef": 13, "hit": 85, "flee": 48, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "rosary", "rate": 0.25},
       {"item_id": "horrendous_mouth", "rate": 0.2},
@@ -1329,7 +1329,7 @@
     "role": "glass",
     "base_exp": 878,
     "job_exp": 439,
-    "stats": {"max_hp": 1934, "max_sp": 0, "atk": 192, "matk": 57, "defense": 0, "mdef": 14, "hit": 88, "flee": 60, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1469, "max_sp": 0, "atk": 163, "matk": 57, "defense": 0, "mdef": 14, "hit": 88, "flee": 60, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "rosary", "rate": 0.3},
       {"item_id": "oridecon", "rate": 0.12},
@@ -1348,7 +1348,7 @@
     "role": "normal",
     "base_exp": 1050,
     "job_exp": 525,
-    "stats": {"max_hp": 3948, "max_sp": 0, "atk": 171, "matk": 63, "defense": 15, "mdef": 15, "hit": 97, "flee": 55, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 3018, "max_sp": 0, "atk": 142, "matk": 63, "defense": 14, "mdef": 15, "hit": 97, "flee": 55, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fox_tail", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.12},
@@ -1368,7 +1368,7 @@
     "role": "glass",
     "base_exp": 90,
     "job_exp": 45,
-    "stats": {"max_hp": 231, "max_sp": 0, "atk": 35, "matk": 15, "defense": 0, "mdef": 3, "hit": 29, "flee": 18, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 164, "max_sp": 0, "atk": 34, "matk": 15, "defense": 0, "mdef": 3, "hit": 29, "flee": 18, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fluff", "rate": 0.4},
       {"item_id": "insect_leg", "rate": 0.3},
@@ -1387,7 +1387,7 @@
     "role": "glass",
     "base_exp": 143,
     "job_exp": 72,
-    "stats": {"max_hp": 347, "max_sp": 0, "atk": 48, "matk": 20, "defense": 0, "mdef": 4, "hit": 36, "flee": 23, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 248, "max_sp": 0, "atk": 47, "matk": 20, "defense": 0, "mdef": 4, "hit": 36, "flee": 23, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "honey", "rate": 0.35},
       {"item_id": "insect_leg", "rate": 0.3}
@@ -1405,7 +1405,7 @@
     "role": "normal",
     "base_exp": 173,
     "job_exp": 86,
-    "stats": {"max_hp": 590, "max_sp": 0, "atk": 42, "matk": 22, "defense": 5, "mdef": 5, "hit": 39, "flee": 21, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 424, "max_sp": 0, "atk": 41, "matk": 22, "defense": 4, "mdef": 5, "hit": 39, "flee": 21, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "insect_leg", "rate": 0.45},
       {"item_id": "clover", "rate": 0.25}
@@ -1423,7 +1423,7 @@
     "role": "tank",
     "base_exp": 305,
     "job_exp": 152,
-    "stats": {"max_hp": 1440, "max_sp": 0, "atk": 43, "matk": 27, "defense": 18, "mdef": 6, "hit": 46, "flee": 18, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1044, "max_sp": 0, "atk": 41, "matk": 27, "defense": 16, "mdef": 6, "hit": 46, "flee": 18, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "amber", "rate": 0.4},
       {"item_id": "jellopy", "rate": 0.3},
@@ -1442,7 +1442,7 @@
     "role": "normal",
     "base_exp": 359,
     "job_exp": 180,
-    "stats": {"max_hp": 1168, "max_sp": 0, "atk": 73, "matk": 34, "defense": 8, "mdef": 8, "hit": 56, "flee": 31, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 859, "max_sp": 0, "atk": 67, "matk": 34, "defense": 7, "mdef": 8, "hit": 56, "flee": 31, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "orc_tooth", "rate": 0.4},
       {"item_id": "clover", "rate": 0.25}
@@ -1460,7 +1460,7 @@
     "role": "normal",
     "base_exp": 403,
     "job_exp": 202,
-    "stats": {"max_hp": 1306, "max_sp": 0, "atk": 80, "matk": 37, "defense": 8, "mdef": 8, "hit": 60, "flee": 33, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 964, "max_sp": 0, "atk": 73, "matk": 37, "defense": 8, "mdef": 8, "hit": 60, "flee": 33, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "orc_tooth", "rate": 0.45},
       {"item_id": "oridecon", "rate": 0.06},
@@ -1479,7 +1479,7 @@
     "role": "normal",
     "base_exp": 403,
     "job_exp": 202,
-    "stats": {"max_hp": 1306, "max_sp": 0, "atk": 80, "matk": 37, "defense": 8, "mdef": 8, "hit": 60, "flee": 33, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 964, "max_sp": 0, "atk": 73, "matk": 37, "defense": 8, "mdef": 8, "hit": 60, "flee": 33, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "goblin_mask", "rate": 0.3},
       {"item_id": "jellopy", "rate": 0.3},
@@ -1498,7 +1498,7 @@
     "role": "glass",
     "base_exp": 720,
     "job_exp": 360,
-    "stats": {"max_hp": 1596, "max_sp": 0, "atk": 164, "matk": 51, "defense": 0, "mdef": 12, "hit": 80, "flee": 54, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1204, "max_sp": 0, "atk": 142, "matk": 51, "defense": 0, "mdef": 12, "hit": 80, "flee": 54, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "orc_tooth", "rate": 0.4},
       {"item_id": "feather", "rate": 0.3}
@@ -1516,7 +1516,7 @@
     "role": "tank",
     "base_exp": 572,
     "job_exp": 286,
-    "stats": {"max_hp": 2610, "max_sp": 0, "atk": 70, "matk": 39, "defense": 27, "mdef": 9, "hit": 63, "flee": 24, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1935, "max_sp": 0, "atk": 63, "matk": 39, "defense": 25, "mdef": 9, "hit": 63, "flee": 24, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "mane", "rate": 0.4},
       {"item_id": "jellopy", "rate": 0.3},
@@ -1535,7 +1535,7 @@
     "role": "glass",
     "base_exp": 525,
     "job_exp": 262,
-    "stats": {"max_hp": 1176, "max_sp": 0, "atk": 127, "matk": 43, "defense": 0, "mdef": 10, "hit": 68, "flee": 46, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 877, "max_sp": 0, "atk": 114, "matk": 43, "defense": 0, "mdef": 10, "hit": 68, "flee": 46, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "goblin_mask", "rate": 0.3},
       {"item_id": "feather", "rate": 0.3}
@@ -1553,7 +1553,7 @@
     "role": "tank",
     "base_exp": 666,
     "job_exp": 333,
-    "stats": {"max_hp": 3024, "max_sp": 0, "atk": 78, "matk": 43, "defense": 30, "mdef": 10, "hit": 68, "flee": 27, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2255, "max_sp": 0, "atk": 70, "matk": 43, "defense": 27, "mdef": 10, "hit": 68, "flee": 27, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.45},
       {"item_id": "orc_tooth", "rate": 0.3},
@@ -1572,7 +1572,7 @@
     "role": "normal",
     "base_exp": 781,
     "job_exp": 390,
-    "stats": {"max_hp": 3208, "max_sp": 0, "atk": 135, "matk": 53, "defense": 13, "mdef": 13, "hit": 83, "flee": 47, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2427, "max_sp": 0, "atk": 115, "matk": 53, "defense": 12, "mdef": 13, "hit": 83, "flee": 47, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "skel_bone", "rate": 0.5},
       {"item_id": "orc_tooth", "rate": 0.3},
@@ -1593,7 +1593,7 @@
     "role": "normal",
     "base_exp": 661,
     "job_exp": 330,
-    "stats": {"max_hp": 2100, "max_sp": 0, "atk": 118, "matk": 49, "defense": 11, "mdef": 11, "hit": 77, "flee": 43, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1579, "max_sp": 0, "atk": 103, "matk": 49, "defense": 10, "mdef": 11, "hit": 77, "flee": 43, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "mane", "rate": 0.4},
       {"item_id": "clover", "rate": 0.2}
@@ -1611,7 +1611,7 @@
     "role": "glass",
     "base_exp": 661,
     "job_exp": 330,
-    "stats": {"max_hp": 1470, "max_sp": 0, "atk": 153, "matk": 49, "defense": 0, "mdef": 11, "hit": 77, "flee": 52, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1105, "max_sp": 0, "atk": 133, "matk": 49, "defense": 0, "mdef": 11, "hit": 77, "flee": 52, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "voodoo_doll", "rate": 0.35},
       {"item_id": "sticky_mucus", "rate": 0.3},
@@ -1630,7 +1630,7 @@
     "role": "normal",
     "base_exp": 720,
     "job_exp": 360,
-    "stats": {"max_hp": 2964, "max_sp": 0, "atk": 126, "matk": 51, "defense": 12, "mdef": 12, "hit": 80, "flee": 45, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2236, "max_sp": 0, "atk": 109, "matk": 51, "defense": 11, "mdef": 12, "hit": 80, "flee": 45, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "orc_tooth", "rate": 0.5},
       {"item_id": "oridecon", "rate": 0.1},
@@ -1651,7 +1651,7 @@
     "role": "normal",
     "base_exp": 878,
     "job_exp": 439,
-    "stats": {"max_hp": 2762, "max_sp": 0, "atk": 148, "matk": 57, "defense": 14, "mdef": 14, "hit": 88, "flee": 50, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2099, "max_sp": 0, "atk": 125, "matk": 57, "defense": 12, "mdef": 14, "hit": 88, "flee": 50, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "voodoo_doll", "rate": 0.3},
       {"item_id": "cursed_ruby", "rate": 0.1},
@@ -1670,7 +1670,7 @@
     "role": "glass",
     "base_exp": 129,
     "job_exp": 64,
-    "stats": {"max_hp": 316, "max_sp": 0, "atk": 45, "matk": 19, "defense": 0, "mdef": 4, "hit": 34, "flee": 22, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 226, "max_sp": 0, "atk": 44, "matk": 19, "defense": 0, "mdef": 4, "hit": 34, "flee": 22, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "sticky_mucus", "rate": 0.4},
       {"item_id": "gill", "rate": 0.25},
@@ -1689,7 +1689,7 @@
     "role": "tank",
     "base_exp": 200,
     "job_exp": 100,
-    "stats": {"max_hp": 976, "max_sp": 0, "atk": 32, "matk": 21, "defense": 14, "mdef": 4, "hit": 38, "flee": 14, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 700, "max_sp": 0, "atk": 31, "matk": 21, "defense": 12, "mdef": 4, "hit": 38, "flee": 14, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "shell", "rate": 0.5},
       {"item_id": "jellopy", "rate": 0.3},
@@ -1708,7 +1708,7 @@
     "role": "normal",
     "base_exp": 158,
     "job_exp": 79,
-    "stats": {"max_hp": 542, "max_sp": 0, "atk": 40, "matk": 21, "defense": 4, "mdef": 4, "hit": 38, "flee": 20, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 389, "max_sp": 0, "atk": 38, "matk": 21, "defense": 4, "mdef": 4, "hit": 38, "flee": 20, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "nipper", "rate": 0.45},
       {"item_id": "shell", "rate": 0.25}
@@ -1726,7 +1726,7 @@
     "role": "glass",
     "base_exp": 158,
     "job_exp": 79,
-    "stats": {"max_hp": 380, "max_sp": 0, "atk": 52, "matk": 21, "defense": 0, "mdef": 4, "hit": 38, "flee": 24, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 272, "max_sp": 0, "atk": 50, "matk": 21, "defense": 0, "mdef": 4, "hit": 38, "flee": 24, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "sticky_mucus", "rate": 0.4},
       {"item_id": "gill", "rate": 0.2},
@@ -1745,7 +1745,7 @@
     "role": "normal",
     "base_exp": 205,
     "job_exp": 102,
-    "stats": {"max_hp": 692, "max_sp": 0, "atk": 48, "matk": 25, "defense": 5, "mdef": 5, "hit": 43, "flee": 23, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 499, "max_sp": 0, "atk": 46, "matk": 25, "defense": 5, "mdef": 5, "hit": 43, "flee": 23, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "nipper", "rate": 0.4},
       {"item_id": "shell", "rate": 0.3},
@@ -1764,7 +1764,7 @@
     "role": "normal",
     "base_exp": 450,
     "job_exp": 225,
-    "stats": {"max_hp": 1450, "max_sp": 0, "atk": 87, "matk": 39, "defense": 9, "mdef": 9, "hit": 63, "flee": 35, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1075, "max_sp": 0, "atk": 78, "matk": 39, "defense": 8, "mdef": 9, "hit": 63, "flee": 35, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "tendon", "rate": 0.4},
       {"item_id": "fish_tail", "rate": 0.3},
@@ -1783,7 +1783,7 @@
     "role": "glass",
     "base_exp": 661,
     "job_exp": 330,
-    "stats": {"max_hp": 1470, "max_sp": 0, "atk": 153, "matk": 49, "defense": 0, "mdef": 11, "hit": 77, "flee": 52, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1105, "max_sp": 0, "atk": 133, "matk": 49, "defense": 0, "mdef": 11, "hit": 77, "flee": 52, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fish_tail", "rate": 0.4},
       {"item_id": "gill", "rate": 0.3}
@@ -1801,7 +1801,7 @@
     "role": "normal",
     "base_exp": 720,
     "job_exp": 360,
-    "stats": {"max_hp": 2280, "max_sp": 0, "atk": 126, "matk": 51, "defense": 12, "mdef": 12, "hit": 80, "flee": 45, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1720, "max_sp": 0, "atk": 109, "matk": 51, "defense": 11, "mdef": 12, "hit": 80, "flee": 45, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "coral_reef", "rate": 0.35},
       {"item_id": "fish_tail", "rate": 0.3},
@@ -1820,7 +1820,7 @@
     "role": "normal",
     "base_exp": 813,
     "job_exp": 406,
-    "stats": {"max_hp": 2564, "max_sp": 0, "atk": 139, "matk": 55, "defense": 13, "mdef": 13, "hit": 85, "flee": 48, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1943, "max_sp": 0, "atk": 119, "matk": 55, "defense": 12, "mdef": 13, "hit": 85, "flee": 48, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fish_tail", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.08},
@@ -1839,7 +1839,7 @@
     "role": "glass",
     "base_exp": 911,
     "job_exp": 456,
-    "stats": {"max_hp": 2005, "max_sp": 0, "atk": 198, "matk": 58, "defense": 0, "mdef": 14, "hit": 90, "flee": 61, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1525, "max_sp": 0, "atk": 167, "matk": 58, "defense": 0, "mdef": 14, "hit": 90, "flee": 61, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "coral_reef", "rate": 0.35},
       {"item_id": "gill", "rate": 0.3}
@@ -1857,7 +1857,7 @@
     "role": "tank",
     "base_exp": 1244,
     "job_exp": 622,
-    "stats": {"max_hp": 5532, "max_sp": 0, "atk": 129, "matk": 61, "defense": 43, "mdef": 14, "hit": 94, "flee": 37, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4219, "max_sp": 0, "atk": 108, "matk": 61, "defense": 40, "mdef": 14, "hit": 94, "flee": 37, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "coral_reef", "rate": 0.4},
       {"item_id": "tendon", "rate": 0.3},
@@ -1876,7 +1876,7 @@
     "role": "normal",
     "base_exp": 1238,
     "job_exp": 619,
-    "stats": {"max_hp": 3862, "max_sp": 0, "atk": 196, "matk": 69, "defense": 16, "mdef": 16, "hit": 106, "flee": 60, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2969, "max_sp": 0, "atk": 160, "matk": 69, "defense": 15, "mdef": 16, "hit": 106, "flee": 60, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "coral_reef", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.12},
@@ -1895,7 +1895,7 @@
     "role": "normal",
     "base_exp": 661,
     "job_exp": 330,
-    "stats": {"max_hp": 2100, "max_sp": 0, "atk": 118, "matk": 49, "defense": 11, "mdef": 11, "hit": 77, "flee": 43, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1579, "max_sp": 0, "atk": 103, "matk": 49, "defense": 10, "mdef": 11, "hit": 77, "flee": 43, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "jack_o_lantern", "rate": 0.4},
       {"item_id": "sticky_mucus", "rate": 0.25},
@@ -1914,7 +1914,7 @@
     "role": "glass",
     "base_exp": 720,
     "job_exp": 360,
-    "stats": {"max_hp": 1596, "max_sp": 0, "atk": 164, "matk": 51, "defense": 0, "mdef": 12, "hit": 80, "flee": 54, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1204, "max_sp": 0, "atk": 142, "matk": 51, "defense": 0, "mdef": 12, "hit": 80, "flee": 54, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "will_o_wisp", "rate": 0.45},
       {"item_id": "oridecon", "rate": 0.05},
@@ -1933,7 +1933,7 @@
     "role": "normal",
     "base_exp": 813,
     "job_exp": 406,
-    "stats": {"max_hp": 3077, "max_sp": 0, "atk": 139, "matk": 55, "defense": 13, "mdef": 13, "hit": 85, "flee": 48, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2332, "max_sp": 0, "atk": 119, "matk": 55, "defense": 12, "mdef": 13, "hit": 85, "flee": 48, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "nightmare_horn", "rate": 0.4},
       {"item_id": "old_manteau", "rate": 0.2},
@@ -1952,7 +1952,7 @@
     "role": "glass",
     "base_exp": 878,
     "job_exp": 439,
-    "stats": {"max_hp": 1934, "max_sp": 0, "atk": 192, "matk": 57, "defense": 0, "mdef": 14, "hit": 88, "flee": 60, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1469, "max_sp": 0, "atk": 163, "matk": 57, "defense": 0, "mdef": 14, "hit": 88, "flee": 60, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "will_o_wisp", "rate": 0.4},
       {"item_id": "feather", "rate": 0.3},
@@ -1971,7 +1971,7 @@
     "role": "tank",
     "base_exp": 1244,
     "job_exp": 622,
-    "stats": {"max_hp": 5532, "max_sp": 0, "atk": 129, "matk": 61, "defense": 43, "mdef": 14, "hit": 94, "flee": 37, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4219, "max_sp": 0, "atk": 108, "matk": 61, "defense": 40, "mdef": 14, "hit": 94, "flee": 37, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "dark_crystal", "rate": 0.3},
       {"item_id": "elunium", "rate": 0.08},
@@ -1990,7 +1990,7 @@
     "role": "glass",
     "base_exp": 979,
     "job_exp": 490,
-    "stats": {"max_hp": 2152, "max_sp": 0, "atk": 210, "matk": 61, "defense": 0, "mdef": 14, "hit": 94, "flee": 64, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1641, "max_sp": 0, "atk": 176, "matk": 61, "defense": 0, "mdef": 14, "hit": 94, "flee": 64, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "old_manteau", "rate": 0.3},
       {"item_id": "dark_crystal", "rate": 0.2},
@@ -2009,7 +2009,7 @@
     "role": "glass",
     "base_exp": 1050,
     "job_exp": 525,
-    "stats": {"max_hp": 2303, "max_sp": 0, "atk": 222, "matk": 63, "defense": 0, "mdef": 15, "hit": 97, "flee": 66, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1760, "max_sp": 0, "atk": 185, "matk": 63, "defense": 0, "mdef": 15, "hit": 97, "flee": 66, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "voodoo_doll", "rate": 0.35},
       {"item_id": "dark_crystal", "rate": 0.2},
@@ -2028,7 +2028,7 @@
     "role": "normal",
     "base_exp": 1123,
     "job_exp": 562,
-    "stats": {"max_hp": 3514, "max_sp": 0, "atk": 181, "matk": 65, "defense": 16, "mdef": 16, "hit": 100, "flee": 57, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2692, "max_sp": 0, "atk": 150, "matk": 65, "defense": 14, "mdef": 16, "hit": 100, "flee": 57, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "dark_crystal", "rate": 0.35},
       {"item_id": "oridecon", "rate": 0.1},
@@ -2047,7 +2047,7 @@
     "role": "normal",
     "base_exp": 1238,
     "job_exp": 619,
-    "stats": {"max_hp": 3862, "max_sp": 0, "atk": 196, "matk": 69, "defense": 16, "mdef": 16, "hit": 106, "flee": 60, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2969, "max_sp": 0, "atk": 160, "matk": 69, "defense": 15, "mdef": 16, "hit": 106, "flee": 60, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "dark_crystal", "rate": 0.4},
       {"item_id": "rosary", "rate": 0.2},
@@ -2066,7 +2066,7 @@
     "role": "normal",
     "base_exp": 403,
     "job_exp": 202,
-    "stats": {"max_hp": 1306, "max_sp": 0, "atk": 80, "matk": 37, "defense": 8, "mdef": 8, "hit": 60, "flee": 33, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 964, "max_sp": 0, "atk": 73, "matk": 37, "defense": 8, "mdef": 8, "hit": 60, "flee": 33, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ant_jaw", "rate": 0.45},
       {"item_id": "brigan", "rate": 0.3}
@@ -2084,7 +2084,7 @@
     "role": "normal",
     "base_exp": 720,
     "job_exp": 360,
-    "stats": {"max_hp": 2280, "max_sp": 0, "atk": 126, "matk": 51, "defense": 12, "mdef": 12, "hit": 80, "flee": 45, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1720, "max_sp": 0, "atk": 109, "matk": 51, "defense": 11, "mdef": 12, "hit": 80, "flee": 45, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "brigan", "rate": 0.4},
       {"item_id": "scarab_shell", "rate": 0.25},
@@ -2103,7 +2103,7 @@
     "role": "normal",
     "base_exp": 781,
     "job_exp": 390,
-    "stats": {"max_hp": 2468, "max_sp": 0, "atk": 135, "matk": 53, "defense": 13, "mdef": 13, "hit": 83, "flee": 47, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1867, "max_sp": 0, "atk": 115, "matk": 53, "defense": 12, "mdef": 13, "hit": 83, "flee": 47, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "brigan", "rate": 0.45},
       {"item_id": "sand_lump", "rate": 0.3},
@@ -2122,7 +2122,7 @@
     "role": "normal",
     "base_exp": 878,
     "job_exp": 439,
-    "stats": {"max_hp": 2762, "max_sp": 0, "atk": 148, "matk": 57, "defense": 14, "mdef": 14, "hit": 88, "flee": 50, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2099, "max_sp": 0, "atk": 125, "matk": 57, "defense": 12, "mdef": 14, "hit": 88, "flee": 50, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "sand_lump", "rate": 0.4},
       {"item_id": "cursed_ruby", "rate": 0.08},
@@ -2142,7 +2142,7 @@
     "role": "glass",
     "base_exp": 979,
     "job_exp": 490,
-    "stats": {"max_hp": 2152, "max_sp": 0, "atk": 210, "matk": 61, "defense": 0, "mdef": 14, "hit": 94, "flee": 64, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1641, "max_sp": 0, "atk": 176, "matk": 61, "defense": 0, "mdef": 14, "hit": 94, "flee": 64, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "scorpion_tail", "rate": 0.4},
       {"item_id": "snake_skin", "rate": 0.3},
@@ -2161,7 +2161,7 @@
     "role": "tank",
     "base_exp": 1426,
     "job_exp": 713,
-    "stats": {"max_hp": 7589, "max_sp": 0, "atk": 145, "matk": 65, "defense": 47, "mdef": 16, "hit": 100, "flee": 40, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5815, "max_sp": 0, "atk": 120, "matk": 65, "defense": 43, "mdef": 16, "hit": 100, "flee": 40, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "mane", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.1},
@@ -2181,7 +2181,7 @@
     "role": "normal",
     "base_exp": 1238,
     "job_exp": 619,
-    "stats": {"max_hp": 4828, "max_sp": 0, "atk": 196, "matk": 69, "defense": 16, "mdef": 16, "hit": 106, "flee": 60, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 3711, "max_sp": 0, "atk": 160, "matk": 69, "defense": 15, "mdef": 16, "hit": 106, "flee": 60, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ancient_lips", "rate": 0.4},
       {"item_id": "cursed_ruby", "rate": 0.12},
@@ -2200,7 +2200,7 @@
     "role": "tank",
     "base_exp": 1724,
     "job_exp": 862,
-    "stats": {"max_hp": 9132, "max_sp": 0, "atk": 169, "matk": 73, "defense": 52, "mdef": 17, "hit": 111, "flee": 44, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 7039, "max_sp": 0, "atk": 137, "matk": 73, "defense": 48, "mdef": 17, "hit": 111, "flee": 44, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ancient_lips", "rate": 0.4},
       {"item_id": "dark_crystal", "rate": 0.15},
@@ -2219,7 +2219,7 @@
     "role": "tank",
     "base_exp": 1073,
     "job_exp": 536,
-    "stats": {"max_hp": 4792, "max_sp": 0, "atk": 115, "matk": 56, "defense": 40, "mdef": 13, "hit": 87, "flee": 34, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 3636, "max_sp": 0, "atk": 98, "matk": 56, "defense": 36, "mdef": 13, "hit": 87, "flee": 34, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gear_wheel", "rate": 0.45},
       {"item_id": "sticky_mucus", "rate": 0.25}
@@ -2237,7 +2237,7 @@
     "role": "glass",
     "base_exp": 878,
     "job_exp": 439,
-    "stats": {"max_hp": 1934, "max_sp": 0, "atk": 192, "matk": 57, "defense": 0, "mdef": 14, "hit": 88, "flee": 60, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1469, "max_sp": 0, "atk": 163, "matk": 57, "defense": 0, "mdef": 14, "hit": 88, "flee": 60, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "resin", "rate": 0.4},
       {"item_id": "clover", "rate": 0.25},
@@ -2256,7 +2256,7 @@
     "role": "normal",
     "base_exp": 911,
     "job_exp": 456,
-    "stats": {"max_hp": 2864, "max_sp": 0, "atk": 152, "matk": 58, "defense": 14, "mdef": 14, "hit": 90, "flee": 51, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2179, "max_sp": 0, "atk": 129, "matk": 58, "defense": 13, "mdef": 14, "hit": 90, "flee": 51, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "skel_bone", "rate": 0.5},
       {"item_id": "rusty_shackle", "rate": 0.3}
@@ -2274,7 +2274,7 @@
     "role": "glass",
     "base_exp": 979,
     "job_exp": 490,
-    "stats": {"max_hp": 2582, "max_sp": 0, "atk": 210, "matk": 61, "defense": 0, "mdef": 14, "hit": 94, "flee": 64, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1969, "max_sp": 0, "atk": 176, "matk": 61, "defense": 0, "mdef": 14, "hit": 94, "flee": 64, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "old_page", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.06},
@@ -2294,7 +2294,7 @@
     "role": "tank",
     "base_exp": 1244,
     "job_exp": 622,
-    "stats": {"max_hp": 5532, "max_sp": 0, "atk": 129, "matk": 61, "defense": 43, "mdef": 14, "hit": 94, "flee": 37, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4219, "max_sp": 0, "atk": 108, "matk": 61, "defense": 40, "mdef": 14, "hit": 94, "flee": 37, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.5},
       {"item_id": "rusty_shackle", "rate": 0.3},
@@ -2313,7 +2313,7 @@
     "role": "glass",
     "base_exp": 1050,
     "job_exp": 525,
-    "stats": {"max_hp": 2303, "max_sp": 0, "atk": 222, "matk": 63, "defense": 0, "mdef": 15, "hit": 97, "flee": 66, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1760, "max_sp": 0, "atk": 185, "matk": 63, "defense": 0, "mdef": 15, "hit": 97, "flee": 66, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "old_manteau", "rate": 0.35},
       {"item_id": "old_page", "rate": 0.25}
@@ -2331,7 +2331,7 @@
     "role": "normal",
     "base_exp": 1050,
     "job_exp": 525,
-    "stats": {"max_hp": 3290, "max_sp": 0, "atk": 171, "matk": 63, "defense": 15, "mdef": 15, "hit": 97, "flee": 55, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2515, "max_sp": 0, "atk": 142, "matk": 63, "defense": 14, "mdef": 15, "hit": 97, "flee": 55, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gear_wheel", "rate": 0.4},
       {"item_id": "iron_ore", "rate": 0.3},
@@ -2350,7 +2350,7 @@
     "role": "normal",
     "base_exp": 1123,
     "job_exp": 562,
-    "stats": {"max_hp": 4392, "max_sp": 0, "atk": 181, "matk": 65, "defense": 16, "mdef": 16, "hit": 100, "flee": 57, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 3365, "max_sp": 0, "atk": 150, "matk": 65, "defense": 14, "mdef": 16, "hit": 100, "flee": 57, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "dark_crystal", "rate": 0.35},
       {"item_id": "rosary", "rate": 0.2},
@@ -2370,7 +2370,7 @@
     "role": "tank",
     "base_exp": 1426,
     "job_exp": 713,
-    "stats": {"max_hp": 8221, "max_sp": 0, "atk": 145, "matk": 65, "defense": 47, "mdef": 16, "hit": 100, "flee": 40, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 6300, "max_sp": 0, "atk": 120, "matk": 65, "defense": 43, "mdef": 16, "hit": 100, "flee": 40, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gear_wheel", "rate": 0.45},
       {"item_id": "elunium", "rate": 0.06},
@@ -2390,7 +2390,7 @@
     "role": "normal",
     "base_exp": 1238,
     "job_exp": 619,
-    "stats": {"max_hp": 5021, "max_sp": 0, "atk": 196, "matk": 69, "defense": 16, "mdef": 16, "hit": 106, "flee": 60, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 3860, "max_sp": 0, "atk": 160, "matk": 69, "defense": 15, "mdef": 16, "hit": 106, "flee": 60, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "old_manteau", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.12},
@@ -2410,7 +2410,7 @@
     "role": "normal",
     "base_exp": 1357,
     "job_exp": 678,
-    "stats": {"max_hp": 4228, "max_sp": 0, "atk": 211, "matk": 73, "defense": 17, "mdef": 17, "hit": 111, "flee": 63, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 3259, "max_sp": 0, "atk": 171, "matk": 73, "defense": 16, "mdef": 17, "hit": 111, "flee": 63, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "dark_crystal", "rate": 0.4},
       {"item_id": "cursed_ruby", "rate": 0.15},
@@ -2429,7 +2429,7 @@
     "role": "normal",
     "base_exp": 173,
     "job_exp": 86,
-    "stats": {"max_hp": 590, "max_sp": 0, "atk": 42, "matk": 22, "defense": 5, "mdef": 5, "hit": 39, "flee": 21, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 424, "max_sp": 0, "atk": 41, "matk": 22, "defense": 4, "mdef": 5, "hit": 39, "flee": 21, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ant_jaw", "rate": 0.45},
       {"item_id": "iron_ore", "rate": 0.3},
@@ -2448,7 +2448,7 @@
     "role": "normal",
     "base_exp": 359,
     "job_exp": 180,
-    "stats": {"max_hp": 1168, "max_sp": 0, "atk": 73, "matk": 34, "defense": 8, "mdef": 8, "hit": 56, "flee": 31, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 859, "max_sp": 0, "atk": 67, "matk": 34, "defense": 7, "mdef": 8, "hit": 56, "flee": 31, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "skel_bone", "rate": 0.5},
       {"item_id": "rusty_shackle", "rate": 0.25},
@@ -2467,7 +2467,7 @@
     "role": "normal",
     "base_exp": 661,
     "job_exp": 330,
-    "stats": {"max_hp": 2100, "max_sp": 0, "atk": 118, "matk": 49, "defense": 11, "mdef": 11, "hit": 77, "flee": 43, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1579, "max_sp": 0, "atk": 103, "matk": 49, "defense": 10, "mdef": 11, "hit": 77, "flee": 43, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "brigan", "rate": 0.45},
       {"item_id": "ore_fragment", "rate": 0.3}
@@ -2485,7 +2485,7 @@
     "role": "glass",
     "base_exp": 720,
     "job_exp": 360,
-    "stats": {"max_hp": 1596, "max_sp": 0, "atk": 164, "matk": 51, "defense": 0, "mdef": 12, "hit": 80, "flee": 54, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1204, "max_sp": 0, "atk": 142, "matk": 51, "defense": 0, "mdef": 12, "hit": 80, "flee": 54, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fluff", "rate": 0.4},
       {"item_id": "coal", "rate": 0.25},
@@ -2504,7 +2504,7 @@
     "role": "normal",
     "base_exp": 845,
     "job_exp": 422,
-    "stats": {"max_hp": 2662, "max_sp": 0, "atk": 143, "matk": 56, "defense": 13, "mdef": 13, "hit": 87, "flee": 49, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2020, "max_sp": 0, "atk": 122, "matk": 56, "defense": 12, "mdef": 13, "hit": 87, "flee": 49, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "coal", "rate": 0.45},
       {"item_id": "oridecon", "rate": 0.14},
@@ -2524,7 +2524,7 @@
     "role": "tank",
     "base_exp": 1244,
     "job_exp": 622,
-    "stats": {"max_hp": 7192, "max_sp": 0, "atk": 129, "matk": 61, "defense": 43, "mdef": 14, "hit": 94, "flee": 37, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5485, "max_sp": 0, "atk": 108, "matk": 61, "defense": 40, "mdef": 14, "hit": 94, "flee": 37, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ore_fragment", "rate": 0.4},
       {"item_id": "elunium", "rate": 0.1},
@@ -2543,7 +2543,7 @@
     "role": "normal",
     "base_exp": 450,
     "job_exp": 225,
-    "stats": {"max_hp": 1450, "max_sp": 0, "atk": 87, "matk": 39, "defense": 9, "mdef": 9, "hit": 63, "flee": 35, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1075, "max_sp": 0, "atk": 78, "matk": 39, "defense": 8, "mdef": 9, "hit": 63, "flee": 35, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "skel_bone", "rate": 0.45},
       {"item_id": "rusty_shackle", "rate": 0.25},
@@ -2562,7 +2562,7 @@
     "role": "tank",
     "base_exp": 700,
     "job_exp": 350,
-    "stats": {"max_hp": 3169, "max_sp": 0, "atk": 82, "matk": 44, "defense": 31, "mdef": 10, "hit": 70, "flee": 27, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2367, "max_sp": 0, "atk": 72, "matk": 44, "defense": 28, "mdef": 10, "hit": 70, "flee": 27, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "old_manteau", "rate": 0.35},
       {"item_id": "dark_crystal", "rate": 0.08},
@@ -2581,7 +2581,7 @@
     "role": "glass",
     "base_exp": 605,
     "job_exp": 302,
-    "stats": {"max_hp": 1348, "max_sp": 0, "atk": 143, "matk": 46, "defense": 0, "mdef": 11, "hit": 73, "flee": 49, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1011, "max_sp": 0, "atk": 125, "matk": 46, "defense": 0, "mdef": 11, "hit": 73, "flee": 49, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "sticky_mucus", "rate": 0.35},
       {"item_id": "dark_crystal", "rate": 0.06},
@@ -2600,7 +2600,7 @@
     "role": "normal",
     "base_exp": 781,
     "job_exp": 390,
-    "stats": {"max_hp": 2962, "max_sp": 0, "atk": 135, "matk": 53, "defense": 13, "mdef": 13, "hit": 83, "flee": 47, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2240, "max_sp": 0, "atk": 115, "matk": 53, "defense": 12, "mdef": 13, "hit": 83, "flee": 47, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "coral_reef", "rate": 0.35},
       {"item_id": "tendon", "rate": 0.2},
@@ -2619,7 +2619,7 @@
     "role": "normal",
     "base_exp": 1199,
     "job_exp": 600,
-    "stats": {"max_hp": 3744, "max_sp": 0, "atk": 191, "matk": 68, "defense": 16, "mdef": 16, "hit": 104, "flee": 59, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2875, "max_sp": 0, "atk": 157, "matk": 68, "defense": 15, "mdef": 16, "hit": 104, "flee": 59, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "orc_tooth", "rate": 0.45},
       {"item_id": "oridecon", "rate": 0.1},
@@ -2638,7 +2638,7 @@
     "role": "tank",
     "base_exp": 37,
     "job_exp": 18,
-    "stats": {"max_hp": 242, "max_sp": 0, "atk": 11, "matk": 8, "defense": 4, "mdef": 1, "hit": 19, "flee": 6, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 180, "max_sp": 0, "atk": 11, "matk": 8, "defense": 3, "mdef": 1, "hit": 19, "flee": 6, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "jellopy", "rate": 0.5},
       {"item_id": "sticky_mucus", "rate": 0.2},
@@ -2657,7 +2657,7 @@
     "role": "glass",
     "base_exp": 90,
     "job_exp": 45,
-    "stats": {"max_hp": 231, "max_sp": 0, "atk": 35, "matk": 15, "defense": 0, "mdef": 3, "hit": 29, "flee": 18, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 164, "max_sp": 0, "atk": 34, "matk": 15, "defense": 0, "mdef": 3, "hit": 29, "flee": 18, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "jellopy", "rate": 0.55},
       {"item_id": "sticky_mucus", "rate": 0.3},
@@ -2676,7 +2676,7 @@
     "role": "normal",
     "base_exp": 102,
     "job_exp": 51,
-    "stats": {"max_hp": 369, "max_sp": 0, "atk": 29, "matk": 16, "defense": 3, "mdef": 3, "hit": 31, "flee": 16, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 263, "max_sp": 0, "atk": 29, "matk": 16, "defense": 3, "mdef": 3, "hit": 31, "flee": 16, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "jellopy", "rate": 0.5},
       {"item_id": "fluff", "rate": 0.35},
@@ -2695,7 +2695,7 @@
     "role": "normal",
     "base_exp": 173,
     "job_exp": 86,
-    "stats": {"max_hp": 590, "max_sp": 0, "atk": 42, "matk": 22, "defense": 5, "mdef": 5, "hit": 39, "flee": 21, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 424, "max_sp": 0, "atk": 41, "matk": 22, "defense": 4, "mdef": 5, "hit": 39, "flee": 21, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "sticky_mucus", "rate": 0.4},
       {"item_id": "jellopy", "rate": 0.4},
@@ -2714,7 +2714,7 @@
     "role": "normal",
     "base_exp": 813,
     "job_exp": 406,
-    "stats": {"max_hp": 2564, "max_sp": 0, "atk": 139, "matk": 55, "defense": 13, "mdef": 13, "hit": 85, "flee": 48, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1943, "max_sp": 0, "atk": 119, "matk": 55, "defense": 12, "mdef": 13, "hit": 85, "flee": 48, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ribbon", "rate": 0.45},
       {"item_id": "elunium", "rate": 0.05},
@@ -2734,7 +2734,7 @@
     "role": "glass",
     "base_exp": 911,
     "job_exp": 456,
-    "stats": {"max_hp": 2005, "max_sp": 0, "atk": 198, "matk": 58, "defense": 0, "mdef": 14, "hit": 90, "flee": 61, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1525, "max_sp": 0, "atk": 167, "matk": 58, "defense": 0, "mdef": 14, "hit": 90, "flee": 61, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gear_wheel", "rate": 0.35},
       {"item_id": "needle_pack", "rate": 0.25},
@@ -2753,7 +2753,7 @@
     "role": "normal",
     "base_exp": 845,
     "job_exp": 422,
-    "stats": {"max_hp": 2662, "max_sp": 0, "atk": 143, "matk": 56, "defense": 13, "mdef": 13, "hit": 87, "flee": 49, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2020, "max_sp": 0, "atk": 122, "matk": 56, "defense": 12, "mdef": 13, "hit": 87, "flee": 49, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "needle_pack", "rate": 0.4},
       {"item_id": "honey", "rate": 0.15},
@@ -2772,7 +2772,7 @@
     "role": "tank",
     "base_exp": 1334,
     "job_exp": 667,
-    "stats": {"max_hp": 7699, "max_sp": 0, "atk": 137, "matk": 63, "defense": 45, "mdef": 15, "hit": 97, "flee": 38, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5885, "max_sp": 0, "atk": 114, "matk": 63, "defense": 41, "mdef": 15, "hit": 97, "flee": 38, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "stuffing", "rate": 0.45},
       {"item_id": "royal_jelly", "rate": 0.04},
@@ -2791,7 +2791,7 @@
     "role": "normal",
     "base_exp": 1199,
     "job_exp": 600,
-    "stats": {"max_hp": 3744, "max_sp": 0, "atk": 191, "matk": 68, "defense": 16, "mdef": 16, "hit": 104, "flee": 59, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2875, "max_sp": 0, "atk": 157, "matk": 68, "defense": 15, "mdef": 16, "hit": 104, "flee": 59, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "stuffing", "rate": 0.35},
       {"item_id": "ribbon", "rate": 0.3},
@@ -2811,7 +2811,7 @@
     "role": "glass",
     "base_exp": 474,
     "job_exp": 237,
-    "stats": {"max_hp": 1067, "max_sp": 0, "atk": 118, "matk": 40, "defense": 0, "mdef": 9, "hit": 65, "flee": 43, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 793, "max_sp": 0, "atk": 106, "matk": 40, "defense": 0, "mdef": 9, "hit": 65, "flee": 43, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "kobold_hair", "rate": 0.4},
       {"item_id": "talon", "rate": 0.25},
@@ -2830,7 +2830,7 @@
     "role": "normal",
     "base_exp": 525,
     "job_exp": 262,
-    "stats": {"max_hp": 1680, "max_sp": 0, "atk": 98, "matk": 43, "defense": 10, "mdef": 10, "hit": 68, "flee": 38, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1253, "max_sp": 0, "atk": 87, "matk": 43, "defense": 9, "mdef": 10, "hit": 68, "flee": 38, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "kobold_hair", "rate": 0.45},
       {"item_id": "oridecon", "rate": 0.06},
@@ -2849,7 +2849,7 @@
     "role": "normal",
     "base_exp": 578,
     "job_exp": 289,
-    "stats": {"max_hp": 1842, "max_sp": 0, "atk": 106, "matk": 45, "defense": 10, "mdef": 10, "hit": 72, "flee": 40, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1379, "max_sp": 0, "atk": 93, "matk": 45, "defense": 10, "mdef": 10, "hit": 72, "flee": 40, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "kobold_hair", "rate": 0.45},
       {"item_id": "iron_ore", "rate": 0.25},
@@ -2868,7 +2868,7 @@
     "role": "normal",
     "base_exp": 633,
     "job_exp": 316,
-    "stats": {"max_hp": 2012, "max_sp": 0, "atk": 114, "matk": 47, "defense": 11, "mdef": 11, "hit": 75, "flee": 42, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1511, "max_sp": 0, "atk": 100, "matk": 47, "defense": 10, "mdef": 11, "hit": 75, "flee": 42, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "mane", "rate": 0.45},
       {"item_id": "talon", "rate": 0.2},
@@ -2887,7 +2887,7 @@
     "role": "normal",
     "base_exp": 450,
     "job_exp": 225,
-    "stats": {"max_hp": 1450, "max_sp": 0, "atk": 87, "matk": 39, "defense": 9, "mdef": 9, "hit": 63, "flee": 35, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 1075, "max_sp": 0, "atk": 78, "matk": 39, "defense": 8, "mdef": 9, "hit": 63, "flee": 35, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "mane", "rate": 0.4},
       {"item_id": "talon", "rate": 0.2},
@@ -2906,7 +2906,7 @@
     "role": "normal",
     "base_exp": 1482,
     "job_exp": 741,
-    "stats": {"max_hp": 5992, "max_sp": 0, "atk": 227, "matk": 76, "defense": 18, "mdef": 18, "hit": 116, "flee": 66, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4632, "max_sp": 0, "atk": 183, "matk": 76, "defense": 17, "mdef": 18, "hit": 116, "flee": 66, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "old_manteau", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.1},
@@ -2925,7 +2925,7 @@
     "role": "tank",
     "base_exp": 2221,
     "job_exp": 1110,
-    "stats": {"max_hp": 12683, "max_sp": 0, "atk": 209, "matk": 83, "defense": 60, "mdef": 20, "hit": 126, "flee": 50, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 9853, "max_sp": 0, "atk": 165, "matk": 83, "defense": 55, "mdef": 20, "hit": 126, "flee": 50, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "rusty_shackle", "rate": 0.4},
       {"item_id": "elunium", "rate": 0.08},
@@ -2946,7 +2946,7 @@
     "role": "tank",
     "base_exp": 2524,
     "job_exp": 1262,
-    "stats": {"max_hp": 14934, "max_sp": 0, "atk": 233, "matk": 89, "defense": 65, "mdef": 22, "hit": 134, "flee": 54, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 11645, "max_sp": 0, "atk": 181, "matk": 89, "defense": 59, "mdef": 22, "hit": 134, "flee": 54, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "oridecon", "rate": 0.15},
       {"item_id": "dark_crystal", "rate": 0.1},
@@ -2966,7 +2966,7 @@
     "role": "tank",
     "base_exp": 2048,
     "job_exp": 1024,
-    "stats": {"max_hp": 11716, "max_sp": 0, "atk": 195, "matk": 80, "defense": 58, "mdef": 19, "hit": 121, "flee": 48, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 9079, "max_sp": 0, "atk": 156, "matk": 80, "defense": 53, "mdef": 19, "hit": 121, "flee": 48, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.08},
@@ -2985,7 +2985,7 @@
     "role": "normal",
     "base_exp": 1482,
     "job_exp": 741,
-    "stats": {"max_hp": 4609, "max_sp": 0, "atk": 227, "matk": 76, "defense": 18, "mdef": 18, "hit": 116, "flee": 66, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 3563, "max_sp": 0, "atk": 183, "matk": 76, "defense": 17, "mdef": 18, "hit": 116, "flee": 66, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.35},
       {"item_id": "cursed_ruby", "rate": 0.05},
@@ -3004,7 +3004,7 @@
     "role": "normal",
     "base_exp": 1703,
     "job_exp": 852,
-    "stats": {"max_hp": 5280, "max_sp": 0, "atk": 255, "matk": 82, "defense": 20, "mdef": 20, "hit": 124, "flee": 71, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4099, "max_sp": 0, "atk": 202, "matk": 82, "defense": 18, "mdef": 20, "hit": 124, "flee": 71, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "will_o_wisp", "rate": 0.4},
       {"item_id": "elunium", "rate": 0.06},
@@ -3024,7 +3024,7 @@
     "role": "glass",
     "base_exp": 1613,
     "job_exp": 806,
-    "stats": {"max_hp": 3504, "max_sp": 0, "atk": 317, "matk": 80, "defense": 0, "mdef": 19, "hit": 121, "flee": 83, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 2716, "max_sp": 0, "atk": 253, "matk": 80, "defense": 0, "mdef": 19, "hit": 121, "flee": 83, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "insect_leg", "rate": 0.45},
       {"item_id": "talon", "rate": 0.2},
@@ -3043,7 +3043,7 @@
     "role": "tank",
     "base_exp": 2280,
     "job_exp": 1140,
-    "stats": {"max_hp": 13515, "max_sp": 0, "atk": 214, "matk": 85, "defense": 61, "mdef": 20, "hit": 128, "flee": 51, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 10507, "max_sp": 0, "atk": 168, "matk": 85, "defense": 56, "mdef": 20, "hit": 128, "flee": 51, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gear_wheel", "rate": 0.45},
       {"item_id": "oridecon", "rate": 0.08},
@@ -3063,7 +3063,7 @@
     "role": "normal",
     "base_exp": 1938,
     "job_exp": 969,
-    "stats": {"max_hp": 7196, "max_sp": 0, "atk": 285, "matk": 88, "defense": 21, "mdef": 21, "hit": 133, "flee": 76, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5608, "max_sp": 0, "atk": 223, "matk": 88, "defense": 20, "mdef": 21, "hit": 133, "flee": 76, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "rosary", "rate": 0.35},
       {"item_id": "oridecon", "rate": 0.12},
@@ -3083,7 +3083,7 @@
     "role": "normal",
     "base_exp": 1795,
     "job_exp": 898,
-    "stats": {"max_hp": 5562, "max_sp": 0, "atk": 267, "matk": 85, "defense": 20, "mdef": 20, "hit": 128, "flee": 73, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4324, "max_sp": 0, "atk": 210, "matk": 85, "defense": 19, "mdef": 20, "hit": 128, "flee": 73, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "rosary", "rate": 0.4},
       {"item_id": "elunium", "rate": 0.1},
@@ -3104,7 +3104,7 @@
     "role": "normal",
     "base_exp": 1795,
     "job_exp": 898,
-    "stats": {"max_hp": 5562, "max_sp": 0, "atk": 267, "matk": 85, "defense": 20, "mdef": 20, "hit": 128, "flee": 73, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4324, "max_sp": 0, "atk": 210, "matk": 85, "defense": 19, "mdef": 20, "hit": 128, "flee": 73, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "horrendous_mouth", "rate": 0.35},
       {"item_id": "cursed_ruby", "rate": 0.06},
@@ -3125,7 +3125,7 @@
     "role": "normal",
     "base_exp": 1440,
     "job_exp": 720,
-    "stats": {"max_hp": 4480, "max_sp": 0, "atk": 222, "matk": 75, "defense": 18, "mdef": 18, "hit": 114, "flee": 65, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 3460, "max_sp": 0, "atk": 179, "matk": 75, "defense": 16, "mdef": 18, "hit": 114, "flee": 65, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.4},
       {"item_id": "skel_bone", "rate": 0.25},
@@ -3144,7 +3144,7 @@
     "role": "normal",
     "base_exp": 1569,
     "job_exp": 784,
-    "stats": {"max_hp": 4872, "max_sp": 0, "atk": 238, "matk": 79, "defense": 19, "mdef": 19, "hit": 119, "flee": 68, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 3773, "max_sp": 0, "atk": 191, "matk": 79, "defense": 17, "mdef": 19, "hit": 119, "flee": 68, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "rusty_shackle", "rate": 0.4},
       {"item_id": "decayed_nail", "rate": 0.25},
@@ -3163,7 +3163,7 @@
     "role": "normal",
     "base_exp": 1703,
     "job_exp": 852,
-    "stats": {"max_hp": 5280, "max_sp": 0, "atk": 255, "matk": 82, "defense": 20, "mdef": 20, "hit": 124, "flee": 71, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4099, "max_sp": 0, "atk": 202, "matk": 82, "defense": 18, "mdef": 20, "hit": 124, "flee": 71, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "dark_crystal", "rate": 0.3},
       {"item_id": "oridecon", "rate": 0.08},
@@ -3183,7 +3183,7 @@
     "role": "normal",
     "base_exp": 1658,
     "job_exp": 829,
-    "stats": {"max_hp": 5142, "max_sp": 0, "atk": 250, "matk": 81, "defense": 20, "mdef": 20, "hit": 122, "flee": 70, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 3989, "max_sp": 0, "atk": 198, "matk": 81, "defense": 18, "mdef": 20, "hit": 122, "flee": 70, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "nightmare_horn", "rate": 0.4},
       {"item_id": "dark_crystal", "rate": 0.1},
@@ -3203,7 +3203,7 @@
     "role": "normal",
     "base_exp": 2138,
     "job_exp": 1069,
-    "stats": {"max_hp": 6602, "max_sp": 0, "atk": 310, "matk": 93, "defense": 22, "mdef": 22, "hit": 140, "flee": 80, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5159, "max_sp": 0, "atk": 239, "matk": 93, "defense": 21, "mdef": 22, "hit": 140, "flee": 80, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "nipper", "rate": 0.4},
       {"item_id": "shell", "rate": 0.2},
@@ -3223,7 +3223,7 @@
     "role": "normal",
     "base_exp": 2241,
     "job_exp": 1120,
-    "stats": {"max_hp": 6916, "max_sp": 0, "atk": 322, "matk": 95, "defense": 23, "mdef": 23, "hit": 143, "flee": 82, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5411, "max_sp": 0, "atk": 248, "matk": 95, "defense": 21, "mdef": 23, "hit": 143, "flee": 82, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gill", "rate": 0.4},
       {"item_id": "tendon", "rate": 0.15},
@@ -3243,7 +3243,7 @@
     "role": "normal",
     "base_exp": 2087,
     "job_exp": 1044,
-    "stats": {"max_hp": 6448, "max_sp": 0, "atk": 303, "matk": 92, "defense": 22, "mdef": 22, "hit": 138, "flee": 79, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5035, "max_sp": 0, "atk": 235, "matk": 92, "defense": 20, "mdef": 22, "hit": 138, "flee": 79, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gill", "rate": 0.35},
       {"item_id": "coral_reef", "rate": 0.15},
@@ -3262,7 +3262,7 @@
     "role": "normal",
     "base_exp": 2087,
     "job_exp": 1044,
-    "stats": {"max_hp": 6448, "max_sp": 0, "atk": 303, "matk": 92, "defense": 22, "mdef": 22, "hit": 138, "flee": 79, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5035, "max_sp": 0, "atk": 235, "matk": 92, "defense": 20, "mdef": 22, "hit": 138, "flee": 79, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fish_tail", "rate": 0.35},
       {"item_id": "coral_reef", "rate": 0.15},
@@ -3281,7 +3281,7 @@
     "role": "tank",
     "base_exp": 2780,
     "job_exp": 1390,
-    "stats": {"max_hp": 15814, "max_sp": 0, "atk": 253, "matk": 94, "defense": 68, "mdef": 23, "hit": 141, "flee": 57, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 12364, "max_sp": 0, "atk": 195, "matk": 94, "defense": 63, "mdef": 23, "hit": 141, "flee": 57, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "shell", "rate": 0.45},
       {"item_id": "nipper", "rate": 0.2},
@@ -3302,7 +3302,7 @@
     "role": "normal",
     "base_exp": 2138,
     "job_exp": 1069,
-    "stats": {"max_hp": 6602, "max_sp": 0, "atk": 310, "matk": 93, "defense": 22, "mdef": 22, "hit": 140, "flee": 80, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5159, "max_sp": 0, "atk": 239, "matk": 93, "defense": 21, "mdef": 22, "hit": 140, "flee": 80, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gill", "rate": 0.4},
       {"item_id": "ore_fragment", "rate": 0.12},
@@ -3321,7 +3321,7 @@
     "role": "normal",
     "base_exp": 2293,
     "job_exp": 1146,
-    "stats": {"max_hp": 7076, "max_sp": 0, "atk": 329, "matk": 97, "defense": 23, "mdef": 23, "hit": 145, "flee": 83, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5539, "max_sp": 0, "atk": 252, "matk": 97, "defense": 21, "mdef": 23, "hit": 145, "flee": 83, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ore_fragment", "rate": 0.35},
       {"item_id": "coal", "rate": 0.12},
@@ -3342,7 +3342,7 @@
     "role": "normal",
     "base_exp": 2400,
     "job_exp": 1200,
-    "stats": {"max_hp": 7400, "max_sp": 0, "atk": 342, "matk": 99, "defense": 24, "mdef": 24, "hit": 148, "flee": 85, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5800, "max_sp": 0, "atk": 261, "matk": 99, "defense": 22, "mdef": 24, "hit": 148, "flee": 85, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "mane", "rate": 0.35},
       {"item_id": "ore_fragment", "rate": 0.12},
@@ -3363,7 +3363,7 @@
     "role": "tank",
     "base_exp": 3257,
     "job_exp": 1628,
-    "stats": {"max_hp": 18486, "max_sp": 0, "atk": 290, "matk": 103, "defense": 75, "mdef": 25, "hit": 153, "flee": 62, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 14514, "max_sp": 0, "atk": 219, "matk": 103, "defense": 68, "mdef": 25, "hit": 153, "flee": 62, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ore_fragment", "rate": 0.45},
       {"item_id": "coal", "rate": 0.2},
@@ -3386,7 +3386,7 @@
     "role": "normal",
     "base_exp": 2037,
     "job_exp": 1018,
-    "stats": {"max_hp": 6296, "max_sp": 0, "atk": 297, "matk": 91, "defense": 22, "mdef": 22, "hit": 136, "flee": 78, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 4913, "max_sp": 0, "atk": 231, "matk": 91, "defense": 20, "mdef": 22, "hit": 136, "flee": 78, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "snake_skin", "rate": 0.35},
       {"item_id": "resin", "rate": 0.12},
@@ -3405,7 +3405,7 @@
     "role": "normal",
     "base_exp": 2189,
     "job_exp": 1094,
-    "stats": {"max_hp": 6758, "max_sp": 0, "atk": 316, "matk": 94, "defense": 23, "mdef": 23, "hit": 141, "flee": 81, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5284, "max_sp": 0, "atk": 244, "matk": 94, "defense": 21, "mdef": 23, "hit": 141, "flee": 81, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "ancient_lips", "rate": 0.35},
       {"item_id": "resin", "rate": 0.12},
@@ -3425,7 +3425,7 @@
     "role": "tank",
     "base_exp": 2650,
     "job_exp": 1325,
-    "stats": {"max_hp": 15089, "max_sp": 0, "atk": 243, "matk": 92, "defense": 67, "mdef": 22, "hit": 138, "flee": 55, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 11782, "max_sp": 0, "atk": 188, "matk": 92, "defense": 61, "mdef": 22, "hit": 138, "flee": 55, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "resin", "rate": 0.45},
       {"item_id": "trunk", "rate": 0.2},
@@ -3444,7 +3444,7 @@
     "role": "normal",
     "base_exp": 2293,
     "job_exp": 1146,
-    "stats": {"max_hp": 7076, "max_sp": 0, "atk": 329, "matk": 97, "defense": 23, "mdef": 23, "hit": 145, "flee": 83, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5539, "max_sp": 0, "atk": 252, "matk": 97, "defense": 21, "mdef": 23, "hit": 145, "flee": 83, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fox_tail", "rate": 0.35},
       {"item_id": "voodoo_doll", "rate": 0.12},
@@ -3464,7 +3464,7 @@
     "role": "normal",
     "base_exp": 2454,
     "job_exp": 1227,
-    "stats": {"max_hp": 7565, "max_sp": 0, "atk": 349, "matk": 100, "defense": 24, "mdef": 24, "hit": 150, "flee": 86, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5933, "max_sp": 0, "atk": 265, "matk": 100, "defense": 22, "mdef": 24, "hit": 150, "flee": 86, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "voodoo_doll", "rate": 0.35},
       {"item_id": "dark_crystal", "rate": 0.1},
@@ -3486,7 +3486,7 @@
     "role": "normal",
     "base_exp": 2735,
     "job_exp": 1368,
-    "stats": {"max_hp": 8416, "max_sp": 0, "atk": 383, "matk": 106, "defense": 26, "mdef": 26, "hit": 158, "flee": 91, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 6619, "max_sp": 0, "atk": 288, "matk": 106, "defense": 24, "mdef": 26, "hit": 158, "flee": 91, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gear_wheel", "rate": 0.35},
       {"item_id": "old_page", "rate": 0.12},
@@ -3506,7 +3506,7 @@
     "role": "normal",
     "base_exp": 2621,
     "job_exp": 1310,
-    "stats": {"max_hp": 8070, "max_sp": 0, "atk": 369, "matk": 104, "defense": 25, "mdef": 25, "hit": 155, "flee": 89, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 6340, "max_sp": 0, "atk": 279, "matk": 104, "defense": 23, "mdef": 25, "hit": 155, "flee": 89, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "old_page", "rate": 0.35},
       {"item_id": "gear_wheel", "rate": 0.12},
@@ -3526,7 +3526,7 @@
     "role": "tank",
     "base_exp": 3473,
     "job_exp": 1736,
-    "stats": {"max_hp": 19695, "max_sp": 0, "atk": 306, "matk": 106, "defense": 77, "mdef": 26, "hit": 158, "flee": 64, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 15488, "max_sp": 0, "atk": 230, "matk": 106, "defense": 71, "mdef": 26, "hit": 158, "flee": 64, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "coral_reef", "rate": 0.45},
       {"item_id": "gill", "rate": 0.2},
@@ -3547,7 +3547,7 @@
     "role": "normal",
     "base_exp": 2793,
     "job_exp": 1396,
-    "stats": {"max_hp": 8592, "max_sp": 0, "atk": 390, "matk": 107, "defense": 26, "mdef": 26, "hit": 160, "flee": 92, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 6761, "max_sp": 0, "atk": 293, "matk": 107, "defense": 24, "mdef": 26, "hit": 160, "flee": 92, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "dark_crystal", "rate": 0.35},
       {"item_id": "old_page", "rate": 0.12},
@@ -3568,7 +3568,7 @@
     "role": "normal",
     "base_exp": 2678,
     "job_exp": 1339,
-    "stats": {"max_hp": 8242, "max_sp": 0, "atk": 376, "matk": 105, "defense": 26, "mdef": 26, "hit": 156, "flee": 90, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 6479, "max_sp": 0, "atk": 283, "matk": 105, "defense": 23, "mdef": 26, "hit": 156, "flee": 90, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gear_wheel", "rate": 0.38},
       {"item_id": "ore_fragment", "rate": 0.12},
@@ -3588,7 +3588,7 @@
     "role": "tank",
     "base_exp": 3621,
     "job_exp": 1810,
-    "stats": {"max_hp": 20520, "max_sp": 0, "atk": 317, "matk": 109, "defense": 79, "mdef": 26, "hit": 162, "flee": 65, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 16155, "max_sp": 0, "atk": 238, "matk": 109, "defense": 73, "mdef": 26, "hit": 162, "flee": 65, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gear_wheel", "rate": 0.45},
       {"item_id": "coal", "rate": 0.2},
@@ -3610,7 +3610,7 @@
     "role": "normal",
     "base_exp": 2565,
     "job_exp": 1282,
-    "stats": {"max_hp": 7900, "max_sp": 0, "atk": 362, "matk": 103, "defense": 25, "mdef": 25, "hit": 153, "flee": 88, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 6203, "max_sp": 0, "atk": 274, "matk": 103, "defense": 23, "mdef": 25, "hit": 153, "flee": 88, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gear_wheel", "rate": 0.35},
       {"item_id": "ore_fragment", "rate": 0.12},
@@ -3630,7 +3630,7 @@
     "role": "glass",
     "base_exp": 3030,
     "job_exp": 1515,
-    "stats": {"max_hp": 6519, "max_sp": 0, "atk": 544, "matk": 112, "defense": 0, "mdef": 27, "hit": 167, "flee": 115, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5140, "max_sp": 0, "atk": 405, "matk": 112, "defense": 0, "mdef": 27, "hit": 167, "flee": 115, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "gear_wheel", "rate": 0.3},
       {"item_id": "dark_crystal", "rate": 0.12},
@@ -3651,7 +3651,7 @@
     "role": "normal",
     "base_exp": 2678,
     "job_exp": 1339,
-    "stats": {"max_hp": 8242, "max_sp": 0, "atk": 376, "matk": 105, "defense": 26, "mdef": 26, "hit": 156, "flee": 90, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 6479, "max_sp": 0, "atk": 283, "matk": 105, "defense": 23, "mdef": 26, "hit": 156, "flee": 90, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "will_o_wisp", "rate": 0.35},
       {"item_id": "old_page", "rate": 0.12},
@@ -3671,7 +3671,7 @@
     "role": "normal",
     "base_exp": 2851,
     "job_exp": 1426,
-    "stats": {"max_hp": 8770, "max_sp": 0, "atk": 397, "matk": 109, "defense": 26, "mdef": 26, "hit": 162, "flee": 93, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 6904, "max_sp": 0, "atk": 297, "matk": 109, "defense": 24, "mdef": 26, "hit": 162, "flee": 93, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "rusty_shackle", "rate": 0.35},
       {"item_id": "old_page", "rate": 0.12},
@@ -3691,7 +3691,7 @@
     "role": "tank",
     "base_exp": 3848,
     "job_exp": 1924,
-    "stats": {"max_hp": 21792, "max_sp": 0, "atk": 335, "matk": 112, "defense": 82, "mdef": 27, "hit": 167, "flee": 67, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 17182, "max_sp": 0, "atk": 249, "matk": 112, "defense": 75, "mdef": 27, "hit": 167, "flee": 67, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "rusty_shackle", "rate": 0.45},
       {"item_id": "elunium", "rate": 0.08},
@@ -3712,7 +3712,7 @@
     "role": "glass",
     "base_exp": 3215,
     "job_exp": 1608,
-    "stats": {"max_hp": 6911, "max_sp": 0, "atk": 572, "matk": 116, "defense": 0, "mdef": 28, "hit": 172, "flee": 119, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5456, "max_sp": 0, "atk": 423, "matk": 116, "defense": 0, "mdef": 28, "hit": 172, "flee": 119, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "will_o_wisp", "rate": 0.35},
       {"item_id": "oridecon", "rate": 0.1},
@@ -3733,7 +3733,7 @@
     "role": "normal",
     "base_exp": 2735,
     "job_exp": 1368,
-    "stats": {"max_hp": 8416, "max_sp": 0, "atk": 383, "matk": 106, "defense": 26, "mdef": 26, "hit": 158, "flee": 91, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 6619, "max_sp": 0, "atk": 288, "matk": 106, "defense": 24, "mdef": 26, "hit": 158, "flee": 91, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "scarab_shell", "rate": 0.4},
       {"item_id": "scorpion_tail", "rate": 0.15},
@@ -3753,7 +3753,7 @@
     "role": "normal",
     "base_exp": 2241,
     "job_exp": 1120,
-    "stats": {"max_hp": 6916, "max_sp": 0, "atk": 322, "matk": 95, "defense": 23, "mdef": 23, "hit": 143, "flee": 82, "aspd": 100, "crit": 0},
+    "stats": {"max_hp": 5411, "max_sp": 0, "atk": 248, "matk": 95, "defense": 21, "mdef": 23, "hit": 143, "flee": 82, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fox_tail", "rate": 0.4},
       {"item_id": "voodoo_doll", "rate": 0.1},

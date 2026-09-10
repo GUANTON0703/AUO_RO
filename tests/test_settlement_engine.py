@@ -115,9 +115,9 @@ def test_potions_drunk_mid_fight_prevent_one_shot_death():
     foe = c.get_monster("wolf")
     kw = dict(elapsed_seconds=180, cfg=HuntConfig(), offline=False, pity_in={})
 
-    dry = settle(_hero(max_hp=260, defense=0, aspd=120), foe,
+    dry = settle(_hero(max_hp=340, atk=800, defense=0, aspd=150, flee=75), foe,
                  rng=random.Random(7), potion_item_id=None, potion_count=0, **kw)
-    wet = settle(_hero(max_hp=260, defense=0, aspd=120), foe,
+    wet = settle(_hero(max_hp=340, atk=800, defense=0, aspd=150, flee=75), foe,
                  rng=random.Random(7), potion_item_id="red_potion",
                  potion_heal=200, potion_count=300, **kw)
 

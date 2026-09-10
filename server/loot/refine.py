@@ -55,7 +55,7 @@ def attempt_random_refine(current_refine: int,
 
 
 REFINE_BONUS_PER_LEVEL = {"atk": 2, "matk": 2, "defense": 1, "mdef": 1,
-                          "max_hp": 15, "flee": 1, "hit": 1, "crit": 1}
+                          "flee": 1, "hit": 1, "crit": 1}
 
 
 def refine_stat_bonus(base_stats: dict, refine: int) -> dict:

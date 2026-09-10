@@ -14,11 +14,11 @@ _ROLE = {
 def baseline(level: int, role: MonsterRole) -> CombatStats:
     hp_mult, atk_mult, def_mult, flee_mult = _ROLE[role]
 
-    # 基準：Lv1 約 HP 50 / ATK 8。HP 有 level² 項，ATK 也要有，
-    # 不然中後期怪物傷害追不上玩家血量、掛機完全沒威脅。
-    hp_base = 40 + 20 * level + 0.9 * level**2
-    atk_base = 6 + 1.8 * level + 0.03 * level**2
-    def_base = 0.6 * level
+    # Pre-Renewal 小數值尺度。玩家 ATK 拿掉了 ×(1+lv/50) 全域倍率後傷害掉約一半，
+    # 怪物數值同步下修。
+    hp_base = 40 + 12 * level + 0.75 * level**2
+    atk_base = 5 + 2.0 * level + 0.015 * level**2
+    def_base = 0.55 * level
     # 命中要跟得上玩家 FLEE（= base_level + AGI + LUK/5 + 裝備 + 常駐 buff）。
     # 原版怪命中本來就很高（Owl Duke lv68 HIT 226）；這裡取 1.7×level 讓
     # 中等 AGI 角色被打到約一半、專精迴避流仍能閃掉大半。

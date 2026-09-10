@@ -11,9 +11,9 @@ def _mods(base: float, element_multiplier: float, resist_pct: int, race_pct: int
             * (1 - _clamp(resist_pct, -100, 100) / 100))
 
 
-# 防禦用「遞減報酬」而非線性百分比：reduction = def / (def + K)。
-# 永遠打不到 100%，重甲有感但不會變無敵（原本 def 95 = 95% 減傷、直接夾死）。
-_DEF_K = 70
+# 防禦用「遞減報酬」：reduction = def / (def + K)。Pre-Renewal 小數值尺度，
+# 重甲角色 DEF 約 50~90 → 減傷 50~65%，永遠到不了 100%。
+_DEF_K = 45
 
 
 def _dmg_reduction(defense: int) -> float:

@@ -137,11 +137,11 @@ def test_default_disabled_skill_excluded_unless_toggled_on():
 def test_equipment_max_hp_sp_apply():
     c = load_content()
     bare = build_player_combatant(_snap(equipped=[]), c)
-    # curly_horn_helm = +600 HP, circlet = +20 SP
+    # curly_horn_helm = +200 HP, circlet = +10 SP（經典小數值尺度）
     hp_gear = build_player_combatant(_snap(equipped=[EquippedPiece("curly_horn_helm")]), c)
     sp_gear = build_player_combatant(_snap(equipped=[EquippedPiece("circlet")]), c)
-    assert hp_gear.max_hp >= bare.max_hp + 590
-    assert sp_gear.max_sp >= bare.max_sp + 18
+    assert hp_gear.max_hp >= bare.max_hp + 190
+    assert sp_gear.max_sp >= bare.max_sp + 8
 
 
 def test_stale_hp_clamped_to_new_max():
