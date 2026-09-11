@@ -191,6 +191,14 @@ def spend_zeny(character_id: int, amount: int) -> bool:
         return cur.rowcount > 0
 
 
+def set_craft_progress(character_id: int, level: int, exp: int) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            "UPDATE characters SET craft_level = ?, craft_exp = ? WHERE id = ?",
+            (level, exp, character_id),
+        )
+
+
 def apply_progression(character_id: int, *, base_level: int, base_exp: int,
                       job_level: int, job_exp: int, zeny_delta: int) -> None:
     with connection.get_connection() as conn:

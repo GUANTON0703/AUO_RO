@@ -1,0 +1,8 @@
+[
+  {"id": "recipe_heal_boost_potion", "name": "喝水加成藥配方", "result_item": "heal_boost_potion", "result_qty": 1, "required_craft_level": 1, "base_success_pct": 65, "materials": {"jellopy": 5, "honey": 3, "elunium": 1}, "zeny_cost": 200},
+  {"id": "recipe_vitality_potion", "name": "活力藥水配方", "result_item": "vitality_potion", "result_qty": 1, "required_craft_level": 1, "base_success_pct": 65, "materials": {"fluff": 5, "feather": 5, "oridecon": 1}, "zeny_cost": 200},
+  {"id": "recipe_awakening_potion", "name": "覺醒藥配方", "result_item": "awakening_potion", "result_qty": 1, "required_craft_level": 2, "base_success_pct": 60, "materials": {"orc_tooth": 4, "rosary": 2, "oridecon": 2}, "zeny_cost": 350},
+  {"id": "recipe_critical_potion", "name": "爆擊藥水配方", "result_item": "critical_potion", "result_qty": 1, "required_craft_level": 3, "base_success_pct": 55, "materials": {"amber": 3, "mane": 3, "cursed_ruby": 1}, "zeny_cost": 500},
+  {"id": "recipe_sweet_spot_potion", "name": "會心藥水配方", "result_item": "sweet_spot_potion", "result_qty": 1, "required_craft_level": 3, "base_success_pct": 55, "materials": {"fox_tail": 3, "voodoo_doll": 2, "dark_crystal": 1}, "zeny_cost": 500},
+  {"id": "recipe_berserk_potion", "name": "狂暴藥配方", "result_item": "berserk_potion", "result_qty": 1, "required_craft_level": 4, "base_success_pct": 50, "materials": {"dark_crystal": 2, "scarab_shell": 3, "elunium": 3}, "zeny_cost": 800}
+]

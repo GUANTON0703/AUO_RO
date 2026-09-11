@@ -90,6 +90,10 @@ class _DbHelpers:
     def set_zeny(self, character_id, amount):
         self._exec("UPDATE characters SET zeny = ? WHERE id = ?", (amount, character_id))
 
+    def set_craft_level(self, character_id, level, exp=0):
+        self._exec("UPDATE characters SET craft_level = ?, craft_exp = ? WHERE id = ?",
+                   (level, exp, character_id))
+
     def rewind_hunt(self, character_id, seconds):
         with connection.get_connection() as conn:
             row = conn.execute(

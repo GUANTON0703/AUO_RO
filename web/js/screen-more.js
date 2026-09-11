@@ -75,6 +75,11 @@
         </div>
 
         <div class="card">
+          <div class="section-title"><h3>煉製</h3><span class="sub" id="craft-level"></span></div>
+          <div class="list" id="craft-list"><div class="spinner">載入中…</div></div>
+        </div>
+
+        <div class="card">
           <h3>面對面交易</h3>
           <div class="row" style="margin-bottom:8px">
             <input id="trade-to" placeholder="對方角色名稱" style="flex:1">
@@ -96,6 +101,7 @@
 
       this._stopFightDrip();
       await this._loadMvp();
+      await this._loadCraft();
       await this._loadTrade();
       if (S.me && S.me.is_gm) await this._loadGm();
     },
@@ -290,6 +296,58 @@
         await App.refreshChar();
         await this._loadMvp();
       }, `#fight-${id}`);
+    },
+
+    // ---------- 煉製 ----------
+    async _loadCraft() {
+      const box = document.querySelector("#craft-list");
+      if (!box) return;
+      try {
+        const data = await API.listCraft();
+        const lv = document.querySelector("#craft-level");
+        if (lv) {
+          lv.textContent = data.craft_exp_next
+            ? `Lv ${data.craft_level}（${data.craft_exp} / ${data.craft_exp_next}）`
+            : `Lv ${data.craft_level}（滿級）`;
+        }
+        box.innerHTML = (data.recipes || []).map((r) => {
+          const mats = r.materials.map((m) => {
+            const short = m.have < m.need;
+            return `<span${short ? ` style="color:var(--bad)"` : ""}>${esc(m.name)} ${m.have}/${m.need}</span>`;
+          }).join("　");
+          const canOne = r.materials.every((m) => m.have >= m.need);
+          const canFive = r.materials.every((m) => m.have >= m.need * 5);
+          const canTen = r.materials.every((m) => m.have >= m.need * 10);
+          return `<div class="item" style="align-items:flex-start"><div>
+              <div>${esc(r.name)}<span class="pill" style="margin-left:6px">成功率 ${r.success_pct}%</span></div>
+              <div class="sub">產出：${esc(r.result_item_name)} ×${r.result_qty}　需製作等級 ${r.required_craft_level}${
+                r.zeny_cost ? `　${r.zeny_cost}z/次` : ""}</div>
+              <div class="sub">${mats}</div>
+              <div id="craft-result-${esc(r.id)}"></div>
+            </div>
+            <div class="row tight" style="flex-wrap:wrap">
+              <button class="btn small" data-craft="${esc(r.id)}" data-times="1"${canOne ? "" : " disabled"}>做 1</button>
+              <button class="btn small" data-craft="${esc(r.id)}" data-times="5"${canFive ? "" : " disabled"}>做 5</button>
+              <button class="btn small" data-craft="${esc(r.id)}" data-times="10"${canTen ? "" : " disabled"}>做 10</button>
+            </div></div>`;
+        }).join("") || "<p class='muted'>還沒有配方</p>";
+        box.querySelectorAll("[data-craft]").forEach((b) => {
+          b.onclick = () => this._doCraft(b.dataset.craft, Number(b.dataset.times));
+        });
+      } catch (e) { box.innerHTML = `<p class="muted">${esc(e.detail || "載入失敗")}</p>`; }
+    },
+    async _doCraft(recipeId, times) {
+      document.querySelectorAll(`[data-craft="${recipeId}"]`).forEach((b) => { b.disabled = true; });
+      try {
+        const r = await API.craft(recipeId, times);
+        const box = document.querySelector(`#craft-result-${recipeId}`);
+        const line = `製作 ${r.attempts} 次：成功 ${r.successes}${
+          r.great_successes ? `（大成功 ${r.great_successes}）` : ""}、失敗 ${r.fails}，` +
+          `拿到 ${esc(itemName(r.result_item))} ×${r.produced}`;
+        if (box) box.innerHTML = `<p class="sub">${line}</p>`;
+        App.toast(line);
+      } catch (e) { App.toast(e.detail || "製作失敗", true); }
+      await this._loadCraft();
     },
 
     // ---------- 交易 ----------

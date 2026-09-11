@@ -75,6 +75,10 @@ def create_app() -> FastAPI:
 
     app.include_router(admin_router)
 
+    from server.api.craft import router as craft_router
+
+    app.include_router(craft_router)
+
     @app.get("/health")
     def health() -> dict:
         return {"status": "ok"}

@@ -20,7 +20,7 @@ def tiny_data(tmp_path):
          "level_range": [1, 12], "monster_ids": ["poring"], "mvp_id": None,
          "unlock_base_level": 1}
     ], ensure_ascii=False), encoding="utf-8")
-    for name in ["mvps", "skills", "jobs", "equipment", "cards"]:
+    for name in ["mvps", "skills", "jobs", "equipment", "cards", "recipes"]:
         (tmp_path / f"{name}.json").write_text("[]", encoding="utf-8")
     (tmp_path / "items.json").write_text(json.dumps([
         {"id": "jellopy", "name": "壓縮膠", "kind": "material"}

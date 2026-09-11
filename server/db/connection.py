@@ -175,6 +175,12 @@ def _migration_10(conn: sqlite3.Connection) -> None:
     _add_col(conn, "characters", "active_potion_buffs", "TEXT NOT NULL DEFAULT '{}'")
 
 
+def _migration_11(conn: sqlite3.Connection) -> None:
+    """全民製作：每個角色自己的製作等級/經驗。"""
+    _add_col(conn, "characters", "craft_level", "INTEGER NOT NULL DEFAULT 1")
+    _add_col(conn, "characters", "craft_exp", "INTEGER NOT NULL DEFAULT 0")
+
+
 # (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
 _MIGRATIONS: list[tuple[int, "callable"]] = [
     (1, _migration_1),
@@ -187,6 +193,7 @@ _MIGRATIONS: list[tuple[int, "callable"]] = [
     (8, _migration_8),
     (9, _migration_9),
     (10, _migration_10),
+    (11, _migration_11),
 ]
 
 

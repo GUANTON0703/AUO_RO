@@ -4,7 +4,7 @@ from pathlib import Path
 
 from shared.content import (
     CardDef, ElementChart, EquipmentDef, ItemDef, JobDef, MapDef,
-    MonsterDef, MvpDef, SkillDef,
+    MonsterDef, MvpDef, RecipeDef, SkillDef,
 )
 
 _DATA_DIR = Path(__file__).resolve().parents[2] / "data"
@@ -28,6 +28,7 @@ class Content:
     equipment: dict[str, EquipmentDef] = field(default_factory=dict)
     cards: dict[str, CardDef] = field(default_factory=dict)
     items: dict[str, ItemDef] = field(default_factory=dict)
+    recipes: dict[str, RecipeDef] = field(default_factory=dict)
     element_chart: ElementChart = field(default_factory=ElementChart)
 
     def get_monster(self, mid: str) -> MonsterDef:
@@ -76,6 +77,7 @@ def load_content(data_dir: Path | None = None) -> Content:
             equipment=_index((EquipmentDef(**x) for x in _read(d / "equipment.json")), "equipment"),
             cards=_index((CardDef(**x) for x in _read(d / "cards.json")), "cards"),
             items=_index((ItemDef(**x) for x in _read(d / "items.json")), "items"),
+            recipes=_index((RecipeDef(**x) for x in _read(d / "recipes.json")), "recipes"),
             element_chart=ElementChart(**_read(d / "element_chart.json")),
         )
     except ContentError:
@@ -110,6 +112,12 @@ def _check_integrity(c: Content) -> None:
                 raise ContentError(f"職業 {job.id} 引用不存在的技能 {sid}")
         if job.parent_id and job.parent_id not in c.jobs:
             raise ContentError(f"職業 {job.id} 的 parent_id {job.parent_id} 不存在")
+    for recipe in c.recipes.values():
+        if recipe.result_item not in c.items:
+            raise ContentError(f"配方 {recipe.id} 的產出 {recipe.result_item} 不存在")
+        for mat_id in recipe.materials:
+            if mat_id not in c.items:
+                raise ContentError(f"配方 {recipe.id} 的材料 {mat_id} 不存在")
     _ELEMENTS = {"neutral", "water", "earth", "fire", "wind", "poison",
                  "holy", "shadow", "ghost", "undead"}
     for skill in c.skills.values():

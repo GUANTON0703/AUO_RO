@@ -115,6 +115,10 @@ const API = (() => {
     challengeMvp: (mvp_id, flee_hp_frac) =>
       post("/mvp/challenge", flee_hp_frac == null ? { mvp_id } : { mvp_id, flee_hp_frac }),
 
+    // craft
+    listCraft: () => get("/craft"),
+    craft: (recipe_id, times) => post(`/craft/${recipe_id}`, { times }),
+
     // trade
     tradePending: () => get("/trade/pending"),
     tradeOffer: (to_username) => post("/trade/offer", { to_username }),

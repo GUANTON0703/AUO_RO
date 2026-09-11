@@ -62,6 +62,7 @@ def catalog(account_id: CurrentAccount):
         "cards": dump(_content.cards),
         "jobs": dump(_content.jobs),
         "skills": dump(_content.skills),
+        "recipes": dump(_content.recipes),
     }
 
 

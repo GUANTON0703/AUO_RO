@@ -160,6 +160,17 @@ class ItemDef(BaseModel):
     npc_sell: int = Field(default=0, ge=0)
 
 
+class RecipeDef(BaseModel):
+    id: str
+    name: str
+    result_item: str
+    result_qty: int = Field(default=1, ge=1)
+    required_craft_level: int = Field(default=1, ge=1)  # 製作等級門檻，低於也能試，成功率會很低
+    base_success_pct: int = Field(default=50, ge=1, le=100)
+    materials: dict[str, int] = Field(default_factory=dict)  # {item_id: 需要數量}
+    zeny_cost: int = Field(default=0, ge=0)
+
+
 class ElementChart(BaseModel):
     table: dict[str, dict[str, float]] = Field(default_factory=dict)
 
