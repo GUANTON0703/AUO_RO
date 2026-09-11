@@ -11,6 +11,7 @@ from server.auth.dependencies import CurrentAccount
 from server.config import get_settings
 from server.content import load_content
 from server.db import connection
+from server import npc_buff
 from server.loot.pricing import item_sell_price
 from server.progression import CharacterSnapshot, EquippedPiece, build_player_combatant
 from server.progression.levels import apply_base_exp, apply_job_exp
@@ -84,6 +85,7 @@ class HuntStrategyRequest(BaseModel):
     skill_toggles: dict[str, bool] = {}
     auto_buff_potions: list[str] = []
     auto_buy_buff_potions: dict[str, int] = {}
+    npc_buff_rental: bool = False
 
 
 def _load_strategy(character_id: int) -> HuntStrategy:
@@ -119,6 +121,25 @@ def put_hunt_strategy(character_id: int, body: HuntStrategyRequest, account_id: 
     characters_repo.set_hunt_strategy(character_id, body.model_dump())
     _hunt_meta.pop(character_id, None)   # 策略改了，可打怪清單要重算
     return body.model_dump()
+
+
+@router.post("/npc_buff/rent_once")
+def rent_npc_buff_once(account_id: CurrentAccount):
+    """跟 NPC 單次租一套 buff（祝福/疾走/合唱那種整套效果），花 5000z，持續 5 分鐘，不會自動續。"""
+    row = _current_character(account_id)
+    if row["zeny"] < NPC_BUFF_ONE_TIME_COST:
+        raise HTTPException(status_code=400, detail="Zeny 不足")
+    characters_repo.spend_zeny(row["id"], NPC_BUFF_ONE_TIME_COST)
+    now = datetime.now(timezone.utc)
+    expires_at = now + timedelta(seconds=NPC_BUFF_ONE_TIME_DURATION_S)
+    stored = characters_repo.get_active_potion_buffs(row["id"])
+    stored[NPC_BUFF_ITEM_ID] = {"expires_at": expires_at.isoformat(), "stats": NPC_BUFF_STATS}
+    characters_repo.set_active_potion_buffs(row["id"], stored)
+    return {
+        "name": NPC_BUFF_NAME, "stats": NPC_BUFF_STATS,
+        "remaining_s": NPC_BUFF_ONE_TIME_DURATION_S,
+        "zeny": row["zeny"] - NPC_BUFF_ONE_TIME_COST,
+    }
 
 
 def _snapshot(row, *, hp=None, sp=None, apply_prefs=True, active_item_buffs=None) -> CharacterSnapshot:
@@ -170,10 +191,22 @@ def _buff_effect(item) -> dict | None:
     return next((e for e in item.effects if e.get("type") == "buff"), None)
 
 
+# NPC 代喝 buff（牧師/高階牧師/吟遊詩人整套技能效果，不是單一 buff 藥）：
+# 不是真實道具，用一個固定 item_id 存進 active_potion_buffs 同一個池子，跟 buff 藥共用引擎折算邏輯。
+NPC_BUFF_ITEM_ID = npc_buff.ITEM_ID
+NPC_BUFF_NAME = npc_buff.NAME
+NPC_BUFF_STATS = npc_buff.STATS
+NPC_BUFF_ONE_TIME_COST = npc_buff.ONE_TIME_COST
+NPC_BUFF_ONE_TIME_DURATION_S = npc_buff.ONE_TIME_DURATION_S
+NPC_BUFF_HOURLY_COST = npc_buff.HOURLY_COST
+NPC_BUFF_HOURLY_INTERVAL_S = npc_buff.HOURLY_INTERVAL_S
+
+
 def _refresh_active_buffs(character_id: int, strategy, base_level: int, now) -> dict:
     """讀目前還沒過期的 buff 藥，過期的清掉；設定裡有勾自動喝、目前沒生效、
-    背包有貨的就喝一瓶續上。回傳 {item_id: {stat: 加成值}} 給combatant折進面板用
-    （不含 expires_at 這種 metadata）。"""
+    背包有貨的就喝一瓶續上。勾了持續租用 NPC buff、目前沒生效，就扣 8000z 續一小時
+    （扣不出來就讓它斷租，之後有錢了下一輪自動再續上）。
+    回傳 {item_id: {stat: 加成值}} 給combatant折進面板用（不含 expires_at 這種 metadata）。"""
     stored = characters_repo.get_active_potion_buffs(character_id)
     active: dict = {}
     for item_id, info in stored.items():
@@ -198,6 +231,13 @@ def _refresh_active_buffs(character_id: int, strategy, base_level: int, now) -> 
         inventory.consume_item(character_id, item_id, 1)
         expires_at = now + timedelta(seconds=effect.get("duration_s", 60))
         active[item_id] = {"expires_at": expires_at.isoformat(), "stats": effect.get("stats", {})}
+
+    if strategy.npc_buff_rental and NPC_BUFF_ITEM_ID not in active:
+        current_zeny = characters_repo.get_character(character_id)["zeny"]
+        if current_zeny >= NPC_BUFF_HOURLY_COST and characters_repo.spend_zeny(character_id, NPC_BUFF_HOURLY_COST):
+            expires_at = now + timedelta(seconds=NPC_BUFF_HOURLY_INTERVAL_S)
+            active[NPC_BUFF_ITEM_ID] = {"expires_at": expires_at.isoformat(), "stats": NPC_BUFF_STATS}
+            characters_repo.add_hunt_potion_zeny_spent(character_id, NPC_BUFF_HOURLY_COST)
 
     if active != stored:
         characters_repo.set_active_potion_buffs(character_id, active)
@@ -418,7 +458,8 @@ def _active_potion_buffs_view(row) -> list:
         if remaining <= 0:
             continue
         item = _content.items.get(item_id)
-        out.append({"item_id": item_id, "name": item.name if item else item_id,
+        name = NPC_BUFF_NAME if item_id == NPC_BUFF_ITEM_ID else (item.name if item else item_id)
+        out.append({"item_id": item_id, "name": name,
                    "remaining_s": round(remaining), "stats": info.get("stats", {})})
     return out
 

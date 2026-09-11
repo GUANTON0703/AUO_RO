@@ -15,6 +15,7 @@ def test_hunt_strategy_can_be_saved_and_read(client, auth, db_helpers):
         "primary_skill_id": "bash", "skill_toggles": {"magnum_break": False},
         "auto_buff_potions": ["concentration_potion"],
         "auto_buy_buff_potions": {"concentration_potion": 20},
+        "npc_buff_rental": True,
     }
     response = client.put(f"/api/hunt/strategy/{ch['id']}", headers=headers, json=body)
     assert response.status_code == 200
@@ -40,6 +41,7 @@ def test_hunt_strategy_survives_restart(client, auth, db_helpers):
         "primary_skill_id": None, "skill_toggles": {},
         "auto_buff_potions": [],
         "auto_buy_buff_potions": {},
+        "npc_buff_rental": False,
     }
     assert client.put(f"/api/hunt/strategy/{ch['id']}", headers=headers, json=body).status_code == 200
     # 策略進了 DB（模擬重啟：記憶體沒有任何暫存，直接查資料表）

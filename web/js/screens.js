@@ -1125,8 +1125,27 @@ Screens.hunt = {
         <p class="sub">設 0 = 一律放。設高一點會留魔力、少放技能。</p>
         <div class="sub" style="margin-top:8px">自動喝 buff 藥（過期自動補喝，沒庫存就不喝；商店買得到的可以順便設自動買）</div>
         ${this._buffPotionChecklist(s.auto_buff_potions || [], s.auto_buy_buff_potions || {})}
+        ${this._npcBuffCard(s)}
         <button class="btn primary block" id="st-save" style="margin-top:10px">儲存掛機設定</button>
       </div>`;
+  },
+  _npcBuffCard(s) {
+    const nb = S.catalog.npc_buff;
+    if (!nb) return "";
+    const parts = Object.entries(nb.stats || {}).map(([k, v]) => {
+      const zh = STAT_ZH[k] || k;
+      return k === "regen_bonus_pct" ? `${zh} +${v}%` : `${zh} +${v}`;
+    }).join("、");
+    return `
+      <div class="sub" style="margin-top:8px">NPC 代喝套裝 buff（牧師/高階牧師/吟遊詩人整套效果，不是單一 buff）</div>
+      <div class="sub">${esc(parts)}</div>
+      <label class="kv" style="cursor:pointer">
+        <span>持續租用（每小時自動扣 ${nb.hourly_cost}z 續租，沒錢就斷租）</span>
+        <input type="checkbox" id="st-npcbuff" style="width:auto" ${s.npc_buff_rental ? "checked" : ""}>
+      </label>
+      <button class="btn block" id="npc-buff-once" style="margin-top:6px">
+        花 ${nb.one_time_cost}z 租一次（持續 ${Math.round(nb.one_time_duration_s / 60)} 分鐘，不自動續）
+      </button>`;
   },
   _buffPotionChecklist(picked, buyUpto) {
     const set = new Set(picked);
@@ -1168,11 +1187,22 @@ Screens.hunt = {
           [...document.querySelectorAll("[data-buybuffpot]")]
             .map((el) => [el.dataset.buybuffpot, Math.max(0, Math.floor(Number(el.value) || 0))])
             .filter(([, v]) => v > 0)),
+        npc_buff_rental: g("#st-npcbuff") ? g("#st-npcbuff").checked : false,
       };
       btn.disabled = true;
       try { await API.setHuntStrategy(S.char.id, strat); this._strategy = strat; App.toast("已儲存"); }
       catch (e) { App.toast(e.detail || "儲存失敗", true); }
       btn.disabled = false;
+    };
+    const onceBtn = document.querySelector("#npc-buff-once");
+    if (onceBtn) onceBtn.onclick = async () => {
+      onceBtn.disabled = true;
+      try {
+        const r = await API.rentNpcBuffOnce();
+        App.toast(`租到了：${r.name}，剩約 ${r.remaining_s} 秒`);
+        await App.refreshChar();
+      } catch (e) { App.toast(e.detail || "租不起", true); }
+      onceBtn.disabled = false;
     };
   },
   _selectMap(mid) {

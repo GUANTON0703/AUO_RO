@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from server.auth.dependencies import CurrentAccount
 from server.content import load_content
+from server import npc_buff
 from server.repositories import characters as characters_repo
 from server.settlement.drops import effective_drop_rate, load_drop_rate_overrides
 
@@ -63,6 +64,13 @@ def catalog(account_id: CurrentAccount):
         "jobs": dump(_content.jobs),
         "skills": dump(_content.skills),
         "recipes": dump(_content.recipes),
+        "npc_buff": {
+            "name": npc_buff.NAME, "stats": npc_buff.STATS,
+            "one_time_cost": npc_buff.ONE_TIME_COST,
+            "one_time_duration_s": npc_buff.ONE_TIME_DURATION_S,
+            "hourly_cost": npc_buff.HOURLY_COST,
+            "hourly_interval_s": npc_buff.HOURLY_INTERVAL_S,
+        },
     }
 
 

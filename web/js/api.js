@@ -70,6 +70,7 @@ const API = (() => {
     huntStop: () => post("/hunt/stop"),
     huntStrategy: (cid) => get("/hunt/strategy/" + cid),
     setHuntStrategy: (cid, strat) => put("/hunt/strategy/" + cid, strat),
+    rentNpcBuffOnce: () => post("/hunt/npc_buff/rent_once"),
 
     // inventory ops
     equip: (cid, eqInstanceId) =>

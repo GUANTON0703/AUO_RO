@@ -68,6 +68,64 @@ def test_auto_buy_buff_potion(client, auth, db_helpers):
     assert inv["items"].get("concentration_potion", 0) > 0
 
 
+def test_npc_buff_rent_once_charges_zeny_and_applies_buff(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    db_helpers.set_zeny(ch["id"], 10000)
+    r = client.post("/api/hunt/npc_buff/rent_once", headers=h)
+    assert r.status_code == 200
+    body = r.json()
+    assert body["zeny"] == 5000
+    assert body["stats"].get("atk") == 20
+    zeny = client.get("/api/characters", headers=h).json()[0]["zeny"]
+    assert zeny == 5000
+
+
+def test_npc_buff_rent_once_rejects_when_broke(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    db_helpers.set_zeny(ch["id"], 100)
+    r = client.post("/api/hunt/npc_buff/rent_once", headers=h)
+    assert r.status_code == 400
+
+
+def test_npc_buff_continuous_rental_bills_hourly(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    db_helpers.set_zeny(ch["id"], 100000)
+    db_helpers.give_item(ch["id"], "red_potion", 400)  # 別讓角色沒水喝到撤退，掛機才撐得過兩個小時
+    r = client.put(f"/api/hunt/strategy/{ch['id']}", headers=h, json={"npc_buff_rental": True})
+    assert r.status_code == 200
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_south_field"})
+    db_helpers.rewind_hunt(ch["id"], seconds=3600)
+    status = client.get("/api/hunt/status", headers=h).json()
+    buffs = status["character"]["active_potion_buffs"]
+    npc = next((b for b in buffs if b["item_id"] == "npc_buff_rental"), None)
+    assert npc is not None
+    assert npc["stats"].get("atk") == 20
+    spent_after_first = status["character"]["hunt_potion_zeny_spent"]
+    assert spent_after_first >= 8000
+
+    # 租期到期（用直接清掉目前生效的 buff 模擬過期，不用真的等一小時）才會再扣一次
+    from server.repositories import characters as characters_repo
+    characters_repo.set_active_potion_buffs(ch["id"], {})
+    db_helpers.rewind_hunt(ch["id"], seconds=3600)
+    status2 = client.get("/api/hunt/status", headers=h).json()
+    assert status2["character"]["hunt_potion_zeny_spent"] >= spent_after_first + 8000
+
+
+def test_npc_buff_continuous_rental_lapses_when_broke(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    db_helpers.set_zeny(ch["id"], 3000)  # 不夠一次續租
+    client.put(f"/api/hunt/strategy/{ch['id']}", headers=h, json={"npc_buff_rental": True})
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_south_field"})
+    db_helpers.rewind_hunt(ch["id"], seconds=3600)
+    status = client.get("/api/hunt/status", headers=h).json()
+    buffs = status["character"]["active_potion_buffs"]
+    assert not any(b["item_id"] == "npc_buff_rental" for b in buffs)
+
+
 def test_hunt_warm_start_yields_kills_on_first_status(client, auth, db_helpers):
     # 暖啟動：按下掛機後不 rewind，第一次 status 就該結算出一場戰鬥
     _, h, _ = auth
@@ -381,3 +439,4 @@ def test_shared_hp_sp_potion_not_over_consumed(client, auth, db_helpers):
     client.get("/api/hunt/status", headers=h)
     inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
     assert inv["items"].get("royal_jelly", 0) >= 0   # 不會變負
+
