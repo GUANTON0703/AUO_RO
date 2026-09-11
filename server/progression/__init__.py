@@ -149,10 +149,10 @@ def _passive_procs(content, learned: dict) -> dict:
     return out
 
 
-def _maintained_buffs(content, learned: dict, toggles: dict) -> dict:
-    """掛機時「維持型」自我 buff（trigger=sp_available 的 buff 技）當成常駐，
-    直接折進數值 → 不用每場重放、不耗 SP、記錄也不會洗一排施放訊息。"""
-    bonus: dict = {}
+def maintained_buff_list(content, learned: dict, toggles: dict) -> list[dict]:
+    """掛機時「維持型」自我 buff（trigger=sp_available 的 buff 技）明細清單，
+    一個技能一筆，給畫面顯示用（沒有倒數，是常駐效果）。"""
+    out: list[dict] = []
     for sid, lvl in learned.items():
         sk = content.skills.get(sid)
         if not sk or sk.kind != "active":
@@ -167,7 +167,16 @@ def _maintained_buffs(content, learned: dict, toggles: dict) -> dict:
                 continue
             for stat, seq in eff.get("stats", {}).items():
                 val = seq[min(lvl, len(seq)) - 1] if isinstance(seq, list) else seq
-                bonus[stat] = bonus.get(stat, 0) + val
+                out.append({"stat": stat, "magnitude": val, "source": sk.name})
+    return out
+
+
+def _maintained_buffs(content, learned: dict, toggles: dict) -> dict:
+    """掛機時「維持型」自我 buff 當成常駐，直接折進數值 → 不用每場重放、
+    不耗 SP、記錄也不會洗一排施放訊息。"""
+    bonus: dict = {}
+    for b in maintained_buff_list(content, learned, toggles):
+        bonus[b["stat"]] = bonus.get(b["stat"], 0) + b["magnitude"]
     return bonus
 
 

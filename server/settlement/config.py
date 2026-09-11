@@ -19,7 +19,7 @@ class HuntConfig:
     experience_multiplier: float = 1.0
     drop_multiplier: float = 1.0
     zeny_multiplier: float = 1.0
-    settle_floor_seconds: float = 3.0    # 結算防抖：距上次結算未達這個秒數就只回累積值
+    settle_floor_seconds: float = 1.5    # 結算防抖：距上次結算未達這個秒數就只回累積值
     huntable_win_rate: float = 0.85      # 自動選怪 / 輪替時，勝率低於此值的怪不打
 
     @classmethod

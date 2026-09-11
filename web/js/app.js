@@ -107,7 +107,7 @@ const App = (() => {
 
   function startHuntPoll() {
     stopHuntPoll();
-    state.poll = setInterval(tickHunt, 2500);
+    state.poll = setInterval(tickHunt, 1500);
     tickHunt();
   }
   function stopHuntPoll() {

@@ -275,6 +275,7 @@ Screens.home = {
       API.huntStatus().catch((e) => { if (e.status !== 409) throw e; return null; }),
     ]);
     this._sheet = sheet;
+    this._maintained = sheet?.maintained_buffs || [];
     S._sheet = this._sheet;
     this._strategy = strategy;
     this._announce = announce;
@@ -476,24 +477,27 @@ Screens.home = {
   },
 
   _buffHtml() {
-    const buffs = this._buffs || [];
-    if (!this._hunting || !buffs.length) return "";
-    const gone = (Date.now() - (this._buffsAt || Date.now())) / 1000;
     // 同一個技能的多個 stat（例：音速加速 = 攻速 + 命中）併成一行
     const groups = new Map();
-    for (const b of buffs) {
+    const addTo = (b, left) => {
       const key = b.source || b.stat;
-      const left = Math.max(0, Math.round((b.remaining_s || 0) - gone));
       const zh = STAT_ZH[b.stat] || b.stat;
       const sign = b.magnitude >= 0 ? "+" : "";
-      const g = groups.get(key)
-        || { name: b.source || zh, parts: [], left };
+      const g = groups.get(key) || { name: b.source || zh, parts: [], left };
       g.parts.push(`${zh} ${sign}${b.magnitude}`);
-      g.left = Math.min(g.left, left);
+      g.left = left == null ? g.left : Math.min(g.left ?? left, left);
       groups.set(key, g);
+    };
+    // 常駐 buff（維持型技能，例如加速術）不管有沒有在掛機都算數，沒有倒數
+    for (const b of (this._maintained || [])) addTo(b, null);
+    // 限時 buff 只有掛機中才有意義（戰鬥觸發的那種）
+    if (this._hunting && (this._buffs || []).length) {
+      const gone = (Date.now() - (this._buffsAt || Date.now())) / 1000;
+      for (const b of this._buffs) addTo(b, Math.max(0, Math.round((b.remaining_s || 0) - gone)));
     }
+    if (!groups.size) return "";
     const rows = [...groups.values()].map((g) => {
-      const t = g.left > 0 ? `剩約 ${g.left} 秒` : "續投中…";
+      const t = g.left == null ? "持續中" : g.left > 0 ? `剩約 ${g.left} 秒` : "續投中…";
       return `<div class="kv"><span class="k">${esc(g.name)}</span>` +
         `<span>${esc(g.parts.join("、"))}　${t}</span></div>`;
     }).join("");

@@ -6,7 +6,9 @@ from pydantic import BaseModel, Field
 from server.auth.dependencies import CurrentAccount
 from server.config import get_settings
 from server.content import load_content
-from server.progression import CharacterSnapshot, EquippedPiece, build_player_combatant
+from server.progression import (
+    CharacterSnapshot, EquippedPiece, build_player_combatant, maintained_buff_list,
+)
 from server.progression.skills import skill_points_available
 from server.progression.stats import stat_points_available
 from server.repositories import characters as characters_repo
@@ -85,6 +87,7 @@ def character_sheet(character_id: int, account_id: CurrentAccount):
     if row is None or row["account_id"] != account_id:
         raise HTTPException(status_code=404, detail="找不到角色")
     content = load_content()
+    skill_toggles = characters_repo.get_hunt_strategy(character_id).get("skill_toggles") or {}
     snap = CharacterSnapshot(
         name=row["name"],
         job_id=row["job_id"],
@@ -92,6 +95,7 @@ def character_sheet(character_id: int, account_id: CurrentAccount):
         job_level=row["job_level"],
         stats={k: row[f"stat_{k}"] for k in _STAT_KEYS},
         learned_skills=json.loads(row["learned_skills"]),
+        skill_toggles=skill_toggles,
         equipped=[
             EquippedPiece(
                 equipment_id=e["equipment_id"],
@@ -117,6 +121,7 @@ def character_sheet(character_id: int, account_id: CurrentAccount):
         # 換裝後 max 可能變小，夾一下避免顯示超過上限（DB 值下次結算會自己修正）
         "hunt_hp": min(row["hunt_hp"], c.max_hp) if row["hunt_hp"] is not None else c.max_hp,
         "hunt_sp": min(row["hunt_sp"], c.max_sp) if row["hunt_sp"] is not None else c.max_sp,
+        "maintained_buffs": maintained_buff_list(content, snap.learned_skills, skill_toggles),
     }
 
 
