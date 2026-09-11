@@ -149,6 +149,11 @@ function combatLogLines(events, opts) {
     actor === me ? "atk-mine" : (target === me ? "atk-foe" : "hit");
   const out = [];
   const list = events || [];
+  // 這批賺到的經驗/Zeny 平均分給這批裡的每次擊殺，最後一隻補上四捨五入的零頭，
+  // 讓「擊倒了」那行能順便跳一下數字，不用等整批播完才在數字上看到變化。
+  const kg = opts && opts.killGains;
+  const killTotal = kg ? list.filter((e) => e.kind === "kill").length : 0;
+  let killSeen = 0, baseGiven = 0, jobGiven = 0, zenyGiven = 0;
   for (let i = 0; i < list.length; i++) {
     const e = list[i];
     if (e.kind === "attack") {
@@ -172,7 +177,16 @@ function combatLogLines(events, opts) {
       const verb = passive ? `發動【${esc(e.skill_name)}】` : `${tgt}施放【${esc(e.skill_name)}】`;
       out.push(`<span class="${side(e.actor, e.target)}">  ${esc(e.actor)} ${verb}${dmg}</span>`);
     } else if (e.kind === "kill") {
-      out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}</span>`);
+      let extra = "";
+      if (kg && killTotal) {
+        const last = killSeen === killTotal - 1;
+        const b = last ? kg.base_exp - baseGiven : Math.round(kg.base_exp / killTotal);
+        const j = last ? kg.job_exp - jobGiven : Math.round(kg.job_exp / killTotal);
+        const z = last ? kg.zeny - zenyGiven : Math.round(kg.zeny / killTotal);
+        baseGiven += b; jobGiven += j; zenyGiven += z; killSeen++;
+        extra = `　<span class="dim">+${b}經驗${z ? `／+${z}z` : ""}</span>`;
+      }
+      out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}${extra}</span>`);
     } else if (e.kind === "heal") {
       const how = e.source === "potion" ? "喝藥水"
         : e.source === "sp_potion" ? "喝 SP 藥水" : "施放治療";
@@ -268,6 +282,10 @@ Screens.home = {
     this._curMon = null;
     this._buffs = [];
     this._buffsAt = 0;
+    this._tweening = false;
+    this._tweenGen = 0;
+    this._lastKillTotals = null;
+    this._lastProgression = null;
     const [sheet, strategy, announce, status] = await Promise.all([
       API.sheet(S.char.id).catch(() => null),
       API.huntStrategy(S.char.id).catch(() => null),
@@ -366,7 +384,15 @@ Screens.home = {
     this._lastEventCursor = cursor;
     this._lastBatch = status.batch_id || batch.batch_id || cursor;
     if (status.buffs) { this._buffs = status.buffs; this._buffsAt = Date.now(); }
-    const lines = this._logLines(status.events || []);
+    // 這批賺到的經驗/Zeny/擊殺（跟上次記住的累計值比對出來的差），給「擊倒了」那行順便報數用
+    const prevTotals = this._lastKillTotals || { base_exp: 0, job_exp: 0, zeny: 0 };
+    const killGains = {
+      base_exp: (status.base_exp ?? 0) - prevTotals.base_exp,
+      job_exp: (status.job_exp ?? 0) - prevTotals.job_exp,
+      zeny: (status.zeny ?? 0) - prevTotals.zeny,
+    };
+    this._lastKillTotals = { base_exp: status.base_exp ?? 0, job_exp: status.job_exp ?? 0, zeny: status.zeny ?? 0 };
+    const lines = this._logLines(status.events || [], killGains);
     const drops = status.drops || {};
     const dk = Object.keys(drops);
     if (dk.length) {
@@ -394,7 +420,91 @@ Screens.home = {
       // 這樣就算新批在舊批還沒跳完時進來，整體節奏也不會忽快忽慢。
       this._paceBudget = (this._paceBudget || 0) + (Number(status.pace_seconds) || 0);
       this._recalcDrip();
+      // 血條/經驗條/擊殺數跟著這波的節奏補間過去，不要直接跳終值——
+      // 不然數字比戰鬥紀錄還早知道結果，看起來就是兩條線各跑各的。
+      // 積太多批（離開分頁回來、或打很久才死一隻）時跟紀錄一樣快轉，數字不要拖拉到十幾秒後才追上
+      this._tweenStats(status, Math.min(this._paceBudget, 6));
     }
+  },
+  // 讀畫面上目前顯示的數字當補間起點：就算上一輪動畫還沒播完新一批就到了，
+  // 也是從「肉眼現在看到的」接下去，不會產生瞬間跳動。
+  _readDispStats() {
+    const num = (sel, re) => {
+      const t = document.querySelector(sel)?.textContent || "";
+      const m = re ? t.match(re) : t.match(/-?\d+/);
+      return m ? parseInt(m[1] ?? m[0], 10) || 0 : 0;
+    };
+    return {
+      hp: num("#hm-hptext"), sp: num("#hm-sptext"),
+      kills: num("#hk-kills"),
+      baseExp: num("#hk-exp", /\+(-?\d+)\s*\/\s*\+(-?\d+)/),
+      jobExp: (() => {
+        const m = (document.querySelector("#hk-exp")?.textContent || "").match(/\+(-?\d+)\s*\/\s*\+(-?\d+)/);
+        return m ? parseInt(m[2], 10) || 0 : 0;
+      })(),
+      zeny: num("#hk-zeny"),
+    };
+  },
+  _tweenStats(status, durationSec) {
+    if (S.view !== "home") return;
+    const sheet = this._sheet || {};
+    const maxHp = sheet.max_hp || 1, maxSp = sheet.max_sp || 1;
+    const from = this._readDispStats();
+    const to = {
+      hp: status.character?.hunt_hp ?? from.hp, sp: status.character?.hunt_sp ?? from.sp,
+      kills: status.kills ?? from.kills, baseExp: status.base_exp ?? from.baseExp,
+      jobExp: status.job_exp ?? from.jobExp, zeny: status.zeny ?? from.zeny,
+    };
+    // 等級經驗條（帳號真實升級用的，跟上面「本場經驗」是不同東西）：
+    // 這批期間沒升級才補間，升級了直接留給下一輪 _updateKV 算好貼上，
+    // 不然新舊等級的百分比意義不同，補間會變成「倒退嚕」。
+    const progression = status.character || {};
+    const tier = jobTier(progression.job_id || S.char.job_id);
+    const bMaxed = progression.base_level >= Curve.baseCap;
+    const jMaxed = progression.job_level >= (Curve.jobCaps[tier] ?? Curve.jobCaps.first);
+    const bNext = bMaxed ? 0 : Curve.baseNext(progression.base_level);
+    const jNext = jMaxed ? 0 : Curve.jobNext(progression.job_level, tier);
+    const prevProg = this._lastProgression || { ...progression };
+    const levelSame = prevProg.base_level === progression.base_level
+      && prevProg.job_level === progression.job_level;
+    this._lastProgression = { ...progression };
+    this._tweenGen = (this._tweenGen || 0) + 1;
+    const gen = this._tweenGen;
+    this._tweening = true;
+    const dur = Math.max(300, (durationSec || 1) * 1000);
+    const hpBar = document.querySelector("#hm-hpbar"), spBar = document.querySelector("#hm-spbar");
+    const bBar = document.querySelector("#hm-bbar"), jBar = document.querySelector("#hm-jbar");
+    const pct = (v, max) => Math.max(0, Math.min(100, (v / Math.max(1, max)) * 100)) + "%";
+    if (hpBar) { hpBar.style.transition = `width ${dur / 1000}s linear`; hpBar.style.width = pct(to.hp, maxHp); }
+    if (spBar) { spBar.style.transition = `width ${dur / 1000}s linear`; spBar.style.width = pct(to.sp, maxSp); }
+    if (levelSame && bBar && jBar) {
+      bBar.style.transition = `width ${dur / 1000}s linear`;
+      bBar.style.width = xpProgress(progression.base_exp, bNext, bMaxed).percent + "%";
+      jBar.style.transition = `width ${dur / 1000}s linear`;
+      jBar.style.width = xpProgress(progression.job_exp, jNext, jMaxed).percent + "%";
+    } else {
+      if (bBar) bBar.style.transition = "";
+      if (jBar) jBar.style.transition = "";
+    }
+    const start = performance.now();
+    const setT = (id, v) => { const el = document.querySelector(id); if (el) el.textContent = v; };
+    const tick = (t) => {
+      if (gen !== this._tweenGen) return;   // 被更新的一批取代了，這輪作廢
+      const p = Math.min(1, (t - start) / dur);
+      const lerp = (a, b) => Math.round(a + (b - a) * p);
+      setT("#hm-hptext", `${lerp(from.hp, to.hp)} / ${maxHp}`);
+      setT("#hm-sptext", `${lerp(from.sp, to.sp)} / ${maxSp}`);
+      setT("#hk-kills", lerp(from.kills, to.kills));
+      setT("#hk-exp", `+${lerp(from.baseExp, to.baseExp)} / +${lerp(from.jobExp, to.jobExp)}`);
+      setT("#hk-zeny", `+${lerp(from.zeny, to.zeny)}`);
+      if (levelSame) {
+        setT("#hm-btext", xpText(lerp(prevProg.base_exp, progression.base_exp), bNext, bMaxed));
+        setT("#hm-jtext", xpText(lerp(prevProg.job_exp, progression.job_exp), jNext, jMaxed));
+      }
+      if (p < 1) requestAnimationFrame(tick);
+      else this._tweening = false;
+    };
+    requestAnimationFrame(tick);
   },
 
   _updateKV(status) {
@@ -409,20 +519,24 @@ Screens.home = {
     const jMaxed = progression.job_level >= (Curve.jobCaps[tier] ?? Curve.jobCaps.first);
     const bNext = bMaxed ? 0 : Curve.baseNext(progression.base_level);
     const jNext = jMaxed ? 0 : Curve.jobNext(progression.job_level, tier);
-    setT("#hm-btext", xpText(progression.base_exp, bNext, bMaxed));
-    setW("#hm-bbar", xpProgress(progression.base_exp, bNext, bMaxed).percent, 100);
-    setT("#hm-jtext", xpText(progression.job_exp, jNext, jMaxed));
-    setW("#hm-jbar", xpProgress(progression.job_exp, jNext, jMaxed).percent, 100);
+    // 這些數字/血條/經驗條交給 _tweenStats 補間播放時，這裡先不要動——
+    // 不然畫面會被瞬間貼成終值，補間就白做了。補間結束後下一輪自然會走到這裡貼一次。
+    if (!this._tweening) {
+      setT("#hm-btext", xpText(progression.base_exp, bNext, bMaxed));
+      setW("#hm-bbar", xpProgress(progression.base_exp, bNext, bMaxed).percent, 100);
+      setT("#hm-jtext", xpText(progression.job_exp, jNext, jMaxed));
+      setW("#hm-jbar", xpProgress(progression.job_exp, jNext, jMaxed).percent, 100);
+      setT("#hm-hptext", `${hp} / ${sheet.max_hp ?? "?"}`);
+      setW("#hm-hpbar", hp, sheet.max_hp ?? 1);
+      setT("#hm-sptext", `${sp} / ${sheet.max_sp ?? "?"}`);
+      setW("#hm-spbar", sp, sheet.max_sp ?? 1);
+      setT("#hk-kills", status.kills);
+      setT("#hk-exp", `+${status.base_exp} / +${status.job_exp}`);
+      setT("#hk-zeny", `+${status.zeny}`);
+    }
     setT("#hk-state", this._combatState === "combat" ? "交戰中" : "等待下一回合");
-    setT("#hm-hptext", `${hp} / ${sheet.max_hp ?? "?"}`);
-    setW("#hm-hpbar", hp, sheet.max_hp ?? 1);
-    setT("#hm-sptext", `${sp} / ${sheet.max_sp ?? "?"}`);
-    setW("#hm-spbar", sp, sheet.max_sp ?? 1);
     setT("#hm-zeny", progression.zeny ?? c.zeny);
     setT("#hk-mon", monName(status.monster_id));
-    setT("#hk-kills", status.kills);
-    setT("#hk-exp", `+${status.base_exp} / +${status.job_exp}`);
-    setT("#hk-zeny", `+${status.zeny}`);
     setT("#hk-time", Math.floor(App.huntSecsShown()) + " 秒");
     setT("#hk-pot-hp-used", progression.hunt_potions_used ?? 0);
     setT("#hk-pot-sp-used", progression.hunt_sp_potions_used ?? 0);
@@ -913,12 +1027,12 @@ Screens.home = {
     if (gen === this._chatGen) this._chatBusy = false;
   },
 
-  _logLines(events) {
+  _logLines(events, killGains) {
     if (!events) return [];
     // 這批有逐擊事件時，不再顯示彙總的 kill_batch（避免重複）
     const detailed = events.some((e) => ["attack", "skill", "kill"].includes(e.kind));
     const src = detailed ? events.filter((e) => e.kind !== "kill_batch") : events;
-    return combatLogLines(src).slice(-40);
+    return combatLogLines(src, { killGains }).slice(-40);
   },
 };
 
