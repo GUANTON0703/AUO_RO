@@ -170,6 +170,11 @@ def _migration_9(conn: sqlite3.Connection) -> None:
         _add_col(conn, "characters", name, definition)
 
 
+def _migration_10(conn: sqlite3.Connection) -> None:
+    """buff 藥水：記著目前還沒過期的 buff 藥（{item_id: {"expires_at":..., "stats":{...}}}）。"""
+    _add_col(conn, "characters", "active_potion_buffs", "TEXT NOT NULL DEFAULT '{}'")
+
+
 # (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
 _MIGRATIONS: list[tuple[int, "callable"]] = [
     (1, _migration_1),
@@ -181,6 +186,7 @@ _MIGRATIONS: list[tuple[int, "callable"]] = [
     (7, _migration_7),
     (8, _migration_8),
     (9, _migration_9),
+    (10, _migration_10),
 ]
 
 

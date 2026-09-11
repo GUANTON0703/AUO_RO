@@ -583,14 +583,20 @@ Screens.home = {
       const gone = (Date.now() - (this._buffsAt || Date.now())) / 1000;
       for (const b of this._buffs) addTo(b, Math.max(0, Math.round((b.remaining_s || 0) - gone)));
     }
-    if (!groups.size) return "";
+    // buff 藥（有明確過期時間，伺服器算好的秒數，不用自己扣）
+    const potionBuffs = this._lastStatus?.character?.active_potion_buffs || [];
+    const potionRows = potionBuffs.map((b) =>
+      `<div class="kv"><span class="k">${esc(b.name)}</span><span>剩約 ${b.remaining_s} 秒</span></div>`
+    ).join("");
+    const total = groups.size + potionBuffs.length;
+    if (!total) return "";
     const rows = [...groups.values()].map((g) => {
       const t = g.left == null ? "持續中" : g.left > 0 ? `剩約 ${g.left} 秒` : "續投中…";
       return `<div class="kv"><span class="k">${esc(g.name)}</span>` +
         `<span>${esc(g.parts.join("、"))}　${t}</span></div>`;
-    }).join("");
+    }).join("") + potionRows;
     return `<details style="margin-top:4px">` +
-      `<summary style="cursor:pointer" class="dim">增益中 ×${groups.size}（點開看效果）</summary>` +
+      `<summary style="cursor:pointer" class="dim">增益中 ×${total}（點開看效果）</summary>` +
       rows + `</details>`;
   },
   _equipHtml(inv) {
@@ -1076,8 +1082,20 @@ Screens.hunt = {
           <span><input type="number" id="st-skillsp" min="0" max="95" style="width:64px"
             value="${Math.round((s.skill_min_sp_pct ?? 0) * 100)}"> %　才放主動技能</span></div>
         <p class="sub">設 0 = 一律放。設高一點會留魔力、少放技能。</p>
+        <div class="sub" style="margin-top:8px">自動喝 buff 藥（過期自動補喝，沒庫存就不喝）</div>
+        ${this._buffPotionChecklist(s.auto_buff_potions || [])}
         <button class="btn primary block" id="st-save" style="margin-top:10px">儲存掛機設定</button>
       </div>`;
+  },
+  _buffPotionChecklist(picked) {
+    const set = new Set(picked);
+    const buffPotions = Object.values(S.catalog.items || {})
+      .filter((it) => (it.effects || []).some((e) => e.type === "buff"));
+    if (!buffPotions.length) return `<p class="muted">還沒有 buff 藥可以喝</p>`;
+    return buffPotions.map((it) => `<label class="kv" style="cursor:pointer">
+        <span>${esc(it.name)}${it.required_level > 1 ? `（Lv${it.required_level}+）` : ""}</span>
+        <input type="checkbox" data-buffpot="${it.id}" style="width:auto" ${set.has(it.id) ? "checked" : ""}>
+      </label>`).join("");
   },
   _wireStrategy() {
     const btn = document.querySelector("#st-save");
@@ -1097,6 +1115,8 @@ Screens.hunt = {
         buy_sp_potion_id: g("#st-buyspid").value,
         buy_sp_potion_upto: Math.max(0, Math.floor(Number(g("#st-buyspupto").value) || 0)),
         skill_min_sp_pct: Math.min(0.95, Math.max(0, (Number(g("#st-skillsp").value) || 0) / 100)),
+        auto_buff_potions: [...document.querySelectorAll("[data-buffpot]:checked")]
+          .map((el) => el.dataset.buffpot),
       };
       btn.disabled = true;
       try { await API.setHuntStrategy(S.char.id, strat); this._strategy = strat; App.toast("已儲存"); }

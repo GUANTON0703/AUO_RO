@@ -1,7 +1,7 @@
 import json
 import random
 import threading
-from dataclasses import asdict, fields
+from dataclasses import asdict, fields, replace
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, HTTPException
@@ -82,6 +82,7 @@ class HuntStrategyRequest(BaseModel):
     skill_min_sp_pct: float = Field(default=0.0, ge=0.0, le=0.95)
     primary_skill_id: str | None = None
     skill_toggles: dict[str, bool] = {}
+    auto_buff_potions: list[str] = []
 
 
 def _load_strategy(character_id: int) -> HuntStrategy:
@@ -119,7 +120,7 @@ def put_hunt_strategy(character_id: int, body: HuntStrategyRequest, account_id: 
     return body.model_dump()
 
 
-def _snapshot(row, *, hp=None, sp=None, apply_prefs=True) -> CharacterSnapshot:
+def _snapshot(row, *, hp=None, sp=None, apply_prefs=True, active_item_buffs=None) -> CharacterSnapshot:
     try:
         strat = json.loads(row["hunt_strategy"] or "{}") if apply_prefs else {}
     except (KeyError, IndexError, TypeError):
@@ -139,6 +140,7 @@ def _snapshot(row, *, hp=None, sp=None, apply_prefs=True) -> CharacterSnapshot:
         primary_skill_id=strat.get("primary_skill_id"),
         skill_toggles=strat.get("skill_toggles") or {},
         hp=hp, sp=sp,
+        active_item_buffs=active_item_buffs or {},
     )
 
 
@@ -159,6 +161,46 @@ def _sp_restore_amount(item) -> int:
 def _usable(item, base_level: int) -> bool:
     return item is not None and item.kind == "consumable" \
         and base_level >= item.required_level
+
+
+def _buff_effect(item) -> dict | None:
+    if item is None:
+        return None
+    return next((e for e in item.effects if e.get("type") == "buff"), None)
+
+
+def _refresh_active_buffs(character_id: int, strategy, base_level: int, now) -> dict:
+    """讀目前還沒過期的 buff 藥，過期的清掉；設定裡有勾自動喝、目前沒生效、
+    背包有貨的就喝一瓶續上。回傳 {item_id: {stat: 加成值}} 給combatant折進面板用
+    （不含 expires_at 這種 metadata）。"""
+    stored = characters_repo.get_active_potion_buffs(character_id)
+    active: dict = {}
+    for item_id, info in stored.items():
+        try:
+            expires_at = datetime.fromisoformat(info["expires_at"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at > now:
+            active[item_id] = info
+
+    for item_id in strategy.auto_buff_potions:
+        if item_id in active:
+            continue
+        item = _content.items.get(item_id)
+        effect = _buff_effect(item)
+        if not effect or not _usable(item, base_level):
+            continue
+        if inventory.item_qty(character_id, item_id) <= 0:
+            continue
+        inventory.consume_item(character_id, item_id, 1)
+        expires_at = now + timedelta(seconds=effect.get("duration_s", 60))
+        active[item_id] = {"expires_at": expires_at.isoformat(), "stats": effect.get("stats", {})}
+
+    if active != stored:
+        characters_repo.set_active_potion_buffs(character_id, active)
+    return {item_id: info.get("stats", {}) for item_id, info in active.items()}
 
 
 def _pick_potion(character_id: int, preferred_id: str | None = None,
@@ -332,6 +374,30 @@ def start_hunt(body: StartRequest, account_id: CurrentAccount):
             "hunt_hp": player.max_hp, "hunt_sp": player.max_sp}
 
 
+def _active_potion_buffs_view(row) -> list:
+    """給前端顯示用：{item_id, name, remaining_s}，過期的不列。"""
+    try:
+        stored = json.loads(row["active_potion_buffs"] or "{}")
+    except (TypeError, ValueError):
+        return []
+    now = datetime.now(timezone.utc)
+    out = []
+    for item_id, info in stored.items():
+        try:
+            expires_at = datetime.fromisoformat(info["expires_at"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        remaining = (expires_at - now).total_seconds()
+        if remaining <= 0:
+            continue
+        item = _content.items.get(item_id)
+        out.append({"item_id": item_id, "name": item.name if item else item_id,
+                   "remaining_s": round(remaining)})
+    return out
+
+
 def _character_block(row) -> dict:
     return {
         "base_level": row["base_level"], "base_exp": row["base_exp"],
@@ -341,6 +407,7 @@ def _character_block(row) -> dict:
         "hunt_potions_used": row["hunt_potions_used"],
         "hunt_sp_potions_used": row["hunt_sp_potions_used"],
         "hunt_potion_zeny_spent": row["hunt_potion_zeny_spent"],
+        "active_potion_buffs": _active_potion_buffs_view(row),
     }
 
 
@@ -503,7 +570,9 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
             and elapsed < cfg.settle_floor_seconds:
         return _accumulated_snapshot(row, event_cursor)
 
-    snap = _snapshot(row, hp=row["hunt_hp"], sp=row["hunt_sp"])
+    strategy = _load_strategy(row["id"])
+    active_buffs = _refresh_active_buffs(row["id"], strategy, row["base_level"], now)
+    snap = _snapshot(row, hp=row["hunt_hp"], sp=row["hunt_sp"], active_item_buffs=active_buffs)
     player = build_player_combatant(snap, _content)
     monster = _content.get_monster(row["hunting_monster_id"])
     job = _content.get_job(row["job_id"])
@@ -533,7 +602,6 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
             (now.isoformat(), row["id"]),
         )
 
-    strategy = _load_strategy(row["id"])
     potion_zeny_spent = _auto_buy_potions(row["id"], strategy, row["base_level"])
     potion_zeny_spent += _auto_buy_sp_potions(row["id"], strategy, row["base_level"])
     # 買水這筆花費馬上入帳，不管這次有沒有湊出一場戰鬥可結算（下面有提早回傳的分支）
@@ -558,6 +626,14 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
     if potion_id and potion_id == sp_potion_id:
         sp_share = (potion_count + 1) // 2
         potion_count, sp_potion_count = potion_count - sp_share, sp_share
+
+    # 喝水加成藥：補品回復量放大；活力藥水：場間自然回血回魔速度放大
+    if player.potion_heal_pct:
+        potion_heal = round(potion_heal * (1 + player.potion_heal_pct / 100))
+        sp_potion_restore = round(sp_potion_restore * (1 + player.potion_heal_pct / 100))
+    if player.regen_bonus_pct:
+        cfg = replace(cfg, hp_regen_frac_per_sec=cfg.hp_regen_frac_per_sec
+                      * (1 + player.regen_bonus_pct / 100))
 
     rng = random.Random(hash(row["hunt_last_settled_at"]) & 0xFFFFFFFF)
     result = settle(
@@ -609,8 +685,19 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
         settled_until = min(now, last + timedelta(seconds=result.consumed_seconds))
         hunt_secs_delta = result.consumed_seconds
 
+    # 狂暴藥：持續掉血，類似中毒，跟這批結算代表的秒數成正比（每 10 秒扣一次）
+    berserk = active_buffs.get("berserk_potion")
+    final_hp = result.final_hp
+    if berserk:
+        drain_item = _content.items.get("berserk_potion")
+        drain_effect = _buff_effect(drain_item) or {}
+        drain_pct = drain_effect.get("drain_pct_per_tick", 0)
+        ticks = max(0.0, result.consumed_seconds if not offline else result.effective_seconds) / 10
+        drain = round(player.max_hp * drain_pct / 100 * ticks)
+        final_hp = max(1, final_hp - drain)
+
     characters_repo.update_hunt_progress(
-        row["id"], hp=result.final_hp, sp=result.final_sp,
+        row["id"], hp=final_hp, sp=result.final_sp,
         last_settled_at=settled_until.isoformat(),
         kills=result.kills, base_exp=result.base_exp,
         job_exp=result.job_exp, zeny=result.zeny + sell_gain,

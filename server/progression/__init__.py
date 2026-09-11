@@ -39,6 +39,7 @@ class CharacterSnapshot:
     skill_toggles: dict = field(default_factory=dict)
     hp: int | None = None
     sp: int | None = None
+    active_item_buffs: dict = field(default_factory=dict)  # {item_id: {stat: 加成值}}，喝的buff藥還沒過期的效果
 
 
 def _sum_equipment_stats(content, pieces: list) -> dict:
@@ -217,6 +218,10 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     for k, v in mbuff.items():
         if k not in ("str", "agi", "vit", "int", "dex", "luk"):
             passives[k] = passives.get(k, 0) + v
+    # 喝下去還沒過期的 buff 藥（集中力/覺醒/狂暴…），效果跟技能 buff 走同一個池子
+    for buff in snap.active_item_buffs.values():
+        for k, v in buff.items():
+            passives[k] = passives.get(k, 0) + v
 
     # HP/SP：Pre-Renewal 尺度（lv99 騎士約 7500，不是 10000+）
     lv = snap.base_level
@@ -261,7 +266,8 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     # 攻擊屬性：武器本身屬性 → 附魔卡覆蓋
     attack_element = combat_mods["atk_element"] or (
         weapon.element if weapon else "neutral")
-    crit_mult = 1.6 if (weapon and weapon.weapon_type == "katar") else 1.4
+    crit_mult = (1.6 if (weapon and weapon.weapon_type == "katar") else 1.4) \
+        + passives.get("crit_mult_bonus", 0)
 
     resolved = []
     for sid, lvl in snap.learned_skills.items():
@@ -307,6 +313,8 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         perfect_dodge=combat_mods["perfect_dodge"],
         on_kill=combat_mods["on_kill"],
         autocast=combat_mods["autocast"],
+        potion_heal_pct=passives.get("potion_heal_pct", 0),
+        regen_bonus_pct=passives.get("regen_bonus_pct", 0),
         # 換裝後 max 可能變小，把續戰的 hp/sp 夾回上限
         hp=min(snap.hp, derived["max_hp"]) if snap.hp is not None else 0,
         sp=min(snap.sp, derived["max_sp"]) if snap.sp is not None else 0,

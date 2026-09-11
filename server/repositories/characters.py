@@ -254,6 +254,22 @@ def set_hunt_strategy(character_id: int, strategy: dict) -> None:
         )
 
 
+def get_active_potion_buffs(character_id: int) -> dict:
+    with connection.get_connection() as conn:
+        row = conn.execute(
+            "SELECT active_potion_buffs FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()
+    return json.loads(row["active_potion_buffs"]) if row and row["active_potion_buffs"] else {}
+
+
+def set_active_potion_buffs(character_id: int, buffs: dict) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            "UPDATE characters SET active_potion_buffs = ? WHERE id = ?",
+            (json.dumps(buffs), character_id),
+        )
+
+
 def set_learned_skills(character_id: int, learned: dict) -> None:
     with connection.get_connection() as conn:
         conn.execute(

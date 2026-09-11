@@ -33,6 +33,24 @@ def test_hunt_consumes_potions_from_inventory(client, auth, db_helpers):
     assert inv["items"].get("red_potion", 200) < 200
 
 
+def test_buff_potion_auto_drink_and_stat_boost(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    db_helpers.give_item(ch["id"], "concentration_potion", 5)
+    r = client.put(f"/api/hunt/strategy/{ch['id']}", headers=h,
+                   json={"auto_buff_potions": ["concentration_potion"]})
+    assert r.status_code == 200
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_south_field"})
+    db_helpers.rewind_hunt(ch["id"], seconds=3600)
+    status = client.get("/api/hunt/status", headers=h).json()
+
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert inv["items"].get("concentration_potion", 5) < 5
+
+    buffs = status["character"]["active_potion_buffs"]
+    assert any(b["item_id"] == "concentration_potion" for b in buffs)
+
+
 def test_hunt_warm_start_yields_kills_on_first_status(client, auth, db_helpers):
     # 暖啟動：按下掛機後不 rewind，第一次 status 就該結算出一場戰鬥
     _, h, _ = auth

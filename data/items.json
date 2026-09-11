@@ -62,5 +62,12 @@
   {"id": "stuffing", "name": "填充棉", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 12},
   {"id": "gingerbread", "name": "薑餅", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 20},
   {"id": "tin_toy_part", "name": "錫玩具零件", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 24},
-  {"id": "kobold_hair", "name": "狗頭人的毛", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 22}
+  {"id": "kobold_hair", "name": "狗頭人的毛", "kind": "material", "effects": [], "npc_buy": null, "npc_sell": 22},
+  {"id": "concentration_potion", "name": "集中力恢復藥", "kind": "consumable", "required_level": 1, "npc_buy": 500, "npc_sell": 100, "effects": [{"type": "buff", "stats": {"hit": 10, "crit": 5}, "duration_s": 180}]},
+  {"id": "awakening_potion", "name": "覺醒藥", "kind": "consumable", "required_level": 40, "npc_buy": null, "npc_sell": 200, "effects": [{"type": "buff", "stats": {"aspd": 15}, "duration_s": 150}]},
+  {"id": "berserk_potion", "name": "狂暴藥", "kind": "consumable", "required_level": 60, "npc_buy": null, "npc_sell": 300, "effects": [{"type": "buff", "stats": {"atk": 90, "defense": -999}, "duration_s": 90, "drain_pct_per_tick": 2}]},
+  {"id": "heal_boost_potion", "name": "喝水加成藥", "kind": "consumable", "required_level": 30, "npc_buy": null, "npc_sell": 150, "effects": [{"type": "buff", "stats": {"potion_heal_pct": 25}, "duration_s": 180}]},
+  {"id": "vitality_potion", "name": "活力藥水", "kind": "consumable", "required_level": 30, "npc_buy": null, "npc_sell": 150, "effects": [{"type": "buff", "stats": {"regen_bonus_pct": 100}, "duration_s": 300}]},
+  {"id": "critical_potion", "name": "爆擊藥水", "kind": "consumable", "required_level": 50, "npc_buy": null, "npc_sell": 250, "effects": [{"type": "buff", "stats": {"crit": 15}, "duration_s": 150}]},
+  {"id": "sweet_spot_potion", "name": "會心藥水", "kind": "consumable", "required_level": 50, "npc_buy": null, "npc_sell": 250, "effects": [{"type": "buff", "stats": {"crit_mult_bonus": 0.2}, "duration_s": 150}]}
 ]

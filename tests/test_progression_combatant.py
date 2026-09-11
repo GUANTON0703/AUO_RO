@@ -198,6 +198,35 @@ def test_mvp_gear_builtin_effects_wire_into_combatant():
     assert hero("baphomet_trident").procs.get("extra_hit") == 10
 
 
+def test_active_potion_buffs_fold_into_stats():
+    c = load_content()
+
+    def hero(active_item_buffs):
+        return build_player_combatant(CharacterSnapshot(
+            name="P", job_id="knight", base_level=50, job_level=40,
+            stats={"str": 40, "agi": 20, "vit": 30, "int": 5, "dex": 20, "luk": 10},
+            learned_skills={}, equipped=[],
+            active_item_buffs=active_item_buffs), c)
+
+    bare = hero({})
+    boosted = hero({"concentration_potion": {"hit": 10, "crit": 5}})
+    assert boosted.hit == bare.hit + 10
+    assert boosted.crit == bare.crit + 5
+
+    # 狂暴藥：防禦歸零（用大負數表達，靠既有的 max(0,...) 夾住）、爆擊傷害倍率額外加成
+    berserked = hero({"berserk_potion": {"atk": 90, "defense": -999}})
+    assert berserked.defense == 0
+    assert berserked.atk == bare.atk + 90
+
+    sweet = hero({"sweet_spot_potion": {"crit_mult_bonus": 0.2}})
+    assert round(sweet.crit_mult - bare.crit_mult, 2) == 0.2
+
+    healboost = hero({"heal_boost_potion": {"potion_heal_pct": 25}})
+    assert healboost.potion_heal_pct == 25
+    vitality = hero({"vitality_potion": {"regen_bonus_pct": 100}})
+    assert vitality.regen_bonus_pct == 100
+
+
 def test_on_hit_poison_card_applies_dot():
     import random
     from server.combat import simulate_fight

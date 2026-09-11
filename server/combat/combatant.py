@@ -63,6 +63,8 @@ class Combatant:
     perfect_dodge: int = 0                              # 完全迴避 %（無視命中計算）
     on_kill: dict = field(default_factory=dict)         # 擊殺回復 {"hp_pct":5,"sp_pct":3}
     autocast: list = field(default_factory=list)        # [{skill_id,chance_pct,level}]
+    potion_heal_pct: float = 0.0   # 喝水加成藥：補品回復量額外加成 %
+    regen_bonus_pct: float = 0.0   # 活力藥水：場間自然回血回魔速度額外加成 %
 
     def __post_init__(self):
         if self.hp == 0:
