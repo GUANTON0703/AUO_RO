@@ -356,6 +356,7 @@ Screens.home = {
   },
   _ingest(status) {
     if (!status) return;
+    this._lastStatus = status;
     this._combatState = status.combat_state || (status.retreated ? "idle" : "hunting");
     if (status.retreated) return;
     if (status.monster_id) this._curMon = status.monster_id;
@@ -371,9 +372,13 @@ Screens.home = {
     if (dk.length) {
       lines.push(`<span class="kill">　取得 ${dk.map((k) =>
         `${esc(itemName(k))} ×${drops[k]}`).join("、")}</span>`);
-      // 撿到裝備 → 更新狀態頁的裝備欄
-      if (dk.some((k) => S.catalog?.equipment?.[k])) this._refreshEquip();
     }
+    // 撿到裝備、或這批喝/買了水 → 背包數量變了，重新抓一次刷新裝備欄跟藥水欄
+    const potTotals = `${status.character?.hunt_potions_used ?? 0}/` +
+      `${status.character?.hunt_sp_potions_used ?? 0}/${status.character?.hunt_potion_zeny_spent ?? 0}`;
+    const potChanged = potTotals !== this._potTotals;
+    this._potTotals = potTotals;
+    if (potChanged || dk.some((k) => S.catalog?.equipment?.[k])) this._refreshEquip();
     if (status.offline || batch.mode === "offline" || lines.length > 120) {
       // 離線或異常大的批次直接倒完；正常 30 回合 Boss 仍逐回合播放。
       this._queue.length = 0;
@@ -419,6 +424,9 @@ Screens.home = {
     setT("#hk-exp", `+${status.base_exp} / +${status.job_exp}`);
     setT("#hk-zeny", `+${status.zeny}`);
     setT("#hk-time", Math.floor(App.huntSecsShown()) + " 秒");
+    setT("#hk-pot-hp-used", progression.hunt_potions_used ?? 0);
+    setT("#hk-pot-sp-used", progression.hunt_sp_potions_used ?? 0);
+    setT("#hk-pot-spent", `${progression.hunt_potion_zeny_spent ?? 0} z`);
     const lj = JSON.stringify(status.loot || {});
     if (lj !== this._lootJson) {
       this._lootJson = lj;
@@ -432,6 +440,46 @@ Screens.home = {
       const d = bb.querySelector("details");
       if (d && wasOpen) d.open = true;
     }
+  },
+
+  _potionHtml(status) {
+    const strat = this._strategy || {};
+    const inv = (this._inv && this._inv.items) || {};
+    const c = status?.character || {};
+    const group = (name, type, current) => {
+      const owned = Object.values(S.catalog.items || {})
+        .filter((it) => (it.effects || []).some((e) => e.type === type) && (inv[it.id] || 0) > 0);
+      const autoRow = `<label class="kv" style="cursor:pointer">
+        <span>自動挑最好的</span>
+        <input type="radio" name="${name}" value="" style="width:auto" ${!current ? "checked" : ""}></label>`;
+      if (!owned.length) return autoRow + `<p class="muted" style="font-size:.85em">背包目前沒有這類道具</p>`;
+      return autoRow + owned.map((it) => `<label class="kv" style="cursor:pointer">
+          <span>${esc(it.name)} ×${inv[it.id] || 0}</span>
+          <input type="radio" name="${name}" value="${it.id}" style="width:auto"
+            ${current === it.id ? "checked" : ""}></label>`).join("");
+    };
+    return `
+      <div class="sub" style="margin-top:4px">HP 藥水（本場已喝 <span id="hk-pot-hp-used">${c.hunt_potions_used ?? 0}</span> 瓶）</div>
+      ${group("pot-hp", "heal_hp", strat.potion_item_id)}
+      <div class="sub" style="margin-top:8px">SP 藥水（本場已喝 <span id="hk-pot-sp-used">${c.hunt_sp_potions_used ?? 0}</span> 瓶）</div>
+      ${group("pot-sp", "heal_sp", strat.sp_potion_item_id)}
+      <div class="kv" style="margin-top:4px"><span class="k">本場買水花費</span>
+        <span id="hk-pot-spent">${c.hunt_potion_zeny_spent ?? 0} z</span></div>`;
+  },
+  _wirePotion() {
+    const save = async (key, value) => {
+      const strat = this._strategy || (this._strategy = {});
+      const prev = strat[key];
+      strat[key] = value || null;
+      try { await API.setHuntStrategy(S.char.id, strat); }
+      catch (e) { strat[key] = prev; App.toast(e.detail || "設定失敗", true); }
+    };
+    document.querySelectorAll('input[name="pot-hp"]').forEach((r) => {
+      r.onchange = () => save("potion_item_id", r.value);
+    });
+    document.querySelectorAll('input[name="pot-sp"]').forEach((r) => {
+      r.onchange = () => save("sp_potion_item_id", r.value);
+    });
   },
 
   _lootHtml(loot) {
@@ -553,8 +601,11 @@ Screens.home = {
   },
   async _refreshEquip() {
     this._inv = await API.inventory(S.char.id).catch(() => this._inv);
+    if (S.view !== "home") return;
     const box = document.querySelector("#equip-box");
-    if (box && S.view === "home") box.outerHTML = this._equipHtml(this._inv);
+    if (box) box.outerHTML = this._equipHtml(this._inv);
+    const pb = document.querySelector("#potion-box");
+    if (pb) { pb.innerHTML = this._potionHtml(this._lastStatus); this._wirePotion(); }
   },
 
   _layout(status) {
@@ -603,13 +654,14 @@ Screens.home = {
       html += `
         <div class="card">
           <div class="section-title"><h3>掛機中</h3>
-             <span class="pill good" id="hk-mon">${esc(monName(status.monster_id))}</span>
-             <span class="sub" id="hk-state">${combatLabel}</span></div>
+             <span class="pill good" id="hk-mon">${esc(monName(status.monster_id))}</span></div>
+          <div id="potion-box">${this._potionHtml(status)}</div>
+          <div class="log" id="huntlog" style="margin-top:8px">${this._shown.join("\n") || "<span class='dim'>搜尋目標中…</span>"}</div>
+          <div class="kv" style="margin-top:8px"><span class="k">狀態</span><span class="sub" id="hk-state">${combatLabel}</span></div>
           <div class="kv"><span class="k">擊殺</span><span id="hk-kills">${status.kills}</span></div>
           <div class="kv"><span class="k">本場經驗</span><span id="hk-exp">+${status.base_exp} / +${status.job_exp}</span></div>
           <div class="kv"><span class="k">本場 Zeny</span><span id="hk-zeny">+${status.zeny}</span></div>
           <div class="kv"><span class="k">掛機時間</span><span id="hk-time">${Math.floor(App.huntSecsShown())} 秒</span></div>
-          <div class="log" id="huntlog">${this._shown.join("\n") || "<span class='dim'>搜尋目標中…</span>"}</div>
           <div id="loot-box">${this._lootHtml(status.loot)}</div>
           <div class="row" style="margin-top:10px">
             <button class="btn block" id="btn-stop">停止掛機並結算</button>
@@ -629,6 +681,7 @@ Screens.home = {
     view().innerHTML = html;
     this._lootJson = JSON.stringify((status && status.loot) || {});
     this._wireLoot();
+    this._wirePotion();
     this._wireWorldChat();
 
     const stopBtn = document.querySelector("#btn-stop");

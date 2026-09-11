@@ -113,7 +113,8 @@ def set_hunt_state(character_id: int, *, map_id, monster_id, started_at,
                 hunt_last_settled_at = ?, hunt_hp = ?, hunt_sp = ?,
                 location_map = ?,
                 hunt_kills = 0, hunt_base_exp = 0, hunt_job_exp = 0, hunt_zeny = 0,
-                hunt_seconds = 0, hunt_loot = '{}'
+                hunt_seconds = 0, hunt_loot = '{}',
+                hunt_potions_used = 0, hunt_sp_potions_used = 0, hunt_potion_zeny_spent = 0
             WHERE id = ?
             """,
             (map_id, monster_id, started_at, last_settled_at, hp, sp, map_id,
@@ -136,14 +137,27 @@ def clear_hunt_state(character_id: int) -> None:
 
 
 def update_hunt_progress(character_id: int, *, hp, sp, last_settled_at,
-                         kills=0, base_exp=0, job_exp=0, zeny=0, seconds=0.0) -> None:
+                         kills=0, base_exp=0, job_exp=0, zeny=0, seconds=0.0,
+                         potions_used=0, sp_potions_used=0, potion_zeny_spent=0) -> None:
     with connection.get_connection() as conn:
         conn.execute(
             "UPDATE characters SET hunt_hp = ?, hunt_sp = ?, hunt_last_settled_at = ?, "
             "hunt_kills = hunt_kills + ?, hunt_base_exp = hunt_base_exp + ?, "
             "hunt_job_exp = hunt_job_exp + ?, hunt_zeny = hunt_zeny + ?, "
-            "hunt_seconds = hunt_seconds + ? WHERE id = ?",
-            (hp, sp, last_settled_at, kills, base_exp, job_exp, zeny, seconds, character_id),
+            "hunt_seconds = hunt_seconds + ?, "
+            "hunt_potions_used = hunt_potions_used + ?, "
+            "hunt_sp_potions_used = hunt_sp_potions_used + ?, "
+            "hunt_potion_zeny_spent = hunt_potion_zeny_spent + ? WHERE id = ?",
+            (hp, sp, last_settled_at, kills, base_exp, job_exp, zeny, seconds,
+             potions_used, sp_potions_used, potion_zeny_spent, character_id),
+        )
+
+
+def add_hunt_potion_zeny_spent(character_id: int, amount: int) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            "UPDATE characters SET hunt_potion_zeny_spent = hunt_potion_zeny_spent + ? "
+            "WHERE id = ?", (amount, character_id),
         )
 
 

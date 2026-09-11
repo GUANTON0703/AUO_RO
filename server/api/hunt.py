@@ -204,48 +204,54 @@ def _pick_sp_potion(character_id: int, preferred_id: str | None = None,
     return best
 
 
-def _auto_buy_potions(character_id: int, strategy, base_level: int = 1) -> None:
-    """掛機自動補水：買到手上有 buy_potion_upto 瓶，錢不夠就買能買的。"""
+def _auto_buy_potions(character_id: int, strategy, base_level: int = 1) -> int:
+    """掛機自動補水：買到手上有 buy_potion_upto 瓶，錢不夠就買能買的。回傳花了多少 Zeny。"""
     if not strategy.auto_buy_potion or strategy.buy_potion_upto <= 0:
-        return
+        return 0
     pid = strategy.buy_potion_id or "red_potion"
     item = _content.items.get(pid)
     if item is None or not item.npc_buy or item.npc_buy <= 0:
-        return
+        return 0
     if not _usable(item, base_level) or _heal_amount(item) <= 0:
-        return
+        return 0
     have = inventory.item_qty(character_id, pid)
     want = strategy.buy_potion_upto - have
     if want <= 0:
-        return
+        return 0
     current_zeny = characters_repo.get_character(character_id)["zeny"]
     buy_n = min(want, current_zeny // item.npc_buy)
     if buy_n <= 0:
-        return
-    if characters_repo.spend_zeny(character_id, buy_n * item.npc_buy):
+        return 0
+    cost = buy_n * item.npc_buy
+    if characters_repo.spend_zeny(character_id, cost):
         inventory.add_item(character_id, pid, buy_n)
+        return cost
+    return 0
 
 
-def _auto_buy_sp_potions(character_id: int, strategy, base_level: int = 1) -> None:
-    """掛機自動補 SP 藥水：買到手上有 buy_sp_potion_upto 瓶，錢不夠就買能買的。"""
+def _auto_buy_sp_potions(character_id: int, strategy, base_level: int = 1) -> int:
+    """掛機自動補 SP 藥水：買到手上有 buy_sp_potion_upto 瓶，錢不夠就買能買的。回傳花了多少 Zeny。"""
     if not strategy.auto_buy_sp_potion or strategy.buy_sp_potion_upto <= 0:
-        return
+        return 0
     pid = strategy.buy_sp_potion_id or "blue_potion"
     item = _content.items.get(pid)
     if item is None or not item.npc_buy or item.npc_buy <= 0:
-        return
+        return 0
     if not _usable(item, base_level) or _sp_restore_amount(item) <= 0:
-        return
+        return 0
     have = inventory.item_qty(character_id, pid)
     want = strategy.buy_sp_potion_upto - have
     if want <= 0:
-        return
+        return 0
     current_zeny = characters_repo.get_character(character_id)["zeny"]
     buy_n = min(want, current_zeny // item.npc_buy)
     if buy_n <= 0:
-        return
-    if characters_repo.spend_zeny(character_id, buy_n * item.npc_buy):
+        return 0
+    cost = buy_n * item.npc_buy
+    if characters_repo.spend_zeny(character_id, cost):
         inventory.add_item(character_id, pid, buy_n)
+        return cost
+    return 0
 
 
 def _auto_sell(character_id: int, strategy) -> int:
@@ -332,6 +338,9 @@ def _character_block(row) -> dict:
         "job_level": row["job_level"], "job_exp": row["job_exp"],
         "job_id": row["job_id"], "zeny": row["zeny"],
         "hunt_hp": row["hunt_hp"], "hunt_sp": row["hunt_sp"],
+        "hunt_potions_used": row["hunt_potions_used"],
+        "hunt_sp_potions_used": row["hunt_sp_potions_used"],
+        "hunt_potion_zeny_spent": row["hunt_potion_zeny_spent"],
     }
 
 
@@ -525,8 +534,11 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
         )
 
     strategy = _load_strategy(row["id"])
-    _auto_buy_potions(row["id"], strategy, row["base_level"])
-    _auto_buy_sp_potions(row["id"], strategy, row["base_level"])
+    potion_zeny_spent = _auto_buy_potions(row["id"], strategy, row["base_level"])
+    potion_zeny_spent += _auto_buy_sp_potions(row["id"], strategy, row["base_level"])
+    # 買水這筆花費馬上入帳，不管這次有沒有湊出一場戰鬥可結算（下面有提早回傳的分支）
+    if potion_zeny_spent:
+        characters_repo.add_hunt_potion_zeny_spent(row["id"], potion_zeny_spent)
 
     if strategy.auto_potion:
         potion_id, potion_heal, potion_count = _pick_potion(
@@ -603,6 +615,7 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
         kills=result.kills, base_exp=result.base_exp,
         job_exp=result.job_exp, zeny=result.zeny + sell_gain,
         seconds=hunt_secs_delta,
+        potions_used=result.potions_used, sp_potions_used=result.sp_potions_used,
     )
 
     retreated = result.retreated

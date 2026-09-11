@@ -160,6 +160,16 @@ def _migration_7(conn: sqlite3.Connection) -> None:
             )
 
 
+def _migration_9(conn: sqlite3.Connection) -> None:
+    """掛機補給面板：累計本場喝了幾瓶、買水花了多少 Zeny。"""
+    for name, definition in (
+        ("hunt_potions_used", "INTEGER NOT NULL DEFAULT 0"),
+        ("hunt_sp_potions_used", "INTEGER NOT NULL DEFAULT 0"),
+        ("hunt_potion_zeny_spent", "INTEGER NOT NULL DEFAULT 0"),
+    ):
+        _add_col(conn, "characters", name, definition)
+
+
 # (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
 _MIGRATIONS: list[tuple[int, "callable"]] = [
     (1, _migration_1),
@@ -170,6 +180,7 @@ _MIGRATIONS: list[tuple[int, "callable"]] = [
     (6, _migration_6),
     (7, _migration_7),
     (8, _migration_8),
+    (9, _migration_9),
 ]
 
 
