@@ -515,13 +515,15 @@ Screens.home = {
     const jMaxed = progression.job_level >= (Curve.jobCaps[tier] ?? Curve.jobCaps.first);
     const bNext = bMaxed ? 0 : Curve.baseNext(progression.base_level);
     const jNext = jMaxed ? 0 : Curve.jobNext(progression.job_level, tier);
-    // 紀錄還沒播完（佇列裡還有東西）就先不要把這些數字貼成終值——
+    // 帳號真正的升級經驗條：秒跳，不用等紀錄播完（跟血量/本場經驗不同，
+    // 這條沒有對應到任何一行紀錄可以逐行套用，等佇列清空才貼反而會卡住不動）。
+    setT("#hm-btext", xpText(progression.base_exp, bNext, bMaxed));
+    setW("#hm-bbar", xpProgress(progression.base_exp, bNext, bMaxed).percent, 100);
+    setT("#hm-jtext", xpText(progression.job_exp, jNext, jMaxed));
+    setW("#hm-jbar", xpProgress(progression.job_exp, jNext, jMaxed).percent, 100);
+    // 這些交給 _applyDelta 跟著紀錄逐行套用；紀錄還沒播完就先不要貼終值，
     // 不然數字比戰鬥紀錄還早知道結果。播完之後這裡自然會貼一次做最終校正。
     if (!this._queue.length) {
-      setT("#hm-btext", xpText(progression.base_exp, bNext, bMaxed));
-      setW("#hm-bbar", xpProgress(progression.base_exp, bNext, bMaxed).percent, 100);
-      setT("#hm-jtext", xpText(progression.job_exp, jNext, jMaxed));
-      setW("#hm-jbar", xpProgress(progression.job_exp, jNext, jMaxed).percent, 100);
       setT("#hm-hptext", `${hp} / ${sheet.max_hp ?? "?"}`);
       setW("#hm-hpbar", hp, sheet.max_hp ?? 1);
       setT("#hm-sptext", `${sp} / ${sheet.max_sp ?? "?"}`);
