@@ -6718,7 +6718,7 @@
   },
   {
     "id": "asura_strike",
-    "name": "阿修羅霸凰拳",
+    "name": "阿修羅霸王拳",
     "job_id": "monk",
     "kind": "active",
     "max_level": 5,
@@ -8348,7 +8348,7 @@
   },
   {
     "id": "ashura_strike",
-    "name": "阿修羅霸凰拳",
+    "name": "阿修羅霸王拳・真",
     "job_id": "champion",
     "kind": "active",
     "max_level": 5,

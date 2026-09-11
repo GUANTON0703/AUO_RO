@@ -1636,7 +1636,8 @@
       {"item_id": "oridecon", "rate": 0.1},
       {"item_id": "jur_3", "rate": 0.015},
       {"item_id": "stone_buckler_1", "rate": 0.02},
-      {"item_id": "high_orc_card", "rate": 0.0015}
+      {"item_id": "high_orc_card", "rate": 0.0015},
+      {"item_id": "iron_knuckles", "rate": 0.01}
     ],
     "is_mvp": false,
     "lore": "獸人部隊的精銳，力氣大、盔甲厚。"
@@ -2931,7 +2932,8 @@
       {"item_id": "elunium", "rate": 0.08},
       {"item_id": "khalitzburg_card", "rate": 0.0012},
       {"item_id": "plate_armor_70", "rate": 0.006},
-      {"item_id": "tower_shield_70", "rate": 0.006}
+      {"item_id": "tower_shield_70", "rate": 0.006},
+      {"item_id": "crescent_knuckles_70", "rate": 0.008}
     ],
     "is_mvp": false,
     "lore": "披著聖十字重甲的騎士團守衛，盾牆推進時整條迴廊都在震。"
@@ -3089,7 +3091,8 @@
       {"item_id": "elunium", "rate": 0.1},
       {"item_id": "owl_duke_card", "rate": 0.0012},
       {"item_id": "battle_mace_70", "rate": 0.008},
-      {"item_id": "power_ring_70", "rate": 0.006}
+      {"item_id": "power_ring_70", "rate": 0.006},
+      {"item_id": "crescent_knuckles_70", "rate": 0.007}
     ],
     "is_mvp": false,
     "lore": "時計塔地下的老紳士幽靈，舉止優雅但法術狠辣。"
@@ -3371,7 +3374,8 @@
       {"item_id": "ice_titan_card", "rate": 0.0011},
       {"item_id": "claymore_2h_85", "rate": 0.005},
       {"item_id": "plate_armor_85", "rate": 0.005},
-      {"item_id": "god_slayer_2h", "rate": 0.004}
+      {"item_id": "god_slayer_2h", "rate": 0.004},
+      {"item_id": "asura_fist", "rate": 0.004}
     ],
     "is_mvp": false,
     "lore": "冰洞最深處的冰封巨人，每一拳都像冰山崩落。"
@@ -3573,7 +3577,8 @@
       {"item_id": "gear_wheel", "rate": 0.38},
       {"item_id": "ore_fragment", "rate": 0.12},
       {"item_id": "venatu_card", "rate": 0.0016},
-      {"item_id": "knight_sabre_85", "rate": 0.008}
+      {"item_id": "knight_sabre_85", "rate": 0.008},
+      {"item_id": "crescent_knuckles_85", "rate": 0.008}
     ],
     "is_mvp": false,
     "lore": "朱諾遺跡巡邏的機械兵，關節運轉時發出古文明的低鳴。"
@@ -3656,7 +3661,8 @@
       {"item_id": "will_o_wisp", "rate": 0.35},
       {"item_id": "old_page", "rate": 0.12},
       {"item_id": "frus_card", "rate": 0.0016},
-      {"item_id": "arcane_staff_85", "rate": 0.007}
+      {"item_id": "arcane_staff_85", "rate": 0.007},
+      {"item_id": "crescent_knuckles_85", "rate": 0.007}
     ],
     "is_mvp": false,
     "lore": "奧丁神殿迴廊裡遊蕩的聖靈殘火，光芒下藏著千年怨念。"
