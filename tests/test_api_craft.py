@@ -25,7 +25,7 @@ def test_craft_success_consumes_materials_and_grants_item(client, auth, db_helpe
     db_helpers.set_craft_level(ch["id"], 10)  # 拉滿等級 → 成功率封頂 95%，測試才不會隨機失敗
     db_helpers.give_item(ch["id"], "jellopy", 5)
     db_helpers.give_item(ch["id"], "honey", 3)
-    db_helpers.give_item(ch["id"], "elunium", 1)
+    db_helpers.give_item(ch["id"], "clover", 1)
 
     r = client.post("/api/craft/recipe_heal_boost_potion", headers=h, json={"times": 1})
     assert r.status_code == 200
@@ -52,7 +52,7 @@ def test_craft_batch_gains_craft_exp_even_on_failure(client, auth, db_helpers):
     ch = _char(client, h, db_helpers)
     db_helpers.give_item(ch["id"], "orc_tooth", 40)
     db_helpers.give_item(ch["id"], "rosary", 20)
-    db_helpers.give_item(ch["id"], "oridecon", 20)
+    db_helpers.give_item(ch["id"], "nightmare_horn", 20)
     r = client.post("/api/craft/recipe_awakening_potion", headers=h, json={"times": 5})
     assert r.status_code == 200
     body = r.json()
