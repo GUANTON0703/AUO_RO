@@ -83,6 +83,7 @@ class HuntStrategyRequest(BaseModel):
     primary_skill_id: str | None = None
     skill_toggles: dict[str, bool] = {}
     auto_buff_potions: list[str] = []
+    auto_buy_buff_potions: dict[str, int] = {}
 
 
 def _load_strategy(character_id: int) -> HuntStrategy:
@@ -296,6 +297,30 @@ def _auto_buy_sp_potions(character_id: int, strategy, base_level: int = 1) -> in
     return 0
 
 
+def _auto_buy_buff_potions(character_id: int, strategy, base_level: int = 1) -> int:
+    """掛機自動補 buff 藥（只對商店買得到的有效，例如集中力恢復藥）。回傳花了多少 Zeny。"""
+    total_cost = 0
+    for pid, upto in (strategy.auto_buy_buff_potions or {}).items():
+        if upto <= 0:
+            continue
+        item = _content.items.get(pid)
+        if item is None or not item.npc_buy or item.npc_buy <= 0 or not _usable(item, base_level):
+            continue
+        have = inventory.item_qty(character_id, pid)
+        want = upto - have
+        if want <= 0:
+            continue
+        current_zeny = characters_repo.get_character(character_id)["zeny"]
+        buy_n = min(want, current_zeny // item.npc_buy)
+        if buy_n <= 0:
+            continue
+        cost = buy_n * item.npc_buy
+        if characters_repo.spend_zeny(character_id, cost):
+            inventory.add_item(character_id, pid, buy_n)
+            total_cost += cost
+    return total_cost
+
+
 def _auto_sell(character_id: int, strategy) -> int:
     """每次結算把 sell_item_ids 裡的道具整批賣掉，回傳賣得的 Zeny。"""
     gained = 0
@@ -394,7 +419,7 @@ def _active_potion_buffs_view(row) -> list:
             continue
         item = _content.items.get(item_id)
         out.append({"item_id": item_id, "name": item.name if item else item_id,
-                   "remaining_s": round(remaining)})
+                   "remaining_s": round(remaining), "stats": info.get("stats", {})})
     return out
 
 
@@ -604,6 +629,7 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
 
     potion_zeny_spent = _auto_buy_potions(row["id"], strategy, row["base_level"])
     potion_zeny_spent += _auto_buy_sp_potions(row["id"], strategy, row["base_level"])
+    potion_zeny_spent += _auto_buy_buff_potions(row["id"], strategy, row["base_level"])
     # 買水這筆花費馬上入帳，不管這次有沒有湊出一場戰鬥可結算（下面有提早回傳的分支）
     if potion_zeny_spent:
         characters_repo.add_hunt_potion_zeny_spent(row["id"], potion_zeny_spent)

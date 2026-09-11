@@ -199,6 +199,22 @@ def set_craft_progress(character_id: int, level: int, exp: int) -> None:
         )
 
 
+def get_recipe_mastery(character_id: int) -> dict:
+    with connection.get_connection() as conn:
+        row = conn.execute(
+            "SELECT recipe_mastery FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()
+    return json.loads(row["recipe_mastery"]) if row and row["recipe_mastery"] else {}
+
+
+def set_recipe_mastery(character_id: int, mastery: dict) -> None:
+    with connection.get_connection() as conn:
+        conn.execute(
+            "UPDATE characters SET recipe_mastery = ? WHERE id = ?",
+            (json.dumps(mastery), character_id),
+        )
+
+
 def apply_progression(character_id: int, *, base_level: int, base_exp: int,
                       job_level: int, job_exp: int, zeny_delta: int) -> None:
     with connection.get_connection() as conn:

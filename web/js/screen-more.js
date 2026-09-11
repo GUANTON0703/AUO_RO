@@ -160,7 +160,6 @@
       if (!box) return;
       try {
         const list = await API.listMvp();
-        const closed = this._mvpRegionClosed || (this._mvpRegionClosed = new Set());
         const regions = [];
         const byRegion = new Map();
         for (const m of list) {
@@ -174,6 +173,9 @@
           g.minLv = Math.min(g.minLv, m.level ?? 999);
         }
         regions.sort((a, b) => byRegion.get(a).minLv - byRegion.get(b).minLv);
+        // 預設全部收合，只記使用者手動點開過哪些區（第一次載入時整批塞進 closed）
+        if (!this._mvpRegionClosed) this._mvpRegionClosed = new Set(regions);
+        const closed = this._mvpRegionClosed;
         const rowHtml = (m) => {
           const cd = !m.available;
           const secs = m.seconds_remaining || 0;
@@ -322,6 +324,8 @@
               <div>${esc(r.name)}<span class="pill" style="margin-left:6px">成功率 ${r.success_pct}%</span></div>
               <div class="sub">產出：${esc(r.result_item_name)} ×${r.result_qty}　需製作等級 ${r.required_craft_level}${
                 r.zeny_cost ? `　${r.zeny_cost}z/次` : ""}</div>
+              <div class="sub">熟練度：做過 ${r.mastery_attempts} 次（+${r.mastery_bonus_pct}%）${
+                r.mastery_next ? `，再 ${r.mastery_next} 次加一階` : "・已練到頂"}</div>
               <div class="sub">${mats}</div>
               <div id="craft-result-${esc(r.id)}"></div>
             </div>

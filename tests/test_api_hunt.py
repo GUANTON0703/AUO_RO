@@ -49,6 +49,23 @@ def test_buff_potion_auto_drink_and_stat_boost(client, auth, db_helpers):
 
     buffs = status["character"]["active_potion_buffs"]
     assert any(b["item_id"] == "concentration_potion" for b in buffs)
+    # 顯示效果，不是只有名字跟倒數
+    assert buffs[0]["stats"].get("hit") == 10
+
+
+def test_auto_buy_buff_potion(client, auth, db_helpers):
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    db_helpers.set_zeny(ch["id"], 50000)
+    r = client.put(f"/api/hunt/strategy/{ch['id']}", headers=h,
+                   json={"auto_buy_buff_potions": {"concentration_potion": 5}})
+    assert r.status_code == 200
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_south_field"})
+    db_helpers.rewind_hunt(ch["id"], seconds=3600)
+    client.get("/api/hunt/status", headers=h)
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    # 沒開自動喝，買了但至少手上會補到接近設定的數量（可能同一批次也喝了幾瓶）
+    assert inv["items"].get("concentration_potion", 0) > 0
 
 
 def test_hunt_warm_start_yields_kills_on_first_status(client, auth, db_helpers):

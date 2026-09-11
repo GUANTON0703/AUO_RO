@@ -60,7 +60,8 @@ const STAT_ZH = { str: "力量", agi: "敏捷", vit: "體質", int: "智力", de
   luk: "幸運", atk: "攻擊", matk: "魔攻", def: "防禦", defense: "防禦", mdef: "魔防", hit: "命中",
   flee: "迴避", crit: "爆擊", aspd: "攻速", max_hp: "HP上限", max_sp: "SP上限",
   defense: "防禦", magic_defense: "魔防", attack: "攻擊", magic_attack: "魔攻",
-  hp: "HP上限", sp: "SP上限", accuracy: "命中", evasion: "迴避", critical: "爆擊" };
+  hp: "HP上限", sp: "SP上限", accuracy: "命中", evasion: "迴避", critical: "爆擊",
+  potion_heal_pct: "補品回復量", regen_bonus_pct: "自然回復速度", crit_mult_bonus: "爆擊傷害倍率" };
 
 const ELEM_ZH = { neutral: "無", water: "水", earth: "地", fire: "火", wind: "風",
   poison: "毒", holy: "聖", shadow: "暗", ghost: "念", undead: "不死" };
@@ -139,6 +140,15 @@ function effectText(e) {
     return `擊殺後回復 ${p.join("、")}`;
   }
   if (e.type === "autocast") return `攻擊 ${e.chance_pct || 5}% 機率自動施放技能`;
+  if (e.type === "buff") {
+    const parts = Object.entries(e.stats || {}).map(([k, v]) => {
+      const zh = STAT_ZH[k] || k;
+      if (k === "potion_heal_pct" || k === "regen_bonus_pct") return `${zh} +${v}%`;
+      if (k === "crit_mult_bonus") return `${zh} +${v}`;
+      return `${zh} ${v >= 0 ? "+" : ""}${v}`;
+    });
+    return `${parts.join("、")}，持續 ${e.duration_s} 秒`;
+  }
   return e.type;
 }
 
@@ -224,6 +234,18 @@ function itemDesc(id) {
   if (!it) return "";
   const fx = (it.effects || []).map(effectText).filter(Boolean).join("、");
   return fx || (it.kind === "material" ? "素材（賣錢 / 精煉用）" : "");
+}
+
+// 所有配方會用到的材料 item_id 集合，掛機撿到清單用來標「製作材料」，提醒不要手滑賣掉
+let _craftMaterialIdsCache = null;
+function craftMaterialIds() {
+  if (_craftMaterialIdsCache) return _craftMaterialIdsCache;
+  const set = new Set();
+  for (const r of Object.values(S.catalog?.recipes || {})) {
+    for (const m of Object.keys(r.materials || {})) set.add(m);
+  }
+  _craftMaterialIdsCache = set;
+  return set;
 }
 
 // 裝備 / 卡片說明字串
@@ -515,13 +537,15 @@ Screens.home = {
     const held = loot || {};
     const sell = new Set((this._strategy && this._strategy.sell_item_ids) || []);
     const sellable = (id) => !S.catalog?.cards?.[id];   // 卡片以外都能賣
+    const craftMats = craftMaterialIds();
     // 撿到的 + 已被自動賣掉的（清單裡有但背包已清空）都列出來，才能取消勾選
     const ids = [...new Set([...Object.keys(held), ...sell])];
     if (!ids.length) return `<p class="muted" style="margin-top:8px">本場還沒撿到東西</p>`;
     const row = (id) => {
       const qty = held[id] || 0;
-      const label = qty > 0 ? `${esc(itemName(id))} ×${qty}`
-        : `${esc(itemName(id))}（已自動賣出）`;
+      const tag = craftMats.has(id) ? `<span class="pill" style="margin-left:6px">製作材料</span>` : "";
+      const label = qty > 0 ? `${esc(itemName(id))} ×${qty}${tag}`
+        : `${esc(itemName(id))}（已自動賣出）${tag}`;
       return `
       <label class="kv" style="cursor:pointer">
         <span>${label}</span>
@@ -585,9 +609,15 @@ Screens.home = {
     }
     // buff 藥（有明確過期時間，伺服器算好的秒數，不用自己扣）
     const potionBuffs = this._lastStatus?.character?.active_potion_buffs || [];
-    const potionRows = potionBuffs.map((b) =>
-      `<div class="kv"><span class="k">${esc(b.name)}</span><span>剩約 ${b.remaining_s} 秒</span></div>`
-    ).join("");
+    const potionRows = potionBuffs.map((b) => {
+      const parts = Object.entries(b.stats || {}).map(([k, v]) => {
+        const zh = STAT_ZH[k] || k;
+        if (k === "potion_heal_pct" || k === "regen_bonus_pct") return `${zh} +${v}%`;
+        return `${zh} ${v >= 0 ? "+" : ""}${v}`;
+      }).join("、");
+      return `<div class="kv"><span class="k">${esc(b.name)}</span>` +
+        `<span>${esc(parts)}　剩約 ${b.remaining_s} 秒</span></div>`;
+    }).join("");
     const total = groups.size + potionBuffs.length;
     if (!total) return "";
     const rows = [...groups.values()].map((g) => {
@@ -989,12 +1019,23 @@ Screens.hunt = {
       : "";
 
     this._search = "";
-    let html = `<div class="card"><h3>選狩獵地圖</h3>${regSel}` +
+    let mapsOpen = false;
+    try { mapsOpen = localStorage.getItem("rotxt_hunt_maps_open") === "1"; } catch (_) {}
+    const curMapName = S.catalog.maps[S.char.location_map]?.name;
+    let html = `<details class="card"${mapsOpen ? " open" : ""} id="maps-details">` +
+      `<summary style="cursor:pointer"><h3 style="display:inline">選狩獵地圖${
+        curMapName ? `<span class="sub" style="font-weight:400">（目前：${esc(curMapName)}）</span>` : ""}</h3></summary>` +
+      `${regSel}` +
       `<input id="hunt-search" placeholder="搜尋地圖或怪物名稱" style="width:100%;margin-bottom:8px">` +
-      `<div class="list" id="maplist"></div></div>` +
+      `<div class="list" id="maplist"></div></details>` +
       `<div id="monsterpick"></div>` + this._strategyCard();
     view().innerHTML = html;
     this._renderMapList();
+
+    const mapsDetails = document.querySelector("#maps-details");
+    if (mapsDetails) mapsDetails.ontoggle = () => {
+      try { localStorage.setItem("rotxt_hunt_maps_open", mapsDetails.open ? "1" : "0"); } catch (_) {}
+    };
 
     const ss = document.querySelector("#hunt-search");
     if (ss) ss.oninput = () => { this._search = ss.value; this._renderMapList(); };
@@ -1082,20 +1123,26 @@ Screens.hunt = {
           <span><input type="number" id="st-skillsp" min="0" max="95" style="width:64px"
             value="${Math.round((s.skill_min_sp_pct ?? 0) * 100)}"> %　才放主動技能</span></div>
         <p class="sub">設 0 = 一律放。設高一點會留魔力、少放技能。</p>
-        <div class="sub" style="margin-top:8px">自動喝 buff 藥（過期自動補喝，沒庫存就不喝）</div>
-        ${this._buffPotionChecklist(s.auto_buff_potions || [])}
+        <div class="sub" style="margin-top:8px">自動喝 buff 藥（過期自動補喝，沒庫存就不喝；商店買得到的可以順便設自動買）</div>
+        ${this._buffPotionChecklist(s.auto_buff_potions || [], s.auto_buy_buff_potions || {})}
         <button class="btn primary block" id="st-save" style="margin-top:10px">儲存掛機設定</button>
       </div>`;
   },
-  _buffPotionChecklist(picked) {
+  _buffPotionChecklist(picked, buyUpto) {
     const set = new Set(picked);
     const buffPotions = Object.values(S.catalog.items || {})
       .filter((it) => (it.effects || []).some((e) => e.type === "buff"));
     if (!buffPotions.length) return `<p class="muted">還沒有 buff 藥可以喝</p>`;
-    return buffPotions.map((it) => `<label class="kv" style="cursor:pointer">
-        <span>${esc(it.name)}${it.required_level > 1 ? `（Lv${it.required_level}+）` : ""}</span>
+    return buffPotions.map((it) => {
+      const buyable = it.npc_buy != null;
+      return `<label class="kv" style="cursor:pointer">
+        <span>${esc(it.name)}${it.required_level > 1 ? `（Lv${it.required_level}+）` : ""}
+          <div class="sub">${esc(itemDesc(it.id))}${buyable ? "" : "（商店沒賣，要自己煉）"}</div></span>
         <input type="checkbox" data-buffpot="${it.id}" style="width:auto" ${set.has(it.id) ? "checked" : ""}>
-      </label>`).join("");
+      </label>` + (buyable ? `<div class="kv"><span class="k">自動買，補到手上有</span>
+        <span><input type="number" data-buybuffpot="${it.id}" min="0" max="99" style="width:56px"
+          value="${buyUpto[it.id] || 0}"> 瓶</span></div>` : "");
+    }).join("");
   },
   _wireStrategy() {
     const btn = document.querySelector("#st-save");
@@ -1117,6 +1164,10 @@ Screens.hunt = {
         skill_min_sp_pct: Math.min(0.95, Math.max(0, (Number(g("#st-skillsp").value) || 0) / 100)),
         auto_buff_potions: [...document.querySelectorAll("[data-buffpot]:checked")]
           .map((el) => el.dataset.buffpot),
+        auto_buy_buff_potions: Object.fromEntries(
+          [...document.querySelectorAll("[data-buybuffpot]")]
+            .map((el) => [el.dataset.buybuffpot, Math.max(0, Math.floor(Number(el.value) || 0))])
+            .filter(([, v]) => v > 0)),
       };
       btn.disabled = true;
       try { await API.setHuntStrategy(S.char.id, strat); this._strategy = strat; App.toast("已儲存"); }

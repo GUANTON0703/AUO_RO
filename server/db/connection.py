@@ -181,6 +181,11 @@ def _migration_11(conn: sqlite3.Connection) -> None:
     _add_col(conn, "characters", "craft_exp", "INTEGER NOT NULL DEFAULT 0")
 
 
+def _migration_12(conn: sqlite3.Connection) -> None:
+    """配方熟練度：{recipe_id: 做過幾次}，越常做同一張配方成功率額外加成。"""
+    _add_col(conn, "characters", "recipe_mastery", "TEXT NOT NULL DEFAULT '{}'")
+
+
 # (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
 _MIGRATIONS: list[tuple[int, "callable"]] = [
     (1, _migration_1),
@@ -194,6 +199,7 @@ _MIGRATIONS: list[tuple[int, "callable"]] = [
     (9, _migration_9),
     (10, _migration_10),
     (11, _migration_11),
+    (12, _migration_12),
 ]
 
 

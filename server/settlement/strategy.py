@@ -24,6 +24,7 @@ class HuntStrategy:
     primary_skill_id: str | None = None        # 指定主攻技能（None = 引擎自動挑）
     skill_toggles: dict[str, bool] = field(default_factory=dict)  # {技能id: 掛機要不要放}
     auto_buff_potions: list[str] = field(default_factory=list)  # 過期自動補喝的 buff 藥（item_id 清單）
+    auto_buy_buff_potions: dict[str, int] = field(default_factory=dict)  # {item_id: 補到手上有幾瓶}（只對商店買得到的有效）
 
     def allows(self, monster_id: str) -> bool:
         return monster_id not in self.exclude_monsters and (

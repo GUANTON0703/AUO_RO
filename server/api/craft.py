@@ -25,15 +25,21 @@ def _current_character(account_id: int):
 def list_craft(account_id: CurrentAccount):
     row = _current_character(account_id)
     craft_level = row["craft_level"]
+    mastery = characters_repo.get_recipe_mastery(row["id"])
     out = []
     for r in _content.recipes.values():
         have = {m: inventory.item_qty(row["id"], m) for m in r.materials}
+        attempts = mastery.get(r.id, 0)
         out.append({
             "id": r.id, "name": r.name, "result_item": r.result_item,
             "result_item_name": _content.items[r.result_item].name,
             "result_qty": r.result_qty,
             "required_craft_level": r.required_craft_level,
-            "success_pct": crafting.success_rate(r, craft_level),
+            "success_pct": crafting.success_rate(r, craft_level, attempts),
+            "mastery_attempts": attempts,
+            "mastery_bonus_pct": crafting.mastery_bonus_pct(attempts),
+            "mastery_next": crafting.MASTERY_PER_ATTEMPT - (attempts % crafting.MASTERY_PER_ATTEMPT)
+                if crafting.mastery_bonus_pct(attempts) < crafting.MASTERY_CAP_PCT else 0,
             "zeny_cost": r.zeny_cost,
             "materials": [
                 {"item_id": m, "name": _content.items[m].name, "need": qty, "have": have[m]}
@@ -68,11 +74,14 @@ def craft(recipe_id: str, body: CraftRequest, account_id: CurrentAccount):
 
     rng = random.Random()
     craft_level, craft_exp = row["craft_level"], row["craft_exp"]
+    mastery = characters_repo.get_recipe_mastery(row["id"])
+    attempts_before = mastery.get(recipe_id, 0)
     successes = great_successes = fails = produced = 0
-    for _ in range(body.times):
+    for i in range(body.times):
         for m, qty in recipe.materials.items():
             inventory.consume_item(row["id"], m, qty)
-        success, great, exp_gained = crafting.attempt_craft(recipe, craft_level, rng)
+        success, great, exp_gained = crafting.attempt_craft(
+            recipe, craft_level, attempts_before + i, rng)
         craft_level, craft_exp = crafting.apply_craft_exp(craft_level, craft_exp, exp_gained)
         if success:
             successes += 1
@@ -86,6 +95,8 @@ def craft(recipe_id: str, body: CraftRequest, account_id: CurrentAccount):
 
     characters_repo.spend_zeny(row["id"], total_cost)
     characters_repo.set_craft_progress(row["id"], craft_level, craft_exp)
+    mastery[recipe_id] = attempts_before + body.times
+    characters_repo.set_recipe_mastery(row["id"], mastery)
 
     return {
         "attempts": body.times, "successes": successes, "great_successes": great_successes,
@@ -93,4 +104,6 @@ def craft(recipe_id: str, body: CraftRequest, account_id: CurrentAccount):
         "craft_level": craft_level, "craft_exp": craft_exp,
         "craft_exp_next": crafting.craft_exp_for_next(craft_level)
                           if craft_level < crafting.CRAFT_LEVEL_CAP else 0,
+        "mastery_attempts": mastery[recipe_id],
+        "mastery_bonus_pct": crafting.mastery_bonus_pct(mastery[recipe_id]),
     }
