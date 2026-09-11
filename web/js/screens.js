@@ -441,19 +441,30 @@ Screens.home = {
     // 撿到的 + 已被自動賣掉的（清單裡有但背包已清空）都列出來，才能取消勾選
     const ids = [...new Set([...Object.keys(held), ...sell])];
     if (!ids.length) return `<p class="muted" style="margin-top:8px">本場還沒撿到東西</p>`;
-    return `<div style="margin-top:8px"><div class="sub">本場撿到（勾 = 之後自動賣掉）</div>` +
-      ids.map((id) => {
-        const qty = held[id] || 0;
-        const label = qty > 0 ? `${esc(itemName(id))} ×${qty}`
-          : `${esc(itemName(id))}（已自動賣出）`;
-        return `
-        <label class="kv" style="cursor:pointer">
-          <span>${label}</span>
-          ${sellable(id) || sell.has(id)
-            ? `<input type="checkbox" data-sell="${esc(id)}" style="width:auto" ${sell.has(id) ? "checked" : ""}>`
-            : `<span class="dim" style="font-size:.85em">不可賣</span>`}
-        </label>`;
-      }).join("") + `</div>`;
+    const row = (id) => {
+      const qty = held[id] || 0;
+      const label = qty > 0 ? `${esc(itemName(id))} ×${qty}`
+        : `${esc(itemName(id))}（已自動賣出）`;
+      return `
+      <label class="kv" style="cursor:pointer">
+        <span>${label}</span>
+        ${sellable(id) || sell.has(id)
+          ? `<input type="checkbox" data-sell="${esc(id)}" style="width:auto" ${sell.has(id) ? "checked" : ""}>`
+          : `<span class="dim" style="font-size:.85em">不可賣</span>`}
+      </label>`;
+    };
+    // 已設定自動賣的收進可展開區塊，預設收起，畫面才不會被勾過的舊項目洗掉
+    const pending = ids.filter((id) => !sell.has(id));
+    const autoSold = ids.filter((id) => sell.has(id));
+    const pendingHtml = pending.length
+      ? `<div class="sub">本場撿到（勾 = 之後自動賣掉）</div>` + pending.map(row).join("")
+      : `<p class="muted">本場還沒撿到新東西</p>`;
+    const autoSoldHtml = autoSold.length
+      ? `<details style="margin-top:4px">
+          <summary style="cursor:pointer" class="dim">已設定自動賣出 ×${autoSold.length}（點開看/取消）</summary>
+          ${autoSold.map(row).join("")}</details>`
+      : "";
+    return `<div style="margin-top:8px">${pendingHtml}${autoSoldHtml}</div>`;
   },
   _wireLoot() {
     document.querySelectorAll("#loot-box [data-sell]").forEach((cb) => {
