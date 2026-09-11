@@ -68,7 +68,7 @@ def watch_hunt(api: ApiClient, console: Console, poll_seconds: float = 1.0,
     last_status: dict = {}
     error = None
     no_hunt_message = None
-    with Live(console=console, refresh_per_second=4, transient=False) as live:
+    with Live(console=console, refresh_per_second=1, transient=False) as live:
         while True:
             try:
                 status = api.hunt_status()
