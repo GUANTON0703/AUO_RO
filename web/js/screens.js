@@ -768,21 +768,22 @@ Screens.home = {
         <div class="kv"><span class="k">Zeny</span><span id="hm-zeny">${c.zeny}</span></div>
         <div class="kv"><span class="k">地點</span><span>${esc(mapName(c.location_map))}</span></div>
         <div id="buff-box">${this._buffHtml()}</div>
-      </div>
-      ${this._equipHtml(this._inv)}`;
+      </div>`;
 
     if (this._hunting) {
+      // 手機一個畫面要看得到「上面數值 + 整段戰鬥紀錄」，裝備卡片跟喝水選單這種
+      // 不用一直盯著看的東西往下擺，別擋在戰鬥紀錄前面。
       html += `
         <div class="card">
           <div class="section-title"><h3>掛機中</h3>
              <span class="pill good" id="hk-mon">${esc(monName(status.monster_id))}</span></div>
-          <div id="potion-box">${this._potionHtml(status)}</div>
           <div class="log" id="huntlog" style="margin-top:8px">${this._shown.join("\n") || "<span class='dim'>搜尋目標中…</span>"}</div>
           <div class="kv" style="margin-top:8px"><span class="k">狀態</span><span class="sub" id="hk-state">${combatLabel}</span></div>
           <div class="kv"><span class="k">擊殺</span><span id="hk-kills">${status.kills}</span></div>
           <div class="kv"><span class="k">本場經驗</span><span id="hk-exp">+${status.base_exp} / +${status.job_exp}</span></div>
           <div class="kv"><span class="k">本場 Zeny</span><span id="hk-zeny">+${status.zeny}</span></div>
           <div class="kv"><span class="k">掛機時間</span><span id="hk-time">${Math.floor(App.huntSecsShown())} 秒</span></div>
+          <div id="potion-box" style="margin-top:8px">${this._potionHtml(status)}</div>
           <div id="loot-box">${this._lootHtml(status.loot)}</div>
           <div class="row" style="margin-top:10px">
             <button class="btn block" id="btn-stop">停止掛機並結算</button>
@@ -798,6 +799,7 @@ Screens.home = {
       html += `<div class="card"><h3>沒有在掛機</h3>
         <button class="btn primary block" onclick="App.navigate('hunt')">去掛機</button></div>`;
     }
+    html += this._equipHtml(this._inv);
     html += this._worldChatHtml();
     view().innerHTML = html;
     this._lootJson = JSON.stringify((status && status.loot) || {});
