@@ -84,7 +84,9 @@ def challenge(body: ChallengeRequest, account_id: CurrentAccount):
             detail=f"冷卻中（{mins} 分後復活，上次由 {gs['killer']} 擊殺）")
 
     job = _content.get_job(row["job_id"])
-    player = build_player_combatant(_snapshot(row, apply_prefs=False), _content)
+    active_buffs = characters_repo.active_buff_stats(row["id"])
+    player = build_player_combatant(
+        _snapshot(row, apply_prefs=False, active_item_buffs=active_buffs), _content)
 
     cfg = ChallengeConfig()
     if body.flee_hp_frac is not None:

@@ -294,6 +294,26 @@ def set_active_potion_buffs(character_id: int, buffs: dict) -> None:
         )
 
 
+def active_buff_stats(character_id: int) -> dict:
+    """純讀取目前還沒過期的 buff（藥水/NPC 代喝），回傳 {item_id: {stat: 加成}}
+    給 build_player_combatant 折進面板用。不消耗庫存、不扣錢、不寫回 DB
+    ——那些副作用只在掛機結算時做（見 server/api/hunt.py 的 _refresh_active_buffs）。"""
+    from datetime import datetime, timezone
+    stored = get_active_potion_buffs(character_id)
+    now = datetime.now(timezone.utc)
+    out = {}
+    for item_id, info in stored.items():
+        try:
+            expires_at = datetime.fromisoformat(info["expires_at"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at > now:
+            out[item_id] = info.get("stats", {})
+    return out
+
+
 def set_learned_skills(character_id: int, learned: dict) -> None:
     with connection.get_connection() as conn:
         conn.execute(

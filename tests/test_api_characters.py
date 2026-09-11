@@ -124,3 +124,39 @@ def test_list_characters_works_for_second_job(client, auth, db_helpers):
     r = client.get("/api/characters", headers=headers)
     assert r.status_code == 200, r.text
     assert r.json()[0]["job_id"] == "assassin"
+
+
+def test_sheet_reflects_active_potion_buffs(client, auth, db_helpers):
+    """喝下去的 buff 藥/NPC 代喝，數值面板（/sheet）要能看到差異，不能只有掛機結算內部折算。"""
+    from server.repositories import characters as characters_repo
+
+    _, headers, _ = auth
+    ch = client.post("/api/characters", headers=headers, json={"name": "數值面板王"}).json()
+    baseline = client.get(f"/api/characters/{ch['id']}/sheet", headers=headers).json()
+
+    from datetime import datetime, timedelta, timezone
+    expires_at = datetime.now(timezone.utc) + timedelta(seconds=180)
+    characters_repo.set_active_potion_buffs(ch["id"], {
+        "concentration_potion": {"expires_at": expires_at.isoformat(), "stats": {"hit": 10, "crit": 5}},
+    })
+
+    buffed = client.get(f"/api/characters/{ch['id']}/sheet", headers=headers).json()
+    assert buffed["hit"] == baseline["hit"] + 10
+    assert buffed["crit"] == baseline["crit"] + 5
+
+
+def test_sheet_ignores_expired_buffs(client, auth, db_helpers):
+    from server.repositories import characters as characters_repo
+
+    _, headers, _ = auth
+    ch = client.post("/api/characters", headers=headers, json={"name": "過期不算"}).json()
+    baseline = client.get(f"/api/characters/{ch['id']}/sheet", headers=headers).json()
+
+    from datetime import datetime, timedelta, timezone
+    expired_at = datetime.now(timezone.utc) - timedelta(seconds=1)
+    characters_repo.set_active_potion_buffs(ch["id"], {
+        "concentration_potion": {"expires_at": expired_at.isoformat(), "stats": {"hit": 10}},
+    })
+
+    sheet = client.get(f"/api/characters/{ch['id']}/sheet", headers=headers).json()
+    assert sheet["hit"] == baseline["hit"]

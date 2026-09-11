@@ -104,6 +104,7 @@ def character_sheet(character_id: int, account_id: CurrentAccount):
             )
             for e in inventory.list_equipped(character_id)
         ],
+        active_item_buffs=characters_repo.active_buff_stats(character_id),
     )
     c = build_player_combatant(snap, content)
     return {

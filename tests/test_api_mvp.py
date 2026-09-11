@@ -72,3 +72,27 @@ def test_challenge_cooldown_is_20_minutes(client, auth, db_helpers):
     row = next(m for m in client.get("/api/mvp", headers=h).json() if m["id"] == "angel_poring")
     assert row["cooldown_minutes"] == 20
     assert 1000 < row["seconds_remaining"] <= 1200   # ~20 分鐘內
+
+
+def test_mvp_challenge_snapshot_includes_active_buffs(client, auth, db_helpers):
+    """喝下去的 buff 藥/NPC 代喝，MVP 挑戰也要吃到，不能只有掛機才有效果（跟 challenge() 內部組法一致）。"""
+    from datetime import datetime, timedelta, timezone
+    from server.repositories import characters as characters_repo
+    from server.progression import build_player_combatant
+    from server.api.hunt import _snapshot
+    from server.content import load_content
+
+    _, headers, _ = auth
+    ch = client.post("/api/characters", headers=headers, json={"name": "MVP吃buff"}).json()
+    row = characters_repo.get_character(ch["id"])
+    content = load_content()
+    baseline = build_player_combatant(_snapshot(row, apply_prefs=False), content)
+
+    expires_at = datetime.now(timezone.utc) + timedelta(seconds=180)
+    characters_repo.set_active_potion_buffs(ch["id"], {
+        "concentration_potion": {"expires_at": expires_at.isoformat(), "stats": {"hit": 10}},
+    })
+    active_buffs = characters_repo.active_buff_stats(ch["id"])
+    buffed = build_player_combatant(
+        _snapshot(row, apply_prefs=False, active_item_buffs=active_buffs), content)
+    assert buffed.hit == baseline.hit + 10
