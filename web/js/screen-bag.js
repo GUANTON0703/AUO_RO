@@ -53,6 +53,7 @@
 
       const items = inv.items || {};
       const isCard = (id) => !!S.catalog?.cards?.[id];
+      const isMaterial = (id) => S.catalog?.items?.[id]?.kind === "material";
 
       // 每張已鑲嵌的卡片鑲在哪些裝備上
       const socketedIn = {};
@@ -63,13 +64,20 @@
         }
       }
 
-      const itemRows = Object.entries(items).filter(([id]) => !isCard(id)).map(([id, qty]) => {
+      const itemRow = ([id, qty]) => {
         const d = itemDesc(id);
         return `
         <div class="item">
           <div>${esc(itemName(id))}<div class="sub">×${qty}${d ? "　" + esc(d) : ""}</div></div>
-          <button class="btn small" data-sell="${id}" data-name="${esc(itemName(id))}">賣</button>
-        </div>`; }).join("");
+          <div class="row tight">
+            <button class="btn small" data-deposit-item="${id}" data-name="${esc(itemName(id))}">存</button>
+            <button class="btn small" data-sell="${id}" data-name="${esc(itemName(id))}">賣</button>
+          </div>
+        </div>`;
+      };
+      const nonCardEntries = Object.entries(items).filter(([id]) => !isCard(id));
+      const itemRows = nonCardEntries.filter(([id]) => !isMaterial(id)).map(itemRow).join("");
+      const materialRows = nonCardEntries.filter(([id]) => isMaterial(id)).map(itemRow).join("");
 
       // 卡片：背包持有的 + 已鑲在裝備上的，都列出來
       const cardIds = [...new Set([
@@ -142,6 +150,7 @@
               ${canRefine ? `<button class="btn small" data-refine="${inst.id}">精煉</button>` : ""}
               ${freeSockets > 0 ? `<button class="btn small" data-socket="${inst.id}" data-eqslot="${slotOf(inst.equipment_id)}">鑲卡</button>` : ""}
               ${(inst.card_ids || []).length ? `<button class="btn small" data-uncard="${inst.id}">卸卡</button>` : ""}
+              ${equipped ? "" : `<button class="btn small" data-deposit-eq="${inst.id}" data-name="${esc(eqName(inst.equipment_id))}">存入倉庫</button>`}
               ${equipped ? "" : `<button class="btn small" data-sell-eq="${inst.id}" data-name="${esc(eqName(inst.equipment_id))}">賣出</button>`}
             </div>
           </div>
@@ -149,7 +158,8 @@
         }).join("");
 
       const open = this._open || (this._open = {});
-      const itemCount = Object.keys(items).filter((id) => !isCard(id)).length;
+      const itemCount = nonCardEntries.filter(([id]) => !isMaterial(id)).length;
+      const materialCount = nonCardEntries.filter(([id]) => isMaterial(id)).length;
       const eqCount = (inv.equipment || [])
         .filter((inst) => !this._bagSlot || slotOf(inst.equipment_id) === this._bagSlot).length;
       const sec = (key, title, count, inner) => `
@@ -161,6 +171,8 @@
       this._body().innerHTML =
         sec("items", "道具", itemCount,
           `<div class="list">${itemRows || `<p class="muted">背包沒有道具。</p>`}</div>`)
+        + sec("materials", "材料", materialCount,
+          `<div class="list">${materialRows || `<p class="muted">背包沒有材料。</p>`}</div>`)
         + sec("cards", "卡片", cardIds.length,
           `<div class="list">${cardRows || `<p class="muted">背包沒有卡片。</p>`}</div>`)
         + sec("eq", "裝備", eqCount,
@@ -228,6 +240,32 @@
           } catch (e) { App.toast(e.detail || "販售失敗", true); b.disabled = false; }
         };
       });
+      this._body().querySelectorAll("[data-deposit-item]").forEach((b) => {
+        b.onclick = async () => {
+          const qty = num(`存幾個「${b.dataset.name}」進倉庫？`, 1);
+          if (qty == null) return;
+          b.disabled = true;
+          try {
+            await API.deposit({ item_id: b.dataset.depositItem, qty });
+            App.toast(`存了 ${b.dataset.name} ×${qty} 進倉庫`);
+            reload();
+          } catch (e) { App.toast(e.detail || "存入失敗", true); b.disabled = false; }
+        };
+      });
+      this._body().querySelectorAll("[data-deposit-eq]").forEach((b) => {
+        b.onclick = async () => {
+          const id = Number(b.dataset.depositEq);
+          const name = b.dataset.name;
+          const ids = this._sameStackIds(inv.equipment || [], id, `存幾件「${name}」（未精煉、未鑲卡）進倉庫？`);
+          if (ids == null) return;
+          b.disabled = true;
+          try {
+            for (const eid of ids) await API.deposit({ equipment_instance_id: eid });
+            App.toast(`存了 ${name} ×${ids.length} 進倉庫`);
+            reload();
+          } catch (e) { App.toast(e.detail || "存入失敗", true); b.disabled = false; }
+        };
+      });
       this._body().querySelectorAll("[data-equip]").forEach((b) => {
         b.onclick = async () => {
           b.disabled = true;
@@ -284,6 +322,24 @@
           } catch (e) { App.toast(e.detail || "鑲卡失敗", true); b.disabled = false; }
         };
       });
+    },
+
+    // 同款（同 equipment_id、未精煉、未鑲卡、不在身上）裝備一次選幾件一起處理，
+    // 不用一件一件點。單件就直接回那一件，不用另外問。
+    _sameStackIds(equipment, clickedId, promptLabel) {
+      const clicked = equipment.find((x) => x.id === clickedId);
+      const plain = (x) => x.equipped_slot == null && !x.refine
+        && (!x.card_ids || x.card_ids.length === 0);
+      const same = clicked && plain(clicked)
+        ? equipment.filter((x) => x.equipment_id === clicked.equipment_id && plain(x))
+        : [];
+      if (same.length <= 1) return [clickedId];
+      const raw = prompt(`你有 ${same.length} 件（未精煉、未鑲卡）。\n${promptLabel}輸入 1～${same.length}，或 0 取消：`,
+        String(same.length));
+      if (raw == null) return null;
+      const n = Math.floor(Number(raw));
+      if (!Number.isFinite(n) || n <= 0) return null;
+      return same.slice(0, Math.min(n, same.length)).map((x) => x.id);
     },
 
     _pickCard(items, eqSlot) {
@@ -378,30 +434,50 @@
       if (this._stale("storage")) return;
 
       const items = st.items || {};
-      const itemRows = Object.entries(items).map(([id, qty]) => `
+      const isMaterial = (id) => S.catalog?.items?.[id]?.kind === "material";
+      const itemRow = ([id, qty]) => `
         <div class="item">
           <div>${esc(itemName(id))}<div class="sub">×${qty}</div></div>
           <button class="btn small" data-withdraw-item="${id}" data-name="${esc(itemName(id))}">取出</button>
-        </div>`).join("");
+        </div>`;
+      const itemEntries = Object.entries(items);
+      const itemRows = itemEntries.filter(([id]) => !isMaterial(id)).map(itemRow).join("");
+      const materialRows = itemEntries.filter(([id]) => isMaterial(id)).map(itemRow).join("");
 
-      const eqRows = (st.equipment || []).map((inst) => `
+      // 同款（同 equipment_id、未精煉、未鑲卡）裝備合併成一列顯示數量，不用捲一長串
+      // 一模一樣的東西；有精煉或鑲卡的各自獨一無二，還是分開列。
+      const eqList = st.equipment || [];
+      const plainEq = (x) => !x.refine && (!x.card_ids || x.card_ids.length === 0);
+      const grouped = {};
+      const uniqueRows = [];
+      for (const inst of eqList) {
+        if (plainEq(inst)) {
+          (grouped[inst.equipment_id] = grouped[inst.equipment_id] || []).push(inst);
+        } else {
+          uniqueRows.push(`
         <div class="item">
-          <div>${esc(eqName(inst.equipment_id))}${inst.refine ? ` <span class="pill good">+${inst.refine}</span>` : ""}
+          <div>${esc(eqName(inst.equipment_id))} <span class="pill good">+${inst.refine || 0}</span>
             <div class="sub">${esc(eqSlot(inst.equipment_id) || "")}</div></div>
           <button class="btn small" data-withdraw-eq="${inst.id}">取出</button>
-        </div>`).join("");
+        </div>`);
+        }
+      }
+      const groupRows = Object.entries(grouped).map(([eqId, insts]) => `
+        <div class="item">
+          <div>${esc(eqName(eqId))}${insts.length > 1 ? `<span class="pill" style="margin-left:6px">×${insts.length}</span>` : ""}
+            <div class="sub">${esc(eqSlot(eqId) || "")}</div></div>
+          <button class="btn small" data-withdraw-eq="${insts[0].id}" data-eq-group="${eqId}">取出</button>
+        </div>`);
+      const eqRows = [...groupRows, ...uniqueRows].join("");
 
       this._body().innerHTML = `
         <div class="card"><h3>倉庫道具</h3>
-          <div class="list">${itemRows || `<p class="muted">倉庫沒有道具。</p>`}</div>
-          <div class="row" style="margin-top:10px">
-            <button class="btn ghost small" id="deposit-item">從背包存入道具</button>
-          </div></div>
+          <div class="list">${itemRows || `<p class="muted">倉庫沒有道具。</p>`}</div></div>
+        <div class="card"><h3>倉庫材料</h3>
+          <div class="list">${materialRows || `<p class="muted">倉庫沒有材料。</p>`}</div></div>
         <div class="card"><h3>倉庫裝備</h3>
-          <div class="list">${eqRows || `<p class="muted">倉庫沒有裝備。</p>`}</div>
-          <div class="row" style="margin-top:10px">
-            <button class="btn ghost small" id="deposit-eq">從背包存入裝備</button>
-          </div></div>`;
+          <div class="list">${eqRows || `<p class="muted">倉庫沒有裝備。</p>`}</div></div>
+        <p class="sub">要存東西進倉庫，去「背包」頁面，每個道具/裝備旁邊都有「存」的按鈕。</p>`;
 
       const reload = () => this._drawStorage();
 
@@ -416,43 +492,26 @@
       });
       this._body().querySelectorAll("[data-withdraw-eq]").forEach((b) => {
         b.onclick = async () => {
+          const eqId = b.dataset.eqGroup;
+          const name = eqName(eqId || "");
+          let ids = [Number(b.dataset.withdrawEq)];
+          const stack = eqId ? grouped[eqId] : null;
+          if (stack && stack.length > 1) {
+            const raw = prompt(`倉庫有 ${stack.length} 件「${name}」（未精煉、未鑲卡）。\n要取出幾件？輸入 1～${stack.length}，或 0 取消：`,
+              String(stack.length));
+            if (raw == null) return;
+            const n = Math.floor(Number(raw));
+            if (!Number.isFinite(n) || n <= 0) return;
+            ids = stack.slice(0, Math.min(n, stack.length)).map((x) => x.id);
+          }
           b.disabled = true;
-          try { await API.withdraw({ equipment_instance_id: b.dataset.withdrawEq }); App.toast("已取出"); reload(); }
-          catch (e) { App.toast(e.detail || "取出失敗", true); b.disabled = false; }
+          try {
+            for (const id of ids) await API.withdraw({ equipment_instance_id: id });
+            App.toast(`取出 ×${ids.length}`);
+            reload();
+          } catch (e) { App.toast(e.detail || "取出失敗", true); b.disabled = false; }
         };
       });
-      document.querySelector("#deposit-item").onclick = () => this._depositItem(reload);
-      document.querySelector("#deposit-eq").onclick = () => this._depositEq(reload);
-    },
-
-    async _depositItem(reload) {
-      let inv;
-      try { inv = await API.inventory(S.char.id); } catch (e) { App.toast(e.detail || "載入失敗", true); return; }
-      const ids = Object.keys(inv.items || {});
-      if (!ids.length) { App.toast("背包沒有道具", true); return; }
-      const list = ids.map((id, i) => `${i + 1}. ${itemName(id)} ×${inv.items[id]}`).join("\n");
-      const pick = prompt(`要存哪個道具？輸入編號：\n${list}`, "1");
-      if (pick == null) return;
-      const idx = Math.floor(Number(pick)) - 1;
-      if (idx < 0 || idx >= ids.length) { App.toast("編號不對", true); return; }
-      const qty = num(`存幾個「${itemName(ids[idx])}」？`, 1);
-      if (qty == null) return;
-      try { await API.deposit({ item_id: ids[idx], qty }); App.toast("已存入"); reload(); }
-      catch (e) { App.toast(e.detail || "存入失敗", true); }
-    },
-
-    async _depositEq(reload) {
-      let inv;
-      try { inv = await API.inventory(S.char.id); } catch (e) { App.toast(e.detail || "載入失敗", true); return; }
-      const eqs = (inv.equipment || []).filter((x) => x.equipped_slot == null);
-      if (!eqs.length) { App.toast("背包沒有可存的裝備", true); return; }
-      const list = eqs.map((x, i) => `${i + 1}. ${eqName(x.equipment_id)}${x.refine ? ` +${x.refine}` : ""}`).join("\n");
-      const pick = prompt(`要存哪件裝備？輸入編號：\n${list}`, "1");
-      if (pick == null) return;
-      const idx = Math.floor(Number(pick)) - 1;
-      if (idx < 0 || idx >= eqs.length) { App.toast("編號不對", true); return; }
-      try { await API.deposit({ equipment_instance_id: eqs[idx].id }); App.toast("已存入"); reload(); }
-      catch (e) { App.toast(e.detail || "存入失敗", true); }
     },
   };
 })();
