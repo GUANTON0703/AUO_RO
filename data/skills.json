@@ -6752,6 +6752,149 @@
     }
   },
   {
+    "id": "call_spirit_sphere",
+    "name": "念珠召喚",
+    "job_id": "monk",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "cooldown_s": 8,
+    "effects": [
+      {
+        "type": "buff",
+        "stats": {
+          "atk": [
+            3,
+            6,
+            9,
+            12,
+            15
+          ]
+        },
+        "duration_s": 120
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "sp_available",
+      "priority": 1
+    }
+  },
+  {
+    "id": "spirit_recovery",
+    "name": "回氣",
+    "job_id": "monk",
+    "kind": "passive",
+    "max_level": 5,
+    "sp_cost": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cooldown_s": 0,
+    "effects": [
+      {
+        "type": "passive_stat",
+        "stat": "regen_bonus_pct",
+        "amount": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "passive",
+      "priority": 0
+    },
+    "requires": {
+      "call_spirit_sphere": 1
+    }
+  },
+  {
+    "id": "zen",
+    "name": "心眼",
+    "job_id": "monk",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      18,
+      20,
+      22,
+      24,
+      26
+    ],
+    "cooldown_s": 4,
+    "effects": [
+      {
+        "type": "heal_hp",
+        "flat": [
+          80,
+          120,
+          160,
+          200,
+          240
+        ]
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_50",
+      "priority": 2
+    },
+    "requires": {
+      "call_spirit_sphere": 3
+    }
+  },
+  {
+    "id": "blade_stop",
+    "name": "拔刀式",
+    "job_id": "monk",
+    "kind": "active",
+    "max_level": 5,
+    "sp_cost": [
+      20,
+      22,
+      24,
+      26,
+      28
+    ],
+    "cooldown_s": 6,
+    "effects": [
+      {
+        "type": "debuff",
+        "stat": "atk",
+        "pct": [
+          -20,
+          -25,
+          -30,
+          -35,
+          -40
+        ],
+        "duration_s": 20
+      }
+    ],
+    "idle_default": {
+      "enabled": true,
+      "trigger": "hp_below_30",
+      "priority": 2
+    },
+    "requires": {
+      "iron_fist": 3
+    }
+  },
+  {
     "id": "axe_mastery",
     "name": "斧術鍛鍊",
     "job_id": "alchemist",

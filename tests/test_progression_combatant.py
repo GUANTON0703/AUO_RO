@@ -94,6 +94,13 @@ def test_passive_skill_modifies_stats_not_added_as_active():
     assert not any(s.skill_id == "sword_mastery" for s in with_pas.skills)
 
 
+def test_monk_spirit_recovery_grants_regen_bonus():
+    """武僧補的 Classic 技能：回氣（passive）要折進 regen_bonus_pct，跟藥水的 buff 走同一個池子。"""
+    c = load_content()
+    cb = build_player_combatant(_snap(job_id="monk", learned_skills={"spirit_recovery": 3}), c)
+    assert cb.regen_bonus_pct == 30
+
+
 def test_hp_sp_default_to_max_when_none():
     c = load_content()
     cb = build_player_combatant(_snap(hp=None, sp=None), c)
