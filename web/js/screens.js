@@ -65,6 +65,21 @@ const STAT_ZH = { str: "力量", agi: "敏捷", vit: "體質", int: "智力", de
 
 const ELEM_ZH = { neutral: "無", water: "水", earth: "地", fire: "火", wind: "風",
   poison: "毒", holy: "聖", shadow: "暗", ghost: "念", undead: "不死" };
+
+// 這隻怪最怕哪個屬性：掃屬性表裡「打這個屬性倍率最高」的攻擊屬性。
+// 沒有大於 1 倍的剋制屬性就回空陣列（例如中立屬性通常沒有特別怕的）。
+function monsterWeakness(defElem) {
+  const table = S.catalog?.element_chart || {};
+  const elems = Object.keys(ELEM_ZH);
+  let best = 1.0;
+  const found = [];
+  for (const atk of elems) {
+    const mult = table[atk]?.[defElem || "neutral"] ?? 1.0;
+    if (mult > best) { best = mult; found.length = 0; found.push(atk); }
+    else if (mult === best && best > 1.0) found.push(atk);
+  }
+  return { elements: found, multiplier: best };
+}
 const RACE_ZH = { formless: "無形", undead: "不死", animal: "動物", plant: "植物",
   insect: "昆蟲", fish: "魚貝", demon: "惡魔", demihuman: "人形", angel: "天使",
   dragon: "龍" };
@@ -1033,7 +1048,7 @@ Screens.hunt = {
       `${regSel}` +
       `<input id="hunt-search" placeholder="搜尋地圖或怪物名稱" style="width:100%;margin-bottom:8px">` +
       `<div class="list" id="maplist"></div></details>` +
-      `<div id="monsterpick"></div>` + this._strategyCard();
+      this._strategyCard();
     view().innerHTML = html;
     this._renderMapList();
 
@@ -1054,8 +1069,6 @@ Screens.hunt = {
           && S.catalog.maps[this._mapId]?.town !== this._region) {
         this._mapId = null;
         this._picked.clear();
-        const mp = document.querySelector("#monsterpick");
-        if (mp) mp.innerHTML = "";
       }
       this._renderMapList();
     };
@@ -1072,14 +1085,74 @@ Screens.hunt = {
     if (q) maps = maps.filter((m) =>
       m.name.toLowerCase().includes(q)
       || m.monster_ids.some((id) => monName(id).toLowerCase().includes(q) || monMatchesDrop(id)));
-    box.innerHTML = maps.map((m) => `<button class="btn choice" data-map="${m.id}">
+    // 選中的地圖，怪物清單直接接在「那張地圖」的按鈕下面，不是整個地圖清單最後面
+    box.innerHTML = maps.map((m) => `<button class="btn choice${m.id === this._mapId ? " sel" : ""}" data-map="${m.id}">
         ${esc(m.name)}<div class="sub">解鎖 Lv ${m.unlock_base_level || 1}
-        ・${m.monster_ids.map(monName).join("、")}</div></button>`).join("")
+        ・${m.monster_ids.map(monName).join("、")}</div></button>`
+        + (m.id === this._mapId ? this._monsterPickHtml(m) : "")).join("")
       || `<p class="muted">${q ? "沒有符合的地圖或怪物。" : "這個地區還沒有解鎖的地圖。"}</p>`;
     box.querySelectorAll("[data-map]").forEach((b) => {
-      b.classList.toggle("sel", b.dataset.map === this._mapId);
       b.onclick = () => { this._selectMap(b.dataset.map); };
     });
+    this._wireMonsterPick(box);
+  },
+
+  _monsterPickHtml(m) {
+    const pct = (r) => (r >= 0.1 ? Math.round(r * 100) + "%"
+      : r >= 0.001 ? (r * 100).toFixed(1) + "%" : (r * 100).toFixed(2) + "%");
+    let html = `<div class="card" style="margin:4px 0 8px"><h3>要打哪幾隻？</h3>
+      <p class="muted">留空 = 自動選好打的。指定的話就照你選的打（要拚自己扛）。點掉落物看細節。</p>
+      <div class="list" id="monlist">`;
+    for (const id of m.monster_ids) {
+      const mon = S.catalog.monsters[id] || {};
+      const elem = mon.element || "neutral";
+      const weak = monsterWeakness(elem);
+      const weakTxt = weak.elements.length
+        ? `　怕${weak.elements.map((e) => ELEM_ZH[e] || e).join("/")}屬性（${Math.round(weak.multiplier * 100)}%）`
+        : "　沒有特別怕的屬性";
+      const drops = (mon.drops || []).map((d) =>
+        `<span class="droplink" data-drop="${esc(d.item_id)}" data-owner="${id}"
+          style="color:var(--accent);cursor:pointer;text-decoration:underline">${
+          esc(itemName(d.item_id))} ${pct(d.rate)}</span>`).join("　");
+      html += `<div class="monrow" style="margin-bottom:6px">
+        <button class="btn choice" data-mon="${id}" style="width:100%">
+          ${esc(mon.name || id)}<div class="sub">Lv ${mon.level ?? "?"}　屬性：${ELEM_ZH[elem] || elem}${weakTxt}</div></button>
+        ${drops ? `<div class="sub" style="padding:4px 6px">掉落：${drops}</div>` : ""}
+        <div class="sub" id="dd-${id}" hidden style="padding:4px 6px;color:var(--muted)"></div>
+      </div>`;
+    }
+    html += `</div>
+      <button class="btn primary block" id="btn-go" style="margin-top:12px">開始掛機</button>
+      </div>`;
+    return html;
+  },
+
+  _wireMonsterPick(box) {
+    box.querySelectorAll("[data-mon]").forEach((b) => {
+      b.classList.toggle("sel", this._picked.has(b.dataset.mon));
+      b.onclick = () => {
+        const id = b.dataset.mon;
+        if (this._picked.has(id)) this._picked.delete(id); else this._picked.add(id);
+        b.classList.toggle("sel", this._picked.has(id));
+      };
+    });
+    box.querySelectorAll(".droplink").forEach((el) => {
+      el.onclick = () => {
+        const dd = box.querySelector("#dd-" + el.dataset.owner);
+        if (!dd) return;
+        const txt = `${itemName(el.dataset.drop)}：${
+          gearDesc(el.dataset.drop) || itemDesc(el.dataset.drop) || "（無額外資料）"}`;
+        if (!dd.hidden && dd.dataset.showing === el.dataset.drop) {
+          dd.hidden = true;
+        } else {
+          dd.textContent = txt;
+          dd.dataset.showing = el.dataset.drop;
+          dd.hidden = false;
+        }
+      };
+    });
+    const goBtn = box.querySelector("#btn-go");
+    if (goBtn) goBtn.onclick = () => this._go();
   },
 
   _strategyCard() {
@@ -1211,57 +1284,10 @@ Screens.hunt = {
     };
   },
   _selectMap(mid) {
-    this._mapId = mid;
+    // 再點一次同一張地圖 = 收起來；點別張就換過去
+    this._mapId = this._mapId === mid ? null : mid;
     this._picked.clear();
-    view().querySelectorAll("[data-map]").forEach((b) =>
-      b.classList.toggle("sel", b.dataset.map === mid));
-    const m = S.catalog.maps[mid];
-    const pct = (r) => (r >= 0.1 ? Math.round(r * 100) + "%"
-      : r >= 0.001 ? (r * 100).toFixed(1) + "%" : (r * 100).toFixed(2) + "%");
-    let html = `<div class="card"><h3>要打哪幾隻？</h3>
-      <p class="muted">留空 = 自動選好打的。指定的話就照你選的打（要拚自己扛）。點掉落物看細節。</p>
-      <div class="list" id="monlist">`;
-    for (const id of m.monster_ids) {
-      const mon = S.catalog.monsters[id] || {};
-      const drops = (mon.drops || []).map((d) =>
-        `<span class="droplink" data-drop="${esc(d.item_id)}" data-owner="${id}"
-          style="color:var(--accent);cursor:pointer;text-decoration:underline">${
-          esc(itemName(d.item_id))} ${pct(d.rate)}</span>`).join("　");
-      html += `<div class="monrow" style="margin-bottom:6px">
-        <button class="btn choice" data-mon="${id}" style="width:100%">
-          ${esc(mon.name || id)}<div class="sub">Lv ${mon.level ?? "?"}</div></button>
-        ${drops ? `<div class="sub" style="padding:4px 6px">掉落：${drops}</div>` : ""}
-        <div class="sub" id="dd-${id}" hidden style="padding:4px 6px;color:var(--muted)"></div>
-      </div>`;
-    }
-    html += `</div>
-      <button class="btn primary block" id="btn-go" style="margin-top:12px">開始掛機</button>
-      </div>`;
-    document.querySelector("#monsterpick").innerHTML = html;
-
-    view().querySelectorAll("[data-mon]").forEach((b) => {
-      b.onclick = () => {
-        const id = b.dataset.mon;
-        if (this._picked.has(id)) this._picked.delete(id); else this._picked.add(id);
-        b.classList.toggle("sel", this._picked.has(id));
-      };
-    });
-    view().querySelectorAll(".droplink").forEach((el) => {
-      el.onclick = () => {
-        const box = document.querySelector("#dd-" + el.dataset.owner);
-        if (!box) return;
-        const txt = `${itemName(el.dataset.drop)}：${
-          gearDesc(el.dataset.drop) || itemDesc(el.dataset.drop) || "（無額外資料）"}`;
-        if (!box.hidden && box.dataset.showing === el.dataset.drop) {
-          box.hidden = true;
-        } else {
-          box.textContent = txt;
-          box.dataset.showing = el.dataset.drop;
-          box.hidden = false;
-        }
-      };
-    });
-    document.querySelector("#btn-go").onclick = () => this._go();
+    this._renderMapList();
   },
   async _go() {
     const btn = document.querySelector("#btn-go");

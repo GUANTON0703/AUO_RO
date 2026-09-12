@@ -63,6 +63,7 @@ def catalog(account_id: CurrentAccount):
         "jobs": dump(_content.jobs),
         "skills": dump(_content.skills),
         "recipes": dump(_content.recipes),
+        "element_chart": _content.element_chart.table,
         "npc_buff": {
             "name": npc_buff.NAME, "stats": npc_buff.STATS,
             "one_time_cost": npc_buff.ONE_TIME_COST,

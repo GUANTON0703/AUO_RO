@@ -31,3 +31,5 @@ def test_catalog_returns_full_content_pack(client, auth):
         assert key in body and body[key]
     assert body["maps"]["prontera_east_gate"]["name"]
     assert body["monsters"]["poring"]["name"] == "波利"
+    # 屬性表也要跟著出去，前端才能算「這隻怪怕什麼屬性」
+    assert body["element_chart"]["fire"]["earth"] == 1.5
