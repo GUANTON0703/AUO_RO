@@ -96,6 +96,7 @@
             <div class="sub">${esc(cardDesc(id))}　持有 ${held}</div>
             <div style="margin-top:4px">${status}</div>
           </div>
+          ${held > 0 ? `<button class="btn small" data-deposit-item="${id}" data-name="${esc(itemName(id))}">存</button>` : ""}
         </div>`; }).join("");
 
       const baseSlot = (s) => (s === "accessory1" || s === "accessory2" ? "accessory" : s);
