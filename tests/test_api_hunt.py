@@ -453,3 +453,21 @@ def test_slow_fight_flags_still_fighting_instead_of_looking_stuck(client, auth, 
     db_helpers.rewind_hunt(ch["id"], seconds=2)
     status = client.get("/api/hunt/status", headers=h).json()
     assert status["still_fighting"] is True
+
+
+def test_offline_catchup_auto_buy_ignores_online_upto_cap(client, auth, db_helpers):
+    """離線結算一次要撐很長時間，平常「在線維持幾瓶」的上限不夠用；
+    有錢就該一路買到夠撐完這段離線時間，不能因為那個上限被卡到補品用盡撤退。"""
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    db_helpers.set_zeny(ch["id"], 5_000_000)
+    r = client.put(f"/api/hunt/strategy/{ch['id']}", headers=h,
+                   json={"auto_potion": True, "potion_hp_pct": 0.8,
+                         "auto_buy_potion": True, "buy_potion_id": "red_potion",
+                         "buy_potion_upto": 20})
+    assert r.status_code == 200
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_south_field"})
+    db_helpers.rewind_hunt(ch["id"], seconds=6 * 3600)  # 遠超過 online_grace，走離線結算
+    status = client.get("/api/hunt/status", headers=h).json()
+    assert status["character"]["hunt_potion_zeny_spent"] > 20 * 50  # 買的量遠超過在線上限 20 瓶
+    assert not status.get("retreated")
