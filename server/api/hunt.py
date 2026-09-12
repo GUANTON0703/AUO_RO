@@ -287,13 +287,19 @@ def _pick_sp_potion(character_id: int, preferred_id: str | None = None,
     return best
 
 
-_OFFLINE_AUTO_BUY_CAP = 9999   # 離線結算一次補一大段時間，補到「平常維持的量」根本不夠撐
+_SECONDS_PER_EXTRA_POTION = 2   # 結算涵蓋的時間每多這麼多秒，上限就多讓買一瓶（離線補一大段用）
 
-def _auto_buy_potions(character_id: int, strategy, base_level: int = 1, offline: bool = False) -> int:
-    """掛機自動補水：買到手上有 buy_potion_upto 瓶，錢不夠就買能買的。回傳花了多少 Zeny。
-    離線結算（offline=True）是一次補一大段時間，平常設的 buy_potion_upto 是「在線時維持這麼多瓶」
-    的量，離線一次要用掉的量通常遠不只這樣，所以離線時不看那個上限，有多少錢就買多少
-    （不然明明錢很多，掛機一段時間回來卻常常顯示「補品用盡」被踢出來）。"""
+def _auto_buy_cap(strategy_upto: int, elapsed: float) -> int:
+    """在線維持量 buy_XXX_upto 是給正常一小段一小段結算用的，一次結算涵蓋的時間
+    （這次隔了多久沒結算，通常是離線回來一次補一大段）越長，需要的量就越多，
+    不然離線一段時間回來常常補品還沒用夠就先被那個「在線維持量」卡到用盡撤退。
+    這裡照結算涵蓋的秒數等比例放大上限，正常在線那種秒級的小結算幾乎不影響。"""
+    return max(strategy_upto, int(elapsed // _SECONDS_PER_EXTRA_POTION))
+
+
+def _auto_buy_potions(character_id: int, strategy, base_level: int = 1, elapsed: float = 0.0) -> int:
+    """掛機自動補水：買到手上有 buy_potion_upto 瓶（或這次結算涵蓋的時間需要更多，見
+    _auto_buy_cap），錢不夠就買能買的。回傳花了多少 Zeny。"""
     if not strategy.auto_buy_potion or strategy.buy_potion_upto <= 0:
         return 0
     pid = strategy.buy_potion_id or "red_potion"
@@ -303,7 +309,7 @@ def _auto_buy_potions(character_id: int, strategy, base_level: int = 1, offline:
     if not _usable(item, base_level) or _heal_amount(item) <= 0:
         return 0
     have = inventory.item_qty(character_id, pid)
-    cap = _OFFLINE_AUTO_BUY_CAP if offline else strategy.buy_potion_upto
+    cap = _auto_buy_cap(strategy.buy_potion_upto, elapsed)
     want = cap - have
     if want <= 0:
         return 0
@@ -318,9 +324,8 @@ def _auto_buy_potions(character_id: int, strategy, base_level: int = 1, offline:
     return 0
 
 
-def _auto_buy_sp_potions(character_id: int, strategy, base_level: int = 1, offline: bool = False) -> int:
-    """掛機自動補 SP 藥水：買到手上有 buy_sp_potion_upto 瓶，錢不夠就買能買的。回傳花了多少 Zeny。
-    離線一次補一大段時間，道理跟 _auto_buy_potions 一樣不看在線維持量的上限。"""
+def _auto_buy_sp_potions(character_id: int, strategy, base_level: int = 1, elapsed: float = 0.0) -> int:
+    """掛機自動補 SP 藥水：道理跟 _auto_buy_potions 一樣，上限照這次結算涵蓋的秒數等比例放大。"""
     if not strategy.auto_buy_sp_potion or strategy.buy_sp_potion_upto <= 0:
         return 0
     pid = strategy.buy_sp_potion_id or "blue_potion"
@@ -330,7 +335,7 @@ def _auto_buy_sp_potions(character_id: int, strategy, base_level: int = 1, offli
     if not _usable(item, base_level) or _sp_restore_amount(item) <= 0:
         return 0
     have = inventory.item_qty(character_id, pid)
-    cap = _OFFLINE_AUTO_BUY_CAP if offline else strategy.buy_sp_potion_upto
+    cap = _auto_buy_cap(strategy.buy_sp_potion_upto, elapsed)
     want = cap - have
     if want <= 0:
         return 0
@@ -680,8 +685,8 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
             (now.isoformat(), row["id"]),
         )
 
-    potion_zeny_spent = _auto_buy_potions(row["id"], strategy, row["base_level"], offline=offline)
-    potion_zeny_spent += _auto_buy_sp_potions(row["id"], strategy, row["base_level"], offline=offline)
+    potion_zeny_spent = _auto_buy_potions(row["id"], strategy, row["base_level"], elapsed=elapsed)
+    potion_zeny_spent += _auto_buy_sp_potions(row["id"], strategy, row["base_level"], elapsed=elapsed)
     potion_zeny_spent += _auto_buy_buff_potions(row["id"], strategy, row["base_level"])
     # 買水這筆花費馬上入帳，不管這次有沒有湊出一場戰鬥可結算（下面有提早回傳的分支）
     if potion_zeny_spent:

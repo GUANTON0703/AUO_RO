@@ -471,3 +471,26 @@ def test_offline_catchup_auto_buy_ignores_online_upto_cap(client, auth, db_helpe
     status = client.get("/api/hunt/status", headers=h).json()
     assert status["character"]["hunt_potion_zeny_spent"] > 20 * 50  # 買的量遠超過在線上限 20 瓶
     assert not status.get("retreated")
+
+
+def test_repeated_short_offline_ticks_dont_compound_potion_spend(client, auth, db_helpers):
+    """打很肉的怪常常單場真實秒數會超過 online_grace（30 秒），被誤判成「離線」，
+    但那只是等一場打完，不是真的離線很久——這種情況不該每次都把補品上限炸到很大，
+    不然像服事這種容易吃很多藥水的職業，掛機一下子就燒掉幾百萬 Zeny。"""
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    db_helpers.set_zeny(ch["id"], 5_000_000)
+    r = client.put(f"/api/hunt/strategy/{ch['id']}", headers=h,
+                   json={"auto_potion": True, "potion_hp_pct": 0.8,
+                         "auto_buy_potion": True, "buy_potion_id": "red_potion",
+                         "buy_potion_upto": 100})
+    assert r.status_code == 200
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_south_field"})
+    client.get("/api/hunt/status", headers=h)  # 消耗掉暖啟動
+    for _ in range(10):
+        db_helpers.rewind_hunt(ch["id"], seconds=35)  # 剛好超過 30 秒，但只是短暫間隔
+        client.get("/api/hunt/status", headers=h)
+    status = client.get("/api/hunt/status", headers=h).json()
+    spent = status["character"]["hunt_potion_zeny_spent"]
+    # 10 次「剛好超過 30 秒」的小結算，不該被當成大段離線每次都補到誇張上限
+    assert spent < 100 * 50 * 3
