@@ -186,6 +186,11 @@ def _migration_12(conn: sqlite3.Connection) -> None:
     _add_col(conn, "characters", "recipe_mastery", "TEXT NOT NULL DEFAULT '{}'")
 
 
+def _migration_13(conn: sqlite3.Connection) -> None:
+    """多角色切換：accounts 記著目前在玩哪個角色，沒設或角色被刪掉就退回帳號第一個角色。"""
+    _add_col(conn, "accounts", "active_character_id", "INTEGER")
+
+
 # (version, callable(conn))。版本嚴格遞增，每個包在一個交易裡。
 _MIGRATIONS: list[tuple[int, "callable"]] = [
     (1, _migration_1),
@@ -200,6 +205,7 @@ _MIGRATIONS: list[tuple[int, "callable"]] = [
     (10, _migration_10),
     (11, _migration_11),
     (12, _migration_12),
+    (13, _migration_13),
 ]
 
 

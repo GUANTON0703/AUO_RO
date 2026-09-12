@@ -160,3 +160,94 @@ def test_sheet_ignores_expired_buffs(client, auth, db_helpers):
 
     sheet = client.get(f"/api/characters/{ch['id']}/sheet", headers=headers).json()
     assert sheet["hit"] == baseline["hit"]
+
+
+def test_new_character_becomes_active_and_shop_uses_it(client, auth, db_helpers):
+    """建立多個角色時，最新建立的那個要變成「目前在玩」，掛機/商店等端點才會作用在它身上。"""
+    _, headers, _ = auth
+    first = client.post("/api/characters", headers=headers, json={"name": "老大"}).json()
+    second = client.post("/api/characters", headers=headers, json={"name": "小弟"}).json()
+
+    chars = client.get("/api/characters", headers=headers).json()
+    active = next(c for c in chars if c["is_active"])
+    assert active["id"] == second["id"]
+    assert not next(c for c in chars if c["id"] == first["id"])["is_active"]
+
+    db_helpers.set_zeny(second["id"], 500)
+    r = client.get("/api/shop", headers=headers)
+    assert r.status_code == 200
+    # 商店端點作用在目前的角色（小弟），不是最早建立的那個
+    buy = client.post("/api/shop/buy", headers=headers, json={"item_id": "red_potion", "qty": 1})
+    assert buy.status_code == 200
+    inv = client.get(f"/api/characters/{second['id']}/inventory", headers=headers).json()
+    assert inv["items"].get("red_potion", 0) > 0
+
+
+def test_activate_switches_current_character(client, auth, db_helpers):
+    _, headers, _ = auth
+    first = client.post("/api/characters", headers=headers, json={"name": "阿一"}).json()
+    second = client.post("/api/characters", headers=headers, json={"name": "阿二"}).json()
+
+    r = client.post(f"/api/characters/{first['id']}/activate", headers=headers)
+    assert r.status_code == 200
+    assert r.json()["is_active"] is True
+
+    chars = {c["id"]: c for c in client.get("/api/characters", headers=headers).json()}
+    assert chars[first["id"]]["is_active"] is True
+    assert chars[second["id"]]["is_active"] is False
+
+
+def test_activate_rejects_character_not_owned(client, auth, invite_code):
+    _, headers, _ = auth
+    client.post("/api/characters", headers=headers, json={"name": "我方"})
+
+    from server.auth import invites
+    code = invites.create_invite()
+    client.post("/api/accounts", json={"invite_code": code, "username": "stranger", "password": "password123"})
+    login = client.post("/api/sessions", json={"username": "stranger", "password": "password123"}).json()
+    other_headers = {"Authorization": "Bearer " + login["token"]}
+    other = client.post("/api/characters", headers=other_headers, json={"name": "別人的"}).json()
+
+    r = client.post(f"/api/characters/{other['id']}/activate", headers=headers)
+    assert r.status_code == 404
+
+
+def test_transfer_zeny_between_own_characters(client, auth, db_helpers):
+    _, headers, _ = auth
+    first = client.post("/api/characters", headers=headers, json={"name": "轉出方"}).json()
+    second = client.post("/api/characters", headers=headers, json={"name": "轉入方"}).json()
+    db_helpers.set_zeny(first["id"], 10000)
+    db_helpers.set_zeny(second["id"], 0)
+
+    # 目前活躍角色是 second（最後建立的），先切回 first 才能從 first 轉出
+    client.post(f"/api/characters/{first['id']}/activate", headers=headers)
+    r = client.post("/api/characters/transfer-zeny", headers=headers,
+                    json={"to_character_id": second["id"], "amount": 3000})
+    assert r.status_code == 200
+
+    chars = {c["id"]: c for c in client.get("/api/characters", headers=headers).json()}
+    assert chars[first["id"]]["zeny"] == 7000
+    assert chars[second["id"]]["zeny"] == 3000
+
+
+def test_transfer_zeny_rejects_insufficient_and_other_accounts(client, auth, db_helpers, invite_code):
+    _, headers, _ = auth
+    mine = client.post("/api/characters", headers=headers, json={"name": "自己人"}).json()
+    db_helpers.set_zeny(mine["id"], 100)
+
+    from server.auth import invites
+    code = invites.create_invite()
+    client.post("/api/accounts", json={"invite_code": code, "username": "stranger2", "password": "password123"})
+    login = client.post("/api/sessions", json={"username": "stranger2", "password": "password123"}).json()
+    other_headers = {"Authorization": "Bearer " + login["token"]}
+    other = client.post("/api/characters", headers=other_headers, json={"name": "陌生人"}).json()
+
+    # 錢不夠
+    r = client.post("/api/characters/transfer-zeny", headers=headers,
+                    json={"to_character_id": mine["id"], "amount": 99999})
+    assert r.status_code == 400
+
+    # 不能轉給別的帳號的角色（防呆）
+    r2 = client.post("/api/characters/transfer-zeny", headers=headers,
+                     json={"to_character_id": other["id"], "amount": 10})
+    assert r2.status_code == 400

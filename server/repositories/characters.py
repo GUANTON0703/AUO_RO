@@ -53,6 +53,11 @@ def create_within_limit(
             )
         except sqlite3.IntegrityError as exc:
             raise NameTakenError(name) from exc
+        # 新角色順手變成目前在玩的角色，符合「建立完就開始玩它」的直覺
+        conn.execute(
+            "UPDATE accounts SET active_character_id = ? WHERE id = ?",
+            (cur.lastrowid, account_id),
+        )
         return conn.execute(
             "SELECT * FROM characters WHERE id = ?", (cur.lastrowid,)
         ).fetchone()
@@ -189,6 +194,68 @@ def spend_zeny(character_id: int, amount: int) -> bool:
             (amount, character_id, amount),
         )
         return cur.rowcount > 0
+
+
+def get_active_character(account_id: int):
+    """回傳這個帳號目前在玩的角色。沒設定過，或設定的角色已經不屬於這帳號
+    （例如被刪掉），就退回帳號裡 id 最小（最早建立）的角色。"""
+    with connection.get_connection() as conn:
+        acc = conn.execute(
+            "SELECT active_character_id FROM accounts WHERE id = ?", (account_id,)
+        ).fetchone()
+        active_id = acc["active_character_id"] if acc else None
+        if active_id is not None:
+            row = conn.execute(
+                "SELECT * FROM characters WHERE id = ? AND account_id = ?",
+                (active_id, account_id),
+            ).fetchone()
+            if row is not None:
+                return row
+        return conn.execute(
+            "SELECT * FROM characters WHERE account_id = ? ORDER BY id LIMIT 1",
+            (account_id,),
+        ).fetchone()
+
+
+def set_active_character(account_id: int, character_id: int) -> bool:
+    """切換帳號目前在玩的角色。角色不屬於這個帳號回傳 False，不會亂切。"""
+    with connection.get_connection() as conn:
+        owned = conn.execute(
+            "SELECT 1 FROM characters WHERE id = ? AND account_id = ?",
+            (character_id, account_id),
+        ).fetchone()
+        if not owned:
+            return False
+        conn.execute(
+            "UPDATE accounts SET active_character_id = ? WHERE id = ?",
+            (character_id, account_id),
+        )
+        return True
+
+
+class TransferError(Exception):
+    pass
+
+
+def transfer_zeny(account_id: int, from_id: int, to_id: int, amount: int) -> None:
+    """同帳號角色之間互轉 Zeny，原子操作（BEGIN IMMEDIATE 序列化，不會被併發轉帳超轉）。
+    兩個角色都要屬於這個帳號，不能轉去別人的角色（防止洗錢/duping）。"""
+    if amount <= 0:
+        raise TransferError("金額要大於 0")
+    if from_id == to_id:
+        raise TransferError("不能轉給自己")
+    with connection.transaction() as conn:
+        rows = conn.execute(
+            "SELECT id, zeny FROM characters WHERE id IN (?, ?) AND account_id = ?",
+            (from_id, to_id, account_id),
+        ).fetchall()
+        by_id = {r["id"]: r for r in rows}
+        if from_id not in by_id or to_id not in by_id:
+            raise TransferError("角色不存在")
+        if by_id[from_id]["zeny"] < amount:
+            raise TransferError("Zeny 不足")
+        conn.execute("UPDATE characters SET zeny = zeny - ? WHERE id = ?", (amount, from_id))
+        conn.execute("UPDATE characters SET zeny = zeny + ? WHERE id = ?", (amount, to_id))
 
 
 def set_craft_progress(character_id: int, level: int, exp: int) -> None:

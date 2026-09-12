@@ -25,9 +25,10 @@ class CreateCharacterRequest(BaseModel):
     name: str = Field(min_length=1, max_length=24, pattern=r"^[^\[\]]+$")
 
 
-def _to_public(row) -> CharacterPublic:
+def _to_public(row, *, is_active: bool = False) -> CharacterPublic:
     return CharacterPublic(
         id=row["id"],
+        is_active=is_active,
         name=row["name"],
         job_id=row["job_id"],
         base_level=row["base_level"],
@@ -57,7 +58,10 @@ def _to_public(row) -> CharacterPublic:
 
 @router.get("", response_model=list[CharacterPublic])
 def list_characters(account_id: CurrentAccount):
-    return [_to_public(r) for r in characters_repo.list_for_account(account_id)]
+    rows = characters_repo.list_for_account(account_id)
+    active = characters_repo.get_active_character(account_id)
+    active_id = active["id"] if active else None
+    return [_to_public(r, is_active=r["id"] == active_id) for r in rows]
 
 
 @router.post("", status_code=201, response_model=CharacterPublic)
@@ -78,7 +82,37 @@ def create_character(body: CreateCharacterRequest, account_id: CurrentAccount):
             detail=f"已達角色數上限（{settings.max_characters_per_account}）",
         )
     inventory.grant_starter_kit(row["id"])
-    return _to_public(row)
+    return _to_public(row, is_active=True)   # 新角色建完直接變成在玩的那個（repo 內已同步切換）
+
+
+@router.post("/{character_id}/activate", response_model=CharacterPublic)
+def activate_character(character_id: int, account_id: CurrentAccount):
+    """切換成目前在玩這個角色（同帳號底下的其他角色）。"""
+    if not characters_repo.set_active_character(account_id, character_id):
+        raise HTTPException(status_code=404, detail="角色不存在")
+    return _to_public(characters_repo.get_character(character_id), is_active=True)
+
+
+class TransferZenyRequest(BaseModel):
+    to_character_id: int
+    amount: int = Field(gt=0)
+
+
+@router.post("/transfer-zeny")
+def transfer_zeny(body: TransferZenyRequest, account_id: CurrentAccount):
+    """從目前在玩的角色轉 Zeny 給同帳號的另一個角色。"""
+    from_char = characters_repo.get_active_character(account_id)
+    if from_char is None:
+        raise HTTPException(status_code=404, detail="沒有角色")
+    try:
+        characters_repo.transfer_zeny(account_id, from_char["id"], body.to_character_id, body.amount)
+    except characters_repo.TransferError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return {
+        "from_character_id": from_char["id"],
+        "to_character_id": body.to_character_id,
+        "amount": body.amount,
+    }
 
 
 @router.get("/{character_id}/sheet")

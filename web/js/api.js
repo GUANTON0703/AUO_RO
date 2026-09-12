@@ -55,6 +55,9 @@ const API = (() => {
     listCharacters: () => get("/characters"),
     createCharacter: (name) => post("/characters", { name }),
     deleteCharacter: (cid) => del("/characters/" + cid),
+    activateCharacter: (cid) => post(`/characters/${cid}/activate`),
+    transferZeny: (to_character_id, amount) =>
+      post("/characters/transfer-zeny", { to_character_id, amount }),
     sheet: (cid) => get(`/characters/${cid}/sheet`),
     inventory: (cid) => get(`/characters/${cid}/inventory`),
     allocateStats: (cid, deltas) => post(`/characters/${cid}/stats`, deltas),

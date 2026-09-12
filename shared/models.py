@@ -26,3 +26,4 @@ class CharacterPublic(BaseModel):
     zeny: int
     location_map: str
     learned_skills: dict[str, int] = {}
+    is_active: bool = False  # 這帳號目前是不是在玩這個角色（多角色切換用）

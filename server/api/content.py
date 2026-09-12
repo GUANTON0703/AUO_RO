@@ -11,8 +11,7 @@ _content = load_content()
 
 
 def _current_character(account_id: int):
-    rows = characters_repo.list_for_account(account_id)
-    return rows[0] if rows else None
+    return characters_repo.get_active_character(account_id)
 
 
 def _item_name(item_id: str) -> str:

@@ -70,6 +70,17 @@
       this._lastFight = null;
       view().innerHTML = `
         <div class="card">
+          <h3>角色</h3>
+          <div class="list" id="char-list"><div class="spinner">載入中…</div></div>
+          <button class="btn block" id="char-new" style="margin-top:8px">+ 新增角色</button>
+          <div class="row" style="margin-top:8px">
+            <select id="transfer-to" style="flex:1"></select>
+            <input id="transfer-amount" type="number" min="1" placeholder="金額" style="width:100px">
+            <button class="btn primary" id="transfer-go">轉帳</button>
+          </div>
+        </div>
+
+        <div class="card">
           <h3>MVP 挑戰</h3>
           <div class="list" id="mvp-list"><div class="spinner">載入中…</div></div>
         </div>
@@ -100,6 +111,7 @@
       };
 
       this._stopFightDrip();
+      await this._loadCharSwitcher();
       await this._loadMvp();
       await this._loadCraft();
       await this._loadTrade();
@@ -352,6 +364,65 @@
         App.toast(line);
       } catch (e) { App.toast(e.detail || "製作失敗", true); }
       await this._loadCraft();
+    },
+
+    // ---------- 角色切換 / 轉帳 ----------
+    async _loadCharSwitcher() {
+      let chars;
+      try { chars = await API.listCharacters(); }
+      catch (e) { App.toast(e.detail || "角色清單載入失敗", true); return; }
+
+      const list = document.querySelector("#char-list");
+      if (list) {
+        list.innerHTML = chars.map((c) => `
+          <div class="item">
+            <div>${esc(c.name)}${c.is_active ? `<span class="pill" style="margin-left:6px">目前</span>` : ""}
+              <div class="sub">Lv ${c.base_level}　Zeny ${c.zeny}</div></div>
+            ${c.is_active ? "" : `<button class="btn small" data-switch-char="${c.id}">切換</button>`}
+          </div>`).join("");
+        list.querySelectorAll("[data-switch-char]").forEach((b) => {
+          b.onclick = async () => {
+            b.disabled = true;
+            try { await App.switchCharacter(Number(b.dataset.switchChar)); }
+            catch (e) { App.toast(e.detail || "切換失敗", true); b.disabled = false; }
+          };
+        });
+      }
+
+      const newBtn = document.querySelector("#char-new");
+      if (newBtn) {
+        newBtn.hidden = chars.length >= 3;
+        newBtn.onclick = async () => {
+          const name = prompt("新角色的名字？");
+          if (!name || !name.trim()) return;
+          newBtn.disabled = true;
+          try { await App.createCharacter(name.trim()); }
+          catch (e) { App.toast(e.detail || "建立失敗", true); newBtn.disabled = false; }
+        };
+      }
+
+      const toSel = document.querySelector("#transfer-to");
+      if (toSel) {
+        const others = chars.filter((c) => !c.is_active);
+        toSel.innerHTML = others.length
+          ? others.map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join("")
+          : `<option value="">（沒有別的角色）</option>`;
+      }
+      const goBtn = document.querySelector("#transfer-go");
+      if (goBtn) goBtn.onclick = async () => {
+        const toId = Number(toSel?.value || 0);
+        const amount = Math.floor(Number(document.querySelector("#transfer-amount").value) || 0);
+        if (!toId) { App.toast("沒有可以轉的角色", true); return; }
+        if (amount <= 0) { App.toast("金額要大於 0", true); return; }
+        goBtn.disabled = true;
+        try {
+          await API.transferZeny(toId, amount);
+          App.toast(`轉了 ${amount}z`);
+          await App.refreshChar();
+          await this._loadCharSwitcher();
+        } catch (e) { App.toast(e.detail || "轉帳失敗", true); }
+        goBtn.disabled = false;
+      };
     },
 
     // ---------- 交易 ----------

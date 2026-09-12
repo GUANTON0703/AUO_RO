@@ -95,10 +95,10 @@ def _load_strategy(character_id: int) -> HuntStrategy:
 
 
 def _current_character(account_id: int):
-    rows = characters_repo.list_for_account(account_id)
-    if not rows:
+    row = characters_repo.get_active_character(account_id)
+    if row is None:
         raise HTTPException(status_code=404, detail="沒有角色")
-    return rows[0]
+    return row
 
 
 def _owned_character(character_id: int, account_id: int):

@@ -82,7 +82,7 @@ const App = (() => {
   async function loadGame() {
     const chars = await API.listCharacters();
     if (!chars.length) { showScreen("screen-newchar"); return; }
-    state.char = chars[0];
+    state.char = chars.find((c) => c.is_active) || chars[0];
     state.catalog = state.catalog || (await API.catalog());
     try { state.me = await API.me(); } catch (_) { state.me = { is_gm: false }; }
 
@@ -167,7 +167,26 @@ const App = (() => {
     }
   }
 
-  return { state, toast, navigate, boot, refreshChar,
+  async function _reloadForCharChange() {
+    stopHuntPoll();
+    state.huntCursor = null;
+    state.huntSecs = 0;
+    state.huntSecsAt = 0;
+    await loadGame();
+  }
+
+  async function switchCharacter(characterId) {
+    await API.activateCharacter(characterId);
+    await _reloadForCharChange();
+  }
+
+  async function createCharacter(name) {
+    const created = await API.createCharacter(name);   // 新角色伺服器端已自動變成在玩的
+    await _reloadForCharChange();
+    return created;
+  }
+
+  return { state, toast, navigate, boot, refreshChar, switchCharacter, createCharacter,
            huntSecsShown, startHuntPoll, stopHuntPoll };
 })();
 
