@@ -100,16 +100,21 @@
         ["garment", "披肩"], ["shoes", "鞋子"], ["accessory", "飾品"], ["offhand", "副手"]];
       const opt = (v, zh) => `<option value="${v}"${cat === v ? " selected" : ""}>${zh}</option>`;
       const catSel = `<select id="shop-cat" style="width:100%;margin-bottom:8px">` +
-        opt("all", "全部") + opt("item", "道具") +
+        opt("all", "全部") + opt("item", "道具") + opt("material", "材料") +
         SLOTS.map(([v, zh]) => opt(v, zh)).join("") + `</select>`;
 
       let sections = "";
       if (cat === "all" || cat === "item") {
-        const rows = (data.items || []).map(itemRow).join("");
+        const rows = (data.items || []).filter((it) => it.kind !== "material").map(itemRow).join("");
         sections += `<div class="card"><h3>道具</h3><div class="list">${
           rows || `<p class="muted">沒有商品。</p>`}</div></div>`;
       }
-      if (cat !== "item") {
+      if (cat === "all" || cat === "material") {
+        const rows = (data.items || []).filter((it) => it.kind === "material").map(itemRow).join("");
+        sections += `<div class="card"><h3>材料</h3><div class="list">${
+          rows || `<p class="muted">沒有商品。</p>`}</div></div>`;
+      }
+      if (cat !== "item" && cat !== "material") {
         const eqs = (data.equipment || []).filter((e) => cat === "all" || e.slot === cat);
         const rows = eqs.map(eqRow).join("");
         const title = cat === "all" ? "裝備" : (SLOTS.find(([v]) => v === cat)?.[1] || "裝備");

@@ -37,7 +37,19 @@ def _buff_already_up(c, skill) -> bool:
     return True
 
 
-def _pick_skill(c, min_sp_frac: float = 0.0):
+def _fully_resisted(skill, foe) -> bool:
+    """技能屬性對目標屬性完全被剋（相剋倍率 0），例如暗屬性技能打暗屬性怪。
+    這種情況跳過這招，改選別的技能或普攻，不要每回合浪費 SP 只打出 1 點傷害。"""
+    for eff in skill.effects:
+        if eff.get("type") not in ("physical_hit", "magic_hit", "aoe"):
+            continue
+        elem = eff.get("element")
+        if elem and elements.element_multiplier(elem, getattr(foe, "element", "neutral")) <= 0:
+            return True
+    return False
+
+
+def _pick_skill(c, min_sp_frac: float = 0.0, foe=None):
     if min_sp_frac > 0 and c.sp < c.max_sp * min_sp_frac:
         return None            # 留魔力：SP 沒到門檻就不放主動技能，改普攻
     buffs, others = [], []
@@ -49,7 +61,7 @@ def _pick_skill(c, min_sp_frac: float = 0.0):
         if any(e.get("type") == "buff" for e in s.effects):
             if not _buff_already_up(c, s):     # 已經開著的 buff 不重放，改去攻擊
                 buffs.append(s)
-        else:
+        elif foe is None or not _fully_resisted(s, foe):
             others.append(s)
     # 先把缺的 buff 補上，補齊後才輪到攻擊 / 補血技能
     pool = buffs or others
@@ -166,7 +178,7 @@ def _take_turn(actor, foe, rng, events, min_sp_frac: float = 0.0):
             actor._cast_lock -= 1
         _auto_attack(actor, foe, rng, events)
         return
-    skill = _pick_skill(actor, min_sp_frac)
+    skill = _pick_skill(actor, min_sp_frac, foe)
     if skill and actor.spend_sp(skill.sp_cost):
         # cast_skill 內部按 effect 型別分流：heal_hp/buff 作用在 actor，其餘作用在 foe
         events += cast_skill(actor, foe, skill, rng)

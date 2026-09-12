@@ -150,3 +150,19 @@ def test_sell_price_helpers():
     c = load_content()
     assert equip_sell_price(c.equipment["guardian_greatsword"]) > 0
     assert item_sell_price(c.items["elunium"]) >= 1
+
+
+def test_recipe_materials_are_shop_buyable(client, auth, db_helpers):
+    """煉製配方用到的材料，商店要買得到（跟精練石鋁/神之金屬分開，那兩個仍然只能打怪拿）。"""
+    _, h, _ = auth
+    ch = _char(client, h, db_helpers)
+    r = client.get("/api/shop", headers=h)
+    items = {i["id"]: i for i in r.json()["items"]}
+    assert items["clover"]["kind"] == "material"
+    assert items["clover"]["price"] > 0
+    assert "elunium" not in items    # 精練石不受影響，還是打怪限定
+
+    buy = client.post("/api/shop/buy", headers=h, json={"item_id": "clover", "qty": 3})
+    assert buy.status_code == 200
+    inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
+    assert inv["items"].get("clover", 0) == 3

@@ -233,7 +233,9 @@ function itemDesc(id) {
   const it = S.catalog?.items?.[id];
   if (!it) return "";
   const fx = (it.effects || []).map(effectText).filter(Boolean).join("、");
-  return fx || (it.kind === "material" ? "素材（賣錢 / 精煉用）" : "");
+  if (fx) return fx;
+  if (it.kind !== "material") return "";
+  return craftMaterialIds().has(id) ? "素材（賣錢 / 煉藥材料）" : "素材（賣錢 / 精煉用）";
 }
 
 // 所有配方會用到的材料 item_id 集合，掛機撿到清單用來標「製作材料」，提醒不要手滑賣掉

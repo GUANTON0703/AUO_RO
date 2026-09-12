@@ -192,3 +192,34 @@ def test_katar_crit_multiplier():
     d2 = sum(e.damage for e in r2.events if getattr(e, "damage", 0) and e.actor == "拳刃")
     assert d2 > d1 * 1.3  # 2.0 vs 1.4 → 明顯更高
     assert CRIT_MULTIPLIER == 1.4
+
+
+def test_fully_resisted_skill_falls_back_to_basic_attack():
+    """暗屬性技能打暗屬性怪（相剋倍率 0）該跳過這招改普攻，不要每回合打 1 點傷害卡技能。"""
+    soul_destroyer = ResolvedSkill(
+        "soul_destroyer", "心靈震波", 5, "active", 20, 0,
+        [{"type": "physical_hit", "power_pct": [360, 360, 360, 360, 360], "element": "shadow"}],
+        "every_turn", 3,
+    )
+    hero = _mk("刺客", atk=100, max_sp=100, skills=[soul_destroyer])
+    shadow_foe = _mk("暗屬性怪", max_hp=100000, flee=0, element="shadow")
+    r = simulate_fight(hero, shadow_foe, rng=random.Random(0), max_rounds=5)
+    # 技能沒被選中 → 事件裡不會有心靈震波的 skill 事件，只有普攻
+    skill_events = [e for e in r.events if e.kind == "skill" and e.skill_id == "soul_destroyer"]
+    assert skill_events == []
+    assert any(e.kind == "attack" for e in r.events)
+    # 沒放技能，SP 沒被扣
+    assert hero.sp == 100
+
+
+def test_effective_skill_still_used_against_non_resisted_foe():
+    soul_destroyer = ResolvedSkill(
+        "soul_destroyer", "心靈震波", 5, "active", 20, 0,
+        [{"type": "physical_hit", "power_pct": [360, 360, 360, 360, 360], "element": "shadow"}],
+        "every_turn", 3,
+    )
+    hero = _mk("刺客", atk=100, max_sp=100, skills=[soul_destroyer])
+    normal_foe = _mk("一般怪", max_hp=100000, flee=0, element="neutral")
+    r = simulate_fight(hero, normal_foe, rng=random.Random(0), max_rounds=3)
+    skill_events = [e for e in r.events if e.kind == "skill" and e.skill_id == "soul_destroyer"]
+    assert skill_events != []
