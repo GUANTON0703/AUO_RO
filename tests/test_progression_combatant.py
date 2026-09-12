@@ -124,6 +124,17 @@ def test_primary_skill_gets_top_priority():
     assert prio["magnum_break"] == 99
 
 
+def test_primary_skill_ignores_its_own_default_trigger():
+    """治癒術預設要血量低於 50% 才放，但指定成主攻後要能一直放，
+    不然服事系設了也打不了不死怪（治癒術對不死系是傷害）。"""
+    c = load_content()
+    cb = build_player_combatant(_snap(job_id="acolyte", learned_skills={"heal": 5},
+                                      primary_skill_id="heal"), c)
+    heal = next(s for s in cb.skills if s.skill_id == "heal")
+    assert heal.trigger == "every_turn"
+    assert heal.priority == 99
+
+
 def test_default_disabled_skill_excluded_unless_toggled_on():
     c = load_content()
     # provoke 的 idle_default.enabled = false

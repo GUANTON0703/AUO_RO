@@ -283,12 +283,15 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
             continue
         sp_cost = sk.sp_cost[min(lvl, len(sk.sp_cost)) - 1] if sk.sp_cost else 0
         priority = idle.get("priority", 1)
+        trigger = idle.get("trigger", "every_turn")
         if sid == snap.primary_skill_id:
-            priority = 99   # 指定主攻 → 蓋過其他攻擊技
+            priority = 99      # 指定主攻 → 蓋過其他攻擊技
+            trigger = "every_turn"   # 指定主攻就是要一直放，不再受原本觸發條件卡住
+            # （例如治癒術原本要血量低於 50% 才放，指定成主攻後才放得出來打不死系）
         resolved.append(ResolvedSkill(
             skill_id=sid, name=sk.name, level=lvl, kind="active",
             sp_cost=sp_cost, cooldown_rounds=round(sk.cooldown_s / 2),
-            effects=sk.effects, trigger=idle.get("trigger", "every_turn"),
+            effects=sk.effects, trigger=trigger,
             priority=priority,
         ))
 
