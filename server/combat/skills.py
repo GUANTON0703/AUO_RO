@@ -25,7 +25,7 @@ def cast_skill(caster, target, skill, rng: random.Random) -> list:
         elif t == "magic_hit":
             events += _magic_skill(caster, target, skill, eff, rng)
         elif t == "heal_hp":
-            events += _heal_skill(caster, skill, eff)
+            events += _heal_skill(caster, target, skill, eff)
         elif t == "buff":
             _stat_mod_skill(caster, eff, skill.level, skill.name)
             events.append(SkillEvent(actor=caster.name, target=caster.name,
@@ -101,11 +101,17 @@ def _proc_skill(caster, target, skill, eff, rng):
     return []
 
 
-def _heal_skill(caster, skill, eff):
+def _heal_skill(caster, target, skill, eff):
+    """治癒術：對一般目標是回自己的血；對不死系（種族 undead）是傷害，不是回血
+    ——跟正版 RO 一樣，服事系可以拿治癒術當攻擊技打不死怪。"""
     if "flat" in eff:
         amount = _seq(eff["flat"], skill.level)
     else:
         amount = round(caster.effective_matk * _seq(eff.get("matk_pct", 100), skill.level) / 100)
+    if target is not None and getattr(target, "race", None) == "undead":
+        target.take_damage(amount)
+        return [SkillEvent(actor=caster.name, target=target.name, skill_id=skill.skill_id,
+                           skill_name=skill.name, damage=amount)]
     caster.heal(amount)
     return [HealEvent(actor=caster.name, target=caster.name, amount=amount)]
 

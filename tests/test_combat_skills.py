@@ -43,6 +43,32 @@ def test_heal_skill_restores_caster_hp():
     assert caster.hp > 100
 
 
+def test_heal_skill_damages_undead_target_instead():
+    """真實 RO 的招牌梗：治癒術對不死系是傷害不是回血，服事系可以拿來當攻擊技。"""
+    rng = random.Random(3)
+    caster = _c("牧師", matk=50)
+    undead = _c("殭屍", max_hp=500, race="undead")
+    rs = ResolvedSkill("heal", "治癒", 3, "active", 10, 0,
+                       [{"type": "heal_hp", "matk_pct": [120, 160, 200, 240, 280]}],
+                       "hp_below_50", 2)
+    evs = cast_skill(caster, undead, rs, rng)
+    assert undead.hp < 500
+    assert any(e.kind == "skill" and getattr(e, "damage", 0) > 0 for e in evs)
+
+
+def test_heal_skill_still_heals_self_against_non_undead():
+    rng = random.Random(3)
+    caster = _c("牧師", matk=50)
+    caster.take_damage(200)
+    foe = _c("波利", race="animal")
+    rs = ResolvedSkill("heal", "治癒", 3, "active", 10, 0,
+                       [{"type": "heal_hp", "matk_pct": [120, 160, 200, 240, 280]}],
+                       "hp_below_50", 2)
+    cast_skill(caster, foe, rs, rng)
+    assert caster.hp > 100
+    assert foe.hp == foe.max_hp
+
+
 def test_buff_applies_stat_mod():
     rng = random.Random(4)
     caster = _c("劍士")
