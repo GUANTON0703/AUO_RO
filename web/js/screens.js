@@ -328,6 +328,7 @@ Screens.home = {
       API.huntStatus().catch((e) => { if (e.status !== 409) throw e; return null; }),
     ]);
     this._sheet = sheet;
+    this._sheetLevel = S.char.base_level;
     this._maintained = sheet?.maintained_buffs || [];
     S._sheet = this._sheet;
     this._strategy = strategy;
@@ -356,7 +357,20 @@ Screens.home = {
       else this._stopDrip();
       return;
     }
-    if (hunting) { this._ingest(status); this._updateKV(status); }
+    if (hunting) { this._ingest(status); this._updateKV(status); this._maybeRefreshSheet(status); }
+  },
+
+  // 升級會改變裝備與數值面板（攻擊/命中/HP上限那些），但那些數字是掛機一開始
+  // 抓一次就快取著、每次輪詢不會重抓。等級變了才重抓一次，不然要切分頁重進才會更新。
+  _maybeRefreshSheet(status) {
+    const lvl = status?.character?.base_level;
+    if (lvl == null || lvl === this._sheetLevel) return;
+    this._sheetLevel = lvl;
+    API.sheet(S.char.id).then((sheet) => {
+      this._sheet = sheet;
+      S._sheet = sheet;
+      this._updateKV(status);
+    }).catch(() => {});
   },
 
   _dripInterval() {
