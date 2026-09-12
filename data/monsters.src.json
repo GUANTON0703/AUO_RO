@@ -56,6 +56,26 @@
     "lore": "一動也不動的硬殼蟲蛹。打不還手，就是殼特別厚，新手練耐心用。"
   },
   {
+    "id": "earth_poring",
+    "name": "土波利",
+    "level": 3,
+    "element": "earth",
+    "race": "formless",
+    "size": "small",
+    "role": "glass",
+    "base_exp": 10,
+    "job_exp": 5,
+    "stats": {"max_hp": 75, "max_sp": 0, "atk": 10, "matk": 4, "defense": 1, "mdef": 0, "hit": 4, "flee": 5, "aspd": 100, "crit": 0},
+    "drops": [
+      {"item_id": "jellopy", "rate": 0.55},
+      {"item_id": "sticky_mucus", "rate": 0.3},
+      {"item_id": "clover", "rate": 0.08},
+      {"item_id": "earth_poring_card", "rate": 0.002}
+    ],
+    "is_mvp": false,
+    "lore": "埋在土裡的波利變種，殼比較硬，動作慢吞吞的。"
+  },
+  {
     "id": "little_boar",
     "name": "小野豬",
     "level": 4,
@@ -940,7 +960,7 @@
   {
     "id": "elder_willow", "name": "古柳樹", "level": 28,
     "element": "fire", "race": "plant", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "trunk", "rate": 0.45}, {"item_id": "clover", "rate": 0.25}, {"item_id": "oridecon", "rate": 0.04}],
+    "drops": [{"item_id": "trunk", "rate": 0.45}, {"item_id": "clover", "rate": 0.25}, {"item_id": "oridecon", "rate": 0.04}, {"item_id": "elder_willow_card", "rate": 0.002}],
     "lore": "活了很久的柳樹精，樹枝像鞭子一樣抽人。"
   },
   {

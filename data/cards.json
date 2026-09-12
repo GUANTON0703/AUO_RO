@@ -175,5 +175,7 @@
   {"id": "tao_gunka_card", "name": "道貢卡卡片", "monster_id": "tao_gunka", "slot": "armor", "drop_rate": 0.02, "effects": [{"type": "percent_stat", "stat": "max_hp", "pct": 50}, {"type": "percent_stat", "stat": "defense", "pct": -50}, {"type": "percent_stat", "stat": "mdef", "pct": -50}]},
   {"id": "rsx_0806_card", "name": "RSX-0806卡片", "monster_id": "rsx_0806", "slot": "armor", "drop_rate": 0.02, "effects": [{"type": "status_immune", "status": "stun"}, {"type": "flat_stat", "stat": "defense", "amount": 8}]},
   {"id": "detardeurus_card", "name": "化石雷龍卡片", "monster_id": "detardeurus", "slot": "armor", "drop_rate": 0.02, "effects": [{"type": "element_resist", "element": "fire", "pct": 30}, {"type": "status_immune", "status": "freeze"}]},
-  {"id": "gloom_under_night_card", "name": "冥岩龍卡片", "monster_id": "gloom_under_night", "slot": "weapon", "drop_rate": 0.02, "effects": [{"type": "race_damage", "race": "angel", "pct": 30}, {"type": "race_damage", "race": "demon", "pct": 30}]}
+  {"id": "gloom_under_night_card", "name": "冥岩龍卡片", "monster_id": "gloom_under_night", "slot": "weapon", "drop_rate": 0.02, "effects": [{"type": "race_damage", "race": "angel", "pct": 30}, {"type": "race_damage", "race": "demon", "pct": 30}]},
+  {"id": "earth_poring_card", "name": "土波利卡片", "monster_id": "earth_poring", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 3}]},
+  {"id": "elder_willow_card", "name": "長老樹精卡片", "monster_id": "elder_willow", "slot": "accessory", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "int", "amount": 2}]}
 ]

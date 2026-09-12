@@ -4,7 +4,7 @@
     "name": "普隆德拉野外-東門村郊",
     "town": "prontera",
     "level_range": [1, 10],
-    "monster_ids": ["green_cotton_worm", "mad_bunny", "pupa", "little_boar", "chick", "yoyo_monkey"],
+    "monster_ids": ["green_cotton_worm", "mad_bunny", "pupa", "earth_poring", "little_boar", "chick", "yoyo_monkey"],
     "mvp_id": null,
     "unlock_base_level": 1
   },
