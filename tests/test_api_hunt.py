@@ -440,3 +440,16 @@ def test_shared_hp_sp_potion_not_over_consumed(client, auth, db_helpers):
     inv = client.get(f"/api/characters/{ch['id']}/inventory", headers=h).json()
     assert inv["items"].get("royal_jelly", 0) >= 0   # 不會變負
 
+
+
+def test_slow_fight_flags_still_fighting_instead_of_looking_stuck(client, auth, db_helpers):
+    """真實秒數還沒攢夠打完一場（例如打很肉的怪）時，狀態要標 still_fighting，
+    畫面才知道不是掛機卡住，只是這場還沒打完。"""
+    _, h, _ = auth
+    ch = _ready_char(client, h, db_helpers, base_level=20)
+    client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_south_field"})
+    client.get("/api/hunt/status", headers=h)  # 先消耗掉暖啟動，回到正常線上節奏
+    # 2 秒：超過結算防抖門檻（1.5 秒）會真的跑，但遠不夠打完一場（最少也要 rest_seconds=3 秒）
+    db_helpers.rewind_hunt(ch["id"], seconds=2)
+    status = client.get("/api/hunt/status", headers=h).json()
+    assert status["still_fighting"] is True

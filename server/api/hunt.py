@@ -558,9 +558,12 @@ def _probe_hunt_buffs(row) -> list:
         return []
 
 
-def _accumulated_snapshot(row, event_cursor: str | None = None) -> dict:
+def _accumulated_snapshot(row, event_cursor: str | None = None, *,
+                          still_fighting: bool = False) -> dict:
     """未達結算地板時回這個：目前場次累積值 + 最後一批事件，不重算、不寫入。
-    沒有結算批次時不探測 combat；短輪詢只應讀狀態，不能偷偷跑一場模擬。"""
+    沒有結算批次時不探測 combat；短輪詢只應讀狀態，不能偷偷跑一場模擬。
+    still_fighting=True：對手血厚，這場真實秒數還沒攢夠打完一場，還在纏鬥，
+    不是掛機卡住（給前端顯示用，不然畫面會像當機）。"""
     batch = _last_batch.get(row["id"], {})
     buffs = batch.get("buffs", [])
     payload = {
@@ -574,6 +577,7 @@ def _accumulated_snapshot(row, event_cursor: str | None = None) -> dict:
         "loot": _loot(row),
         "offline": False, "effective_seconds": row["hunt_seconds"],
         "retreated": False, "retreat_reason": None,
+        "still_fighting": still_fighting,
         "character": _character_block(row),
     }
     return _with_event_state(payload, row=row, batch=batch,
@@ -722,7 +726,8 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
                 "UPDATE characters SET hunt_last_settled_at = ? WHERE id = ?",
                 (initial_last, row["id"]),
             )
-        return _accumulated_snapshot(characters_repo.get_character(row["id"]), event_cursor)
+        return _accumulated_snapshot(characters_repo.get_character(row["id"]), event_cursor,
+                                     still_fighting=True)
 
     new_bl, new_bexp, _ = apply_base_exp(row["base_level"], row["base_exp"], result.base_exp)
     new_jl, new_jexp, _ = apply_job_exp(row["job_level"], row["job_exp"],
