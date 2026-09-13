@@ -177,5 +177,17 @@
   {"id": "detardeurus_card", "name": "化石雷龍卡片", "monster_id": "detardeurus", "slot": "armor", "drop_rate": 0.02, "effects": [{"type": "element_resist", "element": "fire", "pct": 30}, {"type": "status_immune", "status": "freeze"}]},
   {"id": "gloom_under_night_card", "name": "冥岩龍卡片", "monster_id": "gloom_under_night", "slot": "weapon", "drop_rate": 0.02, "effects": [{"type": "race_damage", "race": "angel", "pct": 30}, {"type": "race_damage", "race": "demon", "pct": 30}]},
   {"id": "earth_poring_card", "name": "土波利卡片", "monster_id": "earth_poring", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 3}]},
-  {"id": "elder_willow_card", "name": "長老樹精卡片", "monster_id": "elder_willow", "slot": "accessory", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "int", "amount": 2}]}
+  {"id": "elder_willow_card", "name": "長老樹精卡片", "monster_id": "elder_willow", "slot": "accessory", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "int", "amount": 2}]},
+  {"id": "poison_snail_card", "name": "毒紋蝸牛卡片", "monster_id": "poison_snail", "slot": "offhand", "drop_rate": 0.0025, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 3}]},
+  {"id": "sand_man_card", "name": "沙人卡片", "monster_id": "sand_man", "slot": "offhand", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "mdef", "amount": 4}]},
+  {"id": "tick_card", "name": "鐘擺蟲卡片", "monster_id": "tick", "slot": "offhand", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "defense", "amount": 5}]},
+  {"id": "ghoul_card", "name": "食屍鬼卡片", "monster_id": "ghoul", "slot": "offhand", "drop_rate": 0.0015, "effects": [{"type": "status_immune", "status": "poison"}]},
+  {"id": "boar_card", "name": "野豬卡片", "monster_id": "boar", "slot": "offhand", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "max_hp", "amount": 40}]},
+  {"id": "queen_scarab_card", "name": "女王甲蟲卡片", "monster_id": "queen_scarab", "slot": "garment", "drop_rate": 0.0015, "effects": [{"type": "element_resist", "element": "holy", "pct": 15}]},
+  {"id": "metaller_card", "name": "鋼鐵蟲卡片", "monster_id": "metaller", "slot": "garment", "drop_rate": 0.0025, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 8}]},
+  {"id": "kapha_card", "name": "卡帕卡片", "monster_id": "kapha", "slot": "head", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "int", "amount": 1}]},
+  {"id": "orc_archer_card", "name": "獸人弓箭手卡片", "monster_id": "orc_archer", "slot": "head", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "dex", "amount": 1}]},
+  {"id": "skeleton_prisoner_card", "name": "骷髏囚犯卡片", "monster_id": "skeleton_prisoner", "slot": "head", "drop_rate": 0.0015, "effects": [{"type": "status_immune", "status": "curse"}]},
+  {"id": "white_rat_card", "name": "白鼠卡片", "monster_id": "white_rat", "slot": "shoes", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "agi", "amount": 1}]},
+  {"id": "dragonfly_card", "name": "龍蠅卡片", "monster_id": "dragonfly", "slot": "shoes", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 6}]}
 ]

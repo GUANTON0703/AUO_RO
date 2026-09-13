@@ -281,7 +281,8 @@
     "stats": {"max_hp": 5343, "max_sp": 0, "atk": 64, "matk": 59, "defense": 42, "mdef": 14, "hit": 48, "flee": 36, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "fluff", "rate": 0.55},
-      {"item_id": "elunium", "rate": 0.1}
+      {"item_id": "elunium", "rate": 0.1},
+      {"item_id": "boar_card", "rate": 0.002}
     ],
     "is_mvp": false,
     "lore": ""
@@ -340,7 +341,8 @@
     "drops": [
       {"item_id": "sticky_mucus", "rate": 0.6},
       {"item_id": "jellopy", "rate": 0.35},
-      {"item_id": "clover", "rate": 0.1}
+      {"item_id": "clover", "rate": 0.1},
+      {"item_id": "poison_snail_card", "rate": 0.0025}
     ],
     "is_mvp": false,
     "lore": ""
@@ -666,7 +668,8 @@
     "drops": [
       {"item_id": "fluff", "rate": 0.45},
       {"item_id": "feather", "rate": 0.3},
-      {"item_id": "blue_potion", "rate": 0.05}
+      {"item_id": "blue_potion", "rate": 0.05},
+      {"item_id": "white_rat_card", "rate": 0.002}
     ],
     "is_mvp": false,
     "lore": ""
@@ -819,7 +822,8 @@
     "drops": [
       {"item_id": "feather", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.1},
-      {"item_id": "clover", "rate": 0.2}
+      {"item_id": "clover", "rate": 0.2},
+      {"item_id": "queen_scarab_card", "rate": 0.0015}
     ],
     "is_mvp": false,
     "lore": ""
@@ -838,7 +842,8 @@
     "drops": [
       {"item_id": "feather", "rate": 0.45},
       {"item_id": "oridecon", "rate": 0.1},
-      {"item_id": "fly_wing", "rate": 0.15}
+      {"item_id": "fly_wing", "rate": 0.15},
+      {"item_id": "dragonfly_card", "rate": 0.002}
     ],
     "is_mvp": false,
     "lore": ""
@@ -894,7 +899,7 @@
   {
     "id": "metaller", "name": "鋼鐵蟲", "level": 27,
     "element": "wind", "race": "insect", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "iron_ore", "rate": 0.35}, {"item_id": "sticky_mucus", "rate": 0.3}, {"item_id": "oridecon", "rate": 0.05}],
+    "drops": [{"item_id": "iron_ore", "rate": 0.35}, {"item_id": "sticky_mucus", "rate": 0.3}, {"item_id": "oridecon", "rate": 0.05}, {"item_id": "metaller_card", "rate": 0.0025}],
     "lore": "外殼硬如金屬的沙漠大蟲，會發出刺耳嘶鳴。"
   },
   {
@@ -912,7 +917,7 @@
   {
     "id": "sand_man", "name": "沙人", "level": 31,
     "element": "earth", "race": "formless", "size": "large", "role": "tank", "gen": true,
-    "drops": [{"item_id": "iron_ore", "rate": 0.4}, {"item_id": "jellopy", "rate": 0.3}, {"item_id": "elunium", "rate": 0.05}],
+    "drops": [{"item_id": "iron_ore", "rate": 0.4}, {"item_id": "jellopy", "rate": 0.3}, {"item_id": "elunium", "rate": 0.05}, {"item_id": "sand_man_card", "rate": 0.002}],
     "lore": "沙子聚成人形的怪物，打散了又會重組。"
   },
   {
@@ -990,7 +995,7 @@
   {
     "id": "ghoul", "name": "食屍鬼", "level": 40,
     "element": "undead", "race": "undead", "size": "medium", "role": "tank", "gen": true, "hp_mult": 1.3,
-    "drops": [{"item_id": "horrendous_mouth", "rate": 0.35}, {"item_id": "decayed_nail", "rate": 0.4}, {"item_id": "cursed_ruby", "rate": 0.06}],
+    "drops": [{"item_id": "horrendous_mouth", "rate": 0.35}, {"item_id": "decayed_nail", "rate": 0.4}, {"item_id": "cursed_ruby", "rate": 0.06}, {"item_id": "ghoul_card", "rate": 0.0015}],
     "lore": "腐爛發臭的食屍鬼，皮厚肉粗，慢慢磨。"
   },
   {
@@ -1056,7 +1061,7 @@
   {
     "id": "orc_archer", "name": "獸人弓箭手", "level": 40,
     "element": "earth", "race": "demihuman", "size": "medium", "role": "glass", "gen": true,
-    "drops": [{"item_id": "orc_tooth", "rate": 0.4}, {"item_id": "feather", "rate": 0.3}],
+    "drops": [{"item_id": "orc_tooth", "rate": 0.4}, {"item_id": "feather", "rate": 0.3}, {"item_id": "orc_archer_card", "rate": 0.0015}],
     "lore": "站在後排放冷箭的獸人。"
   },
   {
@@ -1164,7 +1169,7 @@
   {
     "id": "kapha", "name": "卡帕", "level": 46,
     "element": "water", "race": "demihuman", "size": "medium", "role": "glass", "gen": true,
-    "drops": [{"item_id": "coral_reef", "rate": 0.35}, {"item_id": "gill", "rate": 0.3}],
+    "drops": [{"item_id": "coral_reef", "rate": 0.35}, {"item_id": "gill", "rate": 0.3}, {"item_id": "kapha_card", "rate": 0.0015}],
     "lore": "背著龜殼、頭頂盛水的水妖，動作靈活。"
   },
   {
@@ -1284,7 +1289,7 @@
   {
     "id": "tick", "name": "鐘擺蟲", "level": 44,
     "element": "earth", "race": "formless", "size": "small", "role": "tank", "gen": true,
-    "drops": [{"item_id": "gear_wheel", "rate": 0.45}, {"item_id": "sticky_mucus", "rate": 0.25}],
+    "drops": [{"item_id": "gear_wheel", "rate": 0.45}, {"item_id": "sticky_mucus", "rate": 0.25}, {"item_id": "tick_card", "rate": 0.002}],
     "lore": "吸附在時計塔齒輪上的機械蟲，殼很硬。"
   },
   {
@@ -1296,7 +1301,7 @@
   {
     "id": "skeleton_prisoner", "name": "骷髏囚犯", "level": 46,
     "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "skel_bone", "rate": 0.5}, {"item_id": "rusty_shackle", "rate": 0.3}],
+    "drops": [{"item_id": "skel_bone", "rate": 0.5}, {"item_id": "rusty_shackle", "rate": 0.3}, {"item_id": "skeleton_prisoner_card", "rate": 0.0015}],
     "lore": "被鎖在格拉斯神殿地牢裡、死了還掙扎的骷髏。"
   },
   {
