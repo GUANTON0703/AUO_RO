@@ -81,6 +81,21 @@
         </div>
 
         <div class="card">
+          <h3>圖鑑查詢</h3>
+          <p class="muted">查哪個屬性、哪些裝備或卡片有加，還有哪隻怪會掉。</p>
+          <div class="row" style="margin-bottom:8px">
+            <select id="dex-stat" style="flex:1"></select>
+            <select id="dex-slot" style="width:110px"></select>
+            <select id="dex-kind" style="width:90px">
+              <option value="all">全部</option>
+              <option value="equipment">裝備</option>
+              <option value="card">卡片</option>
+            </select>
+          </div>
+          <div class="list" id="dex-results"></div>
+        </div>
+
+        <div class="card">
           <h3>MVP 挑戰</h3>
           <div class="list" id="mvp-list"><div class="spinner">載入中…</div></div>
         </div>
@@ -111,6 +126,7 @@
       };
 
       this._stopFightDrip();
+      this._loadDex();
       await this._loadCharSwitcher();
       await this._loadMvp();
       await this._loadCraft();
@@ -364,6 +380,102 @@
         App.toast(line);
       } catch (e) { App.toast(e.detail || "製作失敗", true); }
       await this._loadCraft();
+    },
+
+    // ---------- 圖鑑查詢 ----------
+    _loadDex() {
+      const DEX_STATS = [
+        ["str", "力量"], ["agi", "敏捷"], ["vit", "體質"], ["int", "智力"],
+        ["dex", "靈巧"], ["luk", "幸運"],
+        ["atk", "攻擊"], ["matk", "魔攻"], ["defense", "防禦"], ["mdef", "魔防"],
+        ["hit", "命中"], ["flee", "迴避"], ["crit", "爆擊"], ["aspd", "攻速"],
+        ["max_hp", "HP上限"], ["max_sp", "SP上限"],
+      ];
+      const statSel = document.querySelector("#dex-stat");
+      const slotSel = document.querySelector("#dex-slot");
+      const kindSel = document.querySelector("#dex-kind");
+      if (!statSel) return;
+      statSel.innerHTML = DEX_STATS.map(([k, zh]) =>
+        `<option value="${k}"${k === this._dexStat ? " selected" : ""}>${esc(zh)}</option>`).join("");
+      this._dexStat = statSel.value;
+      const SLOTS = [["", "全部部位"], ["weapon", "武器"], ["offhand", "副手"], ["head", "頭部"],
+        ["armor", "鎧甲"], ["garment", "披肩"], ["shoes", "鞋子"], ["accessory", "飾品"]];
+      slotSel.innerHTML = SLOTS.map(([v, zh]) =>
+        `<option value="${v}"${v === (this._dexSlot || "") ? " selected" : ""}>${esc(zh)}</option>`).join("");
+      statSel.onchange = () => { this._dexStat = statSel.value; this._renderDex(); };
+      slotSel.onchange = () => { this._dexSlot = slotSel.value; this._renderDex(); };
+      kindSel.onchange = () => { this._dexKind = kindSel.value; this._renderDex(); };
+      this._renderDex();
+    },
+
+    _dexStatHit(effects, stat) {
+      for (const e of effects || []) {
+        if (e.stat !== stat) continue;
+        if (e.type === "flat_stat") return { amount: e.amount, pct: false };
+        if (e.type === "percent_stat") return { amount: e.pct, pct: true };
+      }
+      return null;
+    },
+
+    _dexDropSources(itemId) {
+      const out = [];
+      const scan = (coll) => Object.values(coll || {}).forEach((m) => {
+        for (const d of m.drops || []) {
+          if (d.item_id === itemId) out.push({ name: m.name, rate: d.rate });
+        }
+      });
+      scan(S.catalog.monsters);
+      scan(S.catalog.mvps);
+      return out.sort((a, b) => b.rate - a.rate);
+    },
+
+    _renderDex() {
+      const box = document.querySelector("#dex-results");
+      if (!box) return;
+      const stat = this._dexStat;
+      const slot = this._dexSlot || "";
+      const kind = this._dexKind || "all";
+      const pct = (r) => (r >= 0.1 ? Math.round(r * 100) + "%"
+        : r >= 0.001 ? (r * 100).toFixed(1) + "%" : (r * 100).toFixed(2) + "%");
+      const rows = [];
+
+      if (kind !== "card") {
+        for (const eq of Object.values(S.catalog.equipment || {})) {
+          if (slot && eq.slot !== slot) continue;
+          let amt = eq.stats && eq.stats[stat];
+          let isPct = false;
+          if (amt == null) {
+            const hit = this._dexStatHit(eq.effects, stat);
+            if (hit) { amt = hit.amount; isPct = hit.pct; }
+          }
+          if (amt == null) continue;
+          rows.push({ srcKind: "裝備", name: eq.name, slot: eq.slot, amt, isPct,
+            buy: eq.npc_buy, drops: this._dexDropSources(eq.id) });
+        }
+      }
+      if (kind !== "equipment") {
+        for (const c of Object.values(S.catalog.cards || {})) {
+          if (slot && c.slot !== slot) continue;
+          const hit = this._dexStatHit(c.effects, stat);
+          if (!hit) continue;
+          rows.push({ srcKind: "卡片", name: c.name, slot: c.slot, amt: hit.amount, isPct: hit.pct,
+            buy: null, drops: this._dexDropSources(c.id) });
+        }
+      }
+      rows.sort((a, b) => b.amt - a.amt);
+
+      box.innerHTML = rows.length ? rows.map((r) => {
+        const amtTxt = `${r.amt >= 0 ? "+" : ""}${r.amt}${r.isPct ? "%" : ""}`;
+        const where = r.drops.length
+          ? r.drops.slice(0, 4).map((d) => `${esc(d.name)} ${pct(d.rate)}`).join("、")
+          : (r.buy ? `商店買（${r.buy}z）` : "取得方式不明");
+        return `<div class="item">
+          <div>${esc(r.name)}<span class="pill" style="margin-left:6px">${r.srcKind}</span>
+            <div class="sub">${SLOT_ZH[r.slot] || r.slot}　${amtTxt}</div>
+            <div class="sub">來源：${where}</div>
+          </div>
+        </div>`;
+      }).join("") : `<p class="muted">沒有裝備或卡片有加這個屬性。</p>`;
     },
 
     // ---------- 角色切換 / 轉帳 ----------
