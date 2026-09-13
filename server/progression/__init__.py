@@ -250,7 +250,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     mdef = min(120, eq.get("mdef", 0) + INT // 3 + passives.get("mdef", 0))
     hit = snap.base_level + DEX + LUK // 3 + eq.get("hit", 0) + passives.get("hit", 0)
     flee = snap.base_level + AGI + LUK // 5 + eq.get("flee", 0) + passives.get("flee", 0)
-    aspd = min(193, round(base_aspd + AGI * 0.7 + DEX * 0.12 + eq.get("aspd", 0)
+    aspd = min(250, round(base_aspd + AGI * 0.7 + DEX * 0.12 + eq.get("aspd", 0)
                           + passives.get("aspd", 0)))
     crit = round(LUK * 0.3 * crit_rate_mult) + eq.get("crit", 0) + passives.get("crit", 0)
     # 施法後延遲：DEX 高 = 可連續放招（原版高 DEX 幾乎無延遲）
@@ -300,7 +300,7 @@ def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
         atk=max(0, derived["atk"]), matk=max(0, derived["matk"]),
         defense=max(0, min(120, derived["defense"])), mdef=max(0, min(120, derived["mdef"])),
         hit=max(0, derived["hit"]), flee=max(0, derived["flee"]),
-        aspd=max(1, min(193, aspd)), crit=max(0, derived["crit"]),
+        aspd=max(1, min(250, aspd)), crit=max(0, derived["crit"]),
         is_caster=(derived["matk"] > derived["atk"]),
         crit_mult=crit_mult,
         cast_delay=cast_delay,

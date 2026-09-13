@@ -40,8 +40,10 @@ def test_attacks_this_round_from_aspd():
     rng = random.Random(0)
     # aspd 100 → 每回合剛好 1 次
     assert all(f.attacks_this_round(100, rng) == 1 for _ in range(20))
-    # 攻速上限 193 → 剛好 3 次
-    assert all(f.attacks_this_round(193, rng) == 3 for _ in range(20))
+    # 攻速上限 250 → 平均約 4.2 次，落在 4~5 之間
+    xs = [f.attacks_this_round(250, rng) for _ in range(3000)]
+    assert set(xs) <= {4, 5}
+    assert 4.1 < sum(xs) / len(xs) < 4.4
     # aspd 147（約 2 擊點）→ 平均接近 2
     xs = [f.attacks_this_round(147, rng) for _ in range(3000)]
     assert set(xs) <= {1, 2, 3}

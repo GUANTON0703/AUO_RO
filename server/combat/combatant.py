@@ -110,7 +110,7 @@ class Combatant:
 
     @property
     def effective_aspd(self) -> int:
-        return max(1, min(193, self.aspd + self._stat_mod("aspd")))
+        return max(1, min(250, self.aspd + self._stat_mod("aspd")))
 
     @property
     def stunned(self) -> bool:
