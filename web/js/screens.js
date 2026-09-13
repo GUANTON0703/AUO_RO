@@ -261,6 +261,13 @@ function itemDesc(id) {
   return craftMaterialIds().has(id) ? "素材（賣錢 / 煉藥材料）" : "素材（賣錢 / 精煉用）";
 }
 
+// 卡片效果說明（插在裝備上的卡片用，跟 itemDesc 對應但讀 catalog.cards）
+function cardDesc(id) {
+  const c = S.catalog?.cards?.[id];
+  if (!c) return "";
+  return (c.effects || []).map(effectText).filter(Boolean).join("、");
+}
+
 // 所有配方會用到的材料 item_id 集合，掛機撿到清單用來標「製作材料」，提醒不要手滑賣掉
 let _craftMaterialIdsCache = null;
 function craftMaterialIds() {
@@ -706,7 +713,10 @@ Screens.home = {
       const rf = e.refine ? ` +${e.refine}` : "";
       const def = S.catalog?.equipment?.[e.equipment_id];
       const n = def?.card_slots || 0;
-      const cards = (e.card_ids || []).map((c) => esc(itemName(c)));
+      const cards = (e.card_ids || []).map((c) => {
+        const fx = cardDesc(c);
+        return `${esc(itemName(c))}${fx ? `（${esc(fx)}）` : ""}`;
+      });
       const tail = n
         ? ` <span class="dim">[${cards.join("、") || `空 ${n} 孔`}]</span>` : "";
       return `<div class="kv"><span class="k">${zh}</span>` +
@@ -1353,6 +1363,7 @@ window.jobName = jobName; window.jobTier = jobTier;
 window.monName = monName; window.mapName = mapName; window.itemName = itemName;
 window.skillName = skillName;
 window.itemDesc = itemDesc; window.gearDesc = gearDesc; window.effectText = effectText;
+window.cardDesc = cardDesc;
 window.STAT_ZH = STAT_ZH;
 window.skillExplain = skillExplain;
 window.cardDesc = cardDesc; window.SLOT_ZH = SLOT_ZH;

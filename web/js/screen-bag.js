@@ -123,7 +123,10 @@
         .sort((a, b) => (b.equipped_slot != null) - (a.equipped_slot != null))
         .map((inst) => {
           const equipped = inst.equipped_slot != null;
-          const cards = (inst.card_ids || []).map((c) => itemName(c)).join("、");
+          const cards = (inst.card_ids || []).map((c) => {
+            const fx = cardDesc(c);
+            return `${itemName(c)}${fx ? `（${fx}）` : ""}`;
+          }).join("、");
           const slotZh = equipped ? `　裝備中（${SLOT_ZH[inst.equipped_slot] || inst.equipped_slot}）` : "";
           const worn = !equipped ? (wornBySlot[slotOf(inst.equipment_id)] || []) : [];
           const wornLine = worn.length
