@@ -135,6 +135,8 @@
                 ${target}${add ? ` <span class="pill good">+${add}</span>` : ""}
                 <button class="btn small" data-inc="${k}" ${canAdd ? "" : "disabled"}
                   style="margin-left:8px">+ (${cost})</button>
+                <button class="btn small" data-inc10="${k}" ${canAdd ? "" : "disabled"}
+                  style="margin-left:4px">+10</button>
               </span>
             </div>
             <div class="sub">${desc}</div>
@@ -155,6 +157,21 @@
 
       document.querySelectorAll("[data-inc]").forEach((b) => {
         b.onclick = () => { this._pending[b.dataset.inc]++; this._drawStats(); };
+      });
+      document.querySelectorAll("[data-inc10]").forEach((b) => {
+        b.onclick = () => {
+          const k = b.dataset.inc10;
+          const base = c["stat_" + k] || 0;
+          let left2 = avail - this._spend();
+          for (let n = 0; n < 10; n++) {
+            const target2 = base + this._pending[k];
+            const cost2 = statCost(target2);
+            if (target2 >= 99 || cost2 > left2) break;
+            this._pending[k]++;
+            left2 -= cost2;
+          }
+          this._drawStats();
+        };
       });
       document.querySelector("#stat-submit").onclick = async (e) => {
         e.target.disabled = true;
