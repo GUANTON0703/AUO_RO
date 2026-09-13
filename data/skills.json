@@ -6739,7 +6739,8 @@
           360,
           420,
           480
-        ]
+        ],
+        "consumes_all_sp": true
       }
     ],
     "idle_default": {

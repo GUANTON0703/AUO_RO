@@ -168,15 +168,18 @@ function effectText(e) {
 }
 
 // 戰鬥記錄：掛機播放與 MVP 挑戰共用。用角色名分辨「你打」與「你被打」的顏色。
+// 每行回傳 {html, hp, sp}：hp/sp 是這個事件發生當下玩家的即時血/魔（事件沒帶就是
+// undefined，代表這行不影響血條/魔條）。掛機畫面用這個讓血條/魔條跟著訊息一起跳，
+// 求的是看起來對得上的臨場感，不是嚴格即時精準（見 Screens.home._drip）。
 function combatLogLines(events, opts) {
   const me = (opts && opts.playerName) || (S.char && S.char.name) || "";
   const side = (actor, target) =>
     actor === me ? "atk-mine" : (target === me ? "atk-foe" : "hit");
   const out = [];
   const list = events || [];
+  const line = (html, e) => out.push({ html, hp: e?.player_hp, sp: e?.player_sp });
   // 這批賺到的經驗/Zeny 平均分給這批裡的每次擊殺，最後一隻補上四捨五入的零頭，
-  // 讓「擊倒了」那行能順便標出這隻分到多少，純文字裝飾，不影響任何數字的真實計算
-  // （血量/經驗/擊殺數一律以伺服器回傳的當下真實值為準，見 Screens.home._updateKV）。
+  // 讓「擊倒了」那行能順便標出這隻分到多少，純文字裝飾，不影響任何數字的真實計算。
   const kg = opts && opts.killGains;
   const killTotal = kg ? list.filter((e) => e.kind === "kill").length : 0;
   let killSeen = 0, baseGiven = 0, zenyGiven = 0;
@@ -192,56 +195,61 @@ function combatLogLines(events, opts) {
         else nums.push(a.crit ? `<span class="crit-hit">${a.damage}爆</span>` : `${a.damage}`);
         j++;
       }
+      const last = list[j - 1];   // 併行的最後一擊，血條/魔條跳到這一刻的值
       i = j - 1;
-      out.push(`<span class="${side(e.actor, e.target)}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${nums.join(" ")}</span>`);
+      line(`<span class="${side(e.actor, e.target)}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${nums.join(" ")}</span>`, last);
     } else if (e.kind === "skill") {
       const dmg = e.damage ? ` → ${e.damage}` : "";
+      const cost = e.sp_cost ? `　<span class="dim">(耗 ${e.sp_cost} SP)</span>` : "";
       const tgt = e.target && e.target !== e.actor ? `對 ${esc(e.target)} ` : "";
       // 被動技能觸發時用「觸發」而不是「施放」，才不會看起來像主動放招
       const passive = S.catalog?.skills?.[e.skill_id]?.kind === "passive";
       const verb = passive ? `發動【${esc(e.skill_name)}】` : `${tgt}施放【${esc(e.skill_name)}】`;
-      out.push(`<span class="${side(e.actor, e.target)}">  ${esc(e.actor)} ${verb}${dmg}</span>`);
+      line(`<span class="${side(e.actor, e.target)}">  ${esc(e.actor)} ${verb}${dmg}${cost}</span>`, e);
     } else if (e.kind === "kill") {
       let extra = "";
       if (kg && killTotal) {
-        const last = killSeen === killTotal - 1;
-        const b = last ? kg.base_exp - baseGiven : Math.round(kg.base_exp / killTotal);
-        const z = last ? kg.zeny - zenyGiven : Math.round(kg.zeny / killTotal);
+        const isLast = killSeen === killTotal - 1;
+        const b = isLast ? kg.base_exp - baseGiven : Math.round(kg.base_exp / killTotal);
+        const z = isLast ? kg.zeny - zenyGiven : Math.round(kg.zeny / killTotal);
         baseGiven += b; zenyGiven += z; killSeen++;
         extra = `　<span class="dim">+${b}經驗${z ? `／+${z}z` : ""}</span>`;
       }
-      out.push(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}${extra}</span>`);
+      line(`<span class="kill">${esc(e.actor)} 擊倒了 ${esc(e.target)}${extra}</span>`, e);
     } else if (e.kind === "heal") {
       const how = e.source === "potion" ? "喝藥水"
         : e.source === "sp_potion" ? "喝 SP 藥水" : "施放治療";
-      out.push(`<span class="dim">  ${esc(e.actor)} ${how} 回復 ${e.amount}</span>`);
+      line(`<span class="dim">  ${esc(e.actor)} ${how} 回復 ${e.amount}</span>`, e);
     } else if (e.kind === "fled" || e.kind === "retreat") {
       const hp = e.hp != null ? `（HP ${e.hp}）` : "";
       const why = e.reason ? "：" + esc(e.reason) : "";
-      out.push(`<span class="dim">${esc(e.actor || "")} 撤退${hp}${why}</span>`);
+      line(`<span class="dim">${esc(e.actor || "")} 撤退${hp}${why}</span>`, e);
     } else if (e.kind === "status_expired") {
       const st = (e.status || "").replace(/_mod$/, "");
       const zh = STATUS_ZH[st] || STAT_ZH[st] || st;
       const verb = STATUS_ZH[st] ? "解除" : "加成結束";
-      out.push(`<span class="dim">  ${esc(e.target)} 的 ${esc(zh)} ${verb}</span>`);
+      line(`<span class="dim">  ${esc(e.target)} 的 ${esc(zh)} ${verb}</span>`, e);
     } else if (e.kind === "status_applied") {
-      out.push(`<span class="dim">  ${esc(e.target)} 陷入 ${esc(STATUS_ZH[e.status] || e.status)}</span>`);
+      line(`<span class="dim">  ${esc(e.target)} 陷入 ${esc(STATUS_ZH[e.status] || e.status)}</span>`, e);
     } else if (e.kind === "dot") {
       const cls = e.target === me ? "atk-foe" : "hit";
-      out.push(`<span class="${cls}">  ${esc(e.target)} 受到 ${esc(STATUS_ZH[e.status] || e.status)} ${e.damage}</span>`);
+      line(`<span class="${cls}">  ${esc(e.target)} 受到 ${esc(STATUS_ZH[e.status] || e.status)} ${e.damage}</span>`, e);
     } else if (e.kind === "challenge_result") {
       const label = { win: "勝利", loss: "戰敗", fled: "撤退" }[e.outcome] || e.outcome;
-      out.push(`<span class="crit">— ${label}（${e.rounds} 回合）—</span>`);
+      line(`<span class="crit">— ${label}（${e.rounds} 回合）—</span>`, e);
     } else if (e.kind === "kill_batch") {
-      out.push(`<span class="kill">擊殺 ${esc(e.monster_name)} ×${e.count}　+經驗 ${e.base_exp}/${e.job_exp}　+Zeny ${e.zeny}</span>`);
+      line(`<span class="kill">擊殺 ${esc(e.monster_name)} ×${e.count}　+經驗 ${e.base_exp}/${e.job_exp}　+Zeny ${e.zeny}</span>`, e);
     } else if (e.kind === "potion_used") {
-      out.push(`<span class="dim">  使用 ${esc(itemName(e.item_id))} ×${e.count}（剩 ${e.remaining}）</span>`);
+      line(`<span class="dim">  使用 ${esc(itemName(e.item_id))} ×${e.count}（剩 ${e.remaining}）</span>`, e);
     } else if (e.kind === "find_monster") {
-      out.push(`<span class="dim">正在尋找怪物…</span>`);
+      line(`<span class="dim">正在尋找怪物…</span>`, e);
     }
   }
   return out;
 }
+
+// combatLogLines 現在回傳 {html,hp,sp}；舊呼叫端只要純文字時用這個取字串陣列。
+const linesToHtml = (lines) => lines.map((l) => (l && typeof l === "object") ? l.html : l);
 
 // 道具說明字串
 function itemDesc(id) {
@@ -394,14 +402,34 @@ Screens.home = {
     const mon = this._curMon ? esc(monName(this._curMon)) : "怪物";
     return `<span class="dim">${f[this._pulse]} 與 ${mon} 交戰中…</span>`;
   },
+  // 血條/魔條直接貼成某一行事件當下的值，讓畫面看起來跟訊息是同一場戰鬥
+  // ——追求的是對得上的臨場感，不是嚴格即時精準（見檔案開頭 combatLogLines 的說明）。
+  _applyBar(hp, sp) {
+    const sheet = this._sheet || {};
+    const setT = (id, v) => { const el = document.querySelector(id); if (el) el.textContent = v; };
+    const setW = (id, cur, max) => { const el = document.querySelector(id);
+      if (el) el.style.width = Math.max(0, Math.min(100, (cur / Math.max(1, max)) * 100)) + "%"; };
+    if (hp != null) {
+      this._barHp = hp;
+      setT("#hm-hptext", `${hp} / ${sheet.max_hp ?? "?"}`);
+      setW("#hm-hpbar", hp, sheet.max_hp ?? 1);
+    }
+    if (sp != null) {
+      this._barSp = sp;
+      setT("#hm-sptext", `${sp} / ${sheet.max_sp ?? "?"}`);
+      setW("#hm-spbar", sp, sheet.max_sp ?? 1);
+    }
+  },
   _drip() {
     this._stopDrip();
     const box = document.querySelector("#huntlog");
     if (!box || S.view !== "home") return;
     if (this._queue.length) {
-      this._shown.push(this._queue.shift());
+      const line = this._queue.shift();
+      this._applyBar(line.hp, line.sp);
+      this._shown.push(line);
       while (this._shown.length > 60) this._shown.shift();
-      box.innerHTML = this._shown.join("\n");
+      box.innerHTML = linesToHtml(this._shown).join("\n");
       box.scrollTop = box.scrollHeight;
       this._paceBudget = Math.max(0, (this._paceBudget || 0) - this._dripMs / 1000);
       this._recalcDrip();
@@ -409,7 +437,7 @@ Screens.home = {
       box.innerHTML = "<span class='dim'>搜尋目標中…</span>";
     } else if (this._hunting && this._combatState === "combat" && this._queue.length) {
       // 佇列清空、還在掛機 → 顯示一個跳動的「交戰中」，畫面才不會像卡住
-      box.innerHTML = this._shown.join("\n") + "\n" + this._heartbeat();
+      box.innerHTML = linesToHtml(this._shown).join("\n") + "\n" + this._heartbeat();
       box.scrollTop = box.scrollHeight;
     }
     let wait;
@@ -445,8 +473,8 @@ Screens.home = {
     const drops = status.drops || {};
     const dk = Object.keys(drops);
     if (dk.length) {
-      lines.push(`<span class="kill">　取得 ${dk.map((k) =>
-        `${esc(itemName(k))} ×${drops[k]}`).join("、")}</span>`);
+      lines.push({ html: `<span class="kill">　取得 ${dk.map((k) =>
+        `${esc(itemName(k))} ×${drops[k]}`).join("、")}</span>` });
     }
     // 撿到裝備、或這批喝/買了水 → 背包數量變了，重新抓一次刷新裝備欄跟藥水欄
     const potTotals = `${status.character?.hunt_potions_used ?? 0}/` +
@@ -462,7 +490,11 @@ Screens.home = {
       this._shown.push(...lines);
       while (this._shown.length > 60) this._shown.shift();
       const box = document.querySelector("#huntlog");
-      if (box) { box.innerHTML = this._shown.join("\n"); box.scrollTop = box.scrollHeight; }
+      if (box) { box.innerHTML = linesToHtml(this._shown).join("\n"); box.scrollTop = box.scrollHeight; }
+      // 沒有逐行播放的節奏可以跟 → 直接貼這批最後一筆帶血/魔資訊的事件，別留舊值
+      for (let k = lines.length - 1; k >= 0; k--) {
+        if (lines[k].hp != null || lines[k].sp != null) { this._applyBar(lines[k].hp, lines[k].sp); break; }
+      }
     } else {
       this._queue.push(...lines);
       // 每批帶來的遊戲內時間累加進「攤開預算」，再平均分給佇列裡所有還沒跳出的行，
@@ -483,18 +515,16 @@ Screens.home = {
     const jMaxed = progression.job_level >= (Curve.jobCaps[tier] ?? Curve.jobCaps.first);
     const bNext = bMaxed ? 0 : Curve.baseNext(progression.base_level);
     const jNext = jMaxed ? 0 : Curve.jobNext(progression.job_level, tier);
-    // 血量/魔力/等級經驗/本場經驗每次輪詢都直接貼成伺服器目前的真實值，秒跳。
-    // 曾經試過跟著戰鬥紀錄逐行套用，但技能耗魔、擊殺回血這類沒對應到單一行紀錄
-    // 的變化會漏算，數字會卡住不動或方向錯誤——秒跳雖然會比紀錄早知道結果，
-    // 但正確比好看重要，數字一律以這裡貼的為準。
+    // 等級經驗每次輪詢都直接貼伺服器真實值，秒跳——這個沒有戰鬥訊息可以對齊，
+    // 秒跳不會有臨場感的問題。
     setT("#hm-btext", xpText(progression.base_exp, bNext, bMaxed));
     setW("#hm-bbar", xpProgress(progression.base_exp, bNext, bMaxed).percent, 100);
     setT("#hm-jtext", xpText(progression.job_exp, jNext, jMaxed));
     setW("#hm-jbar", xpProgress(progression.job_exp, jNext, jMaxed).percent, 100);
-    setT("#hm-hptext", `${hp} / ${sheet.max_hp ?? "?"}`);
-    setW("#hm-hpbar", hp, sheet.max_hp ?? 1);
-    setT("#hm-sptext", `${sp} / ${sheet.max_sp ?? "?"}`);
-    setW("#hm-spbar", sp, sheet.max_sp ?? 1);
+    // 血量/魔力改成跟著戰鬥訊息一行一行跳（見 _drip → _applyBar），這裡不再每次
+    // 輪詢就秒跳成真實值，免得畫面跑到訊息前面、看起來對不上。只有佇列真的空了
+    // （沒東西可以動畫）才拿真實值校正，避免長期漂太遠。
+    if (!this._queue.length) this._applyBar(hp, sp);
     setT("#hk-kills", status.kills);
     setT("#hk-exp", `+${status.base_exp} / +${status.job_exp}`);
     setT("#hk-zeny", `+${status.zeny}`);
@@ -727,6 +757,8 @@ Screens.home = {
       : ((status?.combat_state || this._combatState) === "combat" ? "交戰中" : "等待下一回合");
     const hp = status?.character?.hunt_hp ?? sheet.hunt_hp ?? sheet.max_hp ?? 0;
     const sp = status?.character?.hunt_sp ?? sheet.hunt_sp ?? sheet.max_sp ?? 0;
+    this._barHp = hp;   // 首次畫面就是這個值，之後跟著戰鬥訊息（_applyBar）走
+    this._barSp = sp;
 
     const ann = this._announce && this._announce.text;
     let html = ann
@@ -760,7 +792,7 @@ Screens.home = {
         <div class="card">
           <div class="section-title"><h3>掛機中</h3>
              <span class="pill good" id="hk-mon">${esc(monName(status.monster_id))}</span></div>
-          <div class="log" id="huntlog" style="margin-top:8px">${this._shown.join("\n") || "<span class='dim'>搜尋目標中…</span>"}</div>
+          <div class="log" id="huntlog" style="margin-top:8px">${linesToHtml(this._shown).join("\n") || "<span class='dim'>搜尋目標中…</span>"}</div>
           <div class="kv" style="margin-top:8px"><span class="k">狀態</span><span class="sub" id="hk-state">${combatLabel}</span></div>
           <div class="kv"><span class="k">擊殺</span><span id="hk-kills">${status.kills}</span></div>
           <div class="kv"><span class="k">本場經驗</span><span id="hk-exp">+${status.base_exp} / +${status.job_exp}</span></div>

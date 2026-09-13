@@ -2,7 +2,7 @@ import random
 from dataclasses import dataclass, field
 
 from server.combat import elements
-from server.combat.events import AttackEvent, FledEvent, HealEvent, KillEvent
+from server.combat.events import AttackEvent, FledEvent, HealEvent, KillEvent, SkillEvent
 from server.combat.formulas import (
     CRIT_MULTIPLIER, attacks_this_round, crit_chance, hit_chance, physical_damage,
 )
@@ -10,6 +10,30 @@ from server.combat.skills import cast_skill
 from server.combat.status import tick_statuses
 
 MAX_ROUNDS_DEFAULT = 500
+
+
+class _PlayerTrackingEvents(list):
+    """事件一產生就把玩家(a)當下的 HP/SP 貼上去，前端才能照事件播放的節奏同步
+    血條/魔條，而不是每次輪詢整條線跳到最終值——臨場感比嚴格即時精準重要。"""
+
+    def __init__(self, player):
+        super().__init__()
+        self._player = player
+
+    def _stamp(self, event):
+        event.player_hp = self._player.hp
+        event.player_sp = self._player.sp
+        return event
+
+    def append(self, event):
+        super().append(self._stamp(event))
+
+    def extend(self, events):
+        super().extend(self._stamp(e) for e in events)
+
+    def __iadd__(self, events):
+        self.extend(events)
+        return self
 
 
 @dataclass
@@ -179,9 +203,19 @@ def _take_turn(actor, foe, rng, events, min_sp_frac: float = 0.0):
         _auto_attack(actor, foe, rng, events)
         return
     skill = _pick_skill(actor, min_sp_frac, foe)
-    if skill and actor.spend_sp(skill.sp_cost):
+    consumes_all_sp = skill is not None and any(
+        e.get("consumes_all_sp") for e in skill.effects)
+    sp_used = actor.sp if consumes_all_sp else (skill.sp_cost if skill else 0)
+    if skill and actor.spend_sp(sp_used):
         # cast_skill 內部按 effect 型別分流：heal_hp/buff 作用在 actor，其餘作用在 foe
-        events += cast_skill(actor, foe, skill, rng)
+        # 阿修羅霸王拳這類 consumes_all_sp 技能：打光多少 SP 就傳進去讓威力等比放大
+        skill_events = cast_skill(actor, foe, skill, rng,
+                                  sp_used=sp_used if consumes_all_sp else None)
+        if sp_used:  # 標上這次實際扣的 SP，前端才能顯示「耗 XX SP」
+            for ev in skill_events:
+                if isinstance(ev, SkillEvent):
+                    ev.sp_cost = sp_used
+        events += skill_events
         skill._cd_left = skill.cooldown_rounds
         # buff / 補血技能不吃施法後延遲（不然開場先普攻很怪）
         if any(e.get("type") in ("physical_hit", "magic_hit", "aoe") for e in skill.effects):
@@ -195,7 +229,7 @@ def simulate_fight(a, b, rng: random.Random, max_rounds: int = MAX_ROUNDS_DEFAUL
                    a_potion_heal: int = 0, a_potion_hp_frac: float = 0.0,
                    a_skill_min_sp_frac: float = 0.0, a_sp_potions: int = 0,
                    a_sp_potion_restore: int = 0, a_sp_potion_frac: float = 0.0) -> FightResult:
-    events: list = []
+    events: list = _PlayerTrackingEvents(a)
     rounds = 0
     potions_used = 0
     sp_potions_used = 0

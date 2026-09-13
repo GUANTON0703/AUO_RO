@@ -12,16 +12,16 @@ def _seq(v, level: int):
     return v[min(level, len(v)) - 1] if isinstance(v, list) else v
 
 
-def cast_skill(caster, target, skill, rng: random.Random) -> list:
+def cast_skill(caster, target, skill, rng: random.Random, sp_used: int | None = None) -> list:
     events: list = []
     for eff in skill.effects:
         t = eff.get("type")
         if t == "physical_hit":
-            events += _physical_skill(caster, target, skill, eff, rng)
+            events += _physical_skill(caster, target, skill, eff, rng, sp_used)
         elif t == "aoe":
             # 範圍技：施法職走魔法傷害，其餘走物理（magnum break 之類）
             fn = _magic_skill if caster.is_caster else _physical_skill
-            events += fn(caster, target, skill, eff, rng)
+            events += fn(caster, target, skill, eff, rng, sp_used)
         elif t == "magic_hit":
             events += _magic_skill(caster, target, skill, eff, rng)
         elif t == "heal_hp":
@@ -50,8 +50,17 @@ def _apply_poison(target, level: int, events: list) -> None:
                                  skill_name="中毒"))
 
 
-def _physical_skill(caster, target, skill, eff, rng):
-    power = _seq(eff.get("power_pct", 100), skill.level) / 100
+def _sp_scaled_power(power, eff, skill, sp_used):
+    """consumes_all_sp 技能（阿修羅霸王拳）：威力隨實際打光的 SP 等比放大，
+    以該等級的 sp_cost 為基準倍率 1；SP 存越多，出招當下扣越多、傷害越高。"""
+    if eff.get("consumes_all_sp") and sp_used is not None and skill.sp_cost > 0:
+        return power * sp_used / skill.sp_cost
+    return power
+
+
+def _physical_skill(caster, target, skill, eff, rng, sp_used=None):
+    power = _sp_scaled_power(_seq(eff.get("power_pct", 100), skill.level) / 100,
+                             eff, skill, sp_used)
     hits = _seq(eff.get("hits", 1), skill.level)
     element = eff.get("element")
     mult, resist, race = elements.damage_mods(caster, target, element)
@@ -77,8 +86,9 @@ def _physical_skill(caster, target, skill, eff, rng):
     return out
 
 
-def _magic_skill(caster, target, skill, eff, rng):
-    power = _seq(eff.get("power_pct", 100), skill.level) / 100
+def _magic_skill(caster, target, skill, eff, rng, sp_used=None):
+    power = _sp_scaled_power(_seq(eff.get("power_pct", 100), skill.level) / 100,
+                             eff, skill, sp_used)
     hits = _seq(eff.get("hits", 1), skill.level)
     mult, resist, race = elements.damage_mods(caster, target, eff.get("element"))
     total = 0

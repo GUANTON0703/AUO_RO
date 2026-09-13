@@ -39,6 +39,11 @@
 
   window.ROFightView = { playbackDelayMs };
 
+  // combatLogLines 回傳 {html,hp,sp}；本地備援分支回傳純字串。兩種都能顯示。
+  function htmlOf(lines) {
+    return (lines || []).map((l) => (l && typeof l === "object") ? l.html : l);
+  }
+
   function fightLogLines(events) {
     // 掛機播放與 MVP 挑戰共用 combatLogLines（連續普攻併行、你打/你被打分色）
     if (typeof window.combatLogLines === "function") return window.combatLogLines(events);
@@ -159,7 +164,7 @@
         if (this._fightTimer) { clearTimeout(this._fightTimer); this._fightTimer = null; }
         const el = document.querySelector(this._fightLogSel);
         if (settle && el) {
-          el.innerHTML = lines.join("\n");
+          el.innerHTML = htmlOf(lines).join("\n");
           el.scrollTop = el.scrollHeight;
           done();
         }
@@ -173,7 +178,7 @@
         const el = document.querySelector(this._fightLogSel);
         if (!el) { end(false); return; }
         if (document.hidden) { end(true); return; }
-        el.innerHTML = lines.slice(0, i + 1).join("\n");
+        el.innerHTML = htmlOf(lines.slice(0, i + 1)).join("\n");
         el.scrollTop = el.scrollHeight;
         i += 1;
         if (i < lines.length) this._fightTimer = setTimeout(tick, step);

@@ -4,6 +4,10 @@ from dataclasses import dataclass, field
 @dataclass
 class CombatEvent:
     kind: str = field(init=False, default="event")
+    # 事件產生當下，玩家的即時 HP/SP（由 engine 產生事件時貼上）。前端照事件播放
+    # 節奏同步血條/魔條，用這個而不是每次輪詢就整條線跳到最終值，才有臨場感。
+    player_hp: int | None = field(init=False, default=None)
+    player_sp: int | None = field(init=False, default=None)
 
 
 @dataclass
@@ -25,6 +29,7 @@ class SkillEvent(CombatEvent):
     skill_id: str
     skill_name: str
     damage: int = 0
+    sp_cost: int = 0    # 這次施放實際扣掉的 SP（consumes_all_sp 技能會是當下全部庫存）
 
     def __post_init__(self):
         self.kind = "skill"
