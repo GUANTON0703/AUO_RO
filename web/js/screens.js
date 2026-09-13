@@ -528,9 +528,7 @@ Screens.home = {
     setT("#hk-kills", status.kills);
     setT("#hk-exp", `+${status.base_exp} / +${status.job_exp}`);
     setT("#hk-zeny", `+${status.zeny}`);
-    setT("#hk-state", status.still_fighting
-      ? "戰鬥中（對手比較肉，可能要等一下才有新紀錄）"
-      : (this._combatState === "combat" ? "交戰中" : "等待下一回合"));
+    setT("#hk-state", "戰鬥中");
     setT("#hm-zeny", progression.zeny ?? c.zeny);
     setT("#hk-mon", monName(status.monster_id));
     setT("#hk-time", Math.floor(App.huntSecsShown()) + " 秒");
@@ -752,9 +750,7 @@ Screens.home = {
     const jNext = jMaxed ? 0 : Curve.jobNext(progression.job_level, tier);
     const bPct = xpProgress(progression.base_exp, bNext, bMaxed).percent;
     const jPct = xpProgress(progression.job_exp, jNext, jMaxed).percent;
-    const combatLabel = status?.still_fighting
-      ? "戰鬥中（對手比較肉，可能要等一下才有新紀錄）"
-      : ((status?.combat_state || this._combatState) === "combat" ? "交戰中" : "等待下一回合");
+    const combatLabel = "戰鬥中";
     const hp = status?.character?.hunt_hp ?? sheet.hunt_hp ?? sheet.max_hp ?? 0;
     const sp = status?.character?.hunt_sp ?? sheet.hunt_sp ?? sheet.max_sp ?? 0;
     this._barHp = hp;   // 首次畫面就是這個值，之後跟著戰鬥訊息（_applyBar）走
