@@ -1,5 +1,13 @@
 // screen-more — MVP 挑戰 / 面對面交易 / GM 面板 / 登出
 (() => {
+  // 哪張地圖有這隻怪，圖鑑的掉落來源用來連去掛機畫面直接選那張地圖
+  function monsterMapId(monsterId) {
+    for (const m of Object.values(S.catalog.maps || {})) {
+      if ((m.monster_ids || []).includes(monsterId)) return m.id;
+    }
+    return null;
+  }
+
   function playbackDelayMs(rounds, lineCount) {
     const lines = Math.max(1, Number(lineCount) || 1);
     const floor = Math.max(7000, Math.max(0, Number(rounds) || 0) * 800);
@@ -424,13 +432,15 @@
 
     _dexDropSources(itemId) {
       const out = [];
-      const scan = (coll) => Object.values(coll || {}).forEach((m) => {
+      // MVP 沒有對應的「去掛機」——挑戰是另一套流程，掉落來源不給地圖連結
+      const scan = (coll, isMvp) => Object.values(coll || {}).forEach((m) => {
         for (const d of m.drops || []) {
-          if (d.item_id === itemId) out.push({ name: m.name, rate: d.rate });
+          if (d.item_id === itemId) out.push({ name: m.name, rate: d.rate,
+            mapId: isMvp ? null : monsterMapId(m.id) });
         }
       });
-      scan(S.catalog.monsters);
-      scan(S.catalog.mvps);
+      scan(S.catalog.monsters, false);
+      scan(S.catalog.mvps, true);
       return out.sort((a, b) => b.rate - a.rate);
     },
 
@@ -472,7 +482,12 @@
       box.innerHTML = rows.length ? rows.map((r) => {
         const amtTxt = `${r.amt >= 0 ? "+" : ""}${r.amt}${r.isPct ? "%" : ""}`;
         const where = r.drops.length
-          ? r.drops.slice(0, 4).map((d) => `${esc(d.name)} ${pct(d.rate)}`).join("、")
+          ? r.drops.slice(0, 4).map((d) => {
+              const label = `${esc(d.name)} ${pct(d.rate)}`;
+              return d.mapId
+                ? `<a href="#" class="dex-map-link" data-map="${d.mapId}">${label}</a>`
+                : label;
+            }).join("、")
           : (r.buy ? `商店買（${r.buy}z）` : "取得方式不明");
         return `<div class="item">
           <div>${esc(r.name)}<span class="pill" style="margin-left:6px">${r.srcKind}</span>
@@ -481,6 +496,13 @@
           </div>
         </div>`;
       }).join("") : `<p class="muted">沒有裝備或卡片有加這個屬性。</p>`;
+      box.querySelectorAll(".dex-map-link").forEach((a) => {
+        a.onclick = (ev) => {
+          ev.preventDefault();
+          S._pendingHuntMap = a.dataset.map;
+          App.navigate("hunt");
+        };
+      });
     },
 
     // ---------- 角色切換 / 轉帳 ----------
