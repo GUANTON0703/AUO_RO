@@ -69,7 +69,10 @@
       };
       const wornSlot = (slot) => (inv.equipment || []).find((e) =>
         e.equipped_slot === (slot === "accessory" ? "accessory1" : slot));
-      const cmpLine = (eq) => equipCompareLine(wornSlot(eq.slot)?.equipment_id, eq.id);
+      const cmpLine = (eq) => {
+        const w = wornSlot(eq.slot);
+        return equipCompareLine(w && { id: w.equipment_id, refine: w.refine || 0 }, { id: eq.id, refine: 0 });
+      };
       const eqRow = (eq) => {
         const d = gearDesc(eq.id);
         return `

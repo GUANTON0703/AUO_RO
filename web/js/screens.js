@@ -199,7 +199,8 @@ function combatLogLines(events, opts) {
       i = j - 1;
       line(`<span class="${side(e.actor, e.target)}">  ${esc(e.actor)} 攻擊 ${esc(e.target)} → ${nums.join(" ")}</span>`, last);
     } else if (e.kind === "skill") {
-      const dmg = e.damage ? ` → ${e.damage}` : "";
+      const dmg = e.damage
+        ? (e.crit ? ` → <span class="crit-hit">${e.damage}爆</span>` : ` → ${e.damage}`) : "";
       const cost = e.sp_cost ? `　<span class="dim">(耗 ${e.sp_cost} SP)</span>` : "";
       const tgt = e.target && e.target !== e.actor ? `對 ${esc(e.target)} ` : "";
       // 被動技能觸發時用「觸發」而不是「施放」，才不會看起來像主動放招
@@ -268,13 +269,24 @@ function cardDesc(id) {
   return (c.effects || []).map(effectText).filter(Boolean).join("、");
 }
 
+// 精煉每級加多少（跟 server/loot/refine.py::REFINE_BONUS_PER_LEVEL 對齊）
+const REFINE_BONUS_PER_LEVEL = { atk: 2, matk: 2, defense: 1, mdef: 1, flee: 1, hit: 1, crit: 1 };
+// 裝備基礎數值套上精煉加成後的實際數值——顯示、比較都要用這個，不能只看底板
+function refinedStats(baseStats, refine) {
+  if (!refine) return baseStats || {};
+  const out = { ...(baseStats || {}) };
+  for (const k of Object.keys(REFINE_BONUS_PER_LEVEL)) {
+    if (k in out) out[k] += REFINE_BONUS_PER_LEVEL[k] * refine;
+  }
+  return out;
+}
+
 // 裝備跟目前穿著的同部位比一比，逐項標好/差（商店買裝備、背包裝備清單共用）。
-// wornEqId 是目前那個部位穿的裝備 id（沒穿傳 null/undefined），candidateEqId 是要比較的那件。
-function equipCompareLine(wornEqId, candidateEqId) {
-  const a = S.catalog?.equipment?.[candidateEqId]?.stats || {};
-  if (!wornEqId) return `<span style="color:var(--good)">目前這個部位沒穿，直接升級</span>`;
-  if (wornEqId === candidateEqId) return "";   // 就是自己身上這件，不用比
-  const b = S.catalog?.equipment?.[wornEqId]?.stats || {};
+// worn/candidate 是 {id, refine} 或 null（那個部位沒穿）；refine 沒帶就當 +0。
+function equipCompareLine(worn, candidate) {
+  const a = refinedStats(S.catalog?.equipment?.[candidate?.id]?.stats, candidate?.refine || 0);
+  if (!worn || !worn.id) return `<span style="color:var(--good)">目前這個部位沒穿，直接升級</span>`;
+  const b = refinedStats(S.catalog?.equipment?.[worn.id]?.stats, worn.refine || 0);
   const Z = STAT_ZH || {};
   const col = (c, t) => `<span style="color:var(--${c})">${t}</span>`;
   const parts = [...new Set([...Object.keys(a), ...Object.keys(b)])].map((k) => {
@@ -285,7 +297,9 @@ function equipCompareLine(wornEqId, candidateEqId) {
     if (!dd) return col("muted", `${zh}+${av}`);
     return col(dd > 0 ? "good" : "bad", `${zh}+${av}（${dd > 0 ? "↑" : "↓"}${Math.abs(dd)}）`);
   });
-  return `比現在的「${esc(itemName(wornEqId))}」：` + parts.join("　");
+  if (!parts.length) return "";
+  const wornLabel = itemName(worn.id) + (worn.refine ? ` +${worn.refine}` : "");
+  return `比現在的「${esc(wornLabel)}」：` + parts.join("　");
 }
 
 // 所有配方會用到的材料 item_id 集合，掛機撿到清單用來標「製作材料」，提醒不要手滑賣掉
@@ -300,13 +314,14 @@ function craftMaterialIds() {
   return set;
 }
 
-// 裝備 / 卡片說明字串
-function gearDesc(id) {
+// 裝備 / 卡片說明字串。refine 帶了就把精煉加成套進數值裡一起顯示，
+// 不然背包裡 +8 的裝備看起來會跟商店貨架上的 +0 一模一樣。
+function gearDesc(id, refine) {
   const eq = S.catalog?.equipment?.[id];
   if (eq) {
     const parts = [];
     parts.push(SLOT_ZH[eq.slot] || eq.slot);
-    const st = Object.entries(eq.stats || {}).map(([k, v]) =>
+    const st = Object.entries(refinedStats(eq.stats, refine || 0)).map(([k, v]) =>
       `${STAT_ZH[k] || k} ${v > 0 ? "+" : ""}${v}`);
     if (st.length) parts.push(st.join(" "));
     if (eq.element && eq.element !== "neutral") parts.push(`${ELEM_ZH[eq.element] || eq.element}屬`);

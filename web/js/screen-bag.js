@@ -102,12 +102,12 @@
       const baseSlot = (s) => (s === "accessory1" || s === "accessory2" ? "accessory" : s);
       const slotOf = (eqId) => S.catalog?.equipment?.[eqId]?.slot || "";
 
-      // 目前每個部位穿著什麼（給沒穿的同部位裝備當比較基準）——飾品有兩格，跟商店
-      // 比較邏輯一樣只拿 accessory1 當基準。
-      const wornEqIdBySlot = {};   // 部位 → 目前穿的 equipment_id
+      // 目前每個部位穿著什麼（給沒穿的同部位裝備當比較基準，含精煉）——飾品有兩格，
+      // 跟商店比較邏輯一樣只拿 accessory1 當基準。
+      const wornBySlotId = {};   // 部位 → {id, refine}
       for (const inst of inv.equipment || []) {
         if (inst.equipped_slot == null || inst.equipped_slot === "accessory2") continue;
-        wornEqIdBySlot[baseSlot(inst.equipped_slot)] = inst.equipment_id;
+        wornBySlotId[baseSlot(inst.equipped_slot)] = { id: inst.equipment_id, refine: inst.refine || 0 };
       }
 
       // 部位篩選下拉：只列出背包裡實際有的部位
@@ -129,7 +129,8 @@
           }).join("、");
           const slotZh = equipped ? `　裝備中（${SLOT_ZH[inst.equipped_slot] || inst.equipped_slot}）` : "";
           const cmp = !equipped
-            ? equipCompareLine(wornEqIdBySlot[slotOf(inst.equipment_id)], inst.equipment_id) : "";
+            ? equipCompareLine(wornBySlotId[slotOf(inst.equipment_id)],
+                               { id: inst.equipment_id, refine: inst.refine || 0 }) : "";
           const wornLine = cmp ? `<div class="sub">${cmp}</div>` : "";
           const def = S.catalog?.equipment?.[inst.equipment_id];
           const canRefine = def && def.refinable !== false && (inst.refine || 0) < 10;
@@ -142,7 +143,7 @@
           return `
         <div class="item" style="align-items:flex-start">
           <div>${esc(eqName(inst.equipment_id))}${inst.refine ? ` <span class="pill good">+${inst.refine}</span>` : ""}
-            <div class="sub">${esc(gearDesc(inst.equipment_id) || "")}${slotZh}${cards ? `　卡：${esc(cards)}` : ""}</div>
+            <div class="sub">${esc(gearDesc(inst.equipment_id, inst.refine || 0) || "")}${slotZh}${cards ? `　卡：${esc(cards)}` : ""}</div>
             ${wornLine}
             ${refLine}
             <div class="row tight" style="margin-top:6px">

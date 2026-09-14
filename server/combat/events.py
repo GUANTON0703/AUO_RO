@@ -30,6 +30,7 @@ class SkillEvent(CombatEvent):
     skill_name: str
     damage: int = 0
     sp_cost: int = 0    # 這次施放實際扣掉的 SP（consumes_all_sp 技能會是當下全部庫存）
+    crit: bool = False  # 這次命中裡有沒有任何一擊是爆擊（多段技能有一擊爆就算）
 
     def __post_init__(self):
         self.kind = "skill"

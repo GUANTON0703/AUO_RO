@@ -65,6 +65,7 @@ def _physical_skill(caster, target, skill, eff, rng, sp_used=None):
     element = eff.get("element")
     mult, resist, race = elements.damage_mods(caster, target, element)
     total = landed = 0
+    crit_any = False
     for _ in range(hits):
         crit = rng.random() < crit_chance(caster.effective_crit)
         if not crit and rng.random() >= max(
@@ -77,10 +78,11 @@ def _physical_skill(caster, target, skill, eff, rng, sp_used=None):
                               resist_pct=resist, race_pct=race, rng=rng)
         if crit:
             dmg = round(dmg * getattr(caster, "crit_mult", CRIT_MULTIPLIER))
+            crit_any = True
         target.take_damage(dmg)
         total += dmg
     out = [SkillEvent(actor=caster.name, target=target.name, skill_id=skill.skill_id,
-                      skill_name=skill.name, damage=total)]
+                      skill_name=skill.name, damage=total, crit=crit_any)]
     if landed and eff.get("debuff") == "poison":
         _apply_poison(target, skill.level, out)
     return out
