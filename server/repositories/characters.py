@@ -143,8 +143,9 @@ def clear_hunt_state(character_id: int) -> None:
 
 def update_hunt_progress(character_id: int, *, hp, sp, last_settled_at,
                          kills=0, base_exp=0, job_exp=0, zeny=0, seconds=0.0,
-                         potions_used=0, sp_potions_used=0, potion_zeny_spent=0) -> None:
-    with connection.get_connection() as conn:
+                         potions_used=0, sp_potions_used=0, potion_zeny_spent=0,
+                         conn=None) -> None:
+    with connection.use(conn) as conn:
         conn.execute(
             "UPDATE characters SET hunt_hp = ?, hunt_sp = ?, hunt_last_settled_at = ?, "
             "hunt_kills = hunt_kills + ?, hunt_base_exp = hunt_base_exp + ?, "
@@ -158,8 +159,8 @@ def update_hunt_progress(character_id: int, *, hp, sp, last_settled_at,
         )
 
 
-def add_hunt_potion_zeny_spent(character_id: int, amount: int) -> None:
-    with connection.get_connection() as conn:
+def add_hunt_potion_zeny_spent(character_id: int, amount: int, conn=None) -> None:
+    with connection.use(conn) as conn:
         conn.execute(
             "UPDATE characters SET hunt_potion_zeny_spent = hunt_potion_zeny_spent + ? "
             "WHERE id = ?", (amount, character_id),
@@ -172,9 +173,9 @@ def update_hunt_target(character_id: int, monster_id: str) -> None:
                      (monster_id, character_id))
 
 
-def adjust_zeny(character_id: int, delta: int) -> int:
+def adjust_zeny(character_id: int, delta: int, conn=None) -> int:
     """加減 Zeny，回傳結果。不會低於 0。"""
-    with connection.get_connection() as conn:
+    with connection.use(conn) as conn:
         conn.execute(
             "UPDATE characters SET zeny = MAX(0, zeny + ?) WHERE id = ?",
             (delta, character_id),
@@ -283,8 +284,8 @@ def set_recipe_mastery(character_id: int, mastery: dict) -> None:
 
 
 def apply_progression(character_id: int, *, base_level: int, base_exp: int,
-                      job_level: int, job_exp: int, zeny_delta: int) -> None:
-    with connection.get_connection() as conn:
+                      job_level: int, job_exp: int, zeny_delta: int, conn=None) -> None:
+    with connection.use(conn) as conn:
         conn.execute(
             """
             UPDATE characters SET
@@ -296,8 +297,8 @@ def apply_progression(character_id: int, *, base_level: int, base_exp: int,
         )
 
 
-def merge_hunt_loot(character_id: int, loot_delta: dict, pity_replace: dict) -> None:
-    with connection.get_connection() as conn:
+def merge_hunt_loot(character_id: int, loot_delta: dict, pity_replace: dict, conn=None) -> None:
+    with connection.use(conn) as conn:
         row = conn.execute(
             "SELECT hunt_loot FROM characters WHERE id = ?", (character_id,)
         ).fetchone()
@@ -310,9 +311,9 @@ def merge_hunt_loot(character_id: int, loot_delta: dict, pity_replace: dict) -> 
         )
 
 
-def reduce_hunt_loot(character_id: int, sold: dict) -> None:
+def reduce_hunt_loot(character_id: int, sold: dict, conn=None) -> None:
     """自動賣掉的道具從本場撿到清單扣掉（顯示的是「留下的」）。"""
-    with connection.get_connection() as conn:
+    with connection.use(conn) as conn:
         row = conn.execute(
             "SELECT hunt_loot FROM characters WHERE id = ?", (character_id,)
         ).fetchone()

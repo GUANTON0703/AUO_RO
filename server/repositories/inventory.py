@@ -9,8 +9,8 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def add_item(character_id: int, item_id: str, qty: int) -> None:
-    with connection.get_connection() as conn:
+def add_item(character_id: int, item_id: str, qty: int, conn=None) -> None:
+    with connection.use(conn) as conn:
         conn.execute(
             """
             INSERT INTO character_items (character_id, item_id, qty)
@@ -22,8 +22,10 @@ def add_item(character_id: int, item_id: str, qty: int) -> None:
         )
 
 
-def item_qty(character_id: int, item_id: str) -> int:
-    with connection.get_connection() as conn:
+def item_qty(character_id: int, item_id: str, conn=None) -> int:
+    # 帶 conn 進來時要用同一條連線讀，不然看不到同一筆交易裡剛寫進去、
+    # 還沒 commit 的東西（例如結算裡剛 apply_drops 進背包、接著就要自動賣掉）。
+    with connection.use(conn) as conn:
         row = conn.execute(
             "SELECT qty FROM character_items WHERE character_id = ? AND item_id = ?",
             (character_id, item_id),
@@ -31,24 +33,27 @@ def item_qty(character_id: int, item_id: str) -> int:
         return row["qty"] if row else 0
 
 
-def consume_item(character_id: int, item_id: str, qty: int) -> bool:
-    with connection.transaction() as conn:
-        row = conn.execute(
+def consume_item(character_id: int, item_id: str, qty: int, conn=None) -> bool:
+    # 帶著外部 conn 進來時，那個外層交易本身已經序列化了併發寫入
+    # （見 hunt.py 的 BEGIN IMMEDIATE claim），不用再包一層 BEGIN IMMEDIATE。
+    ctx = connection.use(conn) if conn is not None else connection.transaction()
+    with ctx as c:
+        row = c.execute(
             "SELECT qty FROM character_items WHERE character_id = ? AND item_id = ?",
             (character_id, item_id),
         ).fetchone()
         have = row["qty"] if row else 0
         if have < qty:
             return False
-        conn.execute(
+        c.execute(
             "UPDATE character_items SET qty = qty - ? WHERE character_id = ? AND item_id = ?",
             (qty, character_id, item_id),
         )
         return True
 
 
-def add_equipment(character_id: int, equipment_id: str, refine: int = 0) -> int:
-    with connection.get_connection() as conn:
+def add_equipment(character_id: int, equipment_id: str, refine: int = 0, conn=None) -> int:
+    with connection.use(conn) as conn:
         cur = conn.execute(
             """
             INSERT INTO character_equipment
@@ -129,13 +134,14 @@ def grant_starter_kit(character_id: int) -> None:
     add_item(character_id, "fly_wing", 5)
 
 
-def apply_drops(character_id: int, drops: dict) -> None:
+def apply_drops(character_id: int, drops: dict, conn=None) -> None:
     content = load_content()
-    for item_id, qty in (drops or {}).items():
-        if qty <= 0:
-            continue
-        if item_id in content.equipment:
-            for _ in range(qty):
-                add_equipment(character_id, item_id)
-        else:
-            add_item(character_id, item_id, qty)
+    with connection.use(conn) as conn:
+        for item_id, qty in (drops or {}).items():
+            if qty <= 0:
+                continue
+            if item_id in content.equipment:
+                for _ in range(qty):
+                    add_equipment(character_id, item_id, conn=conn)
+            else:
+                add_item(character_id, item_id, qty, conn=conn)

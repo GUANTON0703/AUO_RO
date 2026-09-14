@@ -374,7 +374,7 @@ def _auto_buy_buff_potions(character_id: int, strategy, base_level: int = 1) -> 
     return total_cost
 
 
-def _auto_sell(character_id: int, strategy) -> int:
+def _auto_sell(character_id: int, strategy, conn=None) -> int:
     """每次結算把 sell_item_ids 裡的道具整批賣掉，回傳賣得的 Zeny。"""
     gained = 0
     sold: dict = {}
@@ -382,13 +382,13 @@ def _auto_sell(character_id: int, strategy) -> int:
         item = _content.items.get(iid)
         if item is None:
             continue
-        qty = inventory.item_qty(character_id, iid)
-        if qty > 0 and inventory.consume_item(character_id, iid, qty):
+        qty = inventory.item_qty(character_id, iid, conn=conn)
+        if qty > 0 and inventory.consume_item(character_id, iid, qty, conn=conn):
             gained += item_sell_price(item) * qty
             sold[iid] = qty
     if gained:
-        characters_repo.adjust_zeny(character_id, gained)
-        characters_repo.reduce_hunt_loot(character_id, sold)
+        characters_repo.adjust_zeny(character_id, gained, conn=conn)
+        characters_repo.reduce_hunt_loot(character_id, sold, conn=conn)
     return gained
 
 
@@ -745,21 +745,6 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
     new_bl, new_bexp, _ = apply_base_exp(row["base_level"], row["base_exp"], result.base_exp)
     new_jl, new_jexp, _ = apply_job_exp(row["job_level"], row["job_exp"],
                                         result.job_exp, job.tier)
-    characters_repo.apply_progression(
-        row["id"], base_level=new_bl, base_exp=new_bexp,
-        job_level=new_jl, job_exp=new_jexp, zeny_delta=result.zeny,
-    )
-    characters_repo.merge_hunt_loot(row["id"], result.drops, result.pity_out)
-    inventory.apply_drops(row["id"], result.drops)
-    # HP / SP 藥水若是同一個道具（例：蜂王乳），合併扣一次
-    _spent: dict[str, int] = {}
-    if potion_id and result.potions_used:
-        _spent[potion_id] = _spent.get(potion_id, 0) + result.potions_used
-    if sp_potion_id and result.sp_potions_used:
-        _spent[sp_potion_id] = _spent.get(sp_potion_id, 0) + result.sp_potions_used
-    for _pid, _n in _spent.items():
-        inventory.consume_item(row["id"], _pid, _n)
-    sell_gain = _auto_sell(row["id"], strategy)
 
     # 線上結算只「用掉」湊完整場戰鬥的時間，剩下的留給下次 → 玩家一直輪詢
     # 也不會把零碎時間燒光。離線批次結算則整段吃掉。
@@ -781,14 +766,34 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
         drain = round(player.max_hp * drain_pct / 100 * ticks)
         final_hp = max(1, final_hp - drain)
 
-    characters_repo.update_hunt_progress(
-        row["id"], hp=final_hp, sp=result.final_sp,
-        last_settled_at=settled_until.isoformat(),
-        kills=result.kills, base_exp=result.base_exp,
-        job_exp=result.job_exp, zeny=result.zeny + sell_gain,
-        seconds=hunt_secs_delta,
-        potions_used=result.potions_used, sp_potions_used=result.sp_potions_used,
-    )
+    # HP / SP 藥水若是同一個道具（例：蜂王乳），合併扣一次
+    _spent: dict[str, int] = {}
+    if potion_id and result.potions_used:
+        _spent[potion_id] = _spent.get(potion_id, 0) + result.potions_used
+    if sp_potion_id and result.sp_potions_used:
+        _spent[sp_potion_id] = _spent.get(sp_potion_id, 0) + result.sp_potions_used
+
+    # 這批結算固定會寫的東西全包進同一筆交易，別一項一項各開各的連線——
+    # 人多的時候，SQLite 單一寫入者的鎖會被切成好幾倍次數去搶，反而更卡。
+    with connection.transaction() as conn:
+        characters_repo.apply_progression(
+            row["id"], base_level=new_bl, base_exp=new_bexp,
+            job_level=new_jl, job_exp=new_jexp, zeny_delta=result.zeny, conn=conn,
+        )
+        characters_repo.merge_hunt_loot(row["id"], result.drops, result.pity_out, conn=conn)
+        inventory.apply_drops(row["id"], result.drops, conn=conn)
+        for _pid, _n in _spent.items():
+            inventory.consume_item(row["id"], _pid, _n, conn=conn)
+        sell_gain = _auto_sell(row["id"], strategy, conn=conn)
+        characters_repo.update_hunt_progress(
+            row["id"], hp=final_hp, sp=result.final_sp,
+            last_settled_at=settled_until.isoformat(),
+            kills=result.kills, base_exp=result.base_exp,
+            job_exp=result.job_exp, zeny=result.zeny + sell_gain,
+            seconds=hunt_secs_delta,
+            potions_used=result.potions_used, sp_potions_used=result.sp_potions_used,
+            conn=conn,
+        )
 
     retreated = result.retreated
     retreat_reason = result.retreat_reason

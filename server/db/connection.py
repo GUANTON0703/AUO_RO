@@ -31,7 +31,6 @@ def _prepare(conn: sqlite3.Connection) -> None:
 def get_connection():
     conn = sqlite3.connect(_require_path())
     _prepare(conn)
-    conn.execute("PRAGMA journal_mode=WAL")
     try:
         yield conn
         conn.commit()
@@ -40,6 +39,20 @@ def get_connection():
         raise
     finally:
         conn.close()
+
+
+@contextmanager
+def use(conn=None):
+    """給了現成的 conn 就直接用（commit/close 交給呼叫端管理的那層），沒給
+    才開一條新連線、自動 commit。讓 repo 函式能選擇「跟別的寫入包同一筆交易」
+    還是「自己獨立開一筆」，同一次結算裡一堆小 UPDATE 才不用各開各的連線
+    ——那樣既浪費（每次連線都要走一次 SQLite 的鎖），人多的時候又會在
+    單一寫入者的鎖上排隊排更久。"""
+    if conn is not None:
+        yield conn
+        return
+    with get_connection() as c:
+        yield c
 
 
 @contextmanager
@@ -231,5 +244,8 @@ def _apply_migrations(conn: sqlite3.Connection) -> None:
 def init_db() -> None:
     ddl = _SCHEMA.read_text(encoding="utf-8")
     with get_connection() as conn:
+        # WAL 是寫進資料庫檔案本身的持久設定，開一次就好——之前每條連線
+        # 都重下這個 PRAGMA，純粹白做工。
+        conn.execute("PRAGMA journal_mode=WAL")
         conn.executescript(ddl)
         _apply_migrations(conn)
