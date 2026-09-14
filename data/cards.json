@@ -189,5 +189,12 @@
   {"id": "orc_archer_card", "name": "獸人弓箭手卡片", "monster_id": "orc_archer", "slot": "head", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "dex", "amount": 1}]},
   {"id": "skeleton_prisoner_card", "name": "骷髏囚犯卡片", "monster_id": "skeleton_prisoner", "slot": "head", "drop_rate": 0.0015, "effects": [{"type": "status_immune", "status": "curse"}]},
   {"id": "white_rat_card", "name": "白鼠卡片", "monster_id": "white_rat", "slot": "shoes", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "agi", "amount": 1}]},
-  {"id": "dragonfly_card", "name": "龍蠅卡片", "monster_id": "dragonfly", "slot": "shoes", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 6}]}
+  {"id": "dragonfly_card", "name": "龍蠅卡片", "monster_id": "dragonfly", "slot": "shoes", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "flee", "amount": 6}]},
+  {"id": "clay_doll_card", "name": "泥人卡片", "monster_id": "clay_doll", "slot": "weapon", "drop_rate": 0.002, "effects": [{"type": "percent_stat", "stat": "matk", "pct": 8}]},
+  {"id": "kukre_card", "name": "螃蟹卡片", "monster_id": "kukre", "slot": "shoes", "drop_rate": 0.0025, "effects": [{"type": "flat_stat", "stat": "max_sp", "amount": 15}]},
+  {"id": "verit_card", "name": "威利特卡片", "monster_id": "verit", "slot": "armor", "drop_rate": 0.002, "effects": [{"type": "percent_stat", "stat": "matk", "pct": 5}]},
+  {"id": "bon_gun_card", "name": "冤魂卡片", "monster_id": "bon_gun", "slot": "garment", "drop_rate": 0.002, "effects": [{"type": "flat_stat", "stat": "max_sp", "amount": 30}]},
+  {"id": "wander_man_card", "name": "流浪者卡片", "monster_id": "wander_man", "slot": "head", "drop_rate": 0.0015, "effects": [{"type": "flat_stat", "stat": "int", "amount": 1}]},
+  {"id": "heavy_locust_card", "name": "重金屬蝗蟲卡片", "monster_id": "heavy_locust", "slot": "accessory", "drop_rate": 0.0025, "effects": [{"type": "percent_stat", "stat": "max_sp", "pct": 8}]},
+  {"id": "familiar_thief_bug_card", "name": "浮勒盜蟲卡片", "monster_id": "familiar_thief_bug", "slot": "accessory", "drop_rate": 0.0015, "effects": [{"type": "sp_leech", "pct": 2}]}
 ]

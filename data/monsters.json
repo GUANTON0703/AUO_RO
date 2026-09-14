@@ -442,7 +442,8 @@
     "drops": [
       {"item_id": "sticky_mucus", "rate": 0.5},
       {"item_id": "clover", "rate": 0.2},
-      {"item_id": "blue_potion", "rate": 0.03}
+      {"item_id": "blue_potion", "rate": 0.03},
+      {"item_id": "clay_doll_card", "rate": 0.002}
     ],
     "is_mvp": false,
     "lore": ""
@@ -518,7 +519,8 @@
     "drops": [
       {"item_id": "feather", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.06},
-      {"item_id": "elunium", "rate": 0.04}
+      {"item_id": "elunium", "rate": 0.04},
+      {"item_id": "heavy_locust_card", "rate": 0.0025}
     ],
     "is_mvp": false,
     "lore": ""
@@ -710,7 +712,8 @@
     "drops": [
       {"item_id": "sticky_mucus", "rate": 0.5},
       {"item_id": "oridecon", "rate": 0.1},
-      {"item_id": "jellopy", "rate": 0.4}
+      {"item_id": "jellopy", "rate": 0.4},
+      {"item_id": "familiar_thief_bug_card", "rate": 0.0015}
     ],
     "is_mvp": false,
     "lore": ""
@@ -1089,7 +1092,8 @@
     "drops": [
       {"item_id": "decayed_nail", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.1},
-      {"item_id": "cursed_ruby", "rate": 0.05}
+      {"item_id": "cursed_ruby", "rate": 0.05},
+      {"item_id": "verit_card", "rate": 0.002}
     ],
     "is_mvp": false,
     "lore": "守在金字塔二層的掘墓怪，喜歡收集寶石。"
@@ -1343,7 +1347,8 @@
       {"item_id": "rosary", "rate": 0.25},
       {"item_id": "horrendous_mouth", "rate": 0.2},
       {"item_id": "rosary_1", "rate": 0.02},
-      {"item_id": "elunium", "rate": 0.06}
+      {"item_id": "elunium", "rate": 0.06},
+      {"item_id": "bon_gun_card", "rate": 0.002}
     ],
     "is_mvp": false,
     "lore": "含恨而死的怨靈，會突然暴怒衝過來。"
@@ -1742,7 +1747,8 @@
     "stats": {"max_hp": 389, "max_sp": 0, "atk": 38, "matk": 21, "defense": 4, "mdef": 4, "hit": 38, "flee": 20, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "nipper", "rate": 0.45},
-      {"item_id": "shell", "rate": 0.25}
+      {"item_id": "shell", "rate": 0.25},
+      {"item_id": "kukre_card", "rate": 0.0025}
     ],
     "is_mvp": false,
     "lore": "橫著走、大螯亂夾的紅螃蟹。"
@@ -2350,7 +2356,8 @@
     "stats": {"max_hp": 1760, "max_sp": 0, "atk": 185, "matk": 63, "defense": 0, "mdef": 15, "hit": 97, "flee": 66, "aspd": 100, "crit": 0},
     "drops": [
       {"item_id": "old_manteau", "rate": 0.35},
-      {"item_id": "old_page", "rate": 0.25}
+      {"item_id": "old_page", "rate": 0.25},
+      {"item_id": "wander_man_card", "rate": 0.0015}
     ],
     "is_mvp": false,
     "lore": "披著破斗篷、在神殿外苑徘徊的遊魂。"

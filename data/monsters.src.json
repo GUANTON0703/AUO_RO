@@ -440,7 +440,8 @@
     "drops": [
       {"item_id": "sticky_mucus", "rate": 0.5},
       {"item_id": "clover", "rate": 0.2},
-      {"item_id": "blue_potion", "rate": 0.03}
+      {"item_id": "blue_potion", "rate": 0.03},
+      {"item_id": "clay_doll_card", "rate": 0.002}
     ],
     "is_mvp": false,
     "lore": ""
@@ -516,7 +517,8 @@
     "drops": [
       {"item_id": "feather", "rate": 0.4},
       {"item_id": "oridecon", "rate": 0.06},
-      {"item_id": "elunium", "rate": 0.04}
+      {"item_id": "elunium", "rate": 0.04},
+      {"item_id": "heavy_locust_card", "rate": 0.0025}
     ],
     "is_mvp": false,
     "lore": ""
@@ -708,7 +710,8 @@
     "drops": [
       {"item_id": "sticky_mucus", "rate": 0.5},
       {"item_id": "oridecon", "rate": 0.1},
-      {"item_id": "jellopy", "rate": 0.4}
+      {"item_id": "jellopy", "rate": 0.4},
+      {"item_id": "familiar_thief_bug_card", "rate": 0.0015}
     ],
     "is_mvp": false,
     "lore": ""
@@ -923,7 +926,7 @@
   {
     "id": "verit", "name": "威利特", "level": 36,
     "element": "undead", "race": "demon", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "decayed_nail", "rate": 0.4}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "cursed_ruby", "rate": 0.05}],
+    "drops": [{"item_id": "decayed_nail", "rate": 0.4}, {"item_id": "oridecon", "rate": 0.1}, {"item_id": "cursed_ruby", "rate": 0.05}, {"item_id": "verit_card", "rate": 0.002}],
     "lore": "守在金字塔二層的掘墓怪，喜歡收集寶石。"
   },
   {
@@ -1001,7 +1004,7 @@
   {
     "id": "bon_gun", "name": "冤魂", "level": 43,
     "element": "undead", "race": "undead", "size": "medium", "role": "normal", "gen": true,
-    "drops": [{"item_id": "rosary", "rate": 0.25}, {"item_id": "horrendous_mouth", "rate": 0.2}, {"item_id": "rosary_1", "rate": 0.02}, {"item_id": "elunium", "rate": 0.06}],
+    "drops": [{"item_id": "rosary", "rate": 0.25}, {"item_id": "horrendous_mouth", "rate": 0.2}, {"item_id": "rosary_1", "rate": 0.02}, {"item_id": "elunium", "rate": 0.06}, {"item_id": "bon_gun_card", "rate": 0.002}],
     "lore": "含恨而死的怨靈，會突然暴怒衝過來。"
   },
   {
@@ -1127,7 +1130,7 @@
   {
     "id": "kukre", "name": "螃蟹", "level": 15,
     "element": "earth", "race": "fish", "size": "small", "role": "normal", "gen": true,
-    "drops": [{"item_id": "nipper", "rate": 0.45}, {"item_id": "shell", "rate": 0.25}],
+    "drops": [{"item_id": "nipper", "rate": 0.45}, {"item_id": "shell", "rate": 0.25}, {"item_id": "kukre_card", "rate": 0.0025}],
     "lore": "橫著走、大螯亂夾的紅螃蟹。"
   },
   {
@@ -1319,7 +1322,7 @@
   {
     "id": "wander_man", "name": "流浪者", "level": 50,
     "element": "wind", "race": "demihuman", "size": "medium", "role": "glass", "gen": true,
-    "drops": [{"item_id": "old_manteau", "rate": 0.35}, {"item_id": "old_page", "rate": 0.25}],
+    "drops": [{"item_id": "old_manteau", "rate": 0.35}, {"item_id": "old_page", "rate": 0.25}, {"item_id": "wander_man_card", "rate": 0.0015}],
     "lore": "披著破斗篷、在神殿外苑徘徊的遊魂。"
   },
   {
