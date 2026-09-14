@@ -268,6 +268,26 @@ function cardDesc(id) {
   return (c.effects || []).map(effectText).filter(Boolean).join("、");
 }
 
+// 裝備跟目前穿著的同部位比一比，逐項標好/差（商店買裝備、背包裝備清單共用）。
+// wornEqId 是目前那個部位穿的裝備 id（沒穿傳 null/undefined），candidateEqId 是要比較的那件。
+function equipCompareLine(wornEqId, candidateEqId) {
+  const a = S.catalog?.equipment?.[candidateEqId]?.stats || {};
+  if (!wornEqId) return `<span style="color:var(--good)">目前這個部位沒穿，直接升級</span>`;
+  if (wornEqId === candidateEqId) return "";   // 就是自己身上這件，不用比
+  const b = S.catalog?.equipment?.[wornEqId]?.stats || {};
+  const Z = STAT_ZH || {};
+  const col = (c, t) => `<span style="color:var(--${c})">${t}</span>`;
+  const parts = [...new Set([...Object.keys(a), ...Object.keys(b)])].map((k) => {
+    const zh = Z[k] || k, av = a[k] || 0, bv = b[k] || 0;
+    if (av && !bv) return col("good", `${zh}+${av} 新`);
+    if (!av && bv) return col("warn", `缺${zh}${bv > 0 ? "+" : ""}${bv}`);
+    const dd = av - bv;
+    if (!dd) return col("muted", `${zh}+${av}`);
+    return col(dd > 0 ? "good" : "bad", `${zh}+${av}（${dd > 0 ? "↑" : "↓"}${Math.abs(dd)}）`);
+  });
+  return `比現在的「${esc(itemName(wornEqId))}」：` + parts.join("　");
+}
+
 // 所有配方會用到的材料 item_id 集合，掛機撿到清單用來標「製作材料」，提醒不要手滑賣掉
 let _craftMaterialIdsCache = null;
 function craftMaterialIds() {
@@ -1083,6 +1103,17 @@ Screens.hunt = {
       this._region = saved && regions.includes(saved) ? saved : "";
     } catch (_) { this._region = ""; }
 
+    // 從圖鑑點「去這張地圖掛機」跳過來的 → 直接切到那個地區、選好那張地圖
+    const pendingMap = S._pendingHuntMap;
+    S._pendingHuntMap = null;
+    if (pendingMap && S.catalog.maps[pendingMap]) {
+      const town = S.catalog.maps[pendingMap].town;
+      if (regions.includes(town)) {
+        this._region = town;
+        try { localStorage.setItem("rotxt_hunt_region", this._region); } catch (_) {}
+      }
+    }
+
     const regSel = regions.length > 1
       ? `<select id="hunt-region" style="width:100%;margin-bottom:8px">` +
         `<option value="">全部地區</option>` +
@@ -1093,6 +1124,7 @@ Screens.hunt = {
     this._search = "";
     let mapsOpen = false;
     try { mapsOpen = localStorage.getItem("rotxt_hunt_maps_open") === "1"; } catch (_) {}
+    if (pendingMap) mapsOpen = true;
     const curMapName = S.catalog.maps[S.char.location_map]?.name;
     let html = `<details class="card"${mapsOpen ? " open" : ""} id="maps-details">` +
       `<summary style="cursor:pointer"><h3 style="display:inline">選狩獵地圖${
@@ -1103,6 +1135,10 @@ Screens.hunt = {
       this._strategyCard();
     view().innerHTML = html;
     this._renderMapList();
+    if (pendingMap) {
+      this._selectMap(pendingMap);
+      document.querySelector("#maps-details")?.scrollIntoView({ block: "start" });
+    }
 
     const mapsDetails = document.querySelector("#maps-details");
     if (mapsDetails) mapsDetails.ontoggle = () => {
@@ -1363,8 +1399,8 @@ window.jobName = jobName; window.jobTier = jobTier;
 window.monName = monName; window.mapName = mapName; window.itemName = itemName;
 window.skillName = skillName;
 window.itemDesc = itemDesc; window.gearDesc = gearDesc; window.effectText = effectText;
-window.cardDesc = cardDesc;
+window.cardDesc = cardDesc; window.equipCompareLine = equipCompareLine;
 window.STAT_ZH = STAT_ZH;
 window.skillExplain = skillExplain;
-window.cardDesc = cardDesc; window.SLOT_ZH = SLOT_ZH;
+window.SLOT_ZH = SLOT_ZH;
 window.combatLogLines = combatLogLines;

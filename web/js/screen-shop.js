@@ -69,23 +69,7 @@
       };
       const wornSlot = (slot) => (inv.equipment || []).find((e) =>
         e.equipped_slot === (slot === "accessory" ? "accessory1" : slot));
-      const cmpLine = (eq) => {
-        const a = S.catalog?.equipment?.[eq.id]?.stats || {};
-        const worn = wornSlot(eq.slot);
-        if (!worn) return `<span style="color:var(--good)">目前這個部位沒穿，直接升級</span>`;
-        const b = S.catalog?.equipment?.[worn.equipment_id]?.stats || {};
-        const Z = window.STAT_ZH || {};
-        const col = (c, t) => `<span style="color:var(--${c})">${t}</span>`;
-        const parts = [...new Set([...Object.keys(a), ...Object.keys(b)])].map((k) => {
-          const zh = Z[k] || k, av = a[k] || 0, bv = b[k] || 0;
-          if (av && !bv) return col("good", `${zh}+${av} 新`);
-          if (!av && bv) return col("warn", `缺${zh}${bv > 0 ? "+" : ""}${bv}`);
-          const dd = av - bv;
-          if (!dd) return col("muted", `${zh}+${av}`);
-          return col(dd > 0 ? "good" : "bad", `${zh}+${av}（${dd > 0 ? "↑" : "↓"}${Math.abs(dd)}）`);
-        });
-        return `比現在的「${esc(eqName(worn.equipment_id))}」：` + parts.join("　");
-      };
+      const cmpLine = (eq) => equipCompareLine(wornSlot(eq.slot)?.equipment_id, eq.id);
       const eqRow = (eq) => {
         const d = gearDesc(eq.id);
         return `
