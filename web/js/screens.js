@@ -266,7 +266,8 @@ function itemDesc(id) {
 function cardDesc(id) {
   const c = S.catalog?.cards?.[id];
   if (!c) return "";
-  return (c.effects || []).map(effectText).filter(Boolean).join("、");
+  const fx = (c.effects || []).map(effectText).filter(Boolean).join("、");
+  return fx || "特殊效果";
 }
 
 // 精煉每級加多少（跟 server/loot/refine.py::REFINE_BONUS_PER_LEVEL 對齊）
@@ -339,14 +340,6 @@ function gearDesc(id, refine) {
     return `卡片・插${SLOT_ZH[cd.slot] || cd.slot}${fx ? "・" + fx : ""}`;
   }
   return "";
-}
-
-// 卡片說明：效果 + 可鑲部位（背包卡片區用）
-function cardDesc(id) {
-  const cd = S.catalog?.cards?.[id];
-  if (!cd) return "";
-  const fx = (cd.effects || []).map(effectText).filter(Boolean).join("、");
-  return `${fx || "特殊效果"}　可鑲：${SLOT_ZH[cd.slot] || cd.slot}`;
 }
 
 const Screens = {};

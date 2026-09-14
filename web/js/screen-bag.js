@@ -93,7 +93,7 @@
         return `
         <div class="item" style="align-items:flex-start">
           <div>${esc(itemName(id))}
-            <div class="sub">${esc(cardDesc(id))}　持有 ${held}</div>
+            <div class="sub">${esc(cardDesc(id))}　可鑲：${esc(SLOT_ZH[S.catalog?.cards?.[id]?.slot] || "")}　持有 ${held}</div>
             <div style="margin-top:4px">${status}</div>
           </div>
           ${held > 0 ? `<button class="btn small" data-deposit-item="${id}" data-name="${esc(itemName(id))}">存</button>` : ""}
@@ -296,7 +296,10 @@
           if (!cards.length) return;
           let idx = 0;
           if (cards.length > 1) {
-            const list = cards.map((c, i) => `${i + 1}. ${itemName(c)}`).join("\n");
+            const list = cards.map((c, i) => {
+              const fx = cardDesc(c);
+              return `${i + 1}. ${itemName(c)}${fx ? `：${fx}` : ""}`;
+            }).join("\n");
             const pick = prompt(`要卸哪張卡？輸入編號：\n${list}`, "1");
             if (pick == null) return;
             idx = Math.floor(Number(pick)) - 1;
@@ -351,7 +354,10 @@
         (id) => S.catalog?.cards?.[id] && S.catalog.cards[id].slot === eqSlot,
       );
       if (!cards.length) { App.toast(`背包沒有可鑲「${slotZh}」的卡片`, true); return null; }
-      const list = cards.map((id, i) => `${i + 1}. ${itemName(id)} ×${items[id]}（${slotZh}）`).join("\n");
+      const list = cards.map((id, i) => {
+        const fx = cardDesc(id);
+        return `${i + 1}. ${itemName(id)}${fx ? `：${fx}` : ""} ×${items[id]}`;
+      }).join("\n");
       const pick = prompt(`要鑲哪張卡？這件裝備吃「${slotZh}」卡。輸入編號：\n${list}`, "1");
       if (pick == null) return null;
       const idx = Math.floor(Number(pick)) - 1;
