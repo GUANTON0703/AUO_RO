@@ -291,7 +291,7 @@
         if (lf) {
           const flog = box.querySelector(`#fight-${lf.id}`);
           const fres = box.querySelector(`#result-${lf.id}`);
-          if (flog) { flog.hidden = false; flog.innerHTML = lf.lines.join("\n"); }
+          if (flog) { flog.hidden = false; flog.innerHTML = htmlOf(lf.lines).join("\n"); }
           if (fres) fres.innerHTML = lf.resultHtml;
         }
       } catch (e) { box.innerHTML = `<p class="muted">${esc(e.detail || "載入失敗")}</p>`; }
