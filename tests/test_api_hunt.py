@@ -449,8 +449,8 @@ def test_slow_fight_flags_still_fighting_instead_of_looking_stuck(client, auth, 
     ch = _ready_char(client, h, db_helpers, base_level=20)
     client.post("/api/hunt/start", headers=h, json={"map_id": "prontera_south_field"})
     client.get("/api/hunt/status", headers=h)  # 先消耗掉暖啟動，回到正常線上節奏
-    # 2 秒：超過結算防抖門檻（1.5 秒）會真的跑，但遠不夠打完一場（最少也要 rest_seconds=3 秒）
-    db_helpers.rewind_hunt(ch["id"], seconds=2)
+    # 3 秒：超過結算防抖門檻（2.5 秒）會真的跑，但遠不夠打完一場（最少也要 rest_seconds=3 秒）
+    db_helpers.rewind_hunt(ch["id"], seconds=3)
     status = client.get("/api/hunt/status", headers=h).json()
     assert status["still_fighting"] is True
 
