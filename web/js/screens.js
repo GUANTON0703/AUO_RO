@@ -290,14 +290,16 @@ function equipCompareLine(worn, candidate) {
   const b = refinedStats(S.catalog?.equipment?.[worn.id]?.stats, worn.refine || 0);
   const Z = STAT_ZH || {};
   const col = (c, t) => `<span style="color:var(--${c})">${t}</span>`;
+  // 只講差異，不重複貼這件裝備自己的數值：新有的功能直接秀數值（綠），
+  // 缺的功能秀負值（紅），數值不同秀↑↓差多少（綠/紅），完全一樣的就不提。
   const parts = [...new Set([...Object.keys(a), ...Object.keys(b)])].map((k) => {
     const zh = Z[k] || k, av = a[k] || 0, bv = b[k] || 0;
-    if (av && !bv) return col("good", `${zh}+${av} 新`);
-    if (!av && bv) return col("warn", `缺${zh}${bv > 0 ? "+" : ""}${bv}`);
+    if (av && !bv) return col("good", `${zh}+${av}`);
+    if (!av && bv) return col("bad", `${zh}-${bv}`);
     const dd = av - bv;
-    if (!dd) return col("muted", `${zh}+${av}`);
-    return col(dd > 0 ? "good" : "bad", `${zh}+${av}（${dd > 0 ? "↑" : "↓"}${Math.abs(dd)}）`);
-  });
+    if (!dd) return null;
+    return col(dd > 0 ? "good" : "bad", `${zh} ${dd > 0 ? "↑" : "↓"}${Math.abs(dd)}`);
+  }).filter(Boolean);
   if (!parts.length) return "";
   const wornLabel = itemName(worn.id) + (worn.refine ? ` +${worn.refine}` : "");
   return `比現在的「${esc(wornLabel)}」：` + parts.join("　");

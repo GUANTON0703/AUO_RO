@@ -117,10 +117,32 @@
         slotsPresent.map((s) => `<option value="${s}"${this._bagSlot === s ? " selected" : ""}>${SLOT_ZH[s] || s}</option>`),
       ).join("");
 
+      // 職業篩選下拉：只列出背包裡實際有限定職業的裝備涵蓋到的職業（不含全職業通用件）
+      const jobsPresent = [...new Set((inv.equipment || [])
+        .flatMap((i) => S.catalog?.equipment?.[i.equipment_id]?.job_ids || []))];
+      if (this._bagJob && !jobsPresent.includes(this._bagJob)) this._bagJob = "";
+      const jobOptions = [`<option value="">全部職業</option>`].concat(
+        jobsPresent.map((j) => `<option value="${j}"${this._bagJob === j ? " selected" : ""}>${esc(jobName(j))}</option>`),
+      ).join("");
+      const matchesJob = (eqId) => {
+        if (!this._bagJob) return true;
+        const jobIds = S.catalog?.equipment?.[eqId]?.job_ids || [];
+        return jobIds.length === 0 || jobIds.includes(this._bagJob);   // 空陣列 = 全職業通用
+      };
+
+      const sortMode = this._bagSort || "";
+      const reqLv = (eqId) => S.catalog?.equipment?.[eqId]?.required_level || 1;
+      const eqFilter = (inst) =>
+        (!this._bagSlot || slotOf(inst.equipment_id) === this._bagSlot) && matchesJob(inst.equipment_id);
+
       const eqRows = (inv.equipment || [])
-        .filter((inst) => !this._bagSlot || slotOf(inst.equipment_id) === this._bagSlot)
+        .filter(eqFilter)
         .slice()
-        .sort((a, b) => (b.equipped_slot != null) - (a.equipped_slot != null))
+        .sort((a, b) => {
+          if (sortMode === "level_asc") return reqLv(a.equipment_id) - reqLv(b.equipment_id);
+          if (sortMode === "level_desc") return reqLv(b.equipment_id) - reqLv(a.equipment_id);
+          return (b.equipped_slot != null) - (a.equipped_slot != null);   // 預設：裝備中優先
+        })
         .map((inst) => {
           const equipped = inst.equipped_slot != null;
           const cards = (inst.card_ids || []).map((c) => {
@@ -140,10 +162,15 @@
           const refLine = canRefine
             ? `<div class="sub" style="color:var(--muted)">精煉需：${oreName} ×1、Zeny ${refCost}（材料靠打怪掉）</div>`
             : "";
+          const lvShort = (def?.required_level || 1) > S.char.base_level;
+          const lvLine = lvShort
+            ? `<div class="sub" style="color:var(--bad)">未達等級：需 Lv ${def.required_level}（目前 ${S.char.base_level}）</div>`
+            : "";
           return `
         <div class="item" style="align-items:flex-start">
           <div>${esc(eqName(inst.equipment_id))}${inst.refine ? ` <span class="pill good">+${inst.refine}</span>` : ""}
             <div class="sub">${esc(gearDesc(inst.equipment_id, inst.refine || 0) || "")}${slotZh}${cards ? `　卡：${esc(cards)}` : ""}</div>
+            ${lvLine}
             ${wornLine}
             ${refLine}
             <div class="row tight" style="margin-top:6px">
@@ -163,8 +190,7 @@
       const open = this._open || (this._open = {});
       const itemCount = nonCardEntries.filter(([id]) => !isMaterial(id)).length;
       const materialCount = nonCardEntries.filter(([id]) => isMaterial(id)).length;
-      const eqCount = (inv.equipment || [])
-        .filter((inst) => !this._bagSlot || slotOf(inst.equipment_id) === this._bagSlot).length;
+      const eqCount = (inv.equipment || []).filter(eqFilter).length;
       const sec = (key, title, count, inner) => `
         <details class="card bag-sec" data-sec="${key}"${open[key] ? " open" : ""}>
           <summary>${title}<span class="bag-sec-count">${count}</span></summary>
@@ -181,8 +207,16 @@
         + sec("eq", "裝備", eqCount,
           `<div class="row" style="margin-bottom:8px">
              <select id="bag-slot" style="flex:1">${slotOptions}</select>
+             <select id="bag-job" style="flex:1">${jobOptions}</select>
            </div>
-           <div class="list">${eqRows || `<p class="muted">${this._bagSlot ? "這個部位沒有裝備。" : "背包沒有裝備。"}</p>`}</div>`);
+           <div class="row" style="margin-bottom:8px">
+             <select id="bag-sort" style="flex:1">
+               <option value=""${sortMode === "" ? " selected" : ""}>預設（裝備中優先）</option>
+               <option value="level_asc"${sortMode === "level_asc" ? " selected" : ""}>等級低到高</option>
+               <option value="level_desc"${sortMode === "level_desc" ? " selected" : ""}>等級高到低</option>
+             </select>
+           </div>
+           <div class="list">${eqRows || `<p class="muted">${this._bagSlot || this._bagJob ? "沒有符合篩選條件的裝備。" : "背包沒有裝備。"}</p>`}</div>`);
 
       this._body().querySelectorAll("details[data-sec]").forEach((d) => {
         d.ontoggle = () => { open[d.dataset.sec] = d.open; };
@@ -190,6 +224,10 @@
 
       const slotSel = this._body().querySelector("#bag-slot");
       if (slotSel) slotSel.onchange = () => { this._bagSlot = slotSel.value; this._drawBag(); };
+      const jobSel = this._body().querySelector("#bag-job");
+      if (jobSel) jobSel.onchange = () => { this._bagJob = jobSel.value; this._drawBag(); };
+      const sortSel = this._body().querySelector("#bag-sort");
+      if (sortSel) sortSel.onchange = () => { this._bagSort = sortSel.value; this._drawBag(); };
 
       const reload = () => this._drawBag();
 
