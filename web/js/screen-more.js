@@ -657,17 +657,40 @@
         return jobIds.length === 0 || jobIds.includes(this._tradeEqJob);
       };
 
-      const itemRows = Object.entries(inv.items || {}).map(([id, qty]) => `
+      // 選單細分類（跟背包同一套 details 收合樣式）：道具/材料/卡片各自一類，
+      // 裝備再照部位分（武器、頭部……），不然全部塞一長串很難找。
+      const isCard = (id) => !!S.catalog?.cards?.[id];
+      const isMaterial = (id) => S.catalog?.items?.[id]?.kind === "material";
+      const itemRow = ([id, qty]) => `
         <div class="item">
           <div>${esc(itemName(id))} ×${qty}<div class="sub">${esc(anyItemDesc(id) || "")}</div></div>
           <button class="btn small" data-put-item="${esc(id)}">放上</button>
-        </div>`).join("");
-      const eqRows = tradeEq.filter(eqMatchesJob).map((e) => `
+        </div>`;
+      const allItemEntries = Object.entries(inv.items || {});
+      const consumableEntries = allItemEntries.filter(([id]) => !isCard(id) && !isMaterial(id));
+      const materialEntries = allItemEntries.filter(([id]) => !isCard(id) && isMaterial(id));
+      const cardEntries = allItemEntries.filter(([id]) => isCard(id));
+      const consumableRows = consumableEntries.map(itemRow).join("");
+      const materialRows = materialEntries.map(itemRow).join("");
+      const cardRows = cardEntries.map(itemRow).join("");
+      const eqRow = (e) => `
         <div class="item">
           <div>${esc(itemName(e.equipment_id))}${e.refine ? ` +${e.refine}` : ""}
             <div class="sub">${esc(gearDesc(e.equipment_id, e.refine || 0) || "")}</div></div>
           <button class="btn small" data-put-eq="${e.id}">放上</button>
-        </div>`).join("");
+        </div>`;
+      const eqFiltered = tradeEq.filter(eqMatchesJob);
+      const slotsPresent = [...new Set(eqFiltered.map((e) => S.catalog?.equipment?.[e.equipment_id]?.slot).filter(Boolean))];
+      const SLOT_ORDER_LIST = ["weapon", "offhand", "head", "armor", "garment", "shoes", "accessory"];
+      const eqBySlot = SLOT_ORDER_LIST.filter((s) => slotsPresent.includes(s))
+        .map((s) => [s, eqFiltered.filter((e) => S.catalog?.equipment?.[e.equipment_id]?.slot === s)]);
+
+      const tOpen = this._tradeOpen || (this._tradeOpen = {});
+      const sec = (key, title, count, inner) => `
+        <details class="card bag-sec" data-tsec="${key}"${tOpen[key] ? " open" : ""}>
+          <summary>${title}<span class="bag-sec-count">${count}</span></summary>
+          <div class="bag-sec-body">${inner}</div>
+        </details>`;
 
       box.innerHTML = `
         <div class="card" style="margin-top:10px">
@@ -676,17 +699,29 @@
             this._side === "from" ? (t.to_name || "？") : (t.from_name || "？"))}</span></div>
           <div class="k" style="margin-top:6px">我方放上</div>${fmt(mine)}
           <div class="k" style="margin-top:6px">對方放上</div>${fmt(theirs)}
-          ${done ? "" : `
-          <p class="muted" style="margin-top:8px">點「放上」放入（道具會問數量）</p>
-          <div class="list">${itemRows || "<p class='muted'>沒有道具</p>"}</div>
-          <div class="row tight" style="margin-top:8px"><select id="trade-eq-job" style="flex:1">${tradeJobOptions}</select></div>
-          <div class="list">${eqRows || "<p class='muted'>沒有可交易裝備</p>"}</div>`}
-          <div class="row" style="margin-top:10px">
+        </div>
+        ${done ? "" : `
+        <p class="muted" style="margin:8px 0 4px">點「放上」放入（道具會問數量）</p>
+        ${sec("consumables", "道具", consumableEntries.length,
+          `<div class="list">${consumableRows || "<p class='muted'>沒有道具。</p>"}</div>`)}
+        ${sec("materials", "材料", materialEntries.length,
+          `<div class="list">${materialRows || "<p class='muted'>沒有材料。</p>"}</div>`)}
+        ${sec("cards", "卡片", cardEntries.length,
+          `<div class="list">${cardRows || "<p class='muted'>沒有卡片。</p>"}</div>`)}
+        ${eqBySlot.map(([slot, list]) => sec(`eq-${slot}`, SLOT_ZH[slot] || slot, list.length,
+          `<div class="list">${list.map(eqRow).join("")}</div>`)).join("")}
+        ${eqFiltered.length ? `<div class="row tight" style="margin:8px 0"><select id="trade-eq-job" style="flex:1">${tradeJobOptions}</select></div>` : ""}
+        ${eqBySlot.length === 0 ? `<p class="muted" style="margin:8px 0">沒有可交易裝備。</p>` : ""}
+        `}
+        <div class="card" style="margin-top:10px"><div class="row">
             <button class="btn primary" id="trade-confirm"${done ? " disabled" : ""}>確認</button>
             <button class="btn" id="trade-cancel"${done ? " disabled" : ""}>取消</button>
             <button class="btn ghost" id="trade-refresh">重新整理</button>
-          </div>
-        </div>`;
+        </div></div>`;
+
+      box.querySelectorAll("details[data-tsec]").forEach((d) => {
+        d.ontoggle = () => { tOpen[d.dataset.tsec] = d.open; };
+      });
 
       const tradeEqJobSel = box.querySelector("#trade-eq-job");
       if (tradeEqJobSel) tradeEqJobSel.onchange = () => { this._tradeEqJob = tradeEqJobSel.value; this._renderTrade(); };
