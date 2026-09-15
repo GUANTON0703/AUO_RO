@@ -699,7 +699,13 @@
           <input id="gm-wr" type="number" step="0.05" placeholder="勝率門檻" style="flex:1">
           <button class="btn small" id="gm-hunt">套用</button>
         </div>
-        <div class="section-title" style="margin-top:10px"><span class="k">我的角色</span></div>
+        <div class="section-title" style="margin-top:10px"><span class="k">操作對象</span></div>
+        <div class="row">
+          <input id="gm-target-search" placeholder="搜尋角色名 / 帳號（留空 = 我自己）" style="flex:1">
+        </div>
+        <div id="gm-target-results" class="list" style="margin-top:4px"></div>
+        <div class="kv" style="margin-top:4px"><span class="k">目前對象</span>
+          <span id="gm-target-cur" class="pill">${esc(S.char.name)}（我自己）</span></div>
         <div class="row">
           <input id="gm-zeny" type="number" placeholder="給 Zeny（可負）" style="flex:1">
           <button class="btn small" id="gm-money">給錢</button>
@@ -708,6 +714,16 @@
           <input id="gm-be" type="number" placeholder="base_exp" style="flex:1">
           <input id="gm-je" type="number" placeholder="job_exp" style="flex:1">
           <button class="btn small" id="gm-xp">設經驗</button>
+        </div>
+        <div class="section-title" style="margin-top:10px"><span class="k">給物品（進倉庫，不是背包）</span></div>
+        <div class="row">
+          <input id="gm-item-search" placeholder="搜尋道具 / 裝備 / 卡片" style="flex:1">
+        </div>
+        <div class="row" style="margin-top:6px">
+          <select id="gm-item-select" style="flex:1"></select>
+          <input id="gm-item-qty" type="number" min="1" value="1" placeholder="數量" style="width:80px">
+          <input id="gm-item-refine" type="number" min="0" max="10" value="0" placeholder="精煉" style="width:70px">
+          <button class="btn small" id="gm-item-give">給</button>
         </div>
         <div class="section-title" style="margin-top:10px"><span class="k">公告</span></div>
         <div class="row">
@@ -775,18 +791,46 @@
           App.toast("已套用"); showSettings();
         } catch (e) { App.toast(e.detail || "失敗", true); }
       };
+      // 操作對象：預設自己，搜到人選一個就換過去，之後給錢/給經驗/給物品都對這個人
+      this._gmTargetId = S.char.id;
+      const targetId = () => this._gmTargetId || S.char.id;
+      const gmTargetSearch = document.querySelector("#gm-target-search");
+      const gmTargetResults = document.querySelector("#gm-target-results");
+      const gmTargetCur = document.querySelector("#gm-target-cur");
+      let gmTargetReq = 0;
+      gmTargetSearch.oninput = async () => {
+        const q = gmTargetSearch.value.trim();
+        const gen = ++gmTargetReq;
+        if (!q) { gmTargetResults.innerHTML = ""; return; }
+        let rows;
+        try { rows = await API.adminSearchCharacters(q); } catch (_) { return; }
+        if (gen !== gmTargetReq) return;   // 打字太快，舊的搜尋結果別蓋掉新的
+        gmTargetResults.innerHTML = rows.length ? rows.map((r) => `
+          <div class="item">
+            <div>${esc(r.name)}<div class="sub">${esc(r.username)}・B${r.base_level}/J${r.job_level}・${r.zeny}z</div></div>
+            <button class="btn small" data-pick-target="${r.character_id}" data-name="${esc(r.name)}">選這個</button>
+          </div>`).join("") : `<p class="muted">沒有符合的角色</p>`;
+        gmTargetResults.querySelectorAll("[data-pick-target]").forEach((b) => {
+          b.onclick = () => {
+            this._gmTargetId = Number(b.dataset.pickTarget);
+            gmTargetCur.textContent = b.dataset.name;
+            gmTargetResults.innerHTML = ""; gmTargetSearch.value = "";
+          };
+        });
+      };
       document.querySelector("#gm-money").onclick = async () => {
         try {
-          await API.adminMoney(S.char.id, Number(document.querySelector("#gm-zeny").value) || 0);
-          App.toast("已給錢"); await App.refreshChar();
+          await API.adminMoney(targetId(), Number(document.querySelector("#gm-zeny").value) || 0);
+          App.toast("已給錢"); if (targetId() === S.char.id) await App.refreshChar();
         } catch (e) { App.toast(e.detail || "失敗", true); }
       };
       document.querySelector("#gm-xp").onclick = async () => {
         try {
-          await API.adminExperience(S.char.id, Number(document.querySelector("#gm-be").value) || 0, Number(document.querySelector("#gm-je").value) || 0);
-          App.toast("已設經驗"); await App.refreshChar();
+          await API.adminExperience(targetId(), Number(document.querySelector("#gm-be").value) || 0, Number(document.querySelector("#gm-je").value) || 0);
+          App.toast("已設經驗"); if (targetId() === S.char.id) await App.refreshChar();
         } catch (e) { App.toast(e.detail || "失敗", true); }
       };
+
       document.querySelector("#gm-online-refresh").onclick = showOnline;
       document.querySelector("#gm-ann-save").onclick = async () => {
         try {
@@ -807,6 +851,37 @@
       let dropRateRequest = 0;
 
       const kindLabel = { monster: "怪物", mvp: "Boss", equipment: "裝備", card: "卡片" };
+
+      // 給物品：搜尋道具/裝備/卡片，選一筆塞進對象帳號的倉庫
+      const gmItemSearch = document.querySelector("#gm-item-search");
+      const gmItemSelect = document.querySelector("#gm-item-select");
+      const gmKindLabel = { ...kindLabel, item: "道具" };
+      const renderGmItemOptions = () => {
+        // 給物品要涵蓋一般道具（藥水/材料），drop-rate 那個 searchCatalog 只找
+        // 裝備跟卡片（掉落率只對那兩種設），這裡自己拼一份含 items 的搜尋。
+        const q = gmItemSearch.value.trim().toLowerCase();
+        const groups = [["item", S.catalog?.items], ["equipment", S.catalog?.equipment], ["card", S.catalog?.cards]];
+        const matches = groups.flatMap(([kind, entries]) =>
+          Object.values(entries || {})
+            .filter((e) => !q || String(e.id).toLowerCase().includes(q) || String(e.name || e.id).toLowerCase().includes(q))
+            .map((e) => ({ id: e.id, name: e.name || e.id, kind })),
+        ).sort((a, b) => a.name.localeCompare(b.name));
+        gmItemSelect.innerHTML = matches.map((x) =>
+          `<option value="${esc(x.id)}">${esc(x.name)}（${gmKindLabel[x.kind]}）</option>`).join("");
+      };
+      gmItemSearch.oninput = renderGmItemOptions;
+      renderGmItemOptions();
+      document.querySelector("#gm-item-give").onclick = async () => {
+        const itemId = gmItemSelect.value;
+        if (!itemId) { App.toast("先選一個道具", true); return; }
+        const qty = Math.max(1, Math.floor(Number(document.querySelector("#gm-item-qty").value) || 1));
+        const refine = Math.max(0, Math.floor(Number(document.querySelector("#gm-item-refine").value) || 0));
+        try {
+          await API.adminGrantItem(targetId(), itemId, qty, refine);
+          App.toast(`已給 ${itemName(itemId)} ×${qty}（進倉庫）`);
+        } catch (e) { App.toast(e.detail || "失敗", true); }
+      };
+
       const formatRate = (value) => {
         if (value == null) return "未設定";
         const rate = Number(value);

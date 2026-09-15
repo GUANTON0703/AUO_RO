@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from server.auth.dependencies import GMAccount
 from server.content import load_content
 from server.db import connection
+from server.repositories import storage as storage_repo
 from server.settlement.config import HuntConfig
 from server.settlement.drops import effective_drop_rate, load_drop_rate_overrides
 
@@ -41,6 +42,12 @@ class DropRateRequest(BaseModel):
     source_id: str | None = Field(default=None, min_length=1, max_length=100)
     item_id: str = Field(min_length=1, max_length=100)
     rate: float = Field(ge=0, le=1)
+
+
+class GrantItemRequest(BaseModel):
+    item_id: str = Field(min_length=1, max_length=100)
+    qty: int = Field(ge=1, le=100_000)
+    refine: int = Field(default=0, ge=0, le=10)   # 只有裝備會用到
 
 
 _SETTING_DEFAULTS = {
@@ -139,6 +146,43 @@ def set_experience(character_id: int, body: ExperienceRequest, _: GMAccount):
     with connection.get_connection() as conn:
         conn.execute("UPDATE characters SET base_exp = ?, job_exp = ? WHERE id = ?", (body.base_exp, body.job_exp, character_id))
         return dict(conn.execute("SELECT id, base_exp, job_exp FROM characters WHERE id = ?", (character_id,)).fetchone())
+
+
+@router.post("/characters/{character_id}/grant-item")
+def grant_item(character_id: int, body: GrantItemRequest, _: GMAccount):
+    """直接把道具/裝備塞進這個角色所屬帳號的倉庫（不是背包），玩家自己去倉庫領。"""
+    row = _character(character_id)
+    is_equipment = body.item_id in _content.equipment
+    known = is_equipment or body.item_id in _content.items or body.item_id in _content.cards
+    if not known:
+        raise HTTPException(status_code=400, detail="道具不存在")
+    account_id = row["account_id"]
+    if is_equipment:
+        for _ in range(body.qty):
+            storage_repo.grant_equipment(account_id, body.item_id, body.refine)
+    else:
+        storage_repo.grant_item(account_id, body.item_id, body.qty)
+    return {"account_id": account_id, "item_id": body.item_id, "qty": body.qty}
+
+
+@router.get("/characters/search")
+def search_characters(_: GMAccount, q: str = ""):
+    """GM 用：用角色名找人（不限線上），回 account_id 給後續給錢/給經驗/塞倉庫用。"""
+    q = q.strip()
+    if not q:
+        return []
+    with connection.get_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT c.id AS character_id, c.name, c.account_id, a.username,
+                   c.base_level, c.job_level, c.zeny
+            FROM characters c JOIN accounts a ON a.id = c.account_id
+            WHERE c.name LIKE ? OR a.username LIKE ?
+            ORDER BY c.id LIMIT 20
+            """,
+            (f"%{q}%", f"%{q}%"),
+        ).fetchall()
+    return [dict(row) for row in rows]
 
 
 @router.put("/settings/multipliers")

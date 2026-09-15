@@ -160,5 +160,8 @@ const API = (() => {
     adminExperience: (cid, base_exp, job_exp) =>
       post(`/admin/characters/${cid}/experience`, { base_exp, job_exp }),
     adminOnlinePlayers: () => get("/admin/online-players"),
+    adminSearchCharacters: (q) => get("/admin/characters/search?q=" + encodeURIComponent(q || "")),
+    adminGrantItem: (cid, item_id, qty, refine) =>
+      post(`/admin/characters/${cid}/grant-item`, { item_id, qty, refine: refine || 0 }),
   };
 })();

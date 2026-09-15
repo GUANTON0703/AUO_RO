@@ -36,6 +36,28 @@ def list_storage(account_id: int) -> dict:
     return {"items": items, "equipment": equipment}
 
 
+def grant_item(account_id: int, item_id: str, qty: int) -> None:
+    """GM 用：憑空給帳號倉庫加道具，不用先有角色持有這筆（跟 deposit_item 的
+    差別是那個要求先從角色背包扣，這個直接生出來）。"""
+    with connection.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO account_items (account_id, item_id, qty) VALUES (?, ?, ?) "
+            "ON CONFLICT(account_id, item_id) DO UPDATE SET qty = qty + excluded.qty",
+            (account_id, item_id, qty),
+        )
+
+
+def grant_equipment(account_id: int, equipment_id: str, refine: int = 0) -> int:
+    """GM 用：憑空給帳號倉庫加一件裝備，回傳新增的倉庫實例 id。"""
+    with connection.get_connection() as conn:
+        cur = conn.execute(
+            "INSERT INTO account_equipment "
+            "(account_id, equipment_id, refine, card_ids, acquired_at) VALUES (?, ?, ?, ?, ?)",
+            (account_id, equipment_id, refine, "[]", _now()),
+        )
+        return cur.lastrowid
+
+
 def deposit_item(account_id: int, character_id: int, item_id: str, qty: int) -> None:
     with connection.transaction() as conn:
         row = conn.execute(
