@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 
 from server.db import connection
@@ -141,15 +142,34 @@ def pending(account_id: int) -> list[dict]:
         ]
 
 
+def _resolve_items(conn, trade_id: int) -> list:
+    """桌上每筆道具/裝備補上前端顯示要用的細節（裝備要 join character_equipment
+    才拿得到真正的 equipment_id/精煉/插卡——trade_items.equipment_id 是那個
+    角色裝備實例的 row id，不是圖鑑 id）。裝備還沒被拿走（交易還沒結算）時
+    這個 join 一定找得到，結算完那筆已經轉移到對方名下、row id 不變一樣查得到。"""
+    rows = conn.execute(
+        "SELECT * FROM trade_items WHERE trade_id = ?", (trade_id,)
+    ).fetchall()
+    items = []
+    for r in rows:
+        d = dict(r)
+        if d.get("equipment_id") is not None:
+            eq = conn.execute(
+                "SELECT equipment_id, refine, card_ids FROM character_equipment WHERE id = ?",
+                (d["equipment_id"],),
+            ).fetchone()
+            if eq:
+                d["catalog_equipment_id"] = eq["equipment_id"]
+                d["refine"] = eq["refine"]
+                d["card_ids"] = json.loads(eq["card_ids"]) if eq["card_ids"] else []
+        items.append(d)
+    return items
+
+
 def table(trade_id: int) -> dict:
     with connection.get_connection() as conn:
         trade = _load(conn, trade_id)
-        items = [
-            dict(r)
-            for r in conn.execute(
-                "SELECT * FROM trade_items WHERE trade_id = ?", (trade_id,)
-            ).fetchall()
-        ]
+        items = _resolve_items(conn, trade_id)
         return {
             "id": trade["id"],
             "status": trade["status"],

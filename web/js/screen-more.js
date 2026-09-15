@@ -621,36 +621,75 @@
       catch (e) { box.innerHTML = `<p class="muted">${esc(e.detail || "交易不存在")}</p>`; return; }
       const mine = (t.items || []).filter((i) => i.side === this._side);
       const theirs = (t.items || []).filter((i) => i.side !== this._side);
-      const fmt = (arr) => arr.length
-        ? arr.map((i) => i.item_id
-            ? `${esc(itemName(i.item_id))} ×${i.qty}`
-            : `裝備 #${i.equipment_id}`).join("、")
-        : "（空）";
+      // 桌上的道具/卡片(共用 item_id 欄位) 或裝備，都秀出名稱＋細節（卡片/裝備效果、精煉）
+      const anyItemDesc = (id) => itemDesc(id) || cardDesc(id);
+      const fmtLine = (i) => {
+        if (i.item_id) {
+          const d = anyItemDesc(i.item_id);
+          return `<div class="sub">${esc(itemName(i.item_id))} ×${i.qty}${d ? `　${esc(d)}` : ""}</div>`;
+        }
+        const eqId = i.catalog_equipment_id;
+        if (!eqId) return `<div class="sub">裝備（已轉移，細節看不到了）</div>`;
+        const cardsTxt = (i.card_ids || []).map((c) => {
+          const fx = cardDesc(c);
+          return `${itemName(c)}${fx ? `（${fx}）` : ""}`;
+        }).join("、");
+        const desc = gearDesc(eqId, i.refine || 0);
+        return `<div class="sub">${esc(itemName(eqId))}${i.refine ? ` +${i.refine}` : ""}${
+          desc ? `　${esc(desc)}` : ""}${cardsTxt ? `　卡：${esc(cardsTxt)}` : ""}</div>`;
+      };
+      const fmt = (arr) => arr.length ? arr.map(fmtLine).join("") : `<div class="sub muted">（空）</div>`;
       const done = t.status !== "open";
       let inv = { items: {}, equipment: [] };
       if (!done) { try { inv = await API.inventory(S.char.id); } catch (_) {} }
-      const itemBtns = Object.entries(inv.items || {}).map(([id, qty]) =>
-        `<button class="btn small" data-put-item="${esc(id)}">${esc(itemName(id))} ×${qty}</button>`).join("");
-      const eqBtns = (inv.equipment || []).filter((e) => !e.equipped_slot).map((e) =>
-        `<button class="btn small" data-put-eq="${e.id}">${esc(itemName(e.equipment_id))} +${e.refine || 0}</button>`).join("");
+
+      // 裝備分職業篩選，跟背包那邊同一套邏輯：全職業通用件不受篩選影響
+      const tradeEq = (inv.equipment || []).filter((e) => !e.equipped_slot);
+      const tradeJobsPresent = [...new Set(tradeEq
+        .flatMap((e) => S.catalog?.equipment?.[e.equipment_id]?.job_ids || []))];
+      if (this._tradeEqJob && !tradeJobsPresent.includes(this._tradeEqJob)) this._tradeEqJob = "";
+      const tradeJobOptions = [`<option value="">全部職業</option>`].concat(
+        tradeJobsPresent.map((j) => `<option value="${j}"${this._tradeEqJob === j ? " selected" : ""}>${esc(jobName(j))}</option>`),
+      ).join("");
+      const eqMatchesJob = (e) => {
+        if (!this._tradeEqJob) return true;
+        const jobIds = S.catalog?.equipment?.[e.equipment_id]?.job_ids || [];
+        return jobIds.length === 0 || jobIds.includes(this._tradeEqJob);
+      };
+
+      const itemRows = Object.entries(inv.items || {}).map(([id, qty]) => `
+        <div class="item">
+          <div>${esc(itemName(id))} ×${qty}<div class="sub">${esc(anyItemDesc(id) || "")}</div></div>
+          <button class="btn small" data-put-item="${esc(id)}">放上</button>
+        </div>`).join("");
+      const eqRows = tradeEq.filter(eqMatchesJob).map((e) => `
+        <div class="item">
+          <div>${esc(itemName(e.equipment_id))}${e.refine ? ` +${e.refine}` : ""}
+            <div class="sub">${esc(gearDesc(e.equipment_id, e.refine || 0) || "")}</div></div>
+          <button class="btn small" data-put-eq="${e.id}">放上</button>
+        </div>`).join("");
 
       box.innerHTML = `
         <div class="card" style="margin-top:10px">
           <div class="kv"><span class="k">交易 #${t.id}</span><span class="pill">${esc(t.status)}</span></div>
           <div class="kv"><span class="k">對象</span><span>${esc(
             this._side === "from" ? (t.to_name || "？") : (t.from_name || "？"))}</span></div>
-          <div class="kv"><span class="k">我方放上</span><span>${fmt(mine)}</span></div>
-          <div class="kv"><span class="k">對方放上</span><span>${fmt(theirs)}</span></div>
+          <div class="k" style="margin-top:6px">我方放上</div>${fmt(mine)}
+          <div class="k" style="margin-top:6px">對方放上</div>${fmt(theirs)}
           ${done ? "" : `
-          <p class="muted" style="margin-top:8px">點道具 / 裝備放入（道具會問數量）</p>
-          <div class="row tight">${itemBtns || "<span class='muted'>沒有道具</span>"}</div>
-          <div class="row tight" style="margin-top:4px">${eqBtns || "<span class='muted'>沒有可交易裝備</span>"}</div>`}
+          <p class="muted" style="margin-top:8px">點「放上」放入（道具會問數量）</p>
+          <div class="list">${itemRows || "<p class='muted'>沒有道具</p>"}</div>
+          <div class="row tight" style="margin-top:8px"><select id="trade-eq-job" style="flex:1">${tradeJobOptions}</select></div>
+          <div class="list">${eqRows || "<p class='muted'>沒有可交易裝備</p>"}</div>`}
           <div class="row" style="margin-top:10px">
             <button class="btn primary" id="trade-confirm"${done ? " disabled" : ""}>確認</button>
             <button class="btn" id="trade-cancel"${done ? " disabled" : ""}>取消</button>
             <button class="btn ghost" id="trade-refresh">重新整理</button>
           </div>
         </div>`;
+
+      const tradeEqJobSel = box.querySelector("#trade-eq-job");
+      if (tradeEqJobSel) tradeEqJobSel.onchange = () => { this._tradeEqJob = tradeEqJobSel.value; this._renderTrade(); };
 
       box.querySelectorAll("[data-put-item]").forEach((b) => {
         b.onclick = async () => {
