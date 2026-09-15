@@ -196,6 +196,27 @@ def _passive_stat_bonus(content, learned: dict) -> dict:
     return bonus
 
 
+def shop_multipliers(content, learned: dict) -> tuple[int, int]:
+    """折扣（買價打折）/ 加倍索價（賣價加成）技能算出來的百分比，NPC 商店
+    買賣都用得到，不是戰鬥用的 derived stat，跟 _passive_stat_bonus 分開算。"""
+    buy_discount_pct = sell_bonus_pct = 0
+    for sid, lvl in learned.items():
+        sk = content.skills.get(sid)
+        if not sk or sk.kind != "passive":
+            continue
+        for eff in sk.effects:
+            t = eff.get("type")
+            if t not in ("shop_discount_pct", "shop_overcharge_pct"):
+                continue
+            seq = eff.get("amount", [0])
+            val = seq[min(lvl, len(seq)) - 1] if isinstance(seq, list) else seq
+            if t == "shop_discount_pct":
+                buy_discount_pct += val
+            else:
+                sell_bonus_pct += val
+    return buy_discount_pct, sell_bonus_pct
+
+
 def build_player_combatant(snap: CharacterSnapshot, content) -> Combatant:
     job = content.get_job(snap.job_id)
     s = snap.stats

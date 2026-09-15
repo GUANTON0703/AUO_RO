@@ -22,6 +22,7 @@ DATA = Path(__file__).resolve().parent.parent / "data"
 EFFECT_TYPES = {
     "physical_hit", "magic_hit", "aoe", "heal_hp", "heal_sp",
     "buff", "debuff", "passive_stat", "proc",
+    "shop_discount_pct", "shop_overcharge_pct",
 }
 ELEMENTS = {
     "neutral", "water", "earth", "fire", "wind",

@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException
@@ -8,6 +9,7 @@ from server.content import load_content
 from server.db import connection
 from server.loot.pricing import equip_sell_price as _equip_sell_price
 from server.loot.pricing import item_sell_price as _item_sell_price
+from server.progression import shop_multipliers
 from server.repositories import characters as characters_repo
 
 router = APIRouter(prefix="/api/shop", tags=["shop"])
@@ -24,6 +26,12 @@ def _current_character(account_id: int):
     if row is None:
         raise HTTPException(status_code=404, detail="沒有角色")
     return row
+
+
+def _shop_mult(char) -> tuple[int, int]:
+    """這個角色的折扣/加倍索價百分比，商人的招牌被動技能。"""
+    learned = json.loads(char["learned_skills"] or "{}")
+    return shop_multipliers(_content, learned)
 
 
 class BuyRequest(BaseModel):
@@ -69,7 +77,8 @@ def buy(body: BuyRequest, account_id: CurrentAccount):
     else:
         raise HTTPException(status_code=400, detail="此商品無法購買")
 
-    total = price * body.qty
+    buy_discount_pct, _ = _shop_mult(char)
+    total = round(price * body.qty * (1 - buy_discount_pct / 100))
     with connection.transaction() as conn:
         row = conn.execute(
             "SELECT zeny FROM characters WHERE id = ?", (char["id"],)
@@ -99,6 +108,7 @@ def buy(body: BuyRequest, account_id: CurrentAccount):
 def sell(body: SellRequest, account_id: CurrentAccount):
     char = _current_character(account_id)
 
+    _, sell_bonus_pct = _shop_mult(char)
     ids = body.equipment_instance_ids or (
         [body.equipment_instance_id] if body.equipment_instance_id is not None else [])
     if ids:
@@ -113,7 +123,7 @@ def sell(body: SellRequest, account_id: CurrentAccount):
                 if inst["equipped_slot"] is not None:
                     raise HTTPException(status_code=400, detail="裝備中的道具無法賣出")
                 eq = _content.equipment.get(inst["equipment_id"])
-                total += _equip_sell_price(eq) if eq else 0
+                total += round(_equip_sell_price(eq) * (1 + sell_bonus_pct / 100)) if eq else 0
                 conn.execute("DELETE FROM character_equipment WHERE id = ?", (iid,))
             conn.execute(
                 "UPDATE characters SET zeny = zeny + ? WHERE id = ?", (total, char["id"])
@@ -125,7 +135,7 @@ def sell(body: SellRequest, account_id: CurrentAccount):
     item = _content.items.get(body.item_id)
     if item is None:
         raise HTTPException(status_code=400, detail="道具不存在")
-    gained = _item_sell_price(item) * body.qty
+    gained = round(_item_sell_price(item) * body.qty * (1 + sell_bonus_pct / 100))
     with connection.transaction() as conn:
         row = conn.execute(
             "SELECT qty FROM character_items WHERE character_id = ? AND item_id = ?",

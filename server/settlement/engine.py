@@ -143,8 +143,11 @@ def _settle_statistical(player, monster, elapsed_seconds, effective, time_per_ki
             max_kills = expected_before_death
             retreated, reason = True, "戰鬥中被擊倒"
 
-    # 2) 每場淨損 = 平均受傷 - 場間自然回血。淨損 <= 0 → 靠回血無限撐。
-    regen_per_fight = player.max_hp * cfg.hp_regen_frac_per_sec * time_per_kill
+    # 2) 每場淨損 = 平均受傷 - 場間自然回血 - 擊殺回血（卡片/裝備 on_kill_recover，
+    # 例如奧西里斯卡片；只有贏了才回血，乘上勝率折算成期望值）。淨損 <= 0 → 靠回血無限撐。
+    on_kill_hp_pct = getattr(player, "on_kill", {}).get("hp_pct", 0)
+    kill_regen_per_fight = player.max_hp * on_kill_hp_pct / 100 * prof.win_rate
+    regen_per_fight = player.max_hp * cfg.hp_regen_frac_per_sec * time_per_kill + kill_regen_per_fight
     net_dmg = prof.avg_damage_taken - regen_per_fight
     if net_dmg > 0:
         threshold_hp = player.max_hp * cfg.potion_hp_threshold

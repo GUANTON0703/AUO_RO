@@ -13,7 +13,9 @@ from server.content import load_content
 from server.db import connection
 from server import npc_buff
 from server.loot.pricing import item_sell_price
-from server.progression import CharacterSnapshot, EquippedPiece, build_player_combatant
+from server.progression import (
+    CharacterSnapshot, EquippedPiece, build_player_combatant, shop_multipliers,
+)
 from server.progression.levels import apply_base_exp, apply_job_exp
 from server.repositories import characters as characters_repo
 from server.repositories import inventory
@@ -374,8 +376,9 @@ def _auto_buy_buff_potions(character_id: int, strategy, base_level: int = 1) -> 
     return total_cost
 
 
-def _auto_sell(character_id: int, strategy, conn=None) -> int:
-    """每次結算把 sell_item_ids 裡的道具整批賣掉，回傳賣得的 Zeny。"""
+def _auto_sell(character_id: int, strategy, conn=None, sell_bonus_pct: int = 0) -> int:
+    """每次結算把 sell_item_ids 裡的道具整批賣掉，回傳賣得的 Zeny。
+    sell_bonus_pct：加倍索價技能算出來的賣價加成，跟手動商店賣出同一套。"""
     gained = 0
     sold: dict = {}
     for iid in strategy.sell_item_ids or []:
@@ -384,7 +387,7 @@ def _auto_sell(character_id: int, strategy, conn=None) -> int:
             continue
         qty = inventory.item_qty(character_id, iid, conn=conn)
         if qty > 0 and inventory.consume_item(character_id, iid, qty, conn=conn):
-            gained += item_sell_price(item) * qty
+            gained += round(item_sell_price(item) * qty * (1 + sell_bonus_pct / 100))
             sold[iid] = qty
     if gained:
         characters_repo.adjust_zeny(character_id, gained, conn=conn)
@@ -784,7 +787,8 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
         inventory.apply_drops(row["id"], result.drops, conn=conn)
         for _pid, _n in _spent.items():
             inventory.consume_item(row["id"], _pid, _n, conn=conn)
-        sell_gain = _auto_sell(row["id"], strategy, conn=conn)
+        _, sell_bonus_pct = shop_multipliers(_content, json.loads(row["learned_skills"] or "{}"))
+        sell_gain = _auto_sell(row["id"], strategy, conn=conn, sell_bonus_pct=sell_bonus_pct)
         characters_repo.update_hunt_progress(
             row["id"], hp=final_hp, sp=result.final_sp,
             last_settled_at=settled_until.isoformat(),

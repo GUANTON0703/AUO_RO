@@ -1183,19 +1183,18 @@
     "cooldown_s": 0,
     "effects": [
       {
-        "type": "passive_stat",
-        "stat": "luk",
+        "type": "shop_discount_pct",
         "amount": [
           1,
-          1,
-          2,
           2,
           3,
-          3,
-          4,
           4,
           5,
-          5
+          6,
+          7,
+          8,
+          9,
+          10
         ]
       }
     ],
@@ -3514,16 +3513,16 @@
         "type": "passive_stat",
         "stat": "atk",
         "amount": [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
+          1,
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4,
+          5,
+          5
         ]
       }
     ],
@@ -3557,19 +3556,18 @@
     "cooldown_s": 0,
     "effects": [
       {
-        "type": "passive_stat",
-        "stat": "luk",
+        "type": "shop_overcharge_pct",
         "amount": [
           1,
-          1,
-          2,
           2,
           3,
-          3,
-          4,
           4,
           5,
-          5
+          6,
+          7,
+          8,
+          9,
+          10
         ]
       }
     ],
