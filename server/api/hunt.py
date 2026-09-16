@@ -1,4 +1,5 @@
 import json
+import math
 import random
 import threading
 from dataclasses import asdict, fields, replace
@@ -289,36 +290,64 @@ def _pick_sp_potion(character_id: int, preferred_id: str | None = None,
     return best
 
 
-_SECONDS_PER_EXTRA_POTION = 2   # 結算涵蓋的時間每多這麼多秒，上限就多讓買一瓶（離線補一大段用）
-_AUTO_BUY_HARD_CAP = 999        # 不管隔多久沒結算，單次自動補水的絕對上限，跟 buy_XXX_upto 的可設上限對齊
+_AUTO_BUY_HARD_CAP = 999        # 不管算出來要補多少，單次自動補水的絕對上限，跟 buy_XXX_upto 的可設上限對齊
 
-def _auto_buy_cap(strategy_upto: int, elapsed: float, offline_cap_hours: float) -> int:
-    """在線維持量 buy_XXX_upto 是給正常一小段一小段結算用的，一次結算涵蓋的時間
-    （這次隔了多久沒結算，通常是離線回來一次補一大段）越長，需要的量就越多，
-    不然離線一段時間回來常常補品還沒用夠就先被那個「在線維持量」卡到用盡撤退。
-    這裡照結算涵蓋的秒數等比例放大上限，正常在線那種秒級的小結算幾乎不影響。
-    elapsed 先按實際戰鬥結算會採用的離線上限（offline_cap_hours）夾住，離線加碼的部分再套一個
-    絕對天花板（_AUTO_BUY_HARD_CAP），避免玩家隔了好幾天才回來結算時算出離譜的補貨量；但玩家
-    自己設定的在線維持量（strategy_upto）不受這個天花板限制，一定會補到。"""
-    capped_elapsed = min(elapsed, offline_cap_hours * 3600)
-    elapsed_based = min(int(capped_elapsed // _SECONDS_PER_EXTRA_POTION), _AUTO_BUY_HARD_CAP)
-    return max(strategy_upto, elapsed_based)
+
+def _estimate_hp_deficit(player, monster, cfg, elapsed: float, offline: bool) -> float:
+    """離線加碼要補多少血量，不能只看「隔了多久的真實時間」，要看這段時間裡角色實際上
+    打怪的節奏——不然隨便放著掛機十幾分鐘沒點開遊戲，就會被「距上次結算的秒數」
+    直接除出一個跟角色實際會喝掉的瓶數完全不成比例的天文數字。
+    這裡抓角色打這隻怪平均每場要幾回合、平均受傷多少（跟 engine.py 估算戰鬥節奏用
+    同一套 estimate_fight_profile），算出這段時間大概能打幾場、總共淨損多少血量。
+    avg_damage_taken 本身讀的是戰鬥結束當下的血量差，已經含擊殺回血（engine.py
+    simulate_fight 在回傳前就把 on_kill 的回血加上去了），這裡只需要再扣掉場間的
+    自然回血，扣兩次擊殺回血反而會低估。自然回血已經能扛住傷害的角色（淨損 <= 0）
+    估出來就是 0，不會平白多買。win_rate < 1 時角色遲早會在幾場後被打死撤退（跟
+    _settle_statistical 的「幾何分布：平均 win_rate/(1-win_rate) 場後陣亡」算法一樣），
+    撤退前用不到那麼多瓶，買貨量也跟著封頂，不會白花錢。
+    回傳的是「血量」不是瓶數——換算成要買幾瓶由呼叫端用「買的那瓶」的回血量去除，
+    不能在這裡就假設買的瓶子跟戰鬥實際喝的是同一種。
+    這裡抽樣的戰鬥模擬跟真正結算時（engine.py 用 samples=20）是各自獨立抽樣，加上
+    net_dmg 本身是兩個數字相減，數值小的時候抽樣誤差被放大得更明顯，所以結果乘 2
+    當緩衝，寧可買多一點也不要在真正結算時因為「補品用盡」被撤退。"""
+    prof = estimate_fight_profile(player, monster, random.Random(), samples=20)
+    if prof.win_rate <= 0.0:
+        return 0.0
+    time_per_kill = prof.avg_rounds * cfg.round_seconds + cfg.rest_seconds
+    if time_per_kill <= 0:
+        return 0.0
+    regen_per_fight = player.max_hp * cfg.hp_regen_frac_per_sec * time_per_kill
+    net_dmg = prof.avg_damage_taken - regen_per_fight
+    if net_dmg <= 0:
+        return 0.0
+    capped_elapsed = min(elapsed, cfg.offline_cap_hours * 3600)
+    effective = capped_elapsed * cfg.offline_efficiency if offline else capped_elapsed
+    potential_kills = effective / time_per_kill
+    if prof.win_rate < 1.0:
+        expected_before_death = prof.win_rate / (1.0 - prof.win_rate)
+        potential_kills = min(potential_kills, expected_before_death)
+    return net_dmg * potential_kills * 2
 
 
 def _auto_buy_potions(character_id: int, strategy, base_level: int = 1, elapsed: float = 0.0,
-                      offline_cap_hours: float = 8) -> int:
-    """掛機自動補水：買到手上有 buy_potion_upto 瓶（或這次結算涵蓋的時間需要更多，見
-    _auto_buy_cap），錢不夠就買能買的。回傳花了多少 Zeny。"""
+                      cfg=None, player=None, monster=None, offline: bool = False) -> int:
+    """掛機自動補水：買到手上有 buy_potion_upto 瓶（或這次結算涵蓋的時間實際估計需要更多，
+    見 _estimate_hp_deficit），錢不夠就買能買的。回傳花了多少 Zeny。"""
     if not strategy.auto_buy_potion or strategy.buy_potion_upto <= 0:
         return 0
     pid = strategy.buy_potion_id or "red_potion"
     item = _content.items.get(pid)
     if item is None or not item.npc_buy or item.npc_buy <= 0:
         return 0
-    if not _usable(item, base_level) or _heal_amount(item) <= 0:
+    heal = _heal_amount(item)
+    if not _usable(item, base_level) or heal <= 0:
         return 0
     have = inventory.item_qty(character_id, pid)
-    cap = _auto_buy_cap(strategy.buy_potion_upto, elapsed, offline_cap_hours)
+    estimated = 0
+    if strategy.auto_potion:   # 沒開自動喝藥，離線結算本來就不會扣藥，加碼估計沒有意義
+        deficit = _estimate_hp_deficit(player, monster, cfg, elapsed, offline)
+        estimated = min(math.ceil(deficit / heal), _AUTO_BUY_HARD_CAP)
+    cap = max(strategy.buy_potion_upto, estimated)
     want = cap - have
     if want <= 0:
         return 0
@@ -333,9 +362,10 @@ def _auto_buy_potions(character_id: int, strategy, base_level: int = 1, elapsed:
     return 0
 
 
-def _auto_buy_sp_potions(character_id: int, strategy, base_level: int = 1, elapsed: float = 0.0,
-                         offline_cap_hours: float = 8) -> int:
-    """掛機自動補 SP 藥水：道理跟 _auto_buy_potions 一樣，上限照這次結算涵蓋的秒數等比例放大。"""
+def _auto_buy_sp_potions(character_id: int, strategy, base_level: int = 1) -> int:
+    """掛機自動補 SP 藥水：只補到 buy_sp_potion_upto，不隨離線時間加碼——SP 藥水在離線
+    統計結算路徑裡本來就不會被喝掉（見 engine.py 的統計路徑註解），會留到下次上線才用，
+    沒有理由隔越久沒結算就買越多。"""
     if not strategy.auto_buy_sp_potion or strategy.buy_sp_potion_upto <= 0:
         return 0
     pid = strategy.buy_sp_potion_id or "blue_potion"
@@ -345,8 +375,7 @@ def _auto_buy_sp_potions(character_id: int, strategy, base_level: int = 1, elaps
     if not _usable(item, base_level) or _sp_restore_amount(item) <= 0:
         return 0
     have = inventory.item_qty(character_id, pid)
-    cap = _auto_buy_cap(strategy.buy_sp_potion_upto, elapsed, offline_cap_hours)
-    want = cap - have
+    want = strategy.buy_sp_potion_upto - have
     if want <= 0:
         return 0
     current_zeny = characters_repo.get_character(character_id)["zeny"]
@@ -697,9 +726,8 @@ def _settle_current_locked(row, *, force=False, event_cursor: str | None = None)
         )
 
     potion_zeny_spent = _auto_buy_potions(row["id"], strategy, row["base_level"], elapsed=elapsed,
-                                          offline_cap_hours=cfg.offline_cap_hours)
-    potion_zeny_spent += _auto_buy_sp_potions(row["id"], strategy, row["base_level"], elapsed=elapsed,
-                                              offline_cap_hours=cfg.offline_cap_hours)
+                                          cfg=cfg, player=player, monster=monster, offline=offline)
+    potion_zeny_spent += _auto_buy_sp_potions(row["id"], strategy, row["base_level"])
     potion_zeny_spent += _auto_buy_buff_potions(row["id"], strategy, row["base_level"])
     # 買水這筆花費馬上入帳，不管這次有沒有湊出一場戰鬥可結算（下面有提早回傳的分支）
     if potion_zeny_spent:
