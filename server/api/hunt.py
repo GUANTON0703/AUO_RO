@@ -290,18 +290,19 @@ def _pick_sp_potion(character_id: int, preferred_id: str | None = None,
 
 
 _SECONDS_PER_EXTRA_POTION = 2   # 結算涵蓋的時間每多這麼多秒，上限就多讓買一瓶（離線補一大段用）
-_AUTO_BUY_HARD_CAP = 999        # 不管隔多久沒結算，單次自動補水的上限，跟 buy_XXX_upto 的可設上限對齊
+_AUTO_BUY_HARD_CAP = 999        # 不管隔多久沒結算，單次自動補水的絕對上限，跟 buy_XXX_upto 的可設上限對齊
 
 def _auto_buy_cap(strategy_upto: int, elapsed: float, offline_cap_hours: float) -> int:
     """在線維持量 buy_XXX_upto 是給正常一小段一小段結算用的，一次結算涵蓋的時間
     （這次隔了多久沒結算，通常是離線回來一次補一大段）越長，需要的量就越多，
     不然離線一段時間回來常常補品還沒用夠就先被那個「在線維持量」卡到用盡撤退。
     這裡照結算涵蓋的秒數等比例放大上限，正常在線那種秒級的小結算幾乎不影響。
-    elapsed 先按實際戰鬥結算會採用的離線上限（offline_cap_hours）夾住，再套一個絕對天花板
-    （_AUTO_BUY_HARD_CAP），避免玩家隔了好幾天才回來結算時算出離譜的補貨量。"""
+    elapsed 先按實際戰鬥結算會採用的離線上限（offline_cap_hours）夾住，離線加碼的部分再套一個
+    絕對天花板（_AUTO_BUY_HARD_CAP），避免玩家隔了好幾天才回來結算時算出離譜的補貨量；但玩家
+    自己設定的在線維持量（strategy_upto）不受這個天花板限制，一定會補到。"""
     capped_elapsed = min(elapsed, offline_cap_hours * 3600)
-    cap = max(strategy_upto, int(capped_elapsed // _SECONDS_PER_EXTRA_POTION))
-    return min(cap, _AUTO_BUY_HARD_CAP)
+    elapsed_based = min(int(capped_elapsed // _SECONDS_PER_EXTRA_POTION), _AUTO_BUY_HARD_CAP)
+    return max(strategy_upto, elapsed_based)
 
 
 def _auto_buy_potions(character_id: int, strategy, base_level: int = 1, elapsed: float = 0.0,
