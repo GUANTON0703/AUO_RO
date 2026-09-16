@@ -55,7 +55,7 @@ def list_craft(account_id: CurrentAccount):
 
 
 class CraftRequest(BaseModel):
-    times: int = Field(default=1, ge=1, le=10)
+    times: int = Field(default=1, ge=1, le=100)
 
 
 @router.post("/{recipe_id}")

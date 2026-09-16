@@ -361,6 +361,7 @@
           const canOne = r.materials.every((m) => m.have >= m.need);
           const canFive = r.materials.every((m) => m.have >= m.need * 5);
           const canTen = r.materials.every((m) => m.have >= m.need * 10);
+          const canHundred = r.materials.every((m) => m.have >= m.need * 100);
           return `<div class="item" style="align-items:flex-start"><div>
               <div>${esc(r.name)}<span class="pill" style="margin-left:6px">成功率 ${r.success_pct}%</span></div>
               <div class="sub">產出：${esc(r.result_item_name)} ×${r.result_qty}　需製作等級 ${r.required_craft_level}${
@@ -374,6 +375,7 @@
               <button class="btn small" data-craft="${esc(r.id)}" data-times="1"${canOne ? "" : " disabled"}>做 1</button>
               <button class="btn small" data-craft="${esc(r.id)}" data-times="5"${canFive ? "" : " disabled"}>做 5</button>
               <button class="btn small" data-craft="${esc(r.id)}" data-times="10"${canTen ? "" : " disabled"}>做 10</button>
+              <button class="btn small" data-craft="${esc(r.id)}" data-times="100"${canHundred ? "" : " disabled"}>做 100</button>
             </div></div>`;
         }).join("") || "<p class='muted'>還沒有配方</p>";
         box.querySelectorAll("[data-craft]").forEach((b) => {
