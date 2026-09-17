@@ -1,0 +1,67 @@
+{
+  "services": [
+    {
+      "id": "wish_pool",
+      "name": "許願池",
+      "port": 5101,
+      "script": "\\\\tw100049089\\00_MyAgent\\Wishing Well\\app.py",
+      "cwd": "\\\\tw100049089\\00_MyAgent\\Wishing Well",
+      "url": "http://localhost:5101",
+      "python": "auto"
+    },
+    {
+      "id": "roller_mark",
+      "name": "Roller Mark 背污逐站檢",
+      "port": 5102,
+      "script": "\\\\tw100049089\\00_MyAgent\\Roller Mark 背污逐站檢\\前後段拆分版\\HTA版本\\APP.PY",
+      "cwd": "\\\\tw100049089\\00_MyAgent\\Roller Mark 背污逐站檢\\前後段拆分版\\HTA版本",
+      "url": "http://localhost:5102",
+      "python": "auto"
+    },
+    {
+      "id": "lv3",
+      "name": "LV3 資料查詢系統",
+      "port": 5103,
+      "script": "\\\\tw100049089\\00_MyAgent\\LV3\\後端與程式\\app.py",
+      "cwd": "\\\\tw100049089\\00_MyAgent\\LV3\\後端與程式",
+      "url": "http://localhost:5103",
+      "python": "auto"
+    },
+    {
+      "id": "lv3keyin",
+      "name": "新LV3報告 KEY IN 系統",
+      "port": 5104,
+      "script": "\\\\tw100049089\\00_MyAgent\\LV3Keyin\\app.py",
+      "cwd": "\\\\tw100049089\\00_MyAgent\\LV3Keyin",
+      "url": "http://localhost:5104",
+      "python": "auto"
+    },
+    {
+      "id": "yield_query",
+      "name": "良率查詢",
+      "port": 5105,
+      "script": "\\\\tw100049089\\00_MyAgent\\LV3\\良率\\app.py",
+      "cwd": "\\\\tw100049089\\00_MyAgent\\LV3\\良率",
+      "url": "http://10.36.38.240:5105",
+      "python": "auto"
+    },
+    {
+      "id": "id_convert",
+      "name": "大片換中小片ID",
+      "port": 5110,
+      "url": "http://localhost:5110",
+      "script": "\\\\tw100049089\\00_MyAgent\\ID轉換\\api.py",
+      "cwd": "\\\\tw100049089\\00_MyAgent\\ID轉換",
+      "python": "auto"
+    },
+    {
+      "id": "rotxt",
+      "name": "ROtxt 文字版仙境傳說",
+      "port": 8001,
+      "script": "\\\\tw100049089\\ml8bc1\\助工\\個人\\冠豪\\01\\ROtxt-main\\run_server.py",
+      "cwd": "\\\\tw100049089\\ml8bc1\\助工\\個人\\冠豪\\01\\ROtxt-main",
+      "url": "http://localhost:8001",
+      "python": "auto"
+    }
+  ]
+}

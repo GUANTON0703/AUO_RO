@@ -1,13 +1,10 @@
 import json
-import logging
 import sqlite3
 from datetime import datetime, timezone
 
 from server.db import connection
 
 _STAT_COLS = ("str", "agi", "vit", "int", "dex", "luk")
-
-logger = logging.getLogger(__name__)
 
 
 class NameTakenError(Exception):
@@ -67,47 +64,31 @@ def create_within_limit(
 
 
 def list_for_account(account_id: int):
-    try:
-        with connection.get_connection() as conn:
-            return conn.execute(
-                "SELECT * FROM characters WHERE account_id = ? ORDER BY id", (account_id,)
-            ).fetchall()
-    except sqlite3.DatabaseError as exc:
-        logger.error("list_for_account DB error (account_id=%s): %s", account_id, exc)
-        return []
+    with connection.get_connection() as conn:
+        return conn.execute(
+            "SELECT * FROM characters WHERE account_id = ? ORDER BY id", (account_id,)
+        ).fetchall()
 
 
 def count_for_account(account_id: int) -> int:
-    try:
-        with connection.get_connection() as conn:
-            return conn.execute(
-                "SELECT COUNT(*) AS c FROM characters WHERE account_id = ?", (account_id,)
-            ).fetchone()["c"]
-    except sqlite3.DatabaseError as exc:
-        logger.error("count_for_account DB error (account_id=%s): %s", account_id, exc)
-        return 0
+    with connection.get_connection() as conn:
+        return conn.execute(
+            "SELECT COUNT(*) AS c FROM characters WHERE account_id = ?", (account_id,)
+        ).fetchone()["c"]
 
 
 def get_character(character_id: int):
-    try:
-        with connection.get_connection() as conn:
-            return conn.execute(
-                "SELECT * FROM characters WHERE id = ?", (character_id,)
-            ).fetchone()
-    except sqlite3.DatabaseError as exc:
-        logger.error("get_character DB error (character_id=%s): %s", character_id, exc)
-        return None
+    with connection.get_connection() as conn:
+        return conn.execute(
+            "SELECT * FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()
 
 
 def get_character_by_name(name: str):
-    try:
-        with connection.get_connection() as conn:
-            return conn.execute(
-                "SELECT * FROM characters WHERE name = ? COLLATE NOCASE", (name,)
-            ).fetchone()
-    except sqlite3.DatabaseError as exc:
-        logger.error("get_character_by_name DB error (name=%s): %s", name, exc)
-        return None
+    with connection.get_connection() as conn:
+        return conn.execute(
+            "SELECT * FROM characters WHERE name = ? COLLATE NOCASE", (name,)
+        ).fetchone()
 
 
 def names_for_accounts(account_ids: list[int]) -> dict[int, str]:
@@ -115,16 +96,12 @@ def names_for_accounts(account_ids: list[int]) -> dict[int, str]:
     if not account_ids:
         return {}
     placeholders = ",".join("?" * len(account_ids))
-    try:
-        with connection.get_connection() as conn:
-            rows = conn.execute(
-                "SELECT account_id, name FROM characters "
-                "WHERE account_id IN (" + placeholders + ") ORDER BY id",
-                tuple(account_ids),
-            ).fetchall()
-    except sqlite3.DatabaseError as exc:
-        logger.error("names_for_accounts DB error: %s", exc)
-        return {}
+    with connection.get_connection() as conn:
+        rows = conn.execute(
+            f"SELECT account_id, name FROM characters "
+            f"WHERE account_id IN ({placeholders}) ORDER BY id",
+            tuple(account_ids),
+        ).fetchall()
     out: dict[int, str] = {}
     for r in rows:
         out.setdefault(r["account_id"], r["name"])
@@ -223,26 +200,22 @@ def spend_zeny(character_id: int, amount: int) -> bool:
 def get_active_character(account_id: int):
     """回傳這個帳號目前在玩的角色。沒設定過，或設定的角色已經不屬於這帳號
     （例如被刪掉），就退回帳號裡 id 最小（最早建立）的角色。"""
-    try:
-        with connection.get_connection() as conn:
-            acc = conn.execute(
-                "SELECT active_character_id FROM accounts WHERE id = ?", (account_id,)
+    with connection.get_connection() as conn:
+        acc = conn.execute(
+            "SELECT active_character_id FROM accounts WHERE id = ?", (account_id,)
+        ).fetchone()
+        active_id = acc["active_character_id"] if acc else None
+        if active_id is not None:
+            row = conn.execute(
+                "SELECT * FROM characters WHERE id = ? AND account_id = ?",
+                (active_id, account_id),
             ).fetchone()
-            active_id = acc["active_character_id"] if acc else None
-            if active_id is not None:
-                row = conn.execute(
-                    "SELECT * FROM characters WHERE id = ? AND account_id = ?",
-                    (active_id, account_id),
-                ).fetchone()
-                if row is not None:
-                    return row
-            return conn.execute(
-                "SELECT * FROM characters WHERE account_id = ? ORDER BY id LIMIT 1",
-                (account_id,),
-            ).fetchone()
-    except sqlite3.DatabaseError as exc:
-        logger.error("get_active_character DB error (account_id=%s): %s", account_id, exc)
-        return None
+            if row is not None:
+                return row
+        return conn.execute(
+            "SELECT * FROM characters WHERE account_id = ? ORDER BY id LIMIT 1",
+            (account_id,),
+        ).fetchone()
 
 
 def set_active_character(account_id: int, character_id: int) -> bool:
@@ -295,15 +268,11 @@ def set_craft_progress(character_id: int, level: int, exp: int) -> None:
 
 
 def get_recipe_mastery(character_id: int) -> dict:
-    try:
-        with connection.get_connection() as conn:
-            row = conn.execute(
-                "SELECT recipe_mastery FROM characters WHERE id = ?", (character_id,)
-            ).fetchone()
-        return json.loads(row["recipe_mastery"]) if row and row["recipe_mastery"] else {}
-    except sqlite3.DatabaseError as exc:
-        logger.error("get_recipe_mastery DB error (character_id=%s): %s", character_id, exc)
-        return {}
+    with connection.get_connection() as conn:
+        row = conn.execute(
+            "SELECT recipe_mastery FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()
+    return json.loads(row["recipe_mastery"]) if row and row["recipe_mastery"] else {}
 
 
 def set_recipe_mastery(character_id: int, mastery: dict) -> None:
@@ -362,15 +331,11 @@ def reduce_hunt_loot(character_id: int, sold: dict, conn=None) -> None:
 
 
 def get_hunt_strategy(character_id: int) -> dict:
-    try:
-        with connection.get_connection() as conn:
-            row = conn.execute(
-                "SELECT hunt_strategy FROM characters WHERE id = ?", (character_id,)
-            ).fetchone()
-        return json.loads(row["hunt_strategy"]) if row and row["hunt_strategy"] else {}
-    except sqlite3.DatabaseError as exc:
-        logger.error("get_hunt_strategy DB error (character_id=%s): %s", character_id, exc)
-        return {}
+    with connection.get_connection() as conn:
+        row = conn.execute(
+            "SELECT hunt_strategy FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()
+    return json.loads(row["hunt_strategy"]) if row and row["hunt_strategy"] else {}
 
 
 def set_hunt_strategy(character_id: int, strategy: dict) -> None:
@@ -382,15 +347,11 @@ def set_hunt_strategy(character_id: int, strategy: dict) -> None:
 
 
 def get_active_potion_buffs(character_id: int) -> dict:
-    try:
-        with connection.get_connection() as conn:
-            row = conn.execute(
-                "SELECT active_potion_buffs FROM characters WHERE id = ?", (character_id,)
-            ).fetchone()
-        return json.loads(row["active_potion_buffs"]) if row and row["active_potion_buffs"] else {}
-    except sqlite3.DatabaseError as exc:
-        logger.error("get_active_potion_buffs DB error (character_id=%s): %s", character_id, exc)
-        return {}
+    with connection.get_connection() as conn:
+        row = conn.execute(
+            "SELECT active_potion_buffs FROM characters WHERE id = ?", (character_id,)
+        ).fetchone()
+    return json.loads(row["active_potion_buffs"]) if row and row["active_potion_buffs"] else {}
 
 
 def set_active_potion_buffs(character_id: int, buffs: dict) -> None:
